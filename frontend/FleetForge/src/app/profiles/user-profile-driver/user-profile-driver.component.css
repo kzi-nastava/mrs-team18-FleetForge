@@ -61,7 +61,7 @@ form input::placeholder {
 button.changeBtn {
    display: block !important;
   padding: 8px 30px !important;
-  background-color: var(--color-primary) !important;
+  background-color: #ff6600 !important;
   color: white !important;
   font-size: large !important;
   font-weight: 600 !important;
@@ -70,7 +70,7 @@ button.changeBtn {
   letter-spacing: 0.02cm !important;
   border: none !important;
   cursor: pointer !important;
-  margin-top: 25px !important;
+  margin-top: 20px !important;
 }
 
 button.changeBtn:hover {
@@ -83,13 +83,13 @@ button.resetPassBtn {
   margin: 20px auto 0 !important;
   padding: 8px 30px !important;
   background-color: white !important;
-  color:    var(--color-primary) !important;
+  color: #ff6600 !important;
   font-size: large !important;
   font-weight: 600 !important;
   border-radius: 6px !important;
   font-family: 'Poppins', sans-serif !important;
   letter-spacing: 0.02cm !important;
-  border: 2px solid var(--color-primary) !important;
+  border: 2px solid #ff6600 !important;
   cursor: pointer !important;
 }
 
@@ -108,15 +108,17 @@ button.resetPassBtn:hover {
 .user-profile-driver-container {
   display: flex;
   justify-content: center;
-  align-items: center;
-  gap: 350px;
+  align-items: flex-start;
+  gap: 60px;
   padding-top: 20px;
+  flex-wrap: wrap;
 }
 
 .user-profile-driver-container > div {
   display: flex;
   flex-direction: column;
   align-items: center;
+  flex: 0 0 auto;
 }
 
 .user-profile-driver-container > div:last-of-type {
@@ -140,4 +142,32 @@ button.resetPassBtn:hover {
   font-size: 16px;
   font-weight: 500;
   color: #444;
+}
+
+/* Responsive za vece ekrane */
+@media (max-width: 1200px) {
+  .user-profile-driver-container {
+    gap: 40px;
+  }
+
+  .vertical-line {
+    display: none;
+  }
+}
+
+/* Responsive za male ekrane */
+@media (max-width: 768px) {
+  .user-profile-driver-container {
+    flex-direction: column;
+    gap: 40px;
+    padding-top: 20px;
+  }
+
+  .vertical-line {
+    display: none;
+  }
+
+  form {
+    max-width: 320px;
+  }
 }
