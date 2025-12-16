@@ -1,0 +1,23 @@
+<nav class="navbar">
+  <div class="brand">
+    <img class="brand__logo" src="logo.png" alt="FleetForge logo" />
+  </div>
+
+  <div class="nav-right">
+    <ul class="nav-links">
+      @for (item of navItems; track item.path) {
+        <li>
+          <a
+            [routerLink]="item.path"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: item.exact }"
+          >
+            {{ item.label }}
+          </a>
+        </li>
+      }
+    </ul>
+
+    <button type="button" class="login-btn">Login</button>
+  </div>
+</nav>
