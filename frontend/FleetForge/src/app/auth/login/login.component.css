@@ -7,7 +7,6 @@
   align-items: center;
 }
 
-/* Top-left image */
 .brand-image {
   position: absolute;
   top: 10px;
@@ -17,7 +16,7 @@
 }
 
 .login-container {
-  width: 330px;
+  width: 350px;
   display: flex;
   flex-direction: column;
 }
@@ -28,7 +27,7 @@
 }
 
 .title {
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
   color: var(--color-primary);
   font-weight: 500;
 }
@@ -55,7 +54,7 @@ input {
 .forgot-password {
   font-size: 0.85rem;
   text-align: right;
-  margin-bottom: 0.6rem;
+  margin-bottom: 2rem;
   color: var(--color-primary);
   text-decoration: none;
 }
@@ -74,11 +73,6 @@ button:hover {
   background-color: var(--color-primary-dark);
 }
 
-.terms{
-  font-size: 0.6rem;
-  color: var(--color-text-gray);
-}
-
 
 .register {
   margin-top: 1rem;
@@ -86,8 +80,6 @@ button:hover {
   text-align: center;
 }
 
-
-.terms a,
 .register a {
   color: var(--color-primary);
   text-decoration: none;
