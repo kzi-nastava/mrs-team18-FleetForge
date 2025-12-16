@@ -48,7 +48,7 @@ form input {
 }
 
 form input:focus {
-  border-color: #ff6600;
+  border-color: var(--color-primary);
   border-width: 2px;
 }
 
@@ -124,7 +124,7 @@ button.resetPassBtn:hover {
 }
 
 .user-profile-driver-container > div:last-of-type > span {
-  color: #ff6600;
+  color: var(--color-primary);
   font-weight: 600;
   font-size: 24px;
   font-family: 'Poppins', sans-serif;

@@ -47,7 +47,7 @@ form input {
 }
 
 form input:focus {
-  border-color: #ff6600;
+  border-color: var(--color-primary);
   border-width: 2px;
 }
 
