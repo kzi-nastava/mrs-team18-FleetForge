@@ -1,0 +1,184 @@
+/* Base styles from login page */
+.register-page {
+  min-height: 100vh;
+  background-color: var(--color-background);
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+/* Black navbar */
+.register-navbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: #000;
+  color: white;
+  padding: 12px 0;
+  font-weight: 500;
+  font-size: 2.7rem;
+  height: 95px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.navbar-content {
+  width: 800px;
+  max-width: 90%;
+  text-align: left;
+  font-weight: 600;
+}
+
+.navbar-content .highlight {
+  color: var(--color-primary);
+}
+
+.register-container {
+  width: 800px;
+  max-width: 90%;
+  display: flex;
+  flex-direction: column;
+  margin-top: 90px;
+}
+
+/* Form grid layout */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 0.4rem;
+  color: #333;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="password"] {
+  padding: 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-size: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+}
+
+/* File upload styles */
+.file-input-container {
+  position: relative;
+  width: 100%;
+}
+
+.file-input {
+  position: absolute;
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  z-index: -1;
+}
+
+.file-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  width: 100%;
+}
+
+.file-button {
+  background-color: #f0f0f0;
+  border: 1px solid var(--color-border);
+  border-radius: 6px 0 0 6px;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  color: #333;
+  border-right: none;
+  white-space: nowrap;
+}
+
+.file-name {
+  flex-grow: 1;
+  padding: 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0 6px 6px 0;
+  font-size: 0.9rem;
+  color: var(--color-text-gray);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-button:hover {
+  background-color: #e8e8e8;
+}
+
+/* Terms and button */
+.terms {
+  margin-top: 1.5rem;
+  font-size: 0.7rem;
+  color: var(--color-text-gray);
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+button {
+  padding: 0.75rem;
+  background-color: var(--color-primary);
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1.5rem;
+  font-weight: 500;
+  width: 350px;
+  transition: background-color 0.2s;
+  margin: 0 auto;
+  display: block;
+}
+
+button:hover {
+  background-color: var(--color-primary-dark);
+}
+
+.login-link {
+  margin-top: 1.5rem;
+  font-size: 0.8rem;
+  text-align: center;
+  color: #666;
+}
+
+.terms a,
+.login-link a {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.terms a:hover,
+.login-link a:hover {
+  text-decoration: underline;
+}

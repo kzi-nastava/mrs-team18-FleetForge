@@ -1,0 +1,22 @@
+.logo-link {
+  display: inline-block;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.brand-image {
+  position: absolute;
+  top: 10px;
+  left: 50px;
+  height: 130px;
+  width: auto;
+}
+
+.brand-image:hover {
+    filter: brightness(0.9);
+}
+
+.logo-link:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
