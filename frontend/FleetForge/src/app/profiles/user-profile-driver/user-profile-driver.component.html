@@ -1,0 +1,54 @@
+
+
+<div class="user-profile-driver-container">
+<div>
+  <img [src]="imageUrl" class="profilePic" (click)="openFilePicker()">
+  <input
+    type="file"
+    #fileInput
+    accept="image/*"
+    (change)="onFileSelected($event)"
+    style="display: none;"
+  >
+  <form [formGroup]="editDriverInfo" (ngSubmit)="editDriver()">
+    <label for="name">Name</label>
+    <input id="name" formControlName="name" placeholder="Enter your name" required>
+
+    <label for="email">Email</label>
+    <input id="email" formControlName="email" placeholder="Enter your email" required>
+
+    <label for="number">Phone number</label>
+    <input id="number" type="tel" formControlName="number" placeholder="Enter your phone number">
+
+    <label for="age">Age</label>
+    <input id="age" type="number" formControlName="age" placeholder="Enter your age">
+
+    <button class="changeBtn" type="submit">Change</button>
+  </form>
+</div>
+
+<div class="vertical-line"></div>
+
+<div>
+    <span>Vehicle</span>
+  <form [formGroup]="editVehicleInfo" (ngSubmit)="editVehicle()">
+    <label for="carName">Car name</label>
+    <input id="carName" formControlName="carName" placeholder="Enter your car name" required>
+
+    <label for="engineNumber">Engine number</label>
+    <input id="engineNumber" formControlName="engineNumber" placeholder="Enter your engine number" required>
+
+    <label for="licensePlateNumber">License plate number</label>
+    <input id="licensePlateNumber" formControlName="licensePlateNumber" placeholder="Enter your license plate number">
+
+    <label for="passengerNumber">Passenger number</label>
+    <input id="passengerNumber" type="number" formControlName="passengerNumber" placeholder="Enter your passenger number">
+
+    <button class="changeBtn" type="submit">Change</button>
+  </form>
+</div>
+</div>
+
+
+<button class="resetPassBtn" routerLink="/profile-password-reset">Reset password</button>
+<div class="hoursActive">Hours active: 12h 52min </div>
