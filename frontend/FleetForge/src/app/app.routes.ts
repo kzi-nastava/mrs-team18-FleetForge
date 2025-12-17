@@ -11,6 +11,7 @@ import { ForgotPasswordComponent } from './auth/forgot-password/forgot-password.
 import { UserProfileDriverComponent } from './profiles/user-profile-driver/user-profile-driver.component';
 import { UserProfileComponent } from './profiles/user-profile/user-profile.component';
 import { PasswordResetComponent } from './profiles/password-reset/password-reset.component';
+import { DriverHistoryComponent } from './driver/driver-history/driver-history.component';
 
 export const routes: Routes = [
   /** ROUTES WITH NAVBAR */
@@ -21,7 +22,8 @@ export const routes: Routes = [
       { path: '', component: HomeComponent },
       { path: 'profile', component: UserProfileComponent },
       { path: 'profile-driver', component: UserProfileDriverComponent },
-      { path: 'profile-password-reset', component: PasswordResetComponent }
+      { path: 'profile-password-reset', component: PasswordResetComponent },
+      { path: 'driver/ride-history', component: DriverHistoryComponent }
     ]
   },
 
