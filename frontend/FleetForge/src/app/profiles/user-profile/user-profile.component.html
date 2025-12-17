@@ -1,0 +1,28 @@
+
+
+<img [src]="imageUrl" class="profilePic" (click)="openFilePicker()">
+<input
+  type="file"
+  #fileInput
+  accept="image/*"
+  (change)="onFileSelected($event)"
+  style="display: none;"
+>
+
+<form [formGroup]="editUserInfo" (ngSubmit)="edit()">
+  <label for="name">Name</label>
+  <input id="name" formControlName="name" placeholder="Enter your name" required>
+
+  <label for="email">Email</label>
+  <input id="email" formControlName="email" placeholder="Enter your email" required>
+
+  <label for="number">Phone number</label>
+  <input id="number" type="tel" formControlName="number" placeholder="Enter your phone number">
+
+  <label for="age">Age</label>
+  <input id="age" type="number" formControlName="age" placeholder="Enter your age">
+
+  <button class="changeBtn" type="submit">Change</button>
+</form>
+
+<button class="resetPassBtn" routerLink="/profile-password-reset">Reset password</button>
