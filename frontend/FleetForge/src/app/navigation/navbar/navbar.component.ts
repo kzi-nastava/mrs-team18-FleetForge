@@ -47,4 +47,15 @@ export class NavbarComponent {
     this.showProfileMenu = false;
     this.router.navigate(['/']);
   }
+
+  viewProfile(): void {
+    this.userRole$.subscribe(role => {
+      if(role === 'USER'|| role === 'ADMIN'){
+        this.router.navigate(['profile']);
+      }
+      else if(role === 'DRIVER'){
+        this.router.navigate(['profile-driver']);
+      }
+    });
+  }
 }
