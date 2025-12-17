@@ -1,0 +1,65 @@
+<nav class="navbar">
+  <div class="navbar-left">
+    <button
+      type="button"
+      class="logo-btn"
+      (click)="onLogoClick()"
+      [disabled]="!(isAuthenticated$ | async)"
+      aria-label="Toggle sidebar"
+      [attr.aria-disabled]="!(isAuthenticated$ | async)"
+    >
+      <img class="brand__logo" src="logo.png" alt="FleetForge logo" />
+    </button>
+
+    @if (isAuthenticated$ | async; as authed) {
+      <div class="greeting">
+        <div class="greeting-line">Hello, {{ (userRole$ | async) ?? 'user' | lowercase }}</div>
+        <div class="greeting-sub">Have a nice day</div>
+      </div>
+    }
+  </div>
+
+  @if (isAuthenticated$ | async) {
+    <div class="navbar-right">
+      <button type="button" class="icon-btn" aria-label="Notifications">
+        <span class="icon-ring">🔔</span>
+        <span class="icon-badge"></span>
+      </button>
+
+      <div class="divider"></div>
+
+      <div class="profile" (click)="toggleProfileMenu()" tabindex="0">
+        <div class="avatar">{{ ((userRole$ | async) ?? 'U')[0] }}</div>
+        <div class="profile-text">
+          <div class="profile-name">username</div>
+          <div class="profile-role">{{ (userRole$ | async) ?? 'Driver' }}</div>
+        </div>
+        <span class="chevron">▾</span>
+
+        @if (showProfileMenu) {
+          <div class="profile-menu">
+            <button type="button" class="profile-menu-item" (click)="onLogout()">Logout</button>
+          </div>
+        }
+      </div>
+    </div>
+  } @else {
+    <div class="navbar-right">
+        <ul class="nav-links">
+            @for (item of navItems; track item.path) {
+            <li>
+                <a
+                [routerLink]="item.path"
+                routerLinkActive="active"
+                [routerLinkActiveOptions]="{ exact: item.exact }"
+                >
+                {{ item.label }}
+                </a>
+            </li>
+            }
+        </ul>
+
+        <button type="button" class="login-btn" routerLink="/login">Login</button>
+    </div>
+  }
+</nav>
