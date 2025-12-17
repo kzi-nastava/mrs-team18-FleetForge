@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { LogoComponent } from '../../shared/logo/logo.component';
-import { UserService } from '../../profiles/service/user-service';
+import { SidebarService } from '../../navigation/sidebar/sidebar.service';
+import { UserRole } from '../../navigation/sidebar/sidebar-config';
 
 @Component({
   selector: 'app-login',
@@ -10,14 +11,31 @@ import { UserService } from '../../profiles/service/user-service';
   styleUrl: './login.component.css',
 })
 export class LoginComponent {
-  constructor(private userService: UserService, private router: Router) {}
+  constructor(
+    private sidebarService: SidebarService,
+    private router: Router
+  ) {}
 
-  goToProfile(): void {
-    const user = this.userService.user();
-    if (user?.id === 2) {
-      this.router.navigate(['profile-driver']);
-    } else {
-      this.router.navigate(['profile']);
-    }
+  // Mock login - simulates successful login for testing
+  mockLogin(role: UserRole): void {
+    // Set authentication state
+    this.sidebarService.setAuthenticated(true);
+    // Set user role
+    this.sidebarService.setUserRole(role);
+    // Navigate to home page
+    this.router.navigate(['/']);
+  }
+
+  // Quick test methods for each role
+  loginAsUser(): void {
+    this.mockLogin('USER');
+  }
+
+  loginAsDriver(): void {
+    this.mockLogin('DRIVER');
+  }
+
+  loginAsAdmin(): void {
+    this.mockLogin('ADMIN');
   }
 }

@@ -13,10 +13,18 @@
       <input id="password" type="password" placeholder="Enter your password" required />
 
       <a href="/forgot-password" class="forgot-password">Forgot password?</a>
-      <button type="submit" (click)="goToProfile()">Login</button>
+      <button type="submit">Login</button>
     </form>
 
-
+    <!-- Temporary Mock Login Buttons for Testing -->
+    <div class="mock-login-section">
+      <p style="margin-top: 20px; font-size: 14px; color: #666;">Quick Test Login:</p>
+      <div style="display: flex; gap: 10px; margin-top: 10px;">
+        <button type="button" (click)="loginAsUser()" style="background: #28a745;">Login as USER</button>
+        <button type="button" (click)="loginAsDriver()" style="background: #007bff;">Login as DRIVER</button>
+        <button type="button" (click)="loginAsAdmin()" style="background: #dc3545;">Login as ADMIN</button>
+      </div>
+    </div>
 
     <p class="register">
       Don’t have an account?

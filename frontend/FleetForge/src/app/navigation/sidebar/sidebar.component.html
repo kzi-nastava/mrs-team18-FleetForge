@@ -1,0 +1,43 @@
+<!-- Backdrop overlay - closes sidebar when clicked on mobile -->
+<div
+  class="sidebar-backdrop"
+  [class.active]="isOpen$ | async"
+  (click)="onBackdropClick()"
+></div>
+
+<!-- Main sidebar container -->
+<aside class="sidebar" [class.open]="isOpen$ | async">
+  <!-- Logo section at the top of sidebar -->
+  <div class="sidebar-header">
+    <img class="sidebar-logo" src="logo.png" alt="FleetForge logo" />
+  </div>
+
+  <!-- Navigation menu items based on user role -->
+  <nav class="sidebar-nav">
+    <!-- Loop through menu items for current role -->
+    @for (item of menuItems; track item.label) {
+      @if (item.action === 'panic') {
+        <!-- Special PANIC button styling -->
+        <button
+          class="sidebar-item panic-btn"
+          [ngClass]="item.class"
+        >
+          <span class="item-icon">{{ item.icon }}</span>
+          <span class="item-label">{{ item.label }}</span>
+        </button>
+      } @else {
+        <!-- Regular menu items with navigation -->
+        <a
+          class="sidebar-item"
+          [routerLink]="item.path"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          (click)="onMenuItemClick()"
+        >
+          <span class="item-icon">{{ item.icon }}</span>
+          <span class="item-label">{{ item.label }}</span>
+        </a>
+      }
+    }
+  </nav>
+</aside>
