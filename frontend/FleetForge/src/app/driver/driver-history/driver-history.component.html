@@ -1,0 +1,72 @@
+<div class="driver-dashboard">
+
+  <!-- Title and Search -->
+  <div class="header-section">
+    <h2 class="dashboard-title">Ride history</h2>
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input 
+        type="text" 
+        placeholder="Search" 
+        [(ngModel)]="searchQuery"
+        class="search-input"
+      />
+    </div>
+  </div>
+
+  <!-- Latest Rides Section -->
+  <div class="rides-section">
+    <h3 class="section-title">Latest Rides</h3>
+    
+    <div class="table-container">
+      <table class="rides-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Pick up address</th>
+            <th>Drop off address</th>
+            <th>Ride date</th>
+            <th>Total Cost</th>
+            <th>Cancellation Status</th>
+            <th>Panic Activation</th>
+            <th>Feedback</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let ride of rides">
+            <td>
+              <div class="passenger-info">
+                <div class="passenger-name">{{ ride.name }}</div>
+                <div class="ride-id">{{ ride.id }}</div>
+              </div>
+            </td>
+            <td>{{ ride.pickupAddress }}</td>
+            <td>{{ ride.dropoffAddress }}</td>
+            <td>{{ ride.rideDate }}</td>
+            <td>{{ ride.totalCost.toFixed(2) }}</td>
+            <td>{{ ride.cancellationStatus }}</td>
+            <td class="panic-cell">
+              <span class="panic-icon" [class.panic-active]="ride.panicActivation">
+                {{ ride.panicActivation ? '✓' : '✕' }}
+              </span>
+            </td>
+            <td class="feedback-cell">
+              <div class="stars" *ngIf="ride.feedback > 0">
+                <span 
+                  *ngFor="let filled of getStarArray(ride.feedback)" 
+                  class="star"
+                  [class.filled]="filled"
+                >
+                  ★
+                </span>
+              </div>
+              <div class="waiting-feedback" *ngIf="ride.feedback === 0">
+                Waiting
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
