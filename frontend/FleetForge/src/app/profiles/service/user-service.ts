@@ -9,10 +9,11 @@ export class UserService {
   private _user=signal<User>(
     {
       id:2,
-      name:'Milos',
+      firstName:'Milos',
+      lastName:'Damjanovic',
       email:'milosdamjanovic@gmail.com',
       number:323432432,
-      age:23
+      homeAddress:'Bulevar Oslobodjenja 22',
     }
   )
   user=this._user.asReadonly()
@@ -24,10 +25,12 @@ export class UserService {
   private _vehicle=signal<Vehicle>(
     {
       id:1,
-      carName:'Toyota',
-      engineNumber:'EN123456',
+      model:'Toyota',
+      type:'standard',
       licensePlateNumber:'BG1234AB',
-      passengerNumber:4
+      passengerNumber:4,
+      isBabySeatAvailable:false,
+      isPetFriendly:false
     }
   )
   vehicle=this._vehicle.asReadonly()
