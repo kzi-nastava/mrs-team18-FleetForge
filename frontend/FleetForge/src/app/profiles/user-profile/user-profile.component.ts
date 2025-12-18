@@ -25,10 +25,11 @@ import { MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialo
 })
 export class UserProfileComponent implements OnInit {
   editUserInfo=new FormGroup({
-    name: new FormControl('', Validators.required),
+    firstName: new FormControl('', Validators.required),
+    lastName: new FormControl('', Validators.required),
     email: new FormControl('', Validators.required),
     number: new FormControl('',Validators.required),
-    age: new FormControl('',Validators.required)
+    address: new FormControl('',Validators.required)
   });
   protected userShow: Signal<User>;
   constructor(private userService: UserService) {
@@ -38,10 +39,11 @@ export class UserProfileComponent implements OnInit {
   ngOnInit(): void {
     const currentUser = this.userShow();
     this.editUserInfo.patchValue({
-      name: currentUser.name,
+      firstName: currentUser.firstName,
+      lastName: currentUser.lastName,
       email: currentUser.email,
       number: currentUser.number.toString(),
-      age: currentUser.age.toString()
+      address: currentUser.homeAddress
     });
   }
 
@@ -50,10 +52,11 @@ edit(): void {
 
     const user: User = {
        id: Math.random(),
-      name: this.editUserInfo.value.name ?? '',
+      firstName: this.editUserInfo.value.firstName ?? '',
+      lastName: this.editUserInfo.value.lastName ?? '',
       email: this.editUserInfo.value.email ?? '',
       number: Number(this.editUserInfo.value.number) || 0,
-      age: Number(this.editUserInfo.value.age) || 0
+      homeAddress: this.editUserInfo.value.address ?? ''
     };
 
     this.userService.changeUser(user);

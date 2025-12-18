@@ -27,10 +27,11 @@ editDriver(): void {
     if (this.editDriverInfo.invalid) return;
     const user: User = {
        id: Math.random(),
-      name: this.editDriverInfo.value.name ?? '',
+      firstName: this.editDriverInfo.value.firstName ?? '',
+      lastName: this.editDriverInfo.value.lastName ?? '',
       email: this.editDriverInfo.value.email ?? '',
       number: Number(this.editDriverInfo.value.number) || 0,
-      age: Number(this.editDriverInfo.value.age) || 0
+      homeAddress: this.editDriverInfo.value.homeAddress ?? ''
     };
     this.userService.changeUser(user);
 }
@@ -39,10 +40,12 @@ editVehicle(): void {
 
   const vehicle: Vehicle={
     id: Math.random(),
-    carName: this.editVehicleInfo.value.carName ?? '',
-    engineNumber: this.editVehicleInfo.value.engineNumber ?? '',
+    model: this.editVehicleInfo.value.model ?? '',
+    type: this.editVehicleInfo.value.type as 'standard' | 'luxury' | 'suv',
     licensePlateNumber: this.editVehicleInfo.value.licensePlateNumber ?? '',
-    passengerNumber: Number(this.editVehicleInfo.value.passengerNumber) || 0
+    passengerNumber: Number(this.editVehicleInfo.value.passengerNumber) || 0,
+    isBabySeatAvailable: this.editVehicleInfo.value.isBabySeatAvailable ?? false,
+    isPetFriendly: this.editVehicleInfo.value.isPetFriendly ?? false
   };
   this.userService.changeVehicle(vehicle);
 }
@@ -64,10 +67,11 @@ editVehicle(): void {
   }
 
   editDriverInfo=new FormGroup({
-    name: new FormControl('', Validators.required),
+    firstName: new FormControl('', Validators.required),
+    lastName: new FormControl('', Validators.required),
     email: new FormControl('', Validators.required),
     number: new FormControl('',Validators.required),
-    age: new FormControl('',Validators.required)
+    homeAddress : new FormControl('',Validators.required)
   });
   protected userShow: Signal<User>;
   protected vehicleShow: Signal<Vehicle>;
@@ -78,24 +82,29 @@ editVehicle(): void {
 ngOnInit(): void {
     const currentUser = this.userShow();
     this.editDriverInfo.patchValue({
-      name: currentUser.name,
+      firstName: currentUser.firstName,
+      lastName: currentUser.lastName,
       email: currentUser.email,
       number: currentUser.number.toString(),
-      age: currentUser.age.toString()
+      homeAddress: currentUser.homeAddress
     });
     const currentVehicle = this.vehicleShow();
     this.editVehicleInfo.patchValue({
-      carName: currentVehicle.carName,
-      engineNumber: currentVehicle.engineNumber,
+      model: currentVehicle.model,
+      type: currentVehicle.type,
       licensePlateNumber: currentVehicle.licensePlateNumber,
-      passengerNumber: currentVehicle.passengerNumber.toString()
+      passengerNumber: currentVehicle.passengerNumber.toString(),
+      isBabySeatAvailable: currentVehicle.isBabySeatAvailable,
+      isPetFriendly: currentVehicle.isPetFriendly
     });
   }
   editVehicleInfo=new FormGroup({
-    carName: new FormControl('', Validators.required),
-    engineNumber: new FormControl('', Validators.required),
+    model: new FormControl('', Validators.required),
+    type: new FormControl('', Validators.required),
     licensePlateNumber: new FormControl('',Validators.required),
-    passengerNumber: new FormControl('',Validators.required)
+    passengerNumber: new FormControl('',Validators.required),
+    isBabySeatAvailable: new FormControl(false),
+    isPetFriendly: new FormControl(false)
   });
   // protected vehicleShow: Signal<User>;
   // constructor(private vehicleService: UserService) {

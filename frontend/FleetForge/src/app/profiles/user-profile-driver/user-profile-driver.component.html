@@ -11,8 +11,11 @@
     style="display: none;"
   >
   <form [formGroup]="editDriverInfo" (ngSubmit)="editDriver()">
-    <label for="name">Name</label>
-    <input id="name" formControlName="name" placeholder="Enter your name" required>
+    <label for="firstName">First Name</label>
+    <input id="firstName" formControlName="firstName" placeholder="Enter your first name" required>
+
+    <label for="lastName">Last Name</label>
+    <input id="lastName" formControlName="lastName" placeholder="Enter your last name" required>
 
     <label for="email">Email</label>
     <input id="email" formControlName="email" placeholder="Enter your email" required>
@@ -20,8 +23,8 @@
     <label for="number">Phone number</label>
     <input id="number" type="tel" formControlName="number" placeholder="Enter your phone number">
 
-    <label for="age">Age</label>
-    <input id="age" type="number" formControlName="age" placeholder="Enter your age">
+    <label for="homeAddress">Home Address</label>
+    <input id="homeAddress" type="text" formControlName="homeAddress" placeholder="Enter your home address">
 
     <button class="changeBtn" type="submit">Change</button>
   </form>
@@ -32,17 +35,36 @@
 <div>
     <span>Vehicle</span>
   <form [formGroup]="editVehicleInfo" (ngSubmit)="editVehicle()">
-    <label for="carName">Car name</label>
-    <input id="carName" formControlName="carName" placeholder="Enter your car name" required>
+    <label for="model">Car name</label>
+    <input id="model" formControlName="model" placeholder="Enter your car name" required>
 
-    <label for="engineNumber">Engine number</label>
-    <input id="engineNumber" formControlName="engineNumber" placeholder="Enter your engine number" required>
+    <label for="type">Engine number</label>
+    <select id="type" formControlName="type" required>
+      <option value="" disabled selected>Select vehicle type</option>
+      <option value="standard">Standard</option>
+      <option value="luxury">Luxury</option>
+      <option value="suv">SUV</option>
+    </select>
 
     <label for="licensePlateNumber">License plate number</label>
     <input id="licensePlateNumber" formControlName="licensePlateNumber" placeholder="Enter your license plate number">
 
     <label for="passengerNumber">Passenger number</label>
     <input id="passengerNumber" type="number" formControlName="passengerNumber" placeholder="Enter your passenger number">
+
+    <div class="checkbox-row">
+      <label class="checkbox">
+        <input id="isBabySeatAvailable" type="checkbox" formControlName="isBabySeatAvailable">
+        <span>Is baby seat available</span>
+      </label>
+    </div>
+
+    <div class="checkbox-row">
+      <label class="checkbox">
+        <input id="isPetFriendly" type="checkbox" formControlName="isPetFriendly">
+        <span>Is pet friendly</span>
+      </label>
+    </div>
 
     <button class="changeBtn" type="submit">Change</button>
   </form>

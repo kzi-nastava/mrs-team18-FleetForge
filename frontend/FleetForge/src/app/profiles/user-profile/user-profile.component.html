@@ -10,8 +10,11 @@
 >
 
 <form [formGroup]="editUserInfo" (ngSubmit)="edit()">
-  <label for="name">Name</label>
-  <input id="name" formControlName="name" placeholder="Enter your name" required>
+  <label for="firstName">First Name</label>
+  <input id="firstName" formControlName="firstName" placeholder="Enter your first name" required>
+
+  <label for="lastName">Last Name</label>
+  <input id="lastName" formControlName="lastName" placeholder="Enter your last name" required>
 
   <label for="email">Email</label>
   <input id="email" formControlName="email" placeholder="Enter your email" required>
@@ -19,8 +22,8 @@
   <label for="number">Phone number</label>
   <input id="number" type="tel" formControlName="number" placeholder="Enter your phone number">
 
-  <label for="age">Age</label>
-  <input id="age" type="number" formControlName="age" placeholder="Enter your age">
+  <label for="address">Home address</label>
+  <input id="address" type="text" formControlName="address" placeholder="Enter your home address">
 
   <button class="changeBtn" type="submit">Change</button>
 </form>

@@ -1,7 +1,9 @@
 export interface Vehicle{
     id:number;
-    carName:string;
-    engineNumber:string;
+    model:string;
+    type:'standard' | 'luxury' | 'suv';
     licensePlateNumber:string;
-    passengerNumber:number
+    passengerNumber:number,
+    isBabySeatAvailable:boolean;
+    isPetFriendly:boolean;
 }
