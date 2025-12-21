@@ -35,10 +35,10 @@
 <div>
     <span>Vehicle</span>
   <form [formGroup]="editVehicleInfo" (ngSubmit)="editVehicle()">
-    <label for="model">Car name</label>
+    <label for="model">Model</label>
     <input id="model" formControlName="model" placeholder="Enter your car name" required>
 
-    <label for="type">Engine number</label>
+    <label for="type">Vehicle type</label>
     <select id="type" formControlName="type" required>
       <option value="" disabled selected>Select vehicle type</option>
       <option value="standard">Standard</option>
