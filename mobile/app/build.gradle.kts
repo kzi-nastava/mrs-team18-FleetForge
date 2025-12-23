@@ -4,7 +4,7 @@ plugins {
 
 android {
     namespace = "com.ognjen.fleetforge"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.ognjen.fleetforge"
@@ -32,11 +32,19 @@ android {
 }
 
 dependencies {
-
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
+
+    // Fragment support
+    implementation("androidx.fragment:fragment:1.8.9")
+
+    // Navigation Component (for bottom nav)
+    implementation("androidx.navigation:navigation-fragment:2.9.6")
+    implementation("androidx.navigation:navigation-ui:2.9.6")
+
+    // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
