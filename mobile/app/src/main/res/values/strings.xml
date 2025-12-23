@@ -1,3 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">FleetForge</string>
+    <string name="app_name">Fleet Forge</string>
+
+    <string name="nav_home">Home</string>
+    <string name="nav_profile">Profile</string>
+    <string name="nav_dashboard">Dashboard</string>
+    <string name="nav_current_ride">Current</string>
+    <string name="nav_history">History</string>
+    <string name="nav_chat">Chat</string>
+    <string name="nav_register_driver">Register</string>
+    <string name="nav_block_users">Block</string>
+    <string name="nav_panic_status">Panic</string>
 </resources>
