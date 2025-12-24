@@ -91,7 +91,11 @@ public class MainActivity extends AppCompatActivity {
         }
 
         else if (itemId == R.id.nav_profile) {
-            return new ProfileFragment();
+            if(currentRole==UserRole.DRIVER){
+                return new DriverProfile();
+            }else {
+                return new UserProfile();
+            }
         }else if (itemId == R.id.nav_home) {
             return PlaceholderFragment.newInstance("Home");
         }else if (itemId == R.id.nav_dashboard) {
