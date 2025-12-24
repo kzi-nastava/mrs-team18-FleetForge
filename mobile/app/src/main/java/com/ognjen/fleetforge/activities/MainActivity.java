@@ -1,4 +1,4 @@
-package com.ognjen.fleetforge;
+package com.ognjen.fleetforge.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -6,10 +6,17 @@ import android.view.MenuItem;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+
+import com.ognjen.fleetforge.fragments.driver.DriverHistoryFragment;
+import com.ognjen.fleetforge.fragments.PlaceholderFragment;
+import com.ognjen.fleetforge.fragments.common.ProfileFragment;
+import com.ognjen.fleetforge.R;
+import com.ognjen.fleetforge.fragments.unregistered.UnregisteredFragment;
 import com.ognjen.fleetforge.model.UserRole;
 import com.ognjen.fleetforge.utils.AuthManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-
+import com.ognjen.fleetforge.DriverProfile;
+import com.ognjen.fleetforge.UserProfile;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -100,9 +107,15 @@ public class MainActivity extends AppCompatActivity {
             return PlaceholderFragment.newInstance("Home");
         }else if (itemId == R.id.nav_dashboard) {
             return PlaceholderFragment.newInstance("Dashboard");
-        } else if (itemId == R.id.nav_history) {
+        } else if (itemId == R.id.nav_history_user) {
             return PlaceholderFragment.newInstance("Ride History");
-        } else if (itemId == R.id.nav_chat) {
+        }else if (itemId == R.id.nav_history_driver) {
+            return new DriverHistoryFragment();
+        }
+        else if (itemId == R.id.nav_history_admin) {
+            return PlaceholderFragment.newInstance("Ride History");
+        }
+        else if (itemId == R.id.nav_chat) {
             return PlaceholderFragment.newInstance("Live Chat");
         }
         else if (itemId == R.id.nav_current_ride) {

@@ -15,7 +15,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.ognjen.fleetforge.utils.AuthManager;
-
+import com.ognjen.fleetforge.activities.MainActivity;
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link DriverProfile#newInstance} factory method to
