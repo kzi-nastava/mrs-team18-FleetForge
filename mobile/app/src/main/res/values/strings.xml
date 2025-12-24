@@ -22,4 +22,9 @@
     <string name="app_logo">App Logo</string>
     <string name="forgot_password_message">Enter your email and we’ll send you a link to reset your password</string>
     <string name="send">Send</string>
+    <string name="please_enter_your_new_password_below">Please enter your new password below.</string>
+    <string name="reset_password">Reset Password</string>
+    <string name="new_password">New Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="confirm">Confirm</string>
 </resources>
