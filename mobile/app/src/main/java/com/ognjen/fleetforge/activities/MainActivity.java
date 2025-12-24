@@ -9,14 +9,13 @@ import androidx.fragment.app.Fragment;
 
 import com.ognjen.fleetforge.fragments.driver.DriverHistoryFragment;
 import com.ognjen.fleetforge.fragments.PlaceholderFragment;
-import com.ognjen.fleetforge.fragments.common.ProfileFragment;
 import com.ognjen.fleetforge.R;
 import com.ognjen.fleetforge.fragments.unregistered.UnregisteredFragment;
 import com.ognjen.fleetforge.model.UserRole;
 import com.ognjen.fleetforge.utils.AuthManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.ognjen.fleetforge.DriverProfile;
-import com.ognjen.fleetforge.UserProfile;
+import com.ognjen.fleetforge.fragments.driver.DriverProfile;
+import com.ognjen.fleetforge.fragments.user.UserProfile;
 
 public class MainActivity extends AppCompatActivity {
 
