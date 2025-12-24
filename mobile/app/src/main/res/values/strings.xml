@@ -29,4 +29,15 @@
     <string name="new_password">New Password</string>
     <string name="confirm_password">Confirm Password</string>
     <string name="confirm">Confirm</string>
+    <string name="complete_your_profile">Complete Your Profile</string>
+    <string name="step_3_of_3">Step 3 of 3</string>
+    <string name="first_name">First Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="home_address">Home Address</string>
+    <string name="secure_your_account">Secure Your Account</string>
+    <string name="step_2_of_3">Step 2 of 3</string>
+    <string name="next">Next</string>
+    <string name="become_a_fleetforge_user">Become a FleetForge User</string>
+    <string name="step_1_of_3">Step 1 of 3</string>
+    <string name="phone_number">Phone Number</string>
 </resources>

@@ -11,6 +11,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private MaterialButton btnLogin;
     private TextView tvForgotPassword;
+    private TextView tvRegister;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,6 +25,7 @@ public class LoginActivity extends AppCompatActivity {
     private void initViews() {
         btnLogin = findViewById(R.id.btn_login);
         tvForgotPassword = findViewById(R.id.tv_forgot_password);
+        tvRegister = findViewById(R.id.tv_register);
     }
 
     private void setupListeners() {
@@ -34,6 +36,11 @@ public class LoginActivity extends AppCompatActivity {
 
         tvForgotPassword.setOnClickListener(v -> {
             Intent intent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
+            startActivity(intent);
+        });
+
+        tvRegister.setOnClickListener(v -> {
+            Intent intent = new Intent(LoginActivity.this, RegistrationActivity.class);
             startActivity(intent);
         });
 
