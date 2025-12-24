@@ -1,8 +1,10 @@
-package com.ognjen.fleetforge;
+package com.ognjen.fleetforge.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.ognjen.fleetforge.R;
 import com.ognjen.fleetforge.model.UserRole;
 import com.ognjen.fleetforge.utils.AuthManager;
 import com.google.android.material.button.MaterialButton;

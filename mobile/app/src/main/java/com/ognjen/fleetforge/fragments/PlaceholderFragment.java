@@ -1,4 +1,4 @@
-package com.ognjen.fleetforge;
+package com.ognjen.fleetforge.fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -8,6 +8,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
+import com.ognjen.fleetforge.R;
 
 public class PlaceholderFragment extends Fragment {
     // Used for navigation testing, will be removed later

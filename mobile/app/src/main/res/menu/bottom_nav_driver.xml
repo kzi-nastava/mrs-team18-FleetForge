@@ -7,9 +7,9 @@
         android:icon="@android:drawable/ic_menu_view" />
 
     <item
-        android:id="@+id/nav_history"
+        android:id="@+id/nav_history_driver"
         android:title="History"
-        android:icon="@drawable/history" />
+        android:icon="@drawable/ic_history" />
 
     <item
         android:id="@+id/nav_chat"
@@ -19,6 +19,6 @@
     <item
         android:id="@+id/nav_profile"
         android:title="Profile"
-        android:icon="@drawable/profile" />
+        android:icon="@drawable/ic_profile" />
 
 </menu>

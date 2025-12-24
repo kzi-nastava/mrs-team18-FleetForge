@@ -1,4 +1,4 @@
-package com.ognjen.fleetforge;
+package com.ognjen.fleetforge.fragments.common;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,6 +9,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
+import com.ognjen.fleetforge.R;
+import com.ognjen.fleetforge.activities.MainActivity;
+import com.ognjen.fleetforge.activities.MockLoginActivity;
 import com.ognjen.fleetforge.model.UserRole;
 import com.ognjen.fleetforge.utils.AuthManager;
 import com.google.android.material.button.MaterialButton;

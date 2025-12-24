@@ -1,4 +1,4 @@
-package com.ognjen.fleetforge;
+package com.ognjen.fleetforge.fragments.unregistered;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -7,6 +7,8 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
+import com.ognjen.fleetforge.R;
 
 
 public class UnregisteredFragment extends Fragment {
