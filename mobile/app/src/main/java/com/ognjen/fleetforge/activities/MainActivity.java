@@ -15,7 +15,8 @@ import com.ognjen.fleetforge.fragments.unregistered.UnregisteredFragment;
 import com.ognjen.fleetforge.model.UserRole;
 import com.ognjen.fleetforge.utils.AuthManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-
+import com.ognjen.fleetforge.DriverProfile;
+import com.ognjen.fleetforge.UserProfile;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -97,7 +98,11 @@ public class MainActivity extends AppCompatActivity {
         }
 
         else if (itemId == R.id.nav_profile) {
-            return new ProfileFragment();
+            if(currentRole==UserRole.DRIVER){
+                return new DriverProfile();
+            }else {
+                return new UserProfile();
+            }
         }else if (itemId == R.id.nav_home) {
             return PlaceholderFragment.newInstance("Home");
         }else if (itemId == R.id.nav_dashboard) {
