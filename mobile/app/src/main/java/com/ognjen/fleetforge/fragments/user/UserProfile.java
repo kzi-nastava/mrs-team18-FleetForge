@@ -1,4 +1,4 @@
-package com.ognjen.fleetforge;
+package com.ognjen.fleetforge.fragments.user;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,6 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.ognjen.fleetforge.fragments.common.PasswordChangeProfile;
+import com.ognjen.fleetforge.R;
 import com.ognjen.fleetforge.utils.AuthManager;
 import com.ognjen.fleetforge.activities.MainActivity;
 

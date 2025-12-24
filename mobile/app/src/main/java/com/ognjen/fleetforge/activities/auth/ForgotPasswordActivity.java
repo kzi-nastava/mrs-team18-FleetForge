@@ -1,4 +1,4 @@
-package com.ognjen.fleetforge;
+package com.ognjen.fleetforge.activities.auth;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -6,6 +6,7 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.button.MaterialButton;
+import com.ognjen.fleetforge.R;
 
 public class ForgotPasswordActivity extends AppCompatActivity {
 

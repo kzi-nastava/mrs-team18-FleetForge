@@ -1,4 +1,4 @@
-package com.ognjen.fleetforge;
+package com.ognjen.fleetforge.fragments.auth;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,6 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.android.material.button.MaterialButton;
+import com.ognjen.fleetforge.R;
+import com.ognjen.fleetforge.activities.auth.LoginActivity;
 
 public class RegisterProfileFragment extends Fragment {
 

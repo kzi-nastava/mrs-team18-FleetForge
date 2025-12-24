@@ -1,10 +1,11 @@
-package com.ognjen.fleetforge;
+package com.ognjen.fleetforge.activities.auth;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.button.MaterialButton;
+import com.ognjen.fleetforge.R;
 import com.ognjen.fleetforge.activities.MockLoginActivity;
 
 public class LoginActivity extends AppCompatActivity {

@@ -1,4 +1,4 @@
-package com.ognjen.fleetforge;
+package com.ognjen.fleetforge.fragments.driver;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
@@ -14,6 +14,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.ognjen.fleetforge.fragments.common.PasswordChangeProfile;
+import com.ognjen.fleetforge.R;
 import com.ognjen.fleetforge.utils.AuthManager;
 import com.ognjen.fleetforge.activities.MainActivity;
 /**

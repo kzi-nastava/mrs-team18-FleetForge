@@ -1,4 +1,4 @@
-package com.ognjen.fleetforge;
+package com.ognjen.fleetforge.fragments.auth;
 
 import android.os.Bundle;
 
@@ -9,20 +9,21 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.android.material.button.MaterialButton;
+import com.ognjen.fleetforge.R;
 
-public class RegisterContactFragment extends Fragment {
+public class RegisterSecurityFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_register_contact, container, false);
+        View view = inflater.inflate(R.layout.fragment_register_security, container, false);
 
         MaterialButton btnNext = view.findViewById(R.id.btn_next);
         btnNext.setOnClickListener(v -> {
             requireActivity().getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.register_container, new RegisterSecurityFragment())
+                    .replace(R.id.register_container, new RegisterProfileFragment())
                     .addToBackStack(null)
                     .commit();
         });
