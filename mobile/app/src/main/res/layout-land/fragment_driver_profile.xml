@@ -60,18 +60,17 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/addressIL"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="250dp"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:layout_marginStart="1dp"
             android:layout_marginTop="32dp"
+
             android:layout_marginEnd="1dp"
-
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            app:boxCornerRadiusTopStart="8dp"
-            app:boxCornerRadiusTopEnd="8dp"
-            app:boxCornerRadiusBottomStart="8dp"
             app:boxCornerRadiusBottomEnd="8dp"
-
+            app:boxCornerRadiusBottomStart="8dp"
+            app:boxCornerRadiusTopEnd="8dp"
+            app:boxCornerRadiusTopStart="8dp"
 
 
             app:layout_constraintEnd_toEndOf="parent"
@@ -86,15 +85,15 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/firstNameIL"
-            android:layout_width="250dp"
-            android:layout_height="50dp"
-            android:layout_marginTop="32dp"
-
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            app:boxCornerRadiusTopStart="8dp"
-            app:boxCornerRadiusTopEnd="8dp"
-            app:boxCornerRadiusBottomStart="8dp"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+
+            android:layout_marginTop="32dp"
             app:boxCornerRadiusBottomEnd="8dp"
+            app:boxCornerRadiusBottomStart="8dp"
+            app:boxCornerRadiusTopEnd="8dp"
+            app:boxCornerRadiusTopStart="8dp"
 
 
             app:layout_constraintEnd_toEndOf="parent"
@@ -109,16 +108,15 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/lastNameIL"
-            android:layout_width="250dp"
-            android:layout_height="50dp"
-            android:layout_marginTop="32dp"
-
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            app:boxCornerRadiusTopStart="8dp"
-            app:boxCornerRadiusTopEnd="8dp"
-            app:boxCornerRadiusBottomStart="8dp"
-            app:boxCornerRadiusBottomEnd="8dp"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
 
+            android:layout_marginTop="32dp"
+            app:boxCornerRadiusBottomEnd="8dp"
+            app:boxCornerRadiusBottomStart="8dp"
+            app:boxCornerRadiusTopEnd="8dp"
+            app:boxCornerRadiusTopStart="8dp"
 
 
             app:layout_constraintEnd_toEndOf="parent"
@@ -133,17 +131,17 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/emailIL"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="250dp"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:layout_marginStart="1dp"
             android:layout_marginTop="32dp"
-            android:layout_marginEnd="1dp"
 
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            app:boxCornerRadiusTopStart="8dp"
-            app:boxCornerRadiusTopEnd="8dp"
-            app:boxCornerRadiusBottomStart="8dp"
+            android:layout_marginEnd="1dp"
             app:boxCornerRadiusBottomEnd="8dp"
+            app:boxCornerRadiusBottomStart="8dp"
+            app:boxCornerRadiusTopEnd="8dp"
+            app:boxCornerRadiusTopStart="8dp"
 
 
             app:layout_constraintEnd_toEndOf="parent"
@@ -160,7 +158,7 @@
             android:id="@+id/phoneNumberIL"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="250dp"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:layout_marginStart="1dp"
             android:layout_marginTop="32dp"
 
@@ -199,7 +197,7 @@
             android:id="@+id/vehicleModelTV"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="250dp"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:layout_marginStart="1dp"
             android:layout_marginTop="32dp"
 
@@ -239,14 +237,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Vehicle type"
-                android:inputType="none"/>
+                android:inputType="none"
+                android:paddingStart="16dp"  android:paddingEnd="16dp"    android:paddingTop="16dp"
+                android:paddingBottom="16dp"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/licencePlateTV"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="250dp"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:layout_marginStart="1dp"
             android:layout_marginTop="32dp"
 
@@ -265,11 +265,12 @@
                 android:layout_height="wrap_content"
                 android:hint="Licence plate number" />
         </com.google.android.material.textfield.TextInputLayout>
+
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/passengerNumTV"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="250dp"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:layout_marginStart="1dp"
             android:layout_marginTop="32dp"
 
@@ -289,29 +290,29 @@
                 android:hint="Passenger number" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <CheckBox
+        <com.google.android.material.checkbox.MaterialCheckBox
             android:id="@+id/babySeatCB"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-
+            android:layout_marginTop="32dp"
             android:text="Is baby seat available"
+            android:textColor="?attr/colorOnSurface"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.431"
+            app:layout_constraintHorizontal_bias="0.433"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/passengerNumTV" />
+            app:layout_constraintTop_toBottomOf="@id/passengerNumTV" />
 
-        <CheckBox
+        <com.google.android.material.checkbox.MaterialCheckBox
             android:id="@+id/petFriendlyCB"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
-
-            android:text="Is baby seat available"
+            android:layout_marginTop="32dp"
+            android:text="Is pet friendly"
+            android:textColor="?attr/colorOnSurface"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.431"
+            app:layout_constraintHorizontal_bias="0.394"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/babySeatCB" />
+            app:layout_constraintTop_toBottomOf="@id/babySeatCB" />
 
         <Button
             android:id="@+id/changeVehicleBtn"
@@ -342,6 +343,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/changeVehicleBtn" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

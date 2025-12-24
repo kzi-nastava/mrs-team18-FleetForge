@@ -1,11 +1,11 @@
-<ScrollView android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android">
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:tools="http://schemas.android.com/tools"
+<ScrollView xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:android="http://schemas.android.com/apk/res/android">
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
 
     <com.google.android.material.button.MaterialButton
@@ -60,18 +60,17 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/addressIL"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="250dp"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="1dp"
         android:layout_marginTop="32dp"
+
         android:layout_marginEnd="1dp"
-
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        app:boxCornerRadiusTopStart="8dp"
-        app:boxCornerRadiusTopEnd="8dp"
-        app:boxCornerRadiusBottomStart="8dp"
         app:boxCornerRadiusBottomEnd="8dp"
-
+        app:boxCornerRadiusBottomStart="8dp"
+        app:boxCornerRadiusTopEnd="8dp"
+        app:boxCornerRadiusTopStart="8dp"
 
 
         app:layout_constraintEnd_toEndOf="parent"
@@ -86,15 +85,15 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/firstNameIL"
-        android:layout_width="250dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="32dp"
-
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        app:boxCornerRadiusTopStart="8dp"
-        app:boxCornerRadiusTopEnd="8dp"
-        app:boxCornerRadiusBottomStart="8dp"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+
+        android:layout_marginTop="32dp"
         app:boxCornerRadiusBottomEnd="8dp"
+        app:boxCornerRadiusBottomStart="8dp"
+        app:boxCornerRadiusTopEnd="8dp"
+        app:boxCornerRadiusTopStart="8dp"
 
 
         app:layout_constraintEnd_toEndOf="parent"
@@ -109,16 +108,15 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/lastNameIL"
-        android:layout_width="250dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="32dp"
-
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        app:boxCornerRadiusTopStart="8dp"
-        app:boxCornerRadiusTopEnd="8dp"
-        app:boxCornerRadiusBottomStart="8dp"
-        app:boxCornerRadiusBottomEnd="8dp"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
 
+        android:layout_marginTop="32dp"
+        app:boxCornerRadiusBottomEnd="8dp"
+        app:boxCornerRadiusBottomStart="8dp"
+        app:boxCornerRadiusTopEnd="8dp"
+        app:boxCornerRadiusTopStart="8dp"
 
 
         app:layout_constraintEnd_toEndOf="parent"
@@ -133,17 +131,17 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/emailIL"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="250dp"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="1dp"
         android:layout_marginTop="32dp"
-        android:layout_marginEnd="1dp"
 
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        app:boxCornerRadiusTopStart="8dp"
-        app:boxCornerRadiusTopEnd="8dp"
-        app:boxCornerRadiusBottomStart="8dp"
+        android:layout_marginEnd="1dp"
         app:boxCornerRadiusBottomEnd="8dp"
+        app:boxCornerRadiusBottomStart="8dp"
+        app:boxCornerRadiusTopEnd="8dp"
+        app:boxCornerRadiusTopStart="8dp"
 
 
         app:layout_constraintEnd_toEndOf="parent"
@@ -158,17 +156,17 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/phoneNumberIL"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="250dp"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="1dp"
         android:layout_marginTop="32dp"
-        android:layout_marginEnd="1dp"
 
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        app:boxCornerRadiusTopStart="8dp"
-        app:boxCornerRadiusTopEnd="8dp"
-        app:boxCornerRadiusBottomStart="8dp"
+        android:layout_marginEnd="1dp"
         app:boxCornerRadiusBottomEnd="8dp"
+        app:boxCornerRadiusBottomStart="8dp"
+        app:boxCornerRadiusTopEnd="8dp"
+        app:boxCornerRadiusTopStart="8dp"
 
 
         app:layout_constraintEnd_toEndOf="parent"

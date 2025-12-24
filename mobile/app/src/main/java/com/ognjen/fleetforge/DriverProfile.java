@@ -1,8 +1,12 @@
 package com.ognjen.fleetforge;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -81,6 +85,17 @@ public class DriverProfile extends Fragment {
                     .beginTransaction()
                     .replace(R.id.fragment_container, passwordChangeProfile)
                     .commit();
+        });
+
+        SwitchCompat sw=view.findViewById(R.id.dataShowDriverSwitch);
+        sw.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) { // Vehicle
+                view.findViewById(R.id.userSection).setVisibility(View.GONE);
+                view.findViewById(R.id.vehicleSection).setVisibility(VISIBLE);
+            } else { // User
+                view.findViewById(R.id.userSection).setVisibility(VISIBLE);
+                view.findViewById(R.id.vehicleSection).setVisibility(GONE);
+            }
         });
         authManager = AuthManager.getInstance(requireContext());
 

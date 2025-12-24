@@ -5,10 +5,43 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/rootCL"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:padding="24dp">
 
-
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/dataShowDriverSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:thumb="@drawable/thumb"
+            app:track="@drawable/track"
+            android:textOn="Vehicle"
+            android:textOff="User"
+            app:showText="true"
+            app:switchTextAppearance="@style/SwitchTextOrange"
+            android:textSize="16sp"
+            app:layout_constraintTop_toTopOf="parent
+"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:id="@+id/contentWrap"
+    app:layout_constraintTop_toBottomOf="@id/dataShowDriverSwitch"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    >
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/userSection"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
+        app:layout_constraintTop_toTopOf="@id/contentWrap"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
         <Button
             android:id="@+id/changeBtn"
             android:layout_width="wrap_content"
@@ -44,34 +77,33 @@
             android:id="@+id/profileImage"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:src="@drawable/blank_profile__1_"
-            android:scaleType="centerCrop"
+            android:layout_marginTop="32dp"
             android:clickable="true"
             android:focusable="true"
             android:foreground="?attr/selectableItemBackgroundBorderless"
+            android:scaleType="centerCrop"
 
-            app:shapeAppearanceOverlay="@style/CircleImageStyle"
+            android:src="@drawable/blank_profile__1_"
 
 
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="32dp"/>
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/userSection"
+            app:shapeAppearanceOverlay="@style/CircleImageStyle" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/addressIL"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="250dp"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:layout_marginStart="1dp"
             android:layout_marginTop="32dp"
+
             android:layout_marginEnd="1dp"
-
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            app:boxCornerRadiusTopStart="8dp"
-            app:boxCornerRadiusTopEnd="8dp"
-            app:boxCornerRadiusBottomStart="8dp"
             app:boxCornerRadiusBottomEnd="8dp"
-
+            app:boxCornerRadiusBottomStart="8dp"
+            app:boxCornerRadiusTopEnd="8dp"
+            app:boxCornerRadiusTopStart="8dp"
 
 
             app:layout_constraintEnd_toEndOf="parent"
@@ -86,15 +118,15 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/firstNameIL"
-            android:layout_width="250dp"
-            android:layout_height="50dp"
-            android:layout_marginTop="32dp"
-
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            app:boxCornerRadiusTopStart="8dp"
-            app:boxCornerRadiusTopEnd="8dp"
-            app:boxCornerRadiusBottomStart="8dp"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+
+            android:layout_marginTop="32dp"
             app:boxCornerRadiusBottomEnd="8dp"
+            app:boxCornerRadiusBottomStart="8dp"
+            app:boxCornerRadiusTopEnd="8dp"
+            app:boxCornerRadiusTopStart="8dp"
 
 
             app:layout_constraintEnd_toEndOf="parent"
@@ -109,16 +141,15 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/lastNameIL"
-            android:layout_width="250dp"
-            android:layout_height="50dp"
-            android:layout_marginTop="32dp"
-
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            app:boxCornerRadiusTopStart="8dp"
-            app:boxCornerRadiusTopEnd="8dp"
-            app:boxCornerRadiusBottomStart="8dp"
-            app:boxCornerRadiusBottomEnd="8dp"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
 
+            android:layout_marginTop="32dp"
+            app:boxCornerRadiusBottomEnd="8dp"
+            app:boxCornerRadiusBottomStart="8dp"
+            app:boxCornerRadiusTopEnd="8dp"
+            app:boxCornerRadiusTopStart="8dp"
 
 
             app:layout_constraintEnd_toEndOf="parent"
@@ -133,17 +164,17 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/emailIL"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="250dp"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:layout_marginStart="1dp"
             android:layout_marginTop="32dp"
-            android:layout_marginEnd="1dp"
 
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            app:boxCornerRadiusTopStart="8dp"
-            app:boxCornerRadiusTopEnd="8dp"
-            app:boxCornerRadiusBottomStart="8dp"
+            android:layout_marginEnd="1dp"
             app:boxCornerRadiusBottomEnd="8dp"
+            app:boxCornerRadiusBottomStart="8dp"
+            app:boxCornerRadiusTopEnd="8dp"
+            app:boxCornerRadiusTopStart="8dp"
 
 
             app:layout_constraintEnd_toEndOf="parent"
@@ -160,7 +191,7 @@
             android:id="@+id/phoneNumberIL"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="250dp"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:layout_marginStart="1dp"
             android:layout_marginTop="32dp"
 
@@ -181,25 +212,23 @@
                 android:hint="Phone number" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <TextView
-            android:id="@+id/vehicleTV"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="64dp"
-            android:text="Vehicle"
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/vehicleSection"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="@id/contentWrap"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
-            android:textColor="@color/primary_orange"
-            android:textFontWeight="@integer/debljinaFonta"
-            android:textSize="28sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/changeBtn" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/vehicleModelTV"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="250dp"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:layout_marginStart="1dp"
             android:layout_marginTop="32dp"
 
@@ -211,7 +240,7 @@
 
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/vehicleTV">
+            app:layout_constraintTop_toTopOf="@id/vehicleSection" >
 
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
@@ -239,14 +268,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Vehicle type"
-                android:inputType="none"/>
+                android:inputType="none"
+                android:paddingStart="16dp"  android:paddingEnd="16dp"    android:paddingTop="16dp"
+                android:paddingBottom="16dp"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/licencePlateTV"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="250dp"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:layout_marginStart="1dp"
             android:layout_marginTop="32dp"
 
@@ -265,11 +296,12 @@
                 android:layout_height="wrap_content"
                 android:hint="Licence plate number" />
         </com.google.android.material.textfield.TextInputLayout>
+
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/passengerNumTV"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="250dp"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:layout_marginStart="1dp"
             android:layout_marginTop="32dp"
 
@@ -289,29 +321,29 @@
                 android:hint="Passenger number" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <CheckBox
+        <com.google.android.material.checkbox.MaterialCheckBox
             android:id="@+id/babySeatCB"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-
+            android:layout_marginTop="16dp"
             android:text="Is baby seat available"
+            android:textColor="?attr/colorOnSurface"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.351"
+            app:layout_constraintHorizontal_bias="0.33"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/passengerNumTV" />
+            app:layout_constraintTop_toBottomOf="@id/passengerNumTV" />
 
-        <CheckBox
+        <com.google.android.material.checkbox.MaterialCheckBox
             android:id="@+id/petFriendlyCB"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-
-            android:text="Is baby seat available"
+            android:text="Is pet friendly"
+            android:textColor="?attr/colorOnSurface"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.351"
+            app:layout_constraintHorizontal_bias="0.278"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/babySeatCB" />
+            app:layout_constraintTop_toBottomOf="@id/babySeatCB" />
 
         <Button
             android:id="@+id/changeVehicleBtn"
@@ -328,6 +360,10 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/petFriendlyCB" />
 
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_logout"
             android:layout_width="wrap_content"
@@ -342,8 +378,7 @@
             app:cornerRadius="12dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/changeVehicleBtn" />
-
+            app:layout_constraintTop_toBottomOf="@id/contentWrap" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </ScrollView>
