@@ -25,5 +25,8 @@
 
         <item name="colorControlHighlight">@color/background_gray</item>
     </style>
+    <style name="CircleImageStyle" parent="">
+        <item name="cornerSize">50%</item>
+    </style>
 
 </resources>

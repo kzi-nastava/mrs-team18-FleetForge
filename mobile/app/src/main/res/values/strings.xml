@@ -11,4 +11,6 @@
     <string name="nav_register_driver">Register</string>
     <string name="nav_block_users">Block</string>
     <string name="nav_panic_status">Panic</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
