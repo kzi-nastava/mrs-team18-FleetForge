@@ -20,4 +20,6 @@
     <string name="don_t_have_an_account">Don\'t have an account?</string>
     <string name="register">Register</string>
     <string name="app_logo">App Logo</string>
+    <string name="forgot_password_message">Enter your email and we’ll send you a link to reset your password</string>
+    <string name="send">Send</string>
 </resources>
