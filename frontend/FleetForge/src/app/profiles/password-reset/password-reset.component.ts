@@ -6,7 +6,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { Router, RouterLink } from '@angular/router';
 import { Location } from '@angular/common';
-import { routes } from '../../app.routes';
 
 @Component({
   selector: 'app-password-reset',

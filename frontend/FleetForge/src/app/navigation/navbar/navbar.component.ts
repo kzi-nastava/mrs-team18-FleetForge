@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { AsyncPipe, LowerCasePipe } from '@angular/common';
 import { SidebarService } from '../sidebar/sidebar.service';
-import { UserRole } from '../sidebar/sidebar-config';
 
 export interface NavItem {
   label: string;
@@ -50,7 +49,7 @@ export class NavbarComponent {
 
   viewProfile(): void {
     this.userRole$.subscribe(role => {
-      if(role === 'USER'|| role === 'ADMIN'){
+      if(role === 'PASSENGER'|| role === 'ADMIN'){
         this.router.navigate(['profile']);
       }
       else if(role === 'DRIVER'){

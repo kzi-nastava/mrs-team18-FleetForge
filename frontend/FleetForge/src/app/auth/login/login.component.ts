@@ -27,8 +27,8 @@ export class LoginComponent {
   }
 
   // Quick test methods for each role
-  loginAsUser(): void {
-    this.mockLogin('USER');
+  loginAsPassenger(): void {
+    this.mockLogin('PASSENGER');
   }
 
   loginAsDriver(): void {

@@ -10,18 +10,18 @@ import { Vehicle } from '../model/vehicle.model';
 import { RouterLink } from '@angular/router';
 
 @Component({
-  selector: 'app-user-profile-driver',
+  selector: 'app-driver-profile',
   imports: [CommonModule,
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
   RouterLink],
-  templateUrl: './user-profile-driver.component.html',
-  styleUrl: './user-profile-driver.component.css',
+  templateUrl: './driver-profile.component.html',
+  styleUrl: './driver-profile.component.css',
   encapsulation: ViewEncapsulation.None
 })
-export class UserProfileDriverComponent {
+export class DriverProfileComponent {
 editDriver(): void {
 
     if (this.editDriverInfo.invalid) return;
