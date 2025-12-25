@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ElementRef, inject, OnInit, Signal, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, OnInit, Signal, ViewChild, ViewEncapsulation } from '@angular/core';
 
 import { MatInputModule } from '@angular/material/input';
 import { CommonModule } from '@angular/common';
@@ -8,7 +8,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
 import { User } from '../model/user.model';
 import { UserService } from '../service/user-service';
-import { MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 
 
 @Component({
@@ -19,12 +18,12 @@ import { MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialo
     MatInputModule,
     MatButtonModule,
     RouterLink],
-  templateUrl: './user-profile.component.html',
-  styleUrl: './user-profile.component.css',
+  templateUrl: './passenger-profile.component.html',
+  styleUrl: './passenger-profile.component.css',
   encapsulation: ViewEncapsulation.None
 })
-export class UserProfileComponent implements OnInit {
-  editUserInfo=new FormGroup({
+export class PassengerProfileComponent implements OnInit {
+  editPassengerInfo=new FormGroup({
     firstName: new FormControl('', Validators.required),
     lastName: new FormControl('', Validators.required),
     email: new FormControl('', Validators.required),
@@ -38,7 +37,7 @@ export class UserProfileComponent implements OnInit {
 
   ngOnInit(): void {
     const currentUser = this.userShow();
-    this.editUserInfo.patchValue({
+    this.editPassengerInfo.patchValue({
       firstName: currentUser.firstName,
       lastName: currentUser.lastName,
       email: currentUser.email,
@@ -48,15 +47,15 @@ export class UserProfileComponent implements OnInit {
   }
 
 edit(): void {
-    if (this.editUserInfo.invalid) return;
+    if (this.editPassengerInfo.invalid) return;
 
     const user: User = {
        id: Math.random(),
-      firstName: this.editUserInfo.value.firstName ?? '',
-      lastName: this.editUserInfo.value.lastName ?? '',
-      email: this.editUserInfo.value.email ?? '',
-      number: Number(this.editUserInfo.value.number) || 0,
-      homeAddress: this.editUserInfo.value.address ?? ''
+      firstName: this.editPassengerInfo.value.firstName ?? '',
+      lastName: this.editPassengerInfo.value.lastName ?? '',
+      email: this.editPassengerInfo.value.email ?? '',
+      number: Number(this.editPassengerInfo.value.number) || 0,
+      homeAddress: this.editPassengerInfo.value.address ?? ''
     };
 
     this.userService.changeUser(user);
