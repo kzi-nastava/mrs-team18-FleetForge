@@ -105,7 +105,7 @@ button.resetPassBtn:hover {
   flex-shrink: 0;
 }
 
-.user-profile-driver-container {
+.driver-profile-container {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -113,17 +113,17 @@ button.resetPassBtn:hover {
   padding-top: 20px;
 }
 
-.user-profile-driver-container > div {
+.driver-profile-container > div {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.user-profile-driver-container > div:last-of-type {
+.driver-profile-container > div:last-of-type {
   padding-top: 0;
 }
 
-.user-profile-driver-container > div:last-of-type > span {
+.driver-profile-container > div:last-of-type > span {
   color: var(--color-primary);
   font-weight: 600;
   font-size: 24px;
@@ -144,7 +144,7 @@ button.resetPassBtn:hover {
 
 /* Responsive za vece ekrane */
 @media (max-width: 1200px) {
-  .user-profile-driver-container {
+  .driver-profile-container {
     gap: 40px;
   }
 
@@ -155,7 +155,7 @@ button.resetPassBtn:hover {
 
 /* Responsive za male ekrane */
 @media (max-width: 768px) {
-  .user-profile-driver-container {
+  .driver-profile-container {
     flex-direction: column;
     gap: 40px;
     padding-top: 20px;

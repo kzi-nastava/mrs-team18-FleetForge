@@ -16,7 +16,7 @@ export class SidebarService {
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
   public isAuthenticated$: Observable<boolean> = this.isAuthenticatedSubject.asObservable();
 
-  // Track current user role (USER, DRIVER, ADMIN). Null = unauthenticated/unknown
+  // Track current user role (PASSENGER, DRIVER, ADMIN). Null = unauthenticated/unknown
   private userRoleSubject = new BehaviorSubject<UserRole | null>(null);
   public userRole$: Observable<UserRole | null> = this.userRoleSubject.asObservable();
 

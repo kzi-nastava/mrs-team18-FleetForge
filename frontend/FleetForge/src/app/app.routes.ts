@@ -8,8 +8,8 @@ import { LoginComponent } from './auth/login/login.component';
 import { RegisterComponent } from './auth/register/register.component';
 import { ResetPasswordComponent } from './auth/reset-password/reset-password.component';
 import { ForgotPasswordComponent } from './auth/forgot-password/forgot-password.component';
-import { UserProfileDriverComponent } from './profiles/user-profile-driver/user-profile-driver.component';
-import { UserProfileComponent } from './profiles/user-profile/user-profile.component';
+import { DriverProfileComponent } from './profiles/driver-profile/driver-profile.component';
+import { PassengerProfileComponent } from './profiles/passenger-profile/passenger-profile.component';
 import { PasswordResetComponent } from './profiles/password-reset/password-reset.component';
 import { DriverHistoryComponent } from './driver/driver-history/driver-history.component';
 
@@ -20,8 +20,8 @@ export const routes: Routes = [
     component: MainLayoutComponent,
     children: [
       { path: '', component: HomeComponent },
-      { path: 'profile', component: UserProfileComponent },
-      { path: 'profile-driver', component: UserProfileDriverComponent },
+      { path: 'profile', component: PassengerProfileComponent },
+      { path: 'profile-driver', component: DriverProfileComponent },
       { path: 'profile-password-reset', component: PasswordResetComponent },
       { path: 'driver/ride-history', component: DriverHistoryComponent }
     ]

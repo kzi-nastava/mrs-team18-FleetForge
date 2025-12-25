@@ -1,7 +1,7 @@
 // Menu configuration for each user role
-// This defines what menu items appear for USER, DRIVER, and ADMIN roles
+// This defines what menu items appear for PASSENGER, DRIVER, and ADMIN roles
 
-export type UserRole = 'USER' | 'DRIVER' | 'ADMIN';
+export type UserRole = 'PASSENGER' | 'DRIVER' | 'ADMIN';
 
 export interface SidebarMenuItem {
   label: string;
@@ -12,32 +12,32 @@ export interface SidebarMenuItem {
 }
 
 export const SIDEBAR_MENU_CONFIG: Record<UserRole, SidebarMenuItem[]> = {
-  // USER role - customer side functionalities
-  USER: [
+  // PASSENGER role - customer side functionalities
+  PASSENGER: [
     {
       label: 'Dashboard',
       icon: '⊞', // grid/dashboard icon
-      path: '/user/dashboard'
+      path: '/passenger/dashboard'
     },
     {
       label: 'Current Ride',
       icon: '◆', // diamond/location icon
-      path: '/user/current-ride'
+      path: '/passenger/current-ride'
     },
     {
       label: 'Ride History',
       icon: '⏱', // history/time icon
-      path: '/user/ride-history'
+      path: '/passenger/ride-history'
     },
     {
       label: 'Favourite Rides',
       icon: '★', // star icon
-      path: '/user/favourite-rides'
+      path: '/passenger/favourite-rides'
     },
     {
       label: 'Live Chat',
       icon: '💬', // chat icon
-      path: '/user/live-chat'
+      path: '/passenger/live-chat'
     },
     {
       label: 'PANIC',
@@ -48,7 +48,7 @@ export const SIDEBAR_MENU_CONFIG: Record<UserRole, SidebarMenuItem[]> = {
     {
       label: 'Settings',
       icon: '⚙', // settings/gear icon
-      path: '/user/settings'
+      path: '/passenger/settings'
     }
   ],
 
