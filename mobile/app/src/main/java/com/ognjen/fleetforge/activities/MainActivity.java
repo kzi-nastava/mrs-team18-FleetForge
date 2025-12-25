@@ -15,7 +15,7 @@ import com.ognjen.fleetforge.model.UserRole;
 import com.ognjen.fleetforge.utils.AuthManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.ognjen.fleetforge.fragments.driver.DriverProfile;
-import com.ognjen.fleetforge.fragments.user.UserProfile;
+import com.ognjen.fleetforge.fragments.passenger.PassengerProfile;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
                 bottomNavigation.inflateMenu(R.menu.bottom_nav_unregistered);
                 bottomNavigation.setSelectedItemId(R.id.nav_unregistered_home);
                 break;
-            case USER:
+            case PASSENGER:
                 bottomNavigation.getMenu().clear();
                 bottomNavigation.inflateMenu(R.menu.bottom_nav_user);
                 break;
@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
             if(currentRole==UserRole.DRIVER){
                 return new DriverProfile();
             }else {
-                return new UserProfile();
+                return new PassengerProfile();
             }
         }else if (itemId == R.id.nav_home) {
             return PlaceholderFragment.newInstance("Home");

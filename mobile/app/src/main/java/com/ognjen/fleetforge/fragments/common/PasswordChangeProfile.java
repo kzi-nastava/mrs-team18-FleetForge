@@ -11,7 +11,7 @@ import android.widget.Button;
 
 import com.ognjen.fleetforge.R;
 import com.ognjen.fleetforge.fragments.driver.DriverProfile;
-import com.ognjen.fleetforge.fragments.user.UserProfile;
+import com.ognjen.fleetforge.fragments.passenger.PassengerProfile;
 import com.ognjen.fleetforge.model.UserRole;
 import com.ognjen.fleetforge.utils.AuthManager;
 
@@ -75,7 +75,7 @@ public class PasswordChangeProfile extends Fragment {
                fr=new DriverProfile();
            }
            else{
-               fr=new UserProfile();
+               fr=new PassengerProfile();
            }
            requireActivity().getSupportFragmentManager()
                    .beginTransaction()
