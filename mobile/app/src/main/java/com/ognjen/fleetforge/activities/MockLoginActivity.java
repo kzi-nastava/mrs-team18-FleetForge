@@ -12,7 +12,7 @@ import com.google.android.material.button.MaterialButton;
 
 public class MockLoginActivity extends AppCompatActivity {
 
-    private MaterialButton btnLoginUser;
+    private MaterialButton btnLoginPassenger;
     private MaterialButton btnLoginDriver;
     private MaterialButton btnLoginAdmin;
     private MaterialButton btnContinueGuest;
@@ -31,17 +31,17 @@ public class MockLoginActivity extends AppCompatActivity {
     }
 
     private void initViews() {
-        btnLoginUser = findViewById(R.id.btn_login_user);
+        btnLoginPassenger = findViewById(R.id.btn_login_passenger);
         btnLoginDriver = findViewById(R.id.btn_login_driver);
         btnLoginAdmin = findViewById(R.id.btn_login_admin);
         btnContinueGuest = findViewById(R.id.btn_continue_guest);
     }
 
     private void setupListeners() {
-        // Login as USER
-        btnLoginUser.setOnClickListener(v -> {
+        // Login as PASSENGER
+        btnLoginPassenger.setOnClickListener(v -> {
             authManager.login(
-                    UserRole.USER,
+                    UserRole.PASSENGER,
                     "John Doe",
                     "john.doe@example.com"
             );

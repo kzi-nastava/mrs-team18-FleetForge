@@ -49,10 +49,10 @@
                 android:layout_marginBottom="32dp" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_login_user"
+                android:id="@+id/btn_login_passenger"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:text="Login as User"
+                android:text="Login as Passenger"
                 android:textColor="@android:color/white"
                 android:textSize="16sp"
                 android:textStyle="bold"

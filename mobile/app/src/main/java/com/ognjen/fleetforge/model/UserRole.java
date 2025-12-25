@@ -2,7 +2,7 @@ package com.ognjen.fleetforge.model;
 
 public enum UserRole {
     UNREGISTERED("Unregistered User"),
-    USER("User"),
+    PASSENGER("Passenger"),
     DRIVER("Driver"),
     ADMIN("Admin");
 
