@@ -1,0 +1,17 @@
+POST http://localhost:8080/api/ride-estimates
+Content-Type: application/json
+
+{
+  "startLocation": {
+    "latitude": 45.2671,
+    "longitude": 19.8335
+  },
+  "destinationLocation": {
+    "latitude": 45.2710,
+    "longitude": 19.8520
+  },
+  "waypoints": [
+    { "latitude": 45.2680, "longitude": 19.8400 },
+    { "latitude": 45.2690, "longitude": 19.8450 }
+  ]
+}
