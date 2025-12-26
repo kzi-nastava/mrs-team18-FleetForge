@@ -1,8 +1,8 @@
 package com.team18.FleetForge.controller;
 
 import com.team18.FleetForge.dto.*;
-import com.team18.FleetForge.dto.ride.AdminRideHistoryItemDTO;
-import com.team18.FleetForge.dto.ride.RideDetailsDTO;
+import com.team18.FleetForge.dto.ride.view.AdminRideHistoryItemDTO;
+import com.team18.FleetForge.dto.ride.view.RideDetailsDTO;
 import com.team18.FleetForge.model.GeoPoint;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

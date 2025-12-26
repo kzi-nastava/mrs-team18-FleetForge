@@ -1,4 +1,4 @@
-package com.team18.FleetForge.dto.ride;
+package com.team18.FleetForge.dto.ride.lifecycle;
 
 import com.team18.FleetForge.model.GeoPoint;
 import lombok.Builder;

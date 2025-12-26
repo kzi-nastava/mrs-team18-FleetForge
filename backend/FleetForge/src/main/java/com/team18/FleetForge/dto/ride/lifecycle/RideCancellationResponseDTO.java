@@ -1,4 +1,4 @@
-package com.team18.FleetForge.dto.ride;
+package com.team18.FleetForge.dto.ride.lifecycle;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

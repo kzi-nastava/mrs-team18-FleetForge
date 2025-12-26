@@ -1,6 +1,9 @@
 package com.team18.FleetForge.controller;
 
-import com.team18.FleetForge.dto.ride.*;
+import com.team18.FleetForge.dto.ride.lifecycle.RideCancellationRequestDTO;
+import com.team18.FleetForge.dto.ride.lifecycle.RideCancellationResponseDTO;
+import com.team18.FleetForge.dto.ride.lifecycle.RideEndRequestDTO;
+import com.team18.FleetForge.dto.ride.lifecycle.RideEndResponseDTO;
 import com.team18.FleetForge.model.enums.RideCancellationRole;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
