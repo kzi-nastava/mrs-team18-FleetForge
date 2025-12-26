@@ -1,5 +1,6 @@
-package com.team18.FleetForge.dto;
+package com.team18.FleetForge.dto.ride;
 
+import com.team18.FleetForge.dto.RouteDTO;
 import lombok.Builder;
 import lombok.Data;
 

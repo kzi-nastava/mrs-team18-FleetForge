@@ -1,5 +1,6 @@
-package com.team18.FleetForge.dto;
+package com.team18.FleetForge.dto.driver;
 
+import com.team18.FleetForge.dto.vehicle.VehicleCreateRequestDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

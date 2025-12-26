@@ -1,8 +1,8 @@
 package com.team18.FleetForge.controller;
 
 
-import com.team18.FleetForge.dto.RideEstimateRequestDTO;
-import com.team18.FleetForge.dto.RideEstimateResponseDTO;
+import com.team18.FleetForge.dto.ride.RideEstimateRequestDTO;
+import com.team18.FleetForge.dto.ride.RideEstimateResponseDTO;
 import com.team18.FleetForge.dto.RouteDTO;
 import com.team18.FleetForge.model.GeoPoint;
 import org.springframework.http.HttpStatus;

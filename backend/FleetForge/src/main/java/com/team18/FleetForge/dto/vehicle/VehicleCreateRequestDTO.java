@@ -1,4 +1,4 @@
-package com.team18.FleetForge.dto;
+package com.team18.FleetForge.dto.vehicle;
 
 import com.team18.FleetForge.utils.VehicleType;
 import lombok.AllArgsConstructor;
