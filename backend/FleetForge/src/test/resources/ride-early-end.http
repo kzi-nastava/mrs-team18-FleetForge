@@ -1,0 +1,12 @@
+### Driver ends an ongoing ride early
+POST http://localhost:8080/api/rides/42/early-end
+Content-Type: application/json
+Accept: application/json
+
+{
+  "stopLocation": {
+    "latitude": 45.2671,
+    "longitude": 19.8335
+  },
+  "endTime": "2025-12-26T09:22:00"
+}

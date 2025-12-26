@@ -1,0 +1,31 @@
+### Driver cancels assigned ride (reason required)
+POST http://localhost:8080/api/rides/42/cancel
+Content-Type: application/json
+Accept: application/json
+
+{
+  "cancelledBy": "DRIVER",
+  "reason": "Passenger did not appear at pickup location",
+  "scheduledStartTime": "2025-12-26T10:30:00"
+}
+
+### Passenger cancels ride on time
+POST http://localhost:8080/api/rides/42/cancel
+Content-Type: application/json
+Accept: application/json
+
+{
+  "cancelledBy": "PASSENGER",
+  "scheduledStartTime": "2026-12-26T11:00:00"
+}
+
+
+### Passenger cancels too late (should fail)
+POST http://localhost:8080/api/rides/42/cancel
+Content-Type: application/json
+Accept: application/json
+
+{
+  "cancelledBy": "PASSENGER",
+  "scheduledStartTime": "2025-12-26T09:05:00"
+}
