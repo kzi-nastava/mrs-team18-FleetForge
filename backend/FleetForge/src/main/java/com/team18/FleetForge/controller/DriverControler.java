@@ -1,9 +1,11 @@
 package com.team18.FleetForge.controller;
 
-import com.team18.FleetForge.dto.*;
-import com.team18.FleetForge.model.Driver;
+import com.team18.FleetForge.dto.driver.DriverCreateRequestDTO;
+import com.team18.FleetForge.dto.driver.DriverCreateResponseDTO;
+import com.team18.FleetForge.dto.driver.DriverPasswordRequestDTO;
+import com.team18.FleetForge.dto.driver.DriverPasswordResponseDTO;
+import com.team18.FleetForge.dto.vehicle.VehicleCreateResponseDTO;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

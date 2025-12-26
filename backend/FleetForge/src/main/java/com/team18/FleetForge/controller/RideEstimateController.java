@@ -1,8 +1,8 @@
 package com.team18.FleetForge.controller;
 
 
-import com.team18.FleetForge.dto.RideEstimateRequestDTO;
-import com.team18.FleetForge.dto.RideEstimateResponseDTO;
+import com.team18.FleetForge.dto.ride.RideEstimateRequestDTO;
+import com.team18.FleetForge.dto.ride.RideEstimateResponseDTO;
 import com.team18.FleetForge.dto.RouteDTO;
 import com.team18.FleetForge.model.GeoPoint;
 import org.springframework.http.HttpStatus;
@@ -16,6 +16,16 @@ import java.util.List;
 @RequestMapping("/api/ride-estimates")
 public class RideEstimateController {
 
+    /**
+     * POST /api/ride-estimates
+     * Request Body:
+     *  - startLocation (GeoPoint)
+     *  - destinationLocation (GeoPoint)
+     *  - waypoints (List<GeoPoint>)
+     * Response:
+     *  - route (RouteDTO with geometry, distance, duration)
+     *  - estimatedCost (double)
+     */
     @PostMapping(
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
@@ -31,10 +41,11 @@ public class RideEstimateController {
                 request.getDestinationLocation()
         );
 
-        RouteDTO route = new RouteDTO();
-        route.setGeometry(geometry);
-        route.setDistanceMeters(5200);
-        route.setDurationSeconds(900);
+        RouteDTO route = RouteDTO.builder()
+                .geometry(geometry)
+                .distanceMeters(5100)
+                .durationSeconds(890)
+                .build();
 
         RideEstimateResponseDTO response = new RideEstimateResponseDTO();
         response.setRoute(route);
