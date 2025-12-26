@@ -69,4 +69,33 @@ public class RideController {
                 HttpStatus.OK
         );
     }
+
+    /**
+     * POST /api/rides/{rideId}/early-end
+     * Request Body:
+     *  - stopLocation (GeoPoint)
+     *  - endTime (LocalDateTime)
+     * Response:
+     *  - finalDestination (GeoPoint)
+     *  - finalPrice (double)
+     */
+    @PostMapping(
+            value = "/{rideId}/early-end",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<RideEndResponseDTO> endRide(
+            @PathVariable Long rideId,
+            @RequestBody RideEndRequestDTO request
+    ) {
+        // Dummy recalculation logic
+        double recalculatedPrice = 620.00;
+
+        RideEndResponseDTO response = RideEndResponseDTO.builder()
+                .finalDestination(request.getStopLocation())
+                .finalPrice(recalculatedPrice)
+                .build();
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }
