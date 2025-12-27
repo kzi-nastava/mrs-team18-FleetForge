@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class Route {
-
+    private Long id;
     private List<GeoPoint> geometry;
 
     private double distanceMeters;

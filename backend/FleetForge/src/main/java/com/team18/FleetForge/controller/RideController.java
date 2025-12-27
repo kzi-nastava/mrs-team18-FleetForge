@@ -3,7 +3,9 @@ package com.team18.FleetForge.controller;
 import com.team18.FleetForge.dto.ride.lifecycle.*;
 import com.team18.FleetForge.dto.ride.reports.InconsistencyReportDTO;
 import com.team18.FleetForge.dto.ride.reports.InconsistencyReportResponseDTO;
-import com.team18.FleetForge.dto.ride.view.RideGetResponseDTO;
+import com.team18.FleetForge.dto.ride.routes.FavoriteRouteGetResponseDTO;
+import com.team18.FleetForge.dto.ride.routes.FavoriteRoutePostDeleteRequestDTO;
+import com.team18.FleetForge.dto.ride.routes.FavoriteRoutePostDeleteResponseDTO;
 import com.team18.FleetForge.dto.ride.view.RideTrackingDTO;
 import com.team18.FleetForge.dto.driver.DriverInfoDTO;
 import com.team18.FleetForge.model.GeoPoint;
@@ -11,15 +13,14 @@ import com.team18.FleetForge.model.Ride;
 import com.team18.FleetForge.model.Route;
 import com.team18.FleetForge.model.enums.RideCancellationRole;
 import com.team18.FleetForge.model.enums.RideStatus;
-import com.team18.FleetForge.model.enums.VehicleType;
 import jakarta.validation.Valid;
-import org.springframework.cglib.core.Local;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
+import java.security.Principal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -191,7 +192,7 @@ public class RideController {
         route.setGeometry(new ArrayList<>(request.getCoordinates()));
 
     double price=calculatePrice(route,request);
-    //u servisu posle treba proveriti da li ima dostupnih vozaca i odraditi ostalu logiku za dodelu vozaca 
+    //u servisu posle treba proveriti da li ima dostupnih vozaca i odraditi ostalu logiku za dodelu vozaca
         Ride ride = Ride.builder()
                 .id(1L)
                 .passengerId(1L)
@@ -229,38 +230,65 @@ public class RideController {
         return price;
 
     }
+//    Authentication authentication = authenticationManager.authenticate(
+//            new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword())
+//    );
+//
+//SecurityContextHolder.getContext().setAuthentication(authentication);
 
-    @GetMapping("/{id}")
-    public ResponseEntity<RideGetResponseDTO> getRide(@PathVariable Long id) {
+    @GetMapping("/favorites")
+    public ResponseEntity<FavoriteRouteGetResponseDTO> getFavouriteRoutes(Principal principal) {
+        //trazim rute iz passengera a njega iz principal/authentication-a
+//principal.getId ili slicno
+
+        ArrayList<Route> routes = new ArrayList<>();
         Route route = new Route();
+        Route route2 = new Route();
         GeoPoint g1=new GeoPoint(45.2671, 19.8335);
         GeoPoint g2=new GeoPoint(45.2671, 19.8335);
         route.setGeometry(new ArrayList<GeoPoint>());
         route.getGeometry().add(g1);
         route.getGeometry().add(g2);
-        ArrayList<String> passengerEmails=new ArrayList<>();
-        passengerEmails.add("email1");
-        passengerEmails.add("email2");
+        route.setDistanceMeters(2500);
+        route.setDurationSeconds(25000);
+        route.setId(1L);
 
-        RideGetResponseDTO responseDTO=new RideGetResponseDTO().builder()
-                .id(id)
-                .route(route)
-                .passengerNumber(4)
-                .rideTime(LocalDateTime.of(2025,3,2,15,0))
-                .rideNow(false)
-                .passengerEmails(passengerEmails)
-                .vehicleType(VehicleType.VAN)
-                .babySeat(true)
-                .petFriendly(false)
-                .panicActivated(false)
-                .startTime(LocalDateTime.of(2025,3,2,15,5))
-                .stopTime(LocalDateTime.of(2025,3,2,16,5))
-                .rideStatus(RideStatus.PENDING)
-                .totalPrice(2500)
-                .cancellationReason("None")
-                .stopLocation(new GeoPoint(45.2671, 19.8335))
-                .build();
+        GeoPoint g3=new GeoPoint(45.2671, 19.8335);
+        GeoPoint g4=new GeoPoint(45.2671, 19.8335);
+        route2.setGeometry(new ArrayList<>());
+        route2.getGeometry().add(g3);
+        route2.getGeometry().add(g4);
+        route2.setDistanceMeters(3000);
+        route2.setDurationSeconds(30000);
+        route2.setId(2L);
+        routes.add(route);
+        routes.add(route2);
 
+
+
+        FavoriteRouteGetResponseDTO responseDTO=new FavoriteRouteGetResponseDTO();
+        responseDTO.setRoutes(routes);
+
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+    }
+
+    @PostMapping("/favorites")
+    public ResponseEntity<FavoriteRoutePostDeleteRequestDTO> addFavoriteRoute(@RequestBody FavoriteRoutePostDeleteRequestDTO request) {
+
+        //naci putnika preko principal/authenticationa i dodati mu rutu iz request u listu omiljenih
+        FavoriteRoutePostDeleteRequestDTO responseDTO = new FavoriteRoutePostDeleteRequestDTO();
+        responseDTO.setRoute(new Route());
+        responseDTO.setRoute(request.getRoute());
+        return  new ResponseEntity<>(responseDTO, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/favorites/{routeId}")
+    public ResponseEntity<FavoriteRoutePostDeleteResponseDTO> deleteFavoriteRoute(@PathVariable Long routeId) {
+        //naci rutu preko id-a iz passengera ciji su podaci sacuvani jer je ulogovan
+        Route route = new Route();
+        route.setId(routeId);
+        FavoriteRoutePostDeleteResponseDTO responseDTO = new FavoriteRoutePostDeleteResponseDTO();
+        responseDTO.setRoute(route);
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 }
