@@ -5,7 +5,10 @@ import com.team18.FleetForge.dto.admin.*;
 import com.team18.FleetForge.model.DriverProfileChangeRequest;
 import com.team18.FleetForge.model.Users.Admin;
 import com.team18.FleetForge.model.Users.Driver;
-import com.team18.FleetForge.model.enums.DriverProfileChangeRequestStatus;
+import com.team18.FleetForge.model.Vehicle;
+import com.team18.FleetForge.model.VehicleInformationChangeRequest;
+import com.team18.FleetForge.model.enums.InformationChangeRequestStatus;
+import com.team18.FleetForge.model.enums.VehicleType;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -52,8 +55,8 @@ public class AdminController {
         return new ResponseEntity<>(adminChanged, HttpStatus.OK);
 
     }
-    @PutMapping("/{requestId}/accept")
-    public ResponseEntity<AdminAcceptProfileChangeResponseDTO> driverChangeAccept
+    @PutMapping("/{requestId}/accept-driver")
+    public ResponseEntity<AdminProfileChangeStatusResponseDTO> driverChangeAccept
             (@PathVariable Long requestId) {
             //pronadje se po id driverprofilechangerequest preko requestId-a i stavi accepted na status i azurira updatedAt
         DriverProfileChangeRequest foundReq=new DriverProfileChangeRequest();
@@ -63,7 +66,7 @@ public class AdminController {
         foundReq.setNewPhoneNumber("123456789");
         foundReq.setNewAddress("Nova Adresa");
         foundReq.setNewProfilePicture("profilePicture");
-        foundReq.setStatus(DriverProfileChangeRequestStatus.APPROVED);
+        foundReq.setStatus(InformationChangeRequestStatus.APPROVED);
         foundReq.setUpdatedAt(LocalDateTime.now());
         //pronaci drivera moze sad i preko ida jer sad postavljen
         Driver foundDriver= new Driver();
@@ -77,20 +80,20 @@ public class AdminController {
         foundDriver.setProfilePicture(foundReq.getNewProfilePicture());
 
         // sacuvati drivera
-        AdminAcceptProfileChangeResponseDTO  adminAcceptProfileChangeResponseDTO=new AdminAcceptProfileChangeResponseDTO();
-        adminAcceptProfileChangeResponseDTO.setDriverId(foundDriver.getId());
-        adminAcceptProfileChangeResponseDTO.setStatus(foundReq.getStatus());
+        AdminProfileChangeStatusResponseDTO adminProfileChangeStatusResponseDTO =new AdminProfileChangeStatusResponseDTO();
+        adminProfileChangeStatusResponseDTO.setDriverId(foundDriver.getId());
+        adminProfileChangeStatusResponseDTO.setStatus(foundReq.getStatus());
 
-        return new ResponseEntity<>(adminAcceptProfileChangeResponseDTO,HttpStatus.OK);
+        return new ResponseEntity<>(adminProfileChangeStatusResponseDTO,HttpStatus.OK);
     }
 
 
-    @PutMapping("/{requestId}/reject")
-    public ResponseEntity<AdminAcceptProfileChangeResponseDTO> driverChangeReject
+    @PutMapping("/{requestId}/reject-driver")
+    public ResponseEntity<AdminProfileChangeStatusResponseDTO> driverChangeReject
             (@PathVariable Long requestId) {
         //pronadje se po id driverprofilechangerequest preko requestId-a i stavi accepted na status i azurira updatedAt
         DriverProfileChangeRequest foundReq=new DriverProfileChangeRequest();
-        foundReq.setStatus(DriverProfileChangeRequestStatus.REJECTED);
+        foundReq.setStatus(InformationChangeRequestStatus.REJECTED);
         foundReq.setUpdatedAt(LocalDateTime.now());
         //pronaci drivera moze sad i preko ida jer sad postavljen
         Driver foundDriver= new Driver();
@@ -98,11 +101,11 @@ public class AdminController {
 
 
         // sacuvati drivera
-        AdminAcceptProfileChangeResponseDTO  adminAcceptProfileChangeResponseDTO=new AdminAcceptProfileChangeResponseDTO();
-        adminAcceptProfileChangeResponseDTO.setDriverId(foundDriver.getId());
-        adminAcceptProfileChangeResponseDTO.setStatus(foundReq.getStatus());
+        AdminProfileChangeStatusResponseDTO adminProfileChangeStatusResponseDTO =new AdminProfileChangeStatusResponseDTO();
+        adminProfileChangeStatusResponseDTO.setDriverId(foundDriver.getId());
+        adminProfileChangeStatusResponseDTO.setStatus(foundReq.getStatus());
 
-        return new ResponseEntity<>(adminAcceptProfileChangeResponseDTO,HttpStatus.OK);
+        return new ResponseEntity<>(adminProfileChangeStatusResponseDTO,HttpStatus.OK);
     }
 
     @GetMapping("/profile-change-requests")
@@ -110,7 +113,7 @@ public class AdminController {
             @RequestParam("status")String status) {
 
         AdminViewProfileChangeRequestDTO adminViewProfileChangeRequestDTO=new AdminViewProfileChangeRequestDTO();
-        adminViewProfileChangeRequestDTO.setStatus(DriverProfileChangeRequestStatus.PENDING);
+        adminViewProfileChangeRequestDTO.setStatus(InformationChangeRequestStatus.PENDING);
         adminViewProfileChangeRequestDTO.setDriverId(1L);
         adminViewProfileChangeRequestDTO.setRequestId(1L);
         adminViewProfileChangeRequestDTO.setNewFirstName("ime");
@@ -137,6 +140,61 @@ public class AdminController {
 
 
     }
+
+
+    @PutMapping("/{requestId}/accept-vehicle")
+    public ResponseEntity<AdminVehicleChangeStatusResponseDTO> vehicleChangeAccept
+            (@PathVariable Long requestId) {
+        //pronadje se po id driverprofilechangerequest preko requestId-a i stavi accepted na status i azurira updatedAt
+        VehicleInformationChangeRequest foundReq=new VehicleInformationChangeRequest();
+        foundReq.setNewModel("model");
+        foundReq.setNewRegistrationNumber("registrationNumber");
+        foundReq.setNewType(VehicleType.VAN);
+        foundReq.setNewSpace(3);
+        foundReq.setNewBabySeat(true);
+        foundReq.setNewPetFriendly(true);
+        foundReq.setStatus(InformationChangeRequestStatus.APPROVED);
+        foundReq.setUpdatedAt(LocalDateTime.now());
+        //pronaci drivera moze sad i preko ida jer sad postavljen
+        Vehicle foundVehicle= new Vehicle();
+        foundVehicle.setId(1L);
+
+        foundVehicle.setModel(foundReq.getNewModel());
+        foundVehicle.setRegistrationNumber(foundReq.getNewRegistrationNumber());
+        foundVehicle.setType(foundReq.getNewType());
+        foundVehicle.setSpace(foundReq.getNewSpace());
+        foundVehicle.setBabySeat(foundReq.isNewBabySeat());
+        foundVehicle.setPetFriendly(foundReq.isNewPetFriendly());
+
+
+        // sacuvati drivera
+        AdminVehicleChangeStatusResponseDTO adminVehicleChangeStatusResponseDTO =new AdminVehicleChangeStatusResponseDTO();
+        adminVehicleChangeStatusResponseDTO.setVehicleId(foundVehicle.getId());
+        adminVehicleChangeStatusResponseDTO.setStatus(foundReq.getStatus());
+
+        return new ResponseEntity<>(adminVehicleChangeStatusResponseDTO,HttpStatus.OK);
+    }
+
+    @PutMapping("/{requestId}/reject-vehicle")
+    public ResponseEntity<AdminVehicleChangeStatusResponseDTO> vehicleChangeReject
+            (@PathVariable Long requestId) {
+        //pronadje se po id vehicleinfochangereq preko requestId-a i stavi accepted na status i azurira updatedAt
+        VehicleInformationChangeRequest foundReq=new VehicleInformationChangeRequest();
+        foundReq.setStatus(InformationChangeRequestStatus.REJECTED);
+        foundReq.setUpdatedAt(LocalDateTime.now());
+        //pronaci vehicle moze sad i preko ida jer sad postavljen
+        Vehicle foundVehicle = new Vehicle();
+        foundVehicle.setId(1L);
+
+
+        // sacuvati drivera
+        AdminVehicleChangeStatusResponseDTO adminVehicleChangeStatusResponseDTO =new AdminVehicleChangeStatusResponseDTO();
+        adminVehicleChangeStatusResponseDTO.setVehicleId(foundVehicle.getId());
+        adminVehicleChangeStatusResponseDTO.setStatus(foundReq.getStatus());
+
+        return new ResponseEntity<>(adminVehicleChangeStatusResponseDTO,HttpStatus.OK);
+    }
+
 }
 
 
