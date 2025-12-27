@@ -1,16 +1,19 @@
 package com.team18.FleetForge.controller;
 
+import com.team18.FleetForge.dto.ride.lifecycle.*;
 import com.team18.FleetForge.dto.ride.reports.InconsistencyReportDTO;
-import com.team18.FleetForge.dto.ride.lifecycle.RideCancellationRequestDTO;
-import com.team18.FleetForge.dto.ride.lifecycle.RideCancellationResponseDTO;
-import com.team18.FleetForge.dto.ride.lifecycle.RideEndRequestDTO;
-import com.team18.FleetForge.dto.ride.lifecycle.RideEndResponseDTO;
 import com.team18.FleetForge.dto.ride.reports.InconsistencyReportResponseDTO;
+import com.team18.FleetForge.dto.ride.view.RideGetResponseDTO;
 import com.team18.FleetForge.dto.ride.view.RideTrackingDTO;
 import com.team18.FleetForge.dto.driver.DriverInfoDTO;
 import com.team18.FleetForge.model.GeoPoint;
+import com.team18.FleetForge.model.Ride;
+import com.team18.FleetForge.model.Route;
 import com.team18.FleetForge.model.enums.RideCancellationRole;
+import com.team18.FleetForge.model.enums.RideStatus;
+import com.team18.FleetForge.model.enums.VehicleType;
 import jakarta.validation.Valid;
+import org.springframework.cglib.core.Local;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 @RestController
 @RequestMapping("/api/rides")
@@ -179,5 +183,84 @@ public class RideController {
                 .build();
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/create")
+    public ResponseEntity<RideCreateResponseDTO> createRide(@RequestBody RideCreateRequestDTO request) {
+        Route route = new Route();
+        route.setGeometry(new ArrayList<>(request.getCoordinates()));
+
+    double price=calculatePrice(route,request);
+    //u servisu posle treba proveriti da li ima dostupnih vozaca i odraditi ostalu logiku za dodelu vozaca 
+        Ride ride = Ride.builder()
+                .id(1L)
+                .passengerId(1L)
+                .route(route)
+                .passengerNumber(request.getPassengerNumber())
+                .rideTime(request.getRideTime())
+                .rideNow(request.isRideNow())
+                .passengerEmails(request.getPassengerEmails())
+                .vehicleType(request.getVehicleType())
+                .babySeat(request.isBabySeat())
+                .petFriendly(request.isPetFriendly())
+                .panicActivated(false)
+                .startTime(request.getRideTime())
+                .rideStatus(RideStatus.PENDING)
+                .totalPrice(price)
+                .build();
+
+        RideCreateResponseDTO response = RideCreateResponseDTO.builder()
+                .rideId(1L)
+                .status(RideStatus.PENDING)
+                .estimatedPrice(price)
+                .message("Ride created successfully")
+                .build();
+
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    private double calculatePrice(Route route,RideCreateRequestDTO request) {
+        double km=20;
+        double price=120*km;
+        switch (request.getVehicleType()){
+            case VAN -> price+=250;
+            default -> price+=500;
+        }
+        return price;
+
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<RideGetResponseDTO> getRide(@PathVariable Long id) {
+        Route route = new Route();
+        GeoPoint g1=new GeoPoint(45.2671, 19.8335);
+        GeoPoint g2=new GeoPoint(45.2671, 19.8335);
+        route.setGeometry(new ArrayList<GeoPoint>());
+        route.getGeometry().add(g1);
+        route.getGeometry().add(g2);
+        ArrayList<String> passengerEmails=new ArrayList<>();
+        passengerEmails.add("email1");
+        passengerEmails.add("email2");
+
+        RideGetResponseDTO responseDTO=new RideGetResponseDTO().builder()
+                .id(id)
+                .route(route)
+                .passengerNumber(4)
+                .rideTime(LocalDateTime.of(2025,3,2,15,0))
+                .rideNow(false)
+                .passengerEmails(passengerEmails)
+                .vehicleType(VehicleType.VAN)
+                .babySeat(true)
+                .petFriendly(false)
+                .panicActivated(false)
+                .startTime(LocalDateTime.of(2025,3,2,15,5))
+                .stopTime(LocalDateTime.of(2025,3,2,16,5))
+                .rideStatus(RideStatus.PENDING)
+                .totalPrice(2500)
+                .cancellationReason("None")
+                .stopLocation(new GeoPoint(45.2671, 19.8335))
+                .build();
+
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 }
