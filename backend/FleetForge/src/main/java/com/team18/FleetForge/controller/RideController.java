@@ -220,4 +220,5 @@ public class RideController {
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
 }
