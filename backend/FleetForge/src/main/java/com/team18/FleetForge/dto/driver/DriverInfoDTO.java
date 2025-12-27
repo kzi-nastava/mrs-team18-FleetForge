@@ -1,20 +1,18 @@
-package com.team18.FleetForge.model;
-
+package com.team18.FleetForge.dto.driver;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Driver {
+@Builder
+public class DriverInfoDTO {
     private Long id;
     private String firstName;
     private String lastName;
-    private String email;
-    private String password;
-    private int phone;
-    private String address;
-    private Vehicle vehicle;
+    private String phoneNumber;
+    private String profileImage;
 }
