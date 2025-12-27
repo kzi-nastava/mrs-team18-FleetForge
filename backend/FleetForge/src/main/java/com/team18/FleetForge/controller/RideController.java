@@ -6,6 +6,8 @@ import com.team18.FleetForge.dto.ride.reports.InconsistencyReportResponseDTO;
 import com.team18.FleetForge.dto.ride.routes.FavoriteRouteGetResponseDTO;
 import com.team18.FleetForge.dto.ride.routes.FavoriteRoutePostDeleteRequestDTO;
 import com.team18.FleetForge.dto.ride.routes.FavoriteRoutePostDeleteResponseDTO;
+import com.team18.FleetForge.dto.ride.review.RideReviewRequestDTO;
+import com.team18.FleetForge.dto.ride.review.RideReviewResponseDTO;
 import com.team18.FleetForge.dto.ride.view.RideTrackingDTO;
 import com.team18.FleetForge.dto.driver.DriverInfoDTO;
 import com.team18.FleetForge.model.GeoPoint;
@@ -291,4 +293,83 @@ public class RideController {
         responseDTO.setRoute(route);
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
+    /**
+     * PUT /api/rides/{rideId}/complete
+     * Response:
+     *  - rideId (Long)
+     *  - status (String) - "COMPLETED"
+     *  - completedAt (LocalDateTime)
+     *  - finalPrice (Double)
+     *  - message (String)
+     *  - nextRide (NextRideDTO, optional) - if driver has next scheduled ride
+     */
+    @PutMapping(
+            value = "/{rideId}/complete",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<RideCompletionResponseDTO> completeRide(@PathVariable Long rideId) {
+        // Dummy completion data with next scheduled ride
+        RideCompletionResponseDTO response = RideCompletionResponseDTO.builder()
+                .rideId(rideId)
+                .status("COMPLETED")
+                .completedAt(LocalDateTime.now())
+                .finalPrice(1450.00)
+                .message("Ride completed successfully. Driver is now available.")
+                .nextRide(RideCompletionResponseDTO.NextRideDTO.builder()
+                        .rideId(456L)
+                        .startLocation(new GeoPoint(45.2550, 19.8450))
+                        .startAddress("Bulevar oslobođenja 46, Novi Sad")
+                        .endLocation(new GeoPoint(45.2671, 19.8335))
+                        .endAddress("Trg slobode 1, Novi Sad")
+                        .scheduledFor(LocalDateTime.now().plusMinutes(30))
+                        .estimatedDurationMinutes(15)
+                        .passenger(RideCompletionResponseDTO.NextRideDTO.PassengerInfoDTO.builder()
+                                .id(25L)
+                                .firstName("Ana")
+                                .lastName("Anić")
+                                .phoneNumber("+381649876543")
+                                .profileImage("passenger25.jpg")
+                                .build())
+                        .build())
+                .build();
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    /**
+     * POST /api/rides/{rideId}/review
+     * Request Body:
+     *  - vehicleRating (Integer, 1-5, required)
+     *  - driverRating (Integer, 1-5, required)
+     *  - comment (String, optional, max 500 chars)
+     * Response:
+     *  - rideId (Long)
+     *  - vehicleRating (Integer)
+     *  - driverRating (Integer)
+     *  - comment (String)
+     *  - reviewedAt (LocalDateTime)
+     *  - message (String)
+     */
+    @PostMapping(
+            value = "/{rideId}/review",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<RideReviewResponseDTO> submitReview(
+            @PathVariable Long rideId,
+            @Valid @RequestBody RideReviewRequestDTO request) {
+
+        // Dummy review response
+        RideReviewResponseDTO response = RideReviewResponseDTO.builder()
+                .rideId(rideId)
+                .vehicleRating(request.getVehicleRating())
+                .driverRating(request.getDriverRating())
+                .comment(request.getComment())
+                .reviewedAt(LocalDateTime.now())
+                .message("Review submitted successfully. Thank you for your feedback!")
+                .build();
+
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
 }
