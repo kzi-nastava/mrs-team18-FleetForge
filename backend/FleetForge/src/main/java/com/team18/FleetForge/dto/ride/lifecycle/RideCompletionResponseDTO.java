@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 public class RideCompletionResponseDTO {
 
     private Long rideId;
-    private String status;
+    private String status; // "COMPLETED"
     private LocalDateTime completedAt;
     private Double finalPrice;
     private String message;
