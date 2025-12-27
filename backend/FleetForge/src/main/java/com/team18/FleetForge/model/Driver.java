@@ -17,4 +17,7 @@ public class Driver {
     private int phone;
     private String address;
     private Vehicle vehicle;
+    private boolean isActive;
+    private boolean isAvailable;
+    private GeoPoint currentLocation;
 }
