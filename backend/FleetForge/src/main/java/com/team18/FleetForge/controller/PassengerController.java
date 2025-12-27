@@ -1,9 +1,11 @@
 package com.team18.FleetForge.controller;
 
 import com.team18.FleetForge.dto.driver.DriverGetResponseDTO;
+import com.team18.FleetForge.dto.driver.DriverPasswordChangeRequestDTO;
 import com.team18.FleetForge.dto.passenger.PassengerChangeInformationRequestDTO;
 import com.team18.FleetForge.dto.passenger.PassengerChangeInformationResponseDTO;
 import com.team18.FleetForge.dto.passenger.PassengerGetResponseDTO;
+import com.team18.FleetForge.dto.passenger.PassengerPasswordChangeRequestDTO;
 import com.team18.FleetForge.model.Users.Driver;
 import com.team18.FleetForge.model.Users.Passenger;
 import org.springframework.http.HttpStatus;
@@ -48,5 +50,12 @@ public class PassengerController {
 
     }
 
+    @PutMapping("/{id}/password-change")
+    public ResponseEntity<String> passwordChange(@PathVariable Long id,@RequestBody PassengerPasswordChangeRequestDTO request){
+        //pronaci passengera prvo preko id-a
+        Passenger foundPassenger=new Passenger();
+        foundPassenger.setPassword(request.getNewPassword());
 
+        return ResponseEntity.ok("password changed");
+    }
 }

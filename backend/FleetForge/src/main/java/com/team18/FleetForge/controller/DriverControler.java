@@ -1,11 +1,13 @@
 package com.team18.FleetForge.controller;
 
+import com.team18.FleetForge.dto.admin.AdminPasswordChangeRequestDTO;
 import com.team18.FleetForge.dto.driver.*;
 import com.team18.FleetForge.dto.vehicle.VehicleCreateResponseDTO;
 import com.team18.FleetForge.dto.vehicle.VehicleInformationChangeRequestDTO;
 import com.team18.FleetForge.dto.vehicle.VehicleInformationChangeResponseDTO;
 import com.team18.FleetForge.model.DriverProfileChangeRequest;
 import com.team18.FleetForge.model.DriverSession;
+import com.team18.FleetForge.model.Users.Admin;
 import com.team18.FleetForge.model.Users.Driver;
 import com.team18.FleetForge.model.Vehicle;
 import com.team18.FleetForge.model.VehicleInformationChangeRequest;
@@ -182,5 +184,14 @@ public class DriverControler {
 
         VehicleInformationChangeResponseDTO vehicleInformationChangeResponseDTO = new VehicleInformationChangeResponseDTO(vehicleInformationChangeRequest);
         return new ResponseEntity<>(vehicleInformationChangeResponseDTO, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}/password-change")
+    public ResponseEntity<String> passwordChange(@PathVariable Long id,@RequestBody DriverPasswordChangeRequestDTO request){
+        //pronaci drivera prvo preko id-a
+        Driver foundDriver=new Driver();
+        foundDriver.setPassword(request.getNewPassword());
+
+        return ResponseEntity.ok("password changed");
     }
 }

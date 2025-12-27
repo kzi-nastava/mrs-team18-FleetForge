@@ -194,7 +194,14 @@ public class AdminController {
 
         return new ResponseEntity<>(adminVehicleChangeStatusResponseDTO,HttpStatus.OK);
     }
+    @PutMapping("/{id}/password-change")
+    public ResponseEntity<String> passwordChange(@PathVariable Long id,@RequestBody AdminPasswordChangeRequestDTO request){
+        //pronaci admina prvo preko id-a
+        Admin foundAdmin=new Admin();
+        foundAdmin.setPassword(request.getNewPassword());
 
+        return ResponseEntity.ok("password changed");
+    }
 }
 
 
