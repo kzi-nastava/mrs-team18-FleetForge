@@ -1,7 +1,6 @@
 package com.team18.FleetForge.model;
 
-import com.team18.FleetForge.model.Users.Driver;
-import com.team18.FleetForge.model.enums.DriverProfileChangeRequestStatus;
+import com.team18.FleetForge.model.enums.InformationChangeRequestStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,7 +13,7 @@ import java.time.LocalDateTime;
 public class DriverProfileChangeRequest {
     Long id;
     Long driverId;
-    DriverProfileChangeRequestStatus status;
+    InformationChangeRequestStatus status;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
     private String newFirstName;

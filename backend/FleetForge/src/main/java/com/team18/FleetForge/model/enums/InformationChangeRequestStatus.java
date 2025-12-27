@@ -1,6 +1,6 @@
 package com.team18.FleetForge.model.enums;
 
-public enum DriverProfileChangeRequestStatus {
+public enum InformationChangeRequestStatus {
     APPROVED,
     REJECTED,
     PENDING

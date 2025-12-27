@@ -1,6 +1,6 @@
 package com.team18.FleetForge.dto.admin;
 
-import com.team18.FleetForge.model.enums.DriverProfileChangeRequestStatus;
+import com.team18.FleetForge.model.enums.InformationChangeRequestStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -29,6 +29,6 @@ public class AdminViewProfileChangeRequestDTO {
     private String newAddress;
     private String newProfilePicture;
 
-    private DriverProfileChangeRequestStatus status;
+    private InformationChangeRequestStatus status;
     private LocalDateTime createdAt;
 }
