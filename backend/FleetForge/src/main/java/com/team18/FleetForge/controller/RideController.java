@@ -1,10 +1,7 @@
 package com.team18.FleetForge.controller;
 
+import com.team18.FleetForge.dto.ride.lifecycle.*;
 import com.team18.FleetForge.dto.ride.reports.InconsistencyReportDTO;
-import com.team18.FleetForge.dto.ride.lifecycle.RideCancellationRequestDTO;
-import com.team18.FleetForge.dto.ride.lifecycle.RideCancellationResponseDTO;
-import com.team18.FleetForge.dto.ride.lifecycle.RideEndRequestDTO;
-import com.team18.FleetForge.dto.ride.lifecycle.RideEndResponseDTO;
 import com.team18.FleetForge.dto.ride.reports.InconsistencyReportResponseDTO;
 import com.team18.FleetForge.dto.ride.view.RideTrackingDTO;
 import com.team18.FleetForge.dto.driver.DriverInfoDTO;
@@ -180,4 +177,48 @@ public class RideController {
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+
+    /**
+     * PUT /api/rides/{rideId}/complete
+     * Response:
+     *  - rideId (Long)
+     *  - status (String) - "COMPLETED"
+     *  - completedAt (LocalDateTime)
+     *  - finalPrice (Double)
+     *  - message (String)
+     *  - nextRide (NextRideDTO, optional) - if driver has next scheduled ride
+     */
+    @PutMapping(
+            value = "/{rideId}/complete",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<RideCompletionResponseDTO> completeRide(@PathVariable Long rideId) {
+        // Dummy completion data with next scheduled ride
+        RideCompletionResponseDTO response = RideCompletionResponseDTO.builder()
+                .rideId(rideId)
+                .status("COMPLETED")
+                .completedAt(LocalDateTime.now())
+                .finalPrice(1450.00)
+                .message("Ride completed successfully. Driver is now available.")
+                .nextRide(RideCompletionResponseDTO.NextRideDTO.builder()
+                        .rideId(456L)
+                        .startLocation(new GeoPoint(45.2550, 19.8450))
+                        .startAddress("Bulevar oslobođenja 46, Novi Sad")
+                        .endLocation(new GeoPoint(45.2671, 19.8335))
+                        .endAddress("Trg slobode 1, Novi Sad")
+                        .scheduledFor(LocalDateTime.now().plusMinutes(30))
+                        .estimatedDurationMinutes(15)
+                        .passenger(RideCompletionResponseDTO.NextRideDTO.PassengerInfoDTO.builder()
+                                .id(25L)
+                                .firstName("Ana")
+                                .lastName("Anić")
+                                .phoneNumber("+381649876543")
+                                .profileImage("passenger25.jpg")
+                                .build())
+                        .build())
+                .build();
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
 }
