@@ -66,6 +66,45 @@ public class DriverControler {
         return new ResponseEntity<>(driverCreateResponseDTO, HttpStatus.CREATED);
     }
 
+
+    /**
+     * PUT /api/driver/{id}/availability
+     * Request Param:
+     *  - available (boolean)
+     * Response:
+     *  - 200 OK if changed
+     *  - 409 CONFLICT if change is deferred
+     */
+    @PutMapping("/{id}/availability")
+    public ResponseEntity<Void> changeAvailability(
+            @PathVariable Long id,
+            @RequestParam boolean available
+    ) {
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+
+    /**
+     * POST /api/driver/{id}/request-logout
+     * Request Params:
+     *  - isAvailable (boolean)
+     * Response:
+     *  - 200 OK if logout is allowed
+     *  - 409 CONFLICT if logout conditions are not met
+     */
+    @PostMapping("/{id}/request-logout")
+    public ResponseEntity<Void> requestLogout(
+            @PathVariable Long id,
+            @RequestParam boolean hasActiveRide
+    ) {
+        if (hasActiveRide) {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
+        // Logout allowed
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+
     @PutMapping("/{id}/set-password")
     public ResponseEntity<DriverPasswordResponseDTO> setDriverPassword(@PathVariable long id, @RequestBody DriverPasswordRequestDTO request) {
         DriverPasswordResponseDTO driverPasswordResponseDTO = new DriverPasswordResponseDTO();
