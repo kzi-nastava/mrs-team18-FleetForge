@@ -371,5 +371,11 @@ public class RideController {
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
-
+    @PutMapping("/{id}/start")
+    public ResponseEntity<RideStartResponseDTO> startRide(@PathVariable Long id) {
+        RideStartResponseDTO responseDTO = new RideStartResponseDTO();
+        responseDTO.setId(id);
+        responseDTO.setStatus(RideStatus.IN_PROGRESS);
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+    }
 }
