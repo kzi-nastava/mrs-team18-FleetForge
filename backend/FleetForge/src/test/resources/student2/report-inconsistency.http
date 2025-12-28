@@ -1,0 +1,12 @@
+
+### 2.6.2 - Report driver inconsistency
+POST http://localhost:8080/api/rides/123/report-inconsistency
+Content-Type: application/json
+
+{
+  "comment": "Driver is taking a longer route than necessary",
+  "currentLocation": {
+    "latitude": 45.2600,
+    "longitude": 19.8400
+  }
+}

@@ -1,0 +1,4 @@
+
+### 2.1.1 Get all active vehicles on map
+GET http://localhost:8080/api/unregistered-users/active-vehicles
+Content-Type: application/json

@@ -1,0 +1,4 @@
+
+### 2.6.2 - Get live ride tracking
+GET http://localhost:8080/api/rides/123/tracking
+Content-Type: application/json
