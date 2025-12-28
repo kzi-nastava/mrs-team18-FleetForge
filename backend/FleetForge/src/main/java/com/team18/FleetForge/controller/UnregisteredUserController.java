@@ -8,13 +8,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/unregistered")
+@RequestMapping("/api/unregistered-users")
 public class UnregisteredUserController {
 
     // TODO: Inject VehicleService when implemented
 
 
-    @GetMapping("/vehicles/active")
+    @GetMapping("/active-vehicles")
     public ResponseEntity<List<VehicleLocationDTO>> getActiveVehicles() {
         // TODO: Implement service call
         // List<VehicleLocationDTO> vehicles = vehicleService.getActiveVehicleLocations();
