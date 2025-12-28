@@ -1,0 +1,8 @@
+### Get ride history for a specific user (Admin view)
+GET http://localhost:8080/api/admin/rides/users/20?from=2025-12-20T00:00:00&to=2025-12-28T23:59:59&sortBy=startTime&direction=desc
+Accept: application/json
+
+
+### Get detailed information about a single ride
+GET http://localhost:8080/api/admin/rides/1
+Accept: application/json
