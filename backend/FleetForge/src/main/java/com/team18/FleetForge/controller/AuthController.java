@@ -41,47 +41,41 @@ public class AuthController {
     }
 
     /**
-     * POST /api/auth/forgot-password
+     * POST /api/auth/password-reset-requests
      * Request:
      *  - email
      * Response:
-     *  - resetToken
-     *  - expiresAt
+     *  - 202 ACCEPTED
      */
     @PostMapping(
-            value = "/forgot-password",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE
+            value = "/password-reset-requests",
+            consumes = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<ForgotPasswordResponseDTO> forgotPassword(
+    public ResponseEntity<Void> requestPasswordReset(
             @RequestBody ForgotPasswordRequestDTO request
     ) {
-        String resetToken = UUID.randomUUID().toString();
-
-        ForgotPasswordResponseDTO response = ForgotPasswordResponseDTO.builder()
-                .resetToken(resetToken)
-                .expiresAt(LocalDateTime.now().plusHours(1))
-                .build();
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        // For now send 202 later send email
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
     /**
-     * POST /api/auth/reset-password
+     * POST /api/auth/password-resets
      * Request:
      *  - token
      *  - newPassword
+     * Response:
+     *  - 204 NO_CONTENT on success
+     *  - 400 BAD_REQUEST if token invalid/expired
      */
     @PostMapping(
-            value = "/reset-password",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE
+            value = "/password-resets",
+            consumes = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<String> resetPassword(
+    public ResponseEntity<Void> resetPassword(
             @RequestBody ResetPasswordRequestDTO request
     ) {
         // Dummy token validation
-        return ResponseEntity.ok("Password successfully reset.");
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     /**
@@ -95,28 +89,35 @@ public class AuthController {
      *  - phoneNumber
      *  - profilePicture (optional)
      * Response:
-     *  - message
+     *  - 201 CREATED on successful registration
      */
     @PostMapping(
             value = "/register",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.TEXT_PLAIN_VALUE
+            consumes = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<String> register(@RequestBody RegisterRequestDTO request) {
-        System.out.println(request); // just to see what Spring received
-        return new ResponseEntity<>(
-                "Registration successful! Please check your email to activate your account.",
-                HttpStatus.CREATED
-        );
+    public ResponseEntity<Void> register(
+            @RequestBody RegisterRequestDTO request
+    ) {
+        // later create user and send activation email
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     /**
-     * GET /api/auth/activate
+     * POST /api/auth/activations
+     * Request:
+     *  - token
      * Response:
-     *  - message
+     *  - 204 NO_CONTENT on successful activation
+     *  - 400 BAD_REQUEST if token is invalid or expired
      */
-    @GetMapping(value = "/activate")
-    public ResponseEntity<String> activateAccount(@RequestParam String token) {
-        return ResponseEntity.ok("Account successfully activated. You can now log in.");
+    @PostMapping(
+            value = "/activations",
+            consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<Void> activateAccount(
+            @RequestBody ActivationRequestDTO request
+    ) {
+        // Dummy token validation
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

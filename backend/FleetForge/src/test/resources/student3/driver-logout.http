@@ -1,15 +1,20 @@
-### Change driver availability - set available
-PUT http://localhost:8080/api/driver/1/availability?available=true
-Accept: */*
+### Change driver availability – set available
+PUT http://localhost:8080/api/drivers/1/availability
+Content-Type: application/json
 
-### Change driver availability - set unavailable
-PUT http://localhost:8080/api/driver/1/availability?available=false
-Accept: */*
+{
+  "available": true
+}
 
-### Request driver logout - no active ride (should succeed)
-POST http://localhost:8080/api/driver/1/request-logout?hasActiveRide=false
-Accept: */*
+### Change driver availability – set unavailable
+PUT http://localhost:8080/api/drivers/1/availability
+Content-Type: application/json
 
-### Request driver logout - active ride (should return 409)
-POST http://localhost:8080/api/driver/1/request-logout?hasActiveRide=true
-Accept: */*
+{
+  "available": false
+}
+
+
+### Request driver logout
+POST http://localhost:8080/api/drivers/1/logout-requests
+

@@ -32,7 +32,7 @@ import java.util.ArrayList;
 public class RideController {
 
     /**
-     * POST /api/rides/{rideId}/cancel
+     * POST /api/rides/{rideId}/cancellations
      * Request Body:
      *  - cancelledBy (DRIVER | PASSENGER)
      *  - reason (String, required for DRIVER)
@@ -42,7 +42,7 @@ public class RideController {
      *  - message (String)
      */
     @PostMapping(
-            value = "/{rideId}/cancel",
+            value = "/{rideId}/cancellations",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )

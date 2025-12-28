@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/driver")
+@RequestMapping("/api/drivers")
 public class DriverControler {
 
     @GetMapping("/{id}")
@@ -68,40 +68,34 @@ public class DriverControler {
 
 
     /**
-     * PUT /api/driver/{id}/availability
+     * PUT /api/drivers/{id}/availability
      * Request Param:
      *  - available (boolean)
      * Response:
-     *  - 200 OK if changed
+     *  - 204 NO_CONTENT if changed
      *  - 409 CONFLICT if change is deferred
      */
     @PutMapping("/{id}/availability")
     public ResponseEntity<Void> changeAvailability(
             @PathVariable Long id,
-            @RequestParam boolean available
+            @RequestBody ChangeAvailabilityRequestDTO request
     ) {
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.noContent().build();
     }
 
 
     /**
-     * POST /api/driver/{id}/request-logout
-     * Request Params:
-     *  - isAvailable (boolean)
+     * POST /api/drivers/{id}/logout-requests
      * Response:
-     *  - 200 OK if logout is allowed
+     *  - 204 NO_CONTENT if logout is allowed
      *  - 409 CONFLICT if logout conditions are not met
      */
-    @PostMapping("/{id}/request-logout")
+    @PostMapping("/{id}/logout-requests")
     public ResponseEntity<Void> requestLogout(
-            @PathVariable Long id,
-            @RequestParam boolean hasActiveRide
+            @PathVariable Long id
     ) {
-        if (hasActiveRide) {
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
-        }
-        // Logout allowed
-        return new ResponseEntity<>(HttpStatus.OK);
+        // Servers check if request is allowed, for now always send status 200
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 
@@ -239,7 +233,7 @@ public class DriverControler {
     }
 
     /**
-     * GET /api/driver/ride-history
+     * GET /api/drivers/ride-history
      * Query params:
      * - startDate (LocalDate, optional) - Filter rides from this date
      * Response: List of all rides with passenger information

@@ -1,5 +1,5 @@
 ### Driver cancels assigned ride (reason required)
-POST http://localhost:8080/api/rides/42/cancel
+POST http://localhost:8080/api/rides/42/cancellations
 Content-Type: application/json
 Accept: application/json
 
@@ -10,7 +10,7 @@ Accept: application/json
 }
 
 ### Passenger cancels ride on time
-POST http://localhost:8080/api/rides/42/cancel
+POST http://localhost:8080/api/rides/42/cancellations
 Content-Type: application/json
 Accept: application/json
 
@@ -21,7 +21,7 @@ Accept: application/json
 
 
 ### Passenger cancels too late (should fail)
-POST http://localhost:8080/api/rides/42/cancel
+POST http://localhost:8080/api/rides/42/cancellations
 Content-Type: application/json
 Accept: application/json
 
