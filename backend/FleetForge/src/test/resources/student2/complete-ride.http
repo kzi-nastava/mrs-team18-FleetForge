@@ -1,0 +1,4 @@
+
+### 2.7 - Mark ride as completed
+PUT http://localhost:8080/api/rides/123/complete
+Content-Type: application/json

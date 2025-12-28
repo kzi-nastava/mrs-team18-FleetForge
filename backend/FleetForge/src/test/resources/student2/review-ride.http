@@ -1,0 +1,10 @@
+
+### 2.8 - Submit ride review
+POST http://localhost:8080/api/rides/123/review
+Content-Type: application/json
+
+{
+  "vehicleRating": 5,
+  "driverRating": 4,
+  "comment": "Great ride! Very clean vehicle and professional driver."
+}
