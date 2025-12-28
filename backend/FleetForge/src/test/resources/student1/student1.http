@@ -1,0 +1,207 @@
+### Create driver
+POST http://localhost:8080/api/driver
+Content-Type: application/json
+
+{
+  "firstName": "Milos",
+  "lastName": "Damjanovic",
+  "email": "milos.damjanovic@gmail.com",
+  "phone": "061234567",
+  "address": "Belgrade",
+  "vehicle": {
+    "type": "STANDARD",
+    "registrationNumber": "BG-123-AB",
+    "model": "Toyota Corolla",
+    "space": 4,
+    "babySeat": true,
+    "petFriendly": false
+  }
+}
+
+### Set driver password
+PUT http://localhost:8080/api/driver/1/set-password
+Content-Type: application/json
+
+{
+  "password": "Test123!"
+}
+
+### Admin GET
+
+GET http://localhost:8080/api/admin/1
+
+### Admin Update
+PUT http://localhost:8080/api/admin/update-admin/1
+Content-Type: application/json
+
+{
+  "firstName": "Novo Ime",
+  "lastName": "Novo Prezime",
+  "email": "novi.email@example.com",
+  "phoneNumber": "065-123-4567",
+  "address": "Nova Adresa 123",
+  "profilePicture": "https://example.com/new-pic.jpg"
+}
+
+### Admin Accept
+
+PUT http://localhost:8080/api/admin/42/accept-driver
+
+### Admin Reject
+
+PUT  http://localhost:8080/api/admin/42/reject-driver
+
+### Admin profile-change-requests
+
+GET http://localhost:8080/api/admin/profile-change-requests?status=PENDING
+
+
+### Driver get 1
+
+GET http://localhost:8080/api/driver/1
+
+### Driver pravljenje zahteva za izmenu profila
+
+POST http://localhost:8080/api/driver/update-request
+Content-Type: application/json
+
+
+{
+  "newFirstName": "Petar",
+  "newLastName": "Petrović",
+  "newEmail": "petar.petrovic@example.com",
+  "newPhoneNumber": "064-555-1234",
+  "newAddress": "Knez Mihailova 25",
+  "newProfilePicture": "https://example.com/petar.jpg"
+}
+
+
+
+### Passenger dobavi jednog
+
+GET http://localhost:8080/api/passenger/1
+
+### Passenger azuriraj
+PUT http://localhost:8080/api/passenger/update-passenger/1
+Content-Type: application/json
+
+{
+  "firstName": "Marko",
+  "lastName": "Marković",
+  "email": "marko.markovic@example.com",
+  "phoneNumber": "064-123-4567",
+  "address": "Bulevar Kralja Aleksandra 73",
+  "profilePicture": "https://i.pravatar.cc/150?img=10"
+}
+
+
+### Driver session start
+
+POST http://localhost:8080/api/driver/1/online
+
+### Driver session end
+
+PUT http://localhost:8080/api/driver/1/offline
+
+{
+  "sessionId":1
+}
+
+### VEhicle Accept
+
+PUT http://localhost:8080/api/admin/42/accept-vehicle
+
+### Vehicle Reject
+
+PUT  http://localhost:8080/api/admin/42/reject-vehicle
+
+### Vehicle change request
+
+POST http://localhost:8080/api/driver/update-request-vehicle
+Content-Type: application/json
+
+{
+  "newModel":"model",
+  "newType":"VAN",
+  "newRegistrationNumber":"134kk",
+  "newSpace":3,
+  "newBabySeat":true,
+  "newPetFriendly":true
+}
+
+### Password change za sve
+
+PUT http://localhost:8080/api/passenger/1/password-change
+Content-Type: application/json
+
+{
+  "oldPassword":"34324",
+  "newPassword":"32432432"
+}
+
+
+### Ride create
+
+POST http://localhost:8080/api/rides/create
+Content-Type: application/json
+
+{
+  "coordinates": [
+    {
+      "latitude": 45.2544,
+      "longitude": 19.8426
+    },
+    {
+      "latitude": 45.2489,
+      "longitude": 19.8312
+    },
+    {
+      "latitude": 45.2621,
+      "longitude": 19.8533
+    }
+  ],
+  "passengerNumber": 3,
+  "rideTime": "2025-12-27T15:00:00",
+  "rideNow": false,
+  "passengerEmails": [
+    "prijatelj1@gmail.com",
+    "prijatelj2@gmail.com"
+  ],
+  "vehicleType": "VAN",
+  "babySeat": true,
+  "petFriendly": false
+}
+
+### Add favorite route
+
+POST http://localhost:8080/api/rides/favorites
+Content-Type: application/json
+
+{"route":{
+  "id":1,
+  "geometry":[
+    {
+      "latitude": 45.2544,
+      "longitude": 19.8426
+    },
+    {
+      "latitude": 45.2489,
+      "longitude": 19.8312
+    },
+    {
+      "latitude": 45.2621,
+      "longitude": 19.8533
+    }
+  ],
+  "distanceMeters":2500,
+  "durationSeconds":25000
+}}
+
+### get favorite routes
+
+GET http://localhost:8080/api/rides/favorites
+
+
+### ride start
+
+#PUT http://localhost:8080/api/rides/1/start
