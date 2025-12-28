@@ -83,4 +83,40 @@ public class AuthController {
         // Dummy token validation
         return ResponseEntity.ok("Password successfully reset.");
     }
+
+    /**
+     * POST /api/auth/register
+     * Request:
+     *  - email
+     *  - password
+     *  - firstName
+     *  - lastName
+     *  - address
+     *  - phoneNumber
+     *  - profilePicture (optional)
+     * Response:
+     *  - message
+     */
+    @PostMapping(
+            value = "/register",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.TEXT_PLAIN_VALUE
+    )
+    public ResponseEntity<String> register(@RequestBody RegisterRequestDTO request) {
+        System.out.println(request); // just to see what Spring received
+        return new ResponseEntity<>(
+                "Registration successful! Please check your email to activate your account.",
+                HttpStatus.CREATED
+        );
+    }
+
+    /**
+     * GET /api/auth/activate
+     * Response:
+     *  - message
+     */
+    @GetMapping(value = "/activate")
+    public ResponseEntity<String> activateAccount(@RequestParam String token) {
+        return ResponseEntity.ok("Account successfully activated. You can now log in.");
+    }
 }

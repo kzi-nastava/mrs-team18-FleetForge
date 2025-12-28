@@ -1,0 +1,18 @@
+POST http://localhost:8080/api/auth/register
+Content-Type: application/json
+Accept: text/plain
+
+{
+  "email": "test.passenger@example.com",
+  "password": "Password123",
+  "firstName": "John",
+  "lastName": "Doe",
+  "address": "123 Main St, Cityville",
+  "phoneNumber": "+381601234567",
+  "profilePicture": "https://example.com/profile.png"
+}
+
+
+### Activate the newly registered account
+GET http://localhost:8080/api/auth/activate?token=dummy-activation-token
+Accept: text/plain
