@@ -1,6 +1,6 @@
 package com.team18.FleetForge.dto.passenger;
 
-import com.team18.FleetForge.model.Users.Passenger;
+import com.team18.FleetForge.model.users.Passenger;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

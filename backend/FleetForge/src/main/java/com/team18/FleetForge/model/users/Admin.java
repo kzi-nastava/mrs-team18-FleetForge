@@ -1,4 +1,4 @@
-package com.team18.FleetForge.model.Users;
+package com.team18.FleetForge.model.users;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

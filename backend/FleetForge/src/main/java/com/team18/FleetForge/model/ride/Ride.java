@@ -1,8 +1,8 @@
 package com.team18.FleetForge.model.ride;
 
 import com.team18.FleetForge.model.GeoPoint;
-import com.team18.FleetForge.model.Users.Driver;
-import com.team18.FleetForge.model.Users.Passenger;
+import com.team18.FleetForge.model.users.Driver;
+import com.team18.FleetForge.model.users.Passenger;
 import com.team18.FleetForge.model.enums.PanicInitiator;
 import com.team18.FleetForge.model.enums.RideCancellationRole;
 import com.team18.FleetForge.model.enums.RideStatus;

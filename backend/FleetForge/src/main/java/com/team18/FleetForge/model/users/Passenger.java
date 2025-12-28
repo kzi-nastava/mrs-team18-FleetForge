@@ -1,4 +1,4 @@
-package com.team18.FleetForge.model.Users;
+package com.team18.FleetForge.model.users;
 
 import com.team18.FleetForge.model.Route;
 import lombok.*;

@@ -1,7 +1,7 @@
 package com.team18.FleetForge.dto.admin;
 
 
-import com.team18.FleetForge.model.Users.Admin;
+import com.team18.FleetForge.model.users.Admin;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
