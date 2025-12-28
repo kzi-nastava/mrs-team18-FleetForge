@@ -3,8 +3,8 @@ package com.team18.FleetForge.controller;
 
 import com.team18.FleetForge.dto.admin.*;
 import com.team18.FleetForge.model.DriverProfileChangeRequest;
-import com.team18.FleetForge.model.Users.Admin;
-import com.team18.FleetForge.model.Users.Driver;
+import com.team18.FleetForge.model.users.Admin;
+import com.team18.FleetForge.model.users.Driver;
 import com.team18.FleetForge.model.Vehicle;
 import com.team18.FleetForge.model.VehicleInformationChangeRequest;
 import com.team18.FleetForge.model.enums.InformationChangeRequestStatus;

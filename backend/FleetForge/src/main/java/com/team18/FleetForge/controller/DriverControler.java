@@ -1,13 +1,12 @@
 package com.team18.FleetForge.controller;
 
-import com.team18.FleetForge.dto.admin.AdminPasswordChangeRequestDTO;
 import com.team18.FleetForge.dto.driver.*;
 import com.team18.FleetForge.dto.vehicle.VehicleCreateResponseDTO;
 import com.team18.FleetForge.dto.vehicle.VehicleInformationChangeRequestDTO;
 import com.team18.FleetForge.dto.vehicle.VehicleInformationChangeResponseDTO;
 import com.team18.FleetForge.model.DriverProfileChangeRequest;
 import com.team18.FleetForge.model.DriverSession;
-import com.team18.FleetForge.model.Users.Driver;
+import com.team18.FleetForge.model.users.Driver;
 import com.team18.FleetForge.model.Vehicle;
 import com.team18.FleetForge.model.GeoPoint;
 import com.team18.FleetForge.model.VehicleInformationChangeRequest;
