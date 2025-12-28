@@ -11,7 +11,6 @@ import com.team18.FleetForge.dto.ride.review.RideReviewResponseDTO;
 import com.team18.FleetForge.dto.ride.view.RideTrackingDTO;
 import com.team18.FleetForge.dto.driver.DriverInfoDTO;
 import com.team18.FleetForge.model.GeoPoint;
-import com.team18.FleetForge.model.Ride;
 import com.team18.FleetForge.model.Route;
 import com.team18.FleetForge.model.enums.RideCancellationRole;
 import com.team18.FleetForge.model.enums.RideStatus;
@@ -194,23 +193,6 @@ public class RideController {
         route.setGeometry(new ArrayList<>(request.getCoordinates()));
 
     double price=calculatePrice(route,request);
-    //u servisu posle treba proveriti da li ima dostupnih vozaca i odraditi ostalu logiku za dodelu vozaca
-        Ride ride = Ride.builder()
-                .id(1L)
-                .passengerId(1L)
-                .route(route)
-                .passengerNumber(request.getPassengerNumber())
-                .rideTime(request.getRideTime())
-                .rideNow(request.isRideNow())
-                .passengerEmails(request.getPassengerEmails())
-                .vehicleType(request.getVehicleType())
-                .babySeat(request.isBabySeat())
-                .petFriendly(request.isPetFriendly())
-                .panicActivated(false)
-                .startTime(request.getRideTime())
-                .rideStatus(RideStatus.PENDING)
-                .totalPrice(price)
-                .build();
 
         RideCreateResponseDTO response = RideCreateResponseDTO.builder()
                 .rideId(1L)
