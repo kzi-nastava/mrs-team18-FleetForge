@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AdminProfileChangeStatusResponseDTO {
+public class AdminDriverVehicleChangeStatusResponseDTO {
     InformationChangeRequestStatus status;
-    Long driverId;
+    Long id;
 }

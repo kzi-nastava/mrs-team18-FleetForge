@@ -9,6 +9,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PassengerPasswordChangeRequestDTO {
-    private String oldPassword;
     private String newPassword;
 }

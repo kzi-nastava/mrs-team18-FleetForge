@@ -29,7 +29,7 @@ public class PassengerController {
 
         return new ResponseEntity<>(passengerGetResponseDTO, HttpStatus.OK);
     }
-    @PutMapping("/update-passenger/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<PassengerChangeInformationResponseDTO> changeUser
             (@RequestBody PassengerChangeInformationRequestDTO passengerChangeInformationRequestDTO, @PathVariable String id) {
         //prvo ga posle trazim preko id i postavim nove podatke
@@ -47,7 +47,7 @@ public class PassengerController {
 
     }
 
-    @PutMapping("/{id}/password-change")
+    @PutMapping("/{id}/password")
     public ResponseEntity<String> passwordChange(@PathVariable Long id,@RequestBody PassengerPasswordChangeRequestDTO request){
         //pronaci passengera prvo preko id-a
         Passenger foundPassenger=new Passenger();
