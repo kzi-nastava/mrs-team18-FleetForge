@@ -1,5 +1,5 @@
 ### Create driver
-POST http://localhost:8080/api/drivers
+POST http://localhost:8080/api/driver
 Content-Type: application/json
 
 {
@@ -18,13 +18,7 @@ Content-Type: application/json
   }
 }
 
-### Set driver password
-PUT http://localhost:8080/api/drivers/1/set-password
-Content-Type: application/json
 
-{
-  "password": "Test123!"
-}
 
 ### Admin GET
 
@@ -43,13 +37,13 @@ Content-Type: application/json
   "profilePicture": "https://example.com/new-pic.jpg"
 }
 
-### Admin Accept
+### Admin Accept/reject driver info
 
-PUT http://localhost:8080/api/admin/42/accept-driver
+PUT http://localhost:8080/api/admin/1/driver-info
 
-### Admin Reject
-
-PUT  http://localhost:8080/api/admin/42/reject-driver
+{
+   "change":true||false
+}
 
 ### Admin profile-change-requests
 
@@ -58,12 +52,11 @@ GET http://localhost:8080/api/admin/profile-change-requests?status=PENDING
 
 ### Driver get 1
 
-GET http://localhost:8080/api/drivers/1
+GET http://localhost:8080/api/driver/1
 
 ### Driver pravljenje zahteva za izmenu profila
 
-POST http://localhost:8080/api/drivers/update-request
-Content-Type: application/json
+POST http://localhost:8080/api/driver/update-request
 
 
 {
@@ -82,8 +75,7 @@ Content-Type: application/json
 GET http://localhost:8080/api/passenger/1
 
 ### Passenger azuriraj
-PUT http://localhost:8080/api/passenger/update-passenger/1
-Content-Type: application/json
+PUT http://localhost:8080/api/passenger/1
 
 {
   "firstName": "Marko",
@@ -97,29 +89,24 @@ Content-Type: application/json
 
 ### Driver session start
 
-POST http://localhost:8080/api/drivers/1/online
+POST http://localhost:8080/api/driver/1/online
 
 ### Driver session end
 
-PUT http://localhost:8080/api/drivers/1/offline
-Content-Type: application/json
+PUT http://localhost:8080/api/driver/1/offline
 
 {
   "sessionId":1
 }
 
-### VEhicle Accept
+### VEhicle info change accept/reject
 
-PUT http://localhost:8080/api/admin/42/accept-vehicle
+PUT http://localhost:8080/api/admin/1/vehicle-info
+{
+   "change":true||false
+}
 
-### Vehicle Reject
-
-PUT  http://localhost:8080/api/admin/42/reject-vehicle
-
-### Vehicle change request
-
-POST http://localhost:8080/api/drivers/update-request-vehicle
-Content-Type: application/json
+POST http://localhost:8080/api/driver/update-request-vehicle
 
 {
   "newModel":"model",
@@ -132,11 +119,9 @@ Content-Type: application/json
 
 ### Password change za sve
 
-PUT http://localhost:8080/api/passenger/1/password-change
-Content-Type: application/json
+PUT http://localhost:8080/api/drivers/1/password
 
 {
-  "oldPassword":"34324",
   "newPassword":"32432432"
 }
 
@@ -144,7 +129,6 @@ Content-Type: application/json
 ### Ride create
 
 POST http://localhost:8080/api/rides/create
-Content-Type: application/json
 
 {
   "coordinates": [
@@ -173,10 +157,13 @@ Content-Type: application/json
   "petFriendly": false
 }
 
+### Get ride by id-----------izbrisano
+
+GET http://localhost:8080/api/rides/1
+
 ### Add favorite route
 
 POST http://localhost:8080/api/rides/favorites
-Content-Type: application/json
 
 {"route":{
   "id":1,
@@ -205,4 +192,4 @@ GET http://localhost:8080/api/rides/favorites
 
 ### ride start
 
-#PUT http://localhost:8080/api/rides/1/start
+PUT http://localhost:8080/api/rides/1/start
