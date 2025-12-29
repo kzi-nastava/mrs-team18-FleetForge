@@ -1,8 +1,8 @@
 
 ### 2.9.2 - Get driver ride history (no filter)
-GET http://localhost:8080/api/driver/ride-history
+GET http://localhost:8080/api/drivers/ride-history
 Content-Type: application/json
 
 ### 2.9.2 - Get driver ride history (with date filter)
-GET http://localhost:8080/api/driver/ride-history?startDate=2025-12-25
+GET http://localhost:8080/api/drivers/ride-history?startDate=2025-12-25
 Content-Type: application/json

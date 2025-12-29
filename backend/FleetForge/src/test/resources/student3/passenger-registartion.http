@@ -1,6 +1,6 @@
+### Register a new passenger account
 POST http://localhost:8080/api/auth/register
 Content-Type: application/json
-Accept: text/plain
 
 {
   "email": "test.passenger@example.com",
@@ -14,5 +14,9 @@ Accept: text/plain
 
 
 ### Activate the newly registered account
-GET http://localhost:8080/api/auth/activate?token=dummy-activation-token
-Accept: text/plain
+POST http://localhost:8080/api/auth/activations
+Content-Type: application/json
+
+{
+  "token": "test.passenger@example.com"
+}

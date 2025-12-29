@@ -1,5 +1,5 @@
 ### Create driver
-POST http://localhost:8080/api/driver
+POST http://localhost:8080/api/drivers
 Content-Type: application/json
 
 {
@@ -19,7 +19,7 @@ Content-Type: application/json
 }
 
 ### Set driver password
-PUT http://localhost:8080/api/driver/1/set-password
+PUT http://localhost:8080/api/drivers/1/set-password
 Content-Type: application/json
 
 {
@@ -58,11 +58,11 @@ GET http://localhost:8080/api/admin/profile-change-requests?status=PENDING
 
 ### Driver get 1
 
-GET http://localhost:8080/api/driver/1
+GET http://localhost:8080/api/drivers/1
 
 ### Driver pravljenje zahteva za izmenu profila
 
-POST http://localhost:8080/api/driver/update-request
+POST http://localhost:8080/api/drivers/update-request
 Content-Type: application/json
 
 
@@ -97,11 +97,12 @@ Content-Type: application/json
 
 ### Driver session start
 
-POST http://localhost:8080/api/driver/1/online
+POST http://localhost:8080/api/drivers/1/online
 
 ### Driver session end
 
-PUT http://localhost:8080/api/driver/1/offline
+PUT http://localhost:8080/api/drivers/1/offline
+Content-Type: application/json
 
 {
   "sessionId":1
@@ -117,7 +118,7 @@ PUT  http://localhost:8080/api/admin/42/reject-vehicle
 
 ### Vehicle change request
 
-POST http://localhost:8080/api/driver/update-request-vehicle
+POST http://localhost:8080/api/drivers/update-request-vehicle
 Content-Type: application/json
 
 {
