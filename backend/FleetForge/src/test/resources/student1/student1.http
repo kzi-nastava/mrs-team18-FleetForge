@@ -40,9 +40,10 @@ Content-Type: application/json
 ### Admin Accept/reject driver info
 
 PUT http://localhost:8080/api/admin/1/driver-info
+Content-Type: application/json
 
 {
-   "change":true||false
+   "change":false
 }
 
 ### Admin profile-change-requests
@@ -57,6 +58,7 @@ GET http://localhost:8080/api/driver/1
 ### Driver pravljenje zahteva za izmenu profila
 
 POST http://localhost:8080/api/driver/update-request
+Content-Type: application/json
 
 
 {
@@ -76,6 +78,7 @@ GET http://localhost:8080/api/passenger/1
 
 ### Passenger azuriraj
 PUT http://localhost:8080/api/passenger/1
+Content-Type: application/json
 
 {
   "firstName": "Marko",
@@ -94,6 +97,7 @@ POST http://localhost:8080/api/driver/1/online
 ### Driver session end
 
 PUT http://localhost:8080/api/driver/1/offline
+Content-Type: application/json
 
 {
   "sessionId":1
@@ -102,11 +106,15 @@ PUT http://localhost:8080/api/driver/1/offline
 ### VEhicle info change accept/reject
 
 PUT http://localhost:8080/api/admin/1/vehicle-info
+Content-Type: application/json
+
 {
-   "change":true||false
+   "change":true
 }
 
-POST http://localhost:8080/api/driver/update-request-vehicle
+### vehicle update req
+POST http://localhost:8080/api/drivers/update-request-vehicle
+Content-Type: application/json
 
 {
   "newModel":"model",
@@ -120,6 +128,7 @@ POST http://localhost:8080/api/driver/update-request-vehicle
 ### Password change za sve
 
 PUT http://localhost:8080/api/drivers/1/password
+Content-Type: application/json
 
 {
   "newPassword":"32432432"
@@ -129,6 +138,7 @@ PUT http://localhost:8080/api/drivers/1/password
 ### Ride create
 
 POST http://localhost:8080/api/rides/create
+Content-Type: application/json
 
 {
   "coordinates": [
@@ -164,6 +174,7 @@ GET http://localhost:8080/api/rides/1
 ### Add favorite route
 
 POST http://localhost:8080/api/rides/favorites
+Content-Type: application/json
 
 {"route":{
   "id":1,
