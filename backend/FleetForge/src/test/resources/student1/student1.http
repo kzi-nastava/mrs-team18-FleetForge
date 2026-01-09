@@ -25,7 +25,7 @@ Content-Type: application/json
 GET http://localhost:8080/api/admin/1
 
 ### Admin Update
-PUT http://localhost:8080/api/admin/update-admin/1
+PUT http://localhost:8080/api/admin/1
 Content-Type: application/json
 
 {
@@ -166,10 +166,6 @@ Content-Type: application/json
   "babySeat": true,
   "petFriendly": false
 }
-
-### Get ride by id-----------izbrisano
-
-GET http://localhost:8080/api/rides/1
 
 ### Add favorite route
 
