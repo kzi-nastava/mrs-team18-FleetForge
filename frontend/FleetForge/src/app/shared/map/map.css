@@ -1,0 +1,11 @@
+.map-frame {
+  border: none;
+  width: 100%;
+  height: 100%;
+}
+
+#map {
+  height: 450px;
+  width: 100%;
+  border-radius: 8px;
+}
