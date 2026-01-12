@@ -99,17 +99,6 @@ public class DriverControler {
     }
 
 
-    @PutMapping("/{id}/set-password")
-    public ResponseEntity<DriverPasswordResponseDTO> setDriverPassword(@PathVariable long id, @RequestBody DriverPasswordRequestDTO request) {
-        DriverPasswordResponseDTO driverPasswordResponseDTO = new DriverPasswordResponseDTO();
-
-        //ovde treba da se dobavlja iz baze preko id pa da se azurira i da se vrati nesto ovo sam lupio podatke samo sad jer nema baze
-        driverPasswordResponseDTO.setId(id);
-        driverPasswordResponseDTO.setEmail("milos.damjanovic@gmail.com");
-
-        return new ResponseEntity<>(driverPasswordResponseDTO, HttpStatus.OK);
-    }
-
     @PostMapping("/update-request")
     public ResponseEntity<DriverProfileChangeResponseDTO> createChangeRequest(@RequestBody DriverProfileChangeRequestDTO request) {
         //treba pronaci drivera preko maila iz baze da bi id postavio id, sad je samo privremeno ovako
@@ -223,7 +212,7 @@ public class DriverControler {
         return new ResponseEntity<>(vehicleInformationChangeResponseDTO, HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}/password-change")
+    @PutMapping("/{id}/password")
     public ResponseEntity<String> passwordChange(@PathVariable Long id, @RequestBody DriverPasswordChangeRequestDTO request) {
         //pronaci drivera prvo preko id-a
         Driver foundDriver = new Driver();
