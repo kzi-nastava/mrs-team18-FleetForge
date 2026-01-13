@@ -9,7 +9,7 @@ Content-Type: application/json
   "phone": "061234567",
   "address": "Belgrade",
   "vehicle": {
-    "type": "STANDARD",
+    "type": "VAN",
     "registrationNumber": "BG-123-AB",
     "model": "Toyota Corolla",
     "space": 4,

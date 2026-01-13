@@ -1,0 +1,93 @@
+<div class="switch-container">
+<label class="switch">
+  <input type="checkbox" (change)="toggleSlider($event)">
+  <span class="slider round">
+    <span class="slider-thumb">{{ isSliderRight ? 'Vehicle' : 'Driver' }}</span>
+  </span>
+</label>
+</div>
+@if(!isSliderRight) {
+<div class="driverChangeCard">
+@for(change of changes(); track change.id) {
+    <div class="item">
+        <p class="driverName">{{change.oldFristName}} {{change.oldLastName}}</p>
+        @if(isExpanded(change.id)) {
+        <div class="details" >
+            <div class="old">
+                <p class="label">Old</p>
+                <img class="profilePic" [src]="change.oldProfilePictureUrl" alt="Old Profile Picture"/>
+                <p class="value">{{change.oldFristName}}</p>
+                <p class="value">{{change.oldLastName}}</p>
+                <p class="value">{{change.oldEmail}}</p>
+                <p class="value">{{change.oldPhoneNumber}}</p>
+                <p class="value">{{change.oldAddress}}</p>
+                
+            </div>
+            <div class="separator"></div>
+            <div class="new">
+                <p class="label">New</p>
+                <img class="profilePic" [src]="change.newProfilePictureUrl" alt="New Profile Picture"/>
+                <p class="value">{{change.newFirstName}}</p>
+                <p class="value">{{change.newLastName}}</p>
+                <p class="value">{{change.newEmail}}</p>
+                <p class="value">{{change.newPhoneNumber}}</p>
+                <p class="value">{{change.newAddress}}</p>
+            </div>
+        </div>
+    }
+        <div class="card-footer">
+        <div class="action-buttons">
+          <button class="approveBtn">Approve</button>
+          <button class="rejectBtn">Reject</button>
+        </div>
+        
+        <button class="viewDetailsBtn" (click)="toggleDetails(change.id)">
+          {{ isExpanded(change.id) ? 'Hide Details' : 'View Details' }}
+        </button>
+      </div>
+    </div>
+}
+</div>
+} @else {
+<div class="driverChangeCard">
+@for(change of vehicleChanges(); track change.id) {
+    <div class="item">
+        <p class="driverName">{{change.firstName}} {{change.lastName}}</p>
+        @if(isExpanded(change.id)) {
+        <div class="details" >
+            <div class="old">
+                <p class="label">Old</p>
+                <p class="value">{{change.oldModel}}</p>
+                <p class="value">{{change.oldRegistrationNumber}}</p>
+                <p class="value">{{change.oldType}}</p>
+                <p class="value">{{change.oldSpace}}</p>
+                <p class="value">{{change.oldBabySeat}}</p>
+                <p class="value">{{change.oldPetFriendly}}</p>
+                
+            </div>
+            <div class="separator"></div>
+            <div class="new">
+                <p class="label">New</p>
+                <p class="value">{{change.newModel}}</p>
+                <p class="value">{{change.newRegistrationNumber}}</p>
+                <p class="value">{{change.newType}}</p>
+                <p class="value">{{change.newSpace}}</p>
+                <p class="value">{{change.newBabySeat}}</p>
+                <p class="value">{{change.newPetFriendly}}</p>
+            </div>
+        </div>
+    }
+        <div class="card-footer">
+        <div class="action-buttons">
+          <button class="approveBtn">Approve</button>
+          <button class="rejectBtn">Reject</button>
+        </div>
+        
+        <button class="viewDetailsBtn" (click)="toggleDetails(change.id)">
+          {{ isExpanded(change.id) ? 'Hide Details' : 'View Details' }}
+        </button>
+      </div>
+    </div>
+}
+</div>
+}

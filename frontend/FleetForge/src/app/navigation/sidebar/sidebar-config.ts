@@ -108,6 +108,10 @@ export const SIDEBAR_MENU_CONFIG: Record<UserRole, SidebarMenuItem[]> = {
       label: 'Live Chat',
       icon: '💬',
       path: '/admin/live-chat'
+    },{
+      label:'Driver Changes',
+      icon:'🛠',
+      path: '/admin/driver-changes'
     }
   ]
 };
