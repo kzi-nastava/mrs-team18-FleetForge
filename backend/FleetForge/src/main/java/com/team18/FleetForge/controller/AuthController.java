@@ -13,6 +13,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import java.util.Map;
+import java.util.Collections;
+
 
 import java.time.LocalDateTime;
 
@@ -112,6 +115,7 @@ public class AuthController {
      *  - profilePicture (optional)
      * Response:
      *  - 201 CREATED on successful registration
+     *  - 409 CONFLICT on already taken email
      */
     @PostMapping(
             value = "/register",
@@ -132,7 +136,6 @@ public class AuthController {
     }
 
 
-
     /**
      * POST /api/auth/activations
      * Request:
@@ -151,4 +154,25 @@ public class AuthController {
         // Dummy token validation
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    /**
+     * GET /api/auth/email-availability
+     * Query Parameter:
+     *  - email
+     * Response:
+     *  - 200 OK
+     *    {
+     *      "available": true|false
+     *    }
+     */
+    @GetMapping("/email-availability")
+    public ResponseEntity<Map<String, Boolean>> checkEmailAvailability(
+            @RequestParam String email
+    ) {
+        boolean available = authService.findByEmail(email) == null;
+        Map<String, Boolean> response = Collections.singletonMap("available", available);
+        return ResponseEntity.ok(response);
+    }
+
+
 }
