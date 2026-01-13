@@ -2,6 +2,7 @@ package com.team18.FleetForge.controller;
 
 import com.team18.FleetForge.dto.auth.*;
 import com.team18.FleetForge.model.users.User;
+import com.team18.FleetForge.service.AuthService;
 import com.team18.FleetForge.util.JwtTokenUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,7 @@ public class AuthController {
 
     private final AuthenticationManager authenticationManager;
     private final JwtTokenUtils jwtTokenUtils;
+    private final AuthService authService;
 
 
     /**
@@ -118,9 +120,18 @@ public class AuthController {
     public ResponseEntity<Void> register(
             @RequestBody RegisterRequestDTO request
     ) {
-        // later create user and send activation email
+        User existUser = authService.findByEmail(request.getEmail());
+
+        if (existUser != null) {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
+
+        authService.registerPassenger(request);
+
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
+
+
 
     /**
      * POST /api/auth/activations

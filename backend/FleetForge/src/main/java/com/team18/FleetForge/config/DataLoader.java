@@ -39,6 +39,7 @@ public class DataLoader implements CommandLineRunner {
         driver1.setAvailable(true);
         driver1.setCurrentLocation(new GeoPoint(45.2671, 19.8335));
         driver1.setRole(Role.ROLE_DRIVER);
+        driver1.setActivated(true);
 
         Driver driver2 = new Driver();
         driver2.setEmail("driver2@test.com");
@@ -50,6 +51,7 @@ public class DataLoader implements CommandLineRunner {
         driver2.setAvailable(false);
         driver2.setCurrentLocation(new GeoPoint(45.2551, 19.8451));
         driver2.setRole(Role.ROLE_DRIVER);
+        driver2.setActivated(true);
 
         Admin admin = new Admin();
         admin.setEmail("admin@test.com");
@@ -57,6 +59,7 @@ public class DataLoader implements CommandLineRunner {
         admin.setFirstName("System");
         admin.setLastName("Admin");
         admin.setRole(Role.ROLE_ADMIN);
+        admin.setActivated(true);
 
         Passenger passenger = new Passenger();
         passenger.setEmail("passenger@test.com");
@@ -64,6 +67,8 @@ public class DataLoader implements CommandLineRunner {
         passenger.setFirstName("Bob");
         passenger.setLastName("User");
         passenger.setRole(Role.ROLE_PASSENGER);
+        passenger.setActivated(true);
+        admin.setActivated(true);
 
         driverRepository.save(driver1);
         driverRepository.save(driver2);

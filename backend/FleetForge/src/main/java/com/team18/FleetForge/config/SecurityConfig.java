@@ -49,6 +49,7 @@ public class SecurityConfig {
                 // Define endpoint protections
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/login").permitAll() // Login is public
+                        .requestMatchers("/api/auth/register").permitAll() // Login is public
                         .requestMatchers("/api/unregistered-users/**").permitAll() // Guests features are public
                         .anyRequest().authenticated() // Everything else requires a token
                 );
