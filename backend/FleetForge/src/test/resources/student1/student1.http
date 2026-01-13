@@ -18,20 +18,14 @@ Content-Type: application/json
   }
 }
 
-### Set driver password
-PUT http://localhost:8080/api/drivers/1/set-password
-Content-Type: application/json
 
-{
-  "password": "Test123!"
-}
 
 ### Admin GET
 
 GET http://localhost:8080/api/admin/1
 
 ### Admin Update
-PUT http://localhost:8080/api/admin/update-admin/1
+PUT http://localhost:8080/api/admin/1
 Content-Type: application/json
 
 {
@@ -43,13 +37,14 @@ Content-Type: application/json
   "profilePicture": "https://example.com/new-pic.jpg"
 }
 
-### Admin Accept
+### Admin Accept/reject driver info
 
-PUT http://localhost:8080/api/admin/42/accept-driver
+PUT http://localhost:8080/api/admin/1/driver-info
+Content-Type: application/json
 
-### Admin Reject
-
-PUT  http://localhost:8080/api/admin/42/reject-driver
+{
+   "change":false
+}
 
 ### Admin profile-change-requests
 
@@ -82,7 +77,7 @@ Content-Type: application/json
 GET http://localhost:8080/api/passenger/1
 
 ### Passenger azuriraj
-PUT http://localhost:8080/api/passenger/update-passenger/1
+PUT http://localhost:8080/api/passenger/1
 Content-Type: application/json
 
 {
@@ -108,16 +103,16 @@ Content-Type: application/json
   "sessionId":1
 }
 
-### VEhicle Accept
+### VEhicle info change accept/reject
 
-PUT http://localhost:8080/api/admin/42/accept-vehicle
+PUT http://localhost:8080/api/admin/1/vehicle-info
+Content-Type: application/json
 
-### Vehicle Reject
+{
+   "change":true
+}
 
-PUT  http://localhost:8080/api/admin/42/reject-vehicle
-
-### Vehicle change request
-
+### vehicle update req
 POST http://localhost:8080/api/drivers/update-request-vehicle
 Content-Type: application/json
 
@@ -132,11 +127,10 @@ Content-Type: application/json
 
 ### Password change za sve
 
-PUT http://localhost:8080/api/passenger/1/password-change
+PUT http://localhost:8080/api/drivers/1/password
 Content-Type: application/json
 
 {
-  "oldPassword":"34324",
   "newPassword":"32432432"
 }
 
@@ -205,4 +199,4 @@ GET http://localhost:8080/api/rides/favorites
 
 ### ride start
 
-#PUT http://localhost:8080/api/rides/1/start
+PUT http://localhost:8080/api/rides/1/start

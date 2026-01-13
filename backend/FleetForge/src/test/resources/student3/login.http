@@ -1,4 +1,4 @@
-### Passenger login
+### Unsuccessful login
 POST http://localhost:8080/api/auth/login
 Content-Type: application/json
 Accept: application/json
@@ -8,12 +8,12 @@ Accept: application/json
   "password": "password123"
 }
 
-### Driver login
+### Successful login
 POST http://localhost:8080/api/auth/login
 Content-Type: application/json
 Accept: application/json
 
 {
-  "email": "driver@example.com",
-  "password": "password123"
+  "email": "driver1@test.com",
+  "password": "driver123"
 }

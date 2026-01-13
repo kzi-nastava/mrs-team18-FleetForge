@@ -1,17 +1,28 @@
 package com.team18.FleetForge.controller;
 
 import com.team18.FleetForge.dto.auth.*;
+import com.team18.FleetForge.model.users.User;
+import com.team18.FleetForge.util.JwtTokenUtils;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
 public class AuthController {
+
+    private final AuthenticationManager authenticationManager;
+    private final JwtTokenUtils jwtTokenUtils;
+
 
     /**
      * POST /api/auth/login
@@ -22,22 +33,31 @@ public class AuthController {
      *  - token
      *  - role
      */
-    @PostMapping(
-            value = "/login",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    public ResponseEntity<LoginResponseDTO> login(
-            @RequestBody LoginRequestDTO request
-    ) {
-        // Dummy authentication
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO request) {
+
+        Authentication auth = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getEmail(),
+                        request.getPassword()
+                )
+        );
+
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        User user = (User) auth.getPrincipal();
+
+        String token = jwtTokenUtils.generateToken(user);
+
+        String role = auth.getAuthorities().iterator().next().getAuthority();
+
         LoginResponseDTO response = LoginResponseDTO.builder()
-                .token("dummy-jwt-token")
-                .role("PASSENGER")
+                .token(token)
+                .role(role)
                 .loggedInAt(LocalDateTime.now())
                 .build();
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 
     /**

@@ -8,6 +8,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DriverPasswordChangeRequestDTO {
-    private String oldPassword;
     private String newPassword;
 }
