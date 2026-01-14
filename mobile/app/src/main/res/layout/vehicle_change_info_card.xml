@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/driver_profile_info_bg"
+    android:padding="10dp"
+    android:id="@+id/vehicleCard"
+    >
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/driverNameCard"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:text="Driver 1"
+            android:textColor="#000000"
+            android:textSize="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_gravity="center"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:id="@+id/moreInfoItems"
+            android:gravity="center"
+            android:visibility="gone"
+            android:paddingTop="40dp">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+
+
+                android:orientation="vertical"
+                android:layout_marginRight="100dp"
+                >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:paddingTop="20dp"
+                    android:text="Old"
+                    android:layout_gravity="center"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/oldModel"
+                    android:textColor="@color/black"
+                    android:text="Toyota"
+                    android:layout_gravity="center"
+                    android:paddingTop="20dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/oldType"
+                    android:textColor="@color/black"
+                    android:text="VAN"
+                    android:layout_gravity="center"
+                    android:paddingTop="20dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/oldRegNumber"
+                    android:textColor="@color/black"
+                    android:text="VS-024-RR"
+                    android:layout_gravity="center"
+                    android:paddingTop="20dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/oldSpace"
+                    android:textColor="@color/black"
+                    android:text="4"
+                    android:layout_gravity="center"
+                    android:paddingTop="20dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/oldPetFriendly"
+                    android:textColor="@color/black"
+                    android:text="Pet friendly: true"
+                    android:layout_gravity="center"
+                    android:paddingTop="20dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/oldBabySeat"
+                    android:textColor="@color/black"
+                    android:text="Baby seat: true"
+                    android:layout_gravity="center"
+                    android:paddingTop="20dp"/>
+
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:paddingTop="20dp"
+                    android:text="New"
+                    android:layout_gravity="center"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/newModel"
+                    android:textColor="@color/black"
+                    android:text="Opel"
+                    android:layout_gravity="center"
+                    android:paddingTop="20dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/newType"
+                    android:textColor="@color/black"
+                    android:text="VAN"
+                    android:layout_gravity="center"
+                    android:paddingTop="20dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/newRegNumber"
+                    android:textColor="@color/black"
+                    android:text="VS-024-RR"
+                    android:layout_gravity="center"
+                    android:paddingTop="20dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/newSpace"
+                    android:textColor="@color/black"
+                    android:text="4"
+                    android:layout_gravity="center"
+                    android:paddingTop="20dp"/>
+                <TextView
+                    android:id="@+id/newPetFriendly"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:text="Pet friendly: true"
+                    android:layout_gravity="center"
+                    android:paddingTop="20dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/newBabySeat"
+                    android:textColor="@color/black"
+                    android:text="Baby seat: true"
+                    android:layout_gravity="center"
+                    android:paddingTop="20dp"/>
+
+            </LinearLayout>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:paddingTop="50dp">
+
+            <Button
+                android:id="@+id/changeBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Accept"
+                android:textColor="@color/white"
+                app:backgroundTint="#ff9900"
+                app:cornerRadius="6dp"
+                android:layout_marginEnd="50dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/cancelBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Reject"
+                android:textColor="#ff9900"
+                app:backgroundTint="@color/white"
+                app:cornerRadius="6dp"
+                app:strokeColor="#ff9900"
+                app:strokeWidth="1dp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/showMoreInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:text="Show more"
+            android:layout_gravity="end"
+            android:minHeight="48dp"
+            android:minWidth="48dp"
+            android:gravity="center"
+            android:textColor="@color/black"/>
+    </LinearLayout>
+
+
+</FrameLayout>

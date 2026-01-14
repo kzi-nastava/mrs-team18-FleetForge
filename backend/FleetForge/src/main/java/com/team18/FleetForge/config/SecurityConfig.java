@@ -22,6 +22,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.springframework.web.servlet.function.RequestPredicates.headers;
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -35,7 +37,9 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(csrf -> csrf.disable())
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/h2-console/**")
+                        .disable())
 
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -45,12 +49,14 @@ public class SecurityConfig {
 
                 // Define endpoint protections
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/api/auth/login").permitAll() // Login is public
                         .requestMatchers("/api/auth/register").permitAll() // Registration is public
                         .requestMatchers("/api/auth/email-availability").permitAll() // Email checking is public
                         .requestMatchers("/api/unregistered-users/**").permitAll() // Guests features are public
                         .anyRequest().authenticated() // Everything else requires a token
-                );
+                ).headers(headers -> headers
+                                .frameOptions(frameOptions -> frameOptions.sameOrigin()));
 
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 

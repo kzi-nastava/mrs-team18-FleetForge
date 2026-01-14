@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+android:background="@drawable/driver_profile_info_bg"
+    android:padding="10dp"
+    android:id="@+id/driverCard"
+    >
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/driverNameCard"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:text="Driver 1"
+            android:textColor="#000000"
+            android:textSize="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_gravity="center"/>
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:id="@+id/moreInfoItems"
+    android:gravity="center"
+    android:visibility="gone"
+    android:paddingTop="40dp">
+<LinearLayout
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+
+
+    android:orientation="vertical"
+    android:layout_marginRight="100dp"
+    >
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/oldProfileImage"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="32dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackgroundBorderless"
+        android:scaleType="centerCrop"
+        android:layout_gravity="center"
+        android:src="@drawable/blank_profile__1_"
+
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/userSection"
+        app:shapeAppearanceOverlay="@style/CircleImageStyle" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        android:paddingTop="20dp"
+        android:text="Old"
+        android:layout_gravity="center"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/oldFirstName"
+        android:textColor="@color/black"
+        android:text="Alex"
+        android:layout_gravity="center"
+        android:paddingTop="20dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/oldLastName"
+        android:textColor="@color/black"
+        android:text="Cena"
+        android:layout_gravity="center"
+        android:paddingTop="20dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/oldEmail"
+        android:textColor="@color/black"
+        android:text="john@gmail.com"
+        android:layout_gravity="center"
+        android:paddingTop="20dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/oldNumber"
+        android:textColor="@color/black"
+        android:text="54354354353"
+        android:layout_gravity="center"
+        android:paddingTop="20dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/oldAddress"
+        android:textColor="@color/black"
+        android:text="address 2"
+        android:layout_gravity="center"
+        android:paddingTop="20dp"/>
+
+
+</LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/newProfileImage"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginTop="32dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
+            android:scaleType="centerCrop"
+            android:layout_gravity="center"
+            android:src="@drawable/blank_profile__1_"
+
+
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/userSection"
+            app:shapeAppearanceOverlay="@style/CircleImageStyle" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:paddingTop="20dp"
+            android:text="New"
+            android:layout_gravity="center"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/newFirstName"
+            android:textColor="@color/black"
+            android:text="John"
+            android:layout_gravity="center"
+            android:paddingTop="20dp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/newLastName"
+            android:textColor="@color/black"
+            android:text="Cena"
+            android:layout_gravity="center"
+            android:paddingTop="20dp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/newEmail"
+            android:textColor="@color/black"
+            android:text="john@gmail.com"
+            android:layout_gravity="center"
+            android:paddingTop="20dp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/newNumber"
+            android:textColor="@color/black"
+            android:text="54354354353"
+            android:layout_gravity="center"
+            android:paddingTop="20dp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/newAddress"
+            android:textColor="@color/black"
+            android:text="address 2"
+            android:layout_gravity="center"
+            android:paddingTop="20dp"/>
+
+    </LinearLayout>
+</LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:paddingTop="50dp">
+
+            <Button
+                android:id="@+id/changeBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Accept"
+                android:textColor="@color/white"
+                app:backgroundTint="#ff9900"
+                app:cornerRadius="6dp"
+                android:layout_marginEnd="50dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/cancelBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Reject"
+                android:textColor="#ff9900"
+                app:backgroundTint="@color/white"
+                app:cornerRadius="6dp"
+                app:strokeColor="#ff9900"
+                app:strokeWidth="1dp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/showMoreInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:text="Show more"
+            android:layout_gravity="end"
+            android:minHeight="48dp"
+            android:minWidth="48dp"
+            android:gravity="center"/>
+    </LinearLayout>
+
+
+</FrameLayout>

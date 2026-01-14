@@ -1,0 +1,263 @@
+.profilePic {
+  width: 100px;
+  height: 100px;
+  border-radius: 100%;
+  margin-bottom: 40px;
+  margin-top: 3%;
+  object-fit: cover;
+}
+.approveBtn{
+    display: block !important;
+  padding: 3px 15px !important;
+  background-color: var(--color-primary) !important;
+  color: white !important;
+  font-size: large !important;
+  font-weight: 400 !important;
+  border-radius: 6px !important;
+  font-family: 'Poppins', sans-serif !important;
+  letter-spacing: 0.02cm !important;
+  border: none !important;
+  cursor: pointer !important;
+}
+.rejectBtn{
+    display: block !important;
+  padding: 1.5px 15px !important;
+  background-color: white !important;
+  color:    var(--color-primary) !important;
+  font-size: large !important;
+  font-weight: 400 !important;
+  border-radius: 6px !important;
+  font-family: 'Poppins', sans-serif !important;
+  letter-spacing: 0.02cm !important;
+  border: 2px solid var(--color-primary) !important;
+  cursor: pointer !important;
+}
+
+.driverChangeCard {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+  padding: 20px;
+  align-items: start;
+}
+
+.item {
+  border: 2px solid var(--color-primary);
+  border-radius: 12px;
+  padding: 20px;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  transition: transform 0.2s;
+}
+
+.item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 12px rgba(0,0,0,0.1);
+}
+
+.driverName {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 15px;
+  text-align: center;
+  color: #333;
+}
+
+.details {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 20px;
+  animation: fadeIn 0.3s ease-in;
+}
+
+.old, .new {
+  flex: 1;
+  text-align: center;
+}
+
+.label {
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  color: #777;
+  margin-bottom: 10px;
+}
+
+.separator {
+  width: 1px;
+  background-color: #eee;
+  margin: 0 5px;
+}
+
+.profilePic {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin-bottom: 15px;
+  object-fit: cover;
+  border: 2px solid #eee;
+}
+
+.value {
+  font-size: 0.9rem;
+  margin: 4px 0;
+  word-break: break-word; 
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+
+.approveBtn, .rejectBtn {
+  flex: 1; 
+  padding: 8px 0 !important;
+  font-family: 'Poppins', sans-serif !important;
+  font-size: 1rem !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+  font-weight: 500 !important;
+  transition: opacity 0.2s;
+}
+
+.approveBtn {
+  background-color: var(--color-primary) !important;
+  color: white !important;
+  border: none !important;
+}
+
+.rejectBtn {
+  background-color: white !important;
+  color: var(--color-primary) !important;
+  border: 2px solid var(--color-primary) !important;
+}
+
+.approveBtn:hover, .rejectBtn:hover {
+  opacity: 0.8;
+}
+
+.viewDetailsBtn {
+  width: 100%;
+  background-color: transparent;
+  color: #666;
+  border: none;
+  border-top: 1px solid #eee;
+  padding-top: 12px;
+  margin-top: 5px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.viewDetailsBtn:hover {
+  color: var(--color-primary);
+  letter-spacing: 2px; /* Subtle spacing animation */
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.switch-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 20px 0;
+}
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 200px;
+  height: 50px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #000000;
+  -webkit-transition: .4s;
+  transition: .4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 42px;
+  width: 100px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+  z-index: 3;
+  border-radius: 25px;
+}
+
+
+.slider-thumb {
+  position: absolute;
+  left: 4px;
+  bottom: 4px;
+  width: 100px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary);
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  z-index: 4;
+  white-space: nowrap;
+  -webkit-transition: .4s;
+  transition: .4s;
+  pointer-events: none;
+}
+input:checked + .slider .slider-thumb {
+  -webkit-transform: translateX(92px); /* Isti pomak kao thumb */
+  -ms-transform: translateX(92px);
+  transform: translateX(92px);
+}
+
+
+input:not(:checked) + .slider {
+  background-color: #000000;
+}
+
+input:checked + .slider {
+  background-color: var(--color-primary);
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(92px);
+  -ms-transform: translateX(92px);
+  transform: translateX(92px);
+}
+.slider.round {
+  border-radius: 34px;
+}

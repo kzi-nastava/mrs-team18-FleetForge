@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class VehicleInformationChangeRequestDTO {
+    private Long vehicleId;
     private String newModel;
     private VehicleType newType;
     private String newRegistrationNumber;

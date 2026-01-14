@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import com.ognjen.fleetforge.fragments.account_changes.DriverChangesFragment;
 import com.ognjen.fleetforge.fragments.driver.DriverHistoryFragment;
 import com.ognjen.fleetforge.fragments.PlaceholderFragment;
 import com.ognjen.fleetforge.R;
@@ -124,6 +125,8 @@ public class MainActivity extends AppCompatActivity {
             return PlaceholderFragment.newInstance("Register Driver");
         } else if (itemId == R.id.nav_block_users) {
             return PlaceholderFragment.newInstance("Block Users");
+        }else if(itemId==R.id.nav_profile_changes){
+            return new DriverChangesFragment();
         }
 
         return null;

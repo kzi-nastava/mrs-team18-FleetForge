@@ -11,10 +11,16 @@ import com.team18.FleetForge.model.Vehicle;
 import com.team18.FleetForge.model.GeoPoint;
 import com.team18.FleetForge.model.VehicleInformationChangeRequest;
 import com.team18.FleetForge.model.enums.InformationChangeRequestStatus;
+import com.team18.FleetForge.service.DriverProfileChangeRequestService;
+import com.team18.FleetForge.service.UserService;
+import com.team18.FleetForge.service.VehicleInfoChangeReqService;
+import com.team18.FleetForge.service.VehicleService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
@@ -25,22 +31,29 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/drivers")
+@RequiredArgsConstructor
 public class DriverControler {
+    private final UserService userService;
+    private final DriverProfileChangeRequestService driverChangeRequestService;
+    private final VehicleInfoChangeReqService vehicleChangeService;
 
+    @GetMapping
+
+    public ResponseEntity<DriverGetResponseDTO> getCurrentDriver(){
+        Driver driver=userService.getCurrentDriver();
+        if(driver==null){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        ResponseEntity<DriverGetResponseDTO> responseEntity = new ResponseEntity<>(new DriverGetResponseDTO(driver), HttpStatus.OK);
+        return responseEntity;
+    }
     @GetMapping("/{id}")
     public ResponseEntity<DriverGetResponseDTO> getDriver(@PathVariable Long id) {
-        Driver foundDriver = new Driver();
-        foundDriver.setId(id);
-        foundDriver.setFirstName("Admin");
-        foundDriver.setLastName("Admin");
-        foundDriver.setPassword("admin");
-        foundDriver.setEmail("admin");
-        foundDriver.setPhoneNumber("123456789");
-        foundDriver.setAddress("address");
-        foundDriver.setProfilePicture("profilePicture");
-
+        Driver foundDriver = (Driver) userService.getUserById(id);
+        if(foundDriver == null){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
         DriverGetResponseDTO driverGetResponseDTO = new DriverGetResponseDTO(foundDriver);
-
         return new ResponseEntity<>(driverGetResponseDTO, HttpStatus.OK);
     }
 
@@ -98,27 +111,26 @@ public class DriverControler {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-
+    @Transactional
     @PostMapping("/update-request")
     public ResponseEntity<DriverProfileChangeResponseDTO> createChangeRequest(@RequestBody DriverProfileChangeRequestDTO request) {
-        //treba pronaci drivera preko maila iz baze da bi id postavio id, sad je samo privremeno ovako
-        Driver foundDriver = new Driver();
-        foundDriver.setId(1L);
 
-        DriverProfileChangeRequest driverProfileChangeRequest = new DriverProfileChangeRequest();
-        driverProfileChangeRequest.setDriverId(foundDriver.getId());
-        driverProfileChangeRequest.setNewFirstName(request.getNewFirstName());
-        driverProfileChangeRequest.setNewLastName(request.getNewLastName());
-        driverProfileChangeRequest.setNewEmail(request.getNewEmail());
-        driverProfileChangeRequest.setNewPhoneNumber(request.getNewPhoneNumber());
-        driverProfileChangeRequest.setNewAddress(request.getNewAddress());
-        driverProfileChangeRequest.setNewProfilePicture(request.getNewProfilePicture());
-        driverProfileChangeRequest.setCreatedAt(LocalDateTime.now());
-        driverProfileChangeRequest.setStatus(InformationChangeRequestStatus.PENDING);
-        // treba sacuvati ovo posle
+        Driver foundDriver =(Driver) userService.getUserById(userService.getCurrentDriver().getId());
 
+        DriverProfileChangeRequest changeRequest=new DriverProfileChangeRequest();
+        changeRequest.setDriver(foundDriver);
+        changeRequest.setStatus(InformationChangeRequestStatus.PENDING);
+        changeRequest.setCreatedAt(LocalDateTime.now());
+        changeRequest.setNewFirstName(request.getNewFirstName());
+        changeRequest.setNewLastName(request.getNewLastName());
+        changeRequest.setNewAddress(request.getNewAddress());
+        changeRequest.setNewEmail(request.getNewEmail());
+        changeRequest.setNewProfilePicture(request.getNewProfilePicture());
+        changeRequest.setNewPhoneNumber(request.getNewPhoneNumber());
 
-        DriverProfileChangeResponseDTO driverProfileChangeResponseDTO = new DriverProfileChangeResponseDTO(driverProfileChangeRequest);
+        driverChangeRequestService.save(changeRequest);
+
+        DriverProfileChangeResponseDTO driverProfileChangeResponseDTO = new DriverProfileChangeResponseDTO(changeRequest);
         return new ResponseEntity<>(driverProfileChangeResponseDTO, HttpStatus.CREATED);
     }
 
@@ -190,23 +202,22 @@ public class DriverControler {
 
     @PostMapping("/update-request-vehicle")
     public ResponseEntity<VehicleInformationChangeResponseDTO> createChangeRequest(@RequestBody VehicleInformationChangeRequestDTO request) {
-        //treba pronaci drivera preko maila iz baze da bi id postavio id, sad je samo privremeno ovako
-        Vehicle foundVehicle = new Vehicle();
-        foundVehicle.setId(1L);
+
+        Driver foundDriver =(Driver) userService.getUserById(userService.getCurrentDriver().getId());
+        Vehicle vehicle= foundDriver.getVehicle();
 
         VehicleInformationChangeRequest vehicleInformationChangeRequest = new VehicleInformationChangeRequest();
-        vehicleInformationChangeRequest.setVehicleId(foundVehicle.getId());
+        vehicleInformationChangeRequest.setVehicle(vehicle);
+        vehicleInformationChangeRequest.setCreatedAt(LocalDateTime.now());
         vehicleInformationChangeRequest.setNewModel(request.getNewModel());
         vehicleInformationChangeRequest.setNewRegistrationNumber(request.getNewRegistrationNumber());
         vehicleInformationChangeRequest.setNewType(request.getNewType());
         vehicleInformationChangeRequest.setNewSpace(request.getNewSpace());
-        vehicleInformationChangeRequest.setNewBabySeat(request.isNewBabySeat());
-        vehicleInformationChangeRequest.setNewPetFriendly(request.isNewPetFriendly());
-
-        vehicleInformationChangeRequest.setCreatedAt(LocalDateTime.now());
         vehicleInformationChangeRequest.setStatus(InformationChangeRequestStatus.PENDING);
-        // treba sacuvati ovo posle
+        vehicleInformationChangeRequest.setNewPetFriendly(request.isNewPetFriendly());
+        vehicleInformationChangeRequest.setNewBabySeat(request.isNewBabySeat());
 
+        vehicleChangeService.save(vehicleInformationChangeRequest);
 
         VehicleInformationChangeResponseDTO vehicleInformationChangeResponseDTO = new VehicleInformationChangeResponseDTO(vehicleInformationChangeRequest);
         return new ResponseEntity<>(vehicleInformationChangeResponseDTO, HttpStatus.CREATED);

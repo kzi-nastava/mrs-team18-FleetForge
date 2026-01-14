@@ -4,6 +4,7 @@ import com.team18.FleetForge.dto.vehicle.VehicleLocationDTO;
 import com.team18.FleetForge.model.Vehicle;
 import com.team18.FleetForge.model.users.Driver;
 import com.team18.FleetForge.repository.DriverRepository;
+import com.team18.FleetForge.repository.VehicleRepo;
 import com.team18.FleetForge.service.VehicleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 public class VehicleServiceImpl implements VehicleService {
 
     private final DriverRepository driverRepository;
+    private final VehicleRepo  vehicleRepo;
 
     @Override
     public List<VehicleLocationDTO> getActiveVehicleLocations() {
@@ -34,6 +36,16 @@ public class VehicleServiceImpl implements VehicleService {
                 .filter(driver -> driver.getVehicle() != null)
                 .map(this::mapDriverToVehicleLocationDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Vehicle findById(Long id) {
+        return vehicleRepo.findById(id).orElse(null);
+    }
+
+    @Override
+    public void save(Vehicle vehicle) {
+        vehicleRepo.save(vehicle);
     }
 
     private VehicleLocationDTO mapDriverToVehicleLocationDTO(Driver driver) {

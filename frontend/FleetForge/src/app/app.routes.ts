@@ -12,6 +12,7 @@ import { DriverProfileComponent } from './profiles/driver-profile/driver-profile
 import { PassengerProfileComponent } from './profiles/passenger-profile/passenger-profile.component';
 import { PasswordResetComponent } from './profiles/password-reset/password-reset.component';
 import { DriverHistoryComponent } from './driver/driver-history/driver-history.component';
+import { DriverProfileChangesComponent } from './admin/driver-profile-changes/driver-profile-changes-component/driver-profile-changes.component';
 
 export const routes: Routes = [
   /** ROUTES WITH NAVBAR */
@@ -23,7 +24,8 @@ export const routes: Routes = [
       { path: 'profile', component: PassengerProfileComponent },
       { path: 'profile-driver', component: DriverProfileComponent },
       { path: 'profile-password-reset', component: PasswordResetComponent },
-      { path: 'driver/ride-history', component: DriverHistoryComponent }
+      { path: 'driver/ride-history', component: DriverHistoryComponent },
+      { path: 'admin/driver-changes', component: DriverProfileChangesComponent }
     ]
   },
 

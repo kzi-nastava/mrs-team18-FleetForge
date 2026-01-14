@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DriverProfileChangeRequestDTO {
+    private Long driverId;
     private String newFirstName;
     private String newLastName;
     private String newEmail;

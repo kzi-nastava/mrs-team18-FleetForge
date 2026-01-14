@@ -1,5 +1,6 @@
 package com.team18.FleetForge.dto.driver;
 
+import com.team18.FleetForge.dto.vehicle.VehicleGetResponseDTO;
 import com.team18.FleetForge.model.users.Driver;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,6 +16,7 @@ public class DriverGetResponseDTO {
     private String phoneNumber;
     private String address;
     private String profilePicture;
+    private VehicleGetResponseDTO vehicle;
 
     public DriverGetResponseDTO(Driver driver){
         this.firstName=driver.getFirstName();
@@ -23,5 +25,6 @@ public class DriverGetResponseDTO {
         this.phoneNumber=driver.getPhoneNumber();
         this.address=driver.getAddress();
         this.profilePicture=driver.getProfilePicture();
+        vehicle=new VehicleGetResponseDTO(driver.getVehicle());
     }
 }
