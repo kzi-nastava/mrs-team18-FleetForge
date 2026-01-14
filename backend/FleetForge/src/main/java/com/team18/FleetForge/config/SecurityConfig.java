@@ -22,6 +22,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.springframework.web.servlet.function.RequestPredicates.headers;
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -36,7 +38,9 @@ public class SecurityConfig {
         http
                 // Enable CORS with the bean defined below and disable CSRF for API usage
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(csrf -> csrf.disable())
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/h2-console/**")
+                        .disable())
 
                 // Set session management to stateless for JWT
                 .sessionManagement(session ->
@@ -48,10 +52,12 @@ public class SecurityConfig {
 
                 // Define endpoint protections
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/api/auth/login").permitAll() // Login is public
                         .requestMatchers("/api/unregistered-users/**").permitAll() // Guests features are public
                         .anyRequest().authenticated() // Everything else requires a token
-                );
+                ).headers(headers -> headers
+                                .frameOptions(frameOptions -> frameOptions.sameOrigin()));
 
         // Add our JWT filter before the standard UsernamePassword filter
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
