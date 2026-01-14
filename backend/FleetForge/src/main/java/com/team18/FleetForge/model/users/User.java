@@ -59,6 +59,10 @@ public abstract class User implements UserDetails {
     @Column(nullable = false)
     private Role role;
 
+    @Column(name = "is_activated")
+    private boolean isActivated;
+
+
     // --- UserDetails Implementation ---
 
     @Override
@@ -92,6 +96,6 @@ public abstract class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return isActivated || role == Role.ROLE_ADMIN;
     }
 }

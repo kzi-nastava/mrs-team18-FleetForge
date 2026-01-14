@@ -2,6 +2,7 @@ package com.team18.FleetForge.controller;
 
 import com.team18.FleetForge.dto.auth.*;
 import com.team18.FleetForge.model.users.User;
+import com.team18.FleetForge.service.AuthService;
 import com.team18.FleetForge.util.JwtTokenUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import java.util.Map;
+import java.util.Collections;
+
 
 import java.time.LocalDateTime;
 
@@ -22,6 +26,7 @@ public class AuthController {
 
     private final AuthenticationManager authenticationManager;
     private final JwtTokenUtils jwtTokenUtils;
+    private final AuthService authService;
 
 
     /**
@@ -110,6 +115,7 @@ public class AuthController {
      *  - profilePicture (optional)
      * Response:
      *  - 201 CREATED on successful registration
+     *  - 409 CONFLICT on already taken email
      */
     @PostMapping(
             value = "/register",
@@ -118,9 +124,17 @@ public class AuthController {
     public ResponseEntity<Void> register(
             @RequestBody RegisterRequestDTO request
     ) {
-        // later create user and send activation email
+        User existUser = authService.findByEmail(request.getEmail());
+
+        if (existUser != null) {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
+
+        authService.registerPassenger(request);
+
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
+
 
     /**
      * POST /api/auth/activations
@@ -140,4 +154,25 @@ public class AuthController {
         // Dummy token validation
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    /**
+     * GET /api/auth/email-availability
+     * Query Parameter:
+     *  - email
+     * Response:
+     *  - 200 OK
+     *    {
+     *      "available": true|false
+     *    }
+     */
+    @GetMapping("/email-availability")
+    public ResponseEntity<Map<String, Boolean>> checkEmailAvailability(
+            @RequestParam String email
+    ) {
+        boolean available = authService.findByEmail(email) == null;
+        Map<String, Boolean> response = Collections.singletonMap("available", available);
+        return ResponseEntity.ok(response);
+    }
+
+
 }

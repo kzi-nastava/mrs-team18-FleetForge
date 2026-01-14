@@ -36,17 +36,14 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                // Enable CORS with the bean defined below and disable CSRF for API usage
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf
                         .ignoringRequestMatchers("/h2-console/**")
                         .disable())
 
-                // Set session management to stateless for JWT
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                // Handle unauthorized attempts with a clean 401 response
                 .exceptionHandling(ex ->
                         ex.authenticationEntryPoint(restAuthenticationEntryPoint))
 
@@ -54,12 +51,13 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/api/auth/login").permitAll() // Login is public
+                        .requestMatchers("/api/auth/register").permitAll() // Registration is public
+                        .requestMatchers("/api/auth/email-availability").permitAll() // Email checking is public
                         .requestMatchers("/api/unregistered-users/**").permitAll() // Guests features are public
                         .anyRequest().authenticated() // Everything else requires a token
                 ).headers(headers -> headers
                                 .frameOptions(frameOptions -> frameOptions.sameOrigin()));
 
-        // Add our JWT filter before the standard UsernamePassword filter
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

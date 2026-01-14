@@ -12,6 +12,27 @@ Content-Type: application/json
   "profilePicture": "https://example.com/profile.png"
 }
 
+### Try registring with the existing email again
+POST http://localhost:8080/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "passenger@test.com",
+  "password": "Password123",
+  "firstName": "John",
+  "lastName": "Doe",
+  "address": "123 Main St, Cityville",
+  "phoneNumber": "+381601234567",
+  "profilePicture": "https://example.com/profile.png"
+}
+
+### Check email availability for a new email
+GET http://localhost:8080/api/auth/email-availability?email=passenger5@test.com
+
+### Check email availability for an existing email
+GET http://localhost:8080/api/auth/email-availability?email=passenger@test.com
+
+
 
 ### Activate the newly registered account
 POST http://localhost:8080/api/auth/activations
