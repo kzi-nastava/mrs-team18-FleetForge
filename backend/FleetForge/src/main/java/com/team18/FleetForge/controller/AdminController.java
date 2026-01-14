@@ -183,7 +183,8 @@ public class AdminController {
         List<VehicleInformationChangeRequest> requests=vehicleChangeService.findAllPending();
         List<VehicleChangeInformationResponseDTO> responseDTOs=new ArrayList<>();
         for(VehicleInformationChangeRequest request:requests){
-            VehicleChangeInformationResponseDTO responseDTO=new VehicleChangeInformationResponseDTO(request,request.getVehicle());
+            Driver driver=vehicleChangeService.getDriverForVehicleRequest(request.getVehicle().getId());
+            VehicleChangeInformationResponseDTO responseDTO=new VehicleChangeInformationResponseDTO(request,request.getVehicle(),driver);
             responseDTOs.add(responseDTO);
 
         }
