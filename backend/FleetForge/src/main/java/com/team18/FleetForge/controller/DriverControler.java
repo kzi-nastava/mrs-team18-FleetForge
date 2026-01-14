@@ -7,20 +7,22 @@ import com.team18.FleetForge.dto.vehicle.VehicleInformationChangeResponseDTO;
 import com.team18.FleetForge.model.DriverProfileChangeRequest;
 import com.team18.FleetForge.model.DriverSession;
 import com.team18.FleetForge.model.users.Driver;
+import com.team18.FleetForge.model.users.User;
 import com.team18.FleetForge.model.Vehicle;
-import com.team18.FleetForge.model.GeoPoint;
 import com.team18.FleetForge.model.VehicleInformationChangeRequest;
 import com.team18.FleetForge.model.enums.InformationChangeRequestStatus;
-import com.team18.FleetForge.service.DriverProfileChangeRequestService;
+import com.team18.FleetForge.service.RideService;
 import com.team18.FleetForge.service.UserService;
+import com.team18.FleetForge.service.DriverProfileChangeRequestService;
 import com.team18.FleetForge.service.VehicleInfoChangeReqService;
-import com.team18.FleetForge.service.VehicleService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
@@ -34,6 +36,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DriverControler {
     private final UserService userService;
+    private final RideService rideService;
     private final DriverProfileChangeRequestService driverChangeRequestService;
     private final VehicleInfoChangeReqService vehicleChangeService;
 
@@ -253,63 +256,15 @@ public class DriverControler {
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
             LocalDate startDate) {
 
-        List<DriverRideHistoryDTO> history = new ArrayList<>();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        history.add(DriverRideHistoryDTO.builder()
-                .rideId(101L)
-                .startTime(LocalDateTime.of(2025, 12, 25, 14, 30))
-                .endTime(LocalDateTime.of(2025, 12, 25, 14, 50))
-                .startLocation(new GeoPoint(45.2550, 19.8450))
-                .startAddress("Bulevar oslobođenja 46, Novi Sad")
-                .endLocation(new GeoPoint(45.2671, 19.8335))
-                .endAddress("Trg slobode 1, Novi Sad")
-                .totalPrice(850.00)
-                .cancelled(false)
-                .cancelledBy(null)
-                .panicActivated(false)
-                .passengers(List.of(
-                        DriverRideHistoryDTO.PassengerDTO.builder()
-                                .id(10L)
-                                .firstName("Marko")
-                                .lastName("Marković")
-                                .email("marko@example.com")
-                                .phoneNumber("+381641234567")
-                                .profileImage("passenger10.jpg")
-                                .build(),
-                        DriverRideHistoryDTO.PassengerDTO.builder()
-                                .id(11L)
-                                .firstName("Ana")
-                                .lastName("Anić")
-                                .email("ana@example.com")
-                                .phoneNumber("+381649876543")
-                                .profileImage("passenger11.jpg")
-                                .build()
-                ))
-                .build());
+        Long driverId = null;
 
-        history.add(DriverRideHistoryDTO.builder()
-                .rideId(103L)
-                .startTime(LocalDateTime.of(2025, 12, 23, 18, 00))
-                .endTime(LocalDateTime.of(2025, 12, 23, 18, 25))
-                .startLocation(new GeoPoint(45.2600, 19.8400))
-                .startAddress("Novi Sad Centar")
-                .endLocation(new GeoPoint(45.2500, 19.8600))
-                .endAddress("Petrovaradin")
-                .totalPrice(1200.00)
-                .cancelled(false)
-                .cancelledBy(null)
-                .panicActivated(true)
-                .passengers(List.of(
-                        DriverRideHistoryDTO.PassengerDTO.builder()
-                                .id(13L)
-                                .firstName("Jovana")
-                                .lastName("Jovanović")
-                                .email("jovana@example.com")
-                                .phoneNumber("+381645556666")
-                                .profileImage("passenger13.jpg")
-                                .build()
-                ))
-                .build());
+        if (authentication != null && authentication.getPrincipal() instanceof User user) {
+            driverId = user.getId();
+        }
+
+        List<DriverRideHistoryDTO> history = rideService.getDriverRideHistory(driverId, startDate);
 
         return new ResponseEntity<>(history, HttpStatus.OK);
     }
