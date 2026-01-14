@@ -17,6 +17,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PassengerRepository passengerRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
     public void registerPassenger(RegisterRequestDTO request) {
 
@@ -37,6 +38,7 @@ public class AuthService {
                 .build();
 
         passengerRepository.save(passenger);
+        emailService.sendEmail("ognjenvujovic04@gmail.com", "Account Activation", "body");
     }
 
     public User findByEmail(String email) {
