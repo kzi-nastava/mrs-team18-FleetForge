@@ -6,8 +6,8 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
-import { User } from '../model/user.model';
-import { UserService } from '../service/user-service';
+import { User } from '../../shared/models/user.model';
+import { PassengerService } from '../service/passenger-service';
 
 
 @Component({
@@ -27,38 +27,49 @@ export class PassengerProfileComponent implements OnInit {
     firstName: new FormControl('', Validators.required),
     lastName: new FormControl('', Validators.required),
     email: new FormControl('', Validators.required),
-    number: new FormControl('',Validators.required),
-    address: new FormControl('',Validators.required)
+    phoneNumber: new FormControl('',Validators.required),
+    address: new FormControl('',Validators.required),
+    profilePicture: new FormControl('')
   });
-  protected userShow: Signal<User>;
-  constructor(private userService: UserService) {
-    this.userShow=this.userService.user
+  // protected userShow: Signal<User>;
+  constructor(private passengerService:PassengerService,) {
+    // this.userShow=this.userService.user
   }
 
   ngOnInit(): void {
-    const currentUser = this.userShow();
-    this.editPassengerInfo.patchValue({
-      firstName: currentUser.firstName,
-      lastName: currentUser.lastName,
-      email: currentUser.email,
-      number: currentUser.number.toString(),
-      address: currentUser.homeAddress
+     this.passengerService.getCurrentPassenger().subscribe((userData) => {
+       this.editPassengerInfo.setValue({
+      firstName: userData.firstName ?? '',
+      lastName: userData.lastName ?? '',
+      email: userData.email ?? '',
+      phoneNumber: userData.phoneNumber ?? '', 
+      address: userData.address ?? '',
+      profilePicture: userData.profilePicture ?? ''
+    });
     });
   }
 
 edit(): void {
     if (this.editPassengerInfo.invalid) return;
-
-    const user: User = {
-       id: Math.random(),
+    this.passengerService.changePassenger({
       firstName: this.editPassengerInfo.value.firstName ?? '',
       lastName: this.editPassengerInfo.value.lastName ?? '',
       email: this.editPassengerInfo.value.email ?? '',
-      number: Number(this.editPassengerInfo.value.number) || 0,
-      homeAddress: this.editPassengerInfo.value.address ?? ''
-    };
-
-    this.userService.changeUser(user);
+      phoneNumber: this.editPassengerInfo.value.phoneNumber ?? '',
+      address: this.editPassengerInfo.value.address ?? '',
+      profilePicture: this.editPassengerInfo.value.profilePicture ?? 'blank_profile.webp'
+    })
+    .subscribe((updatedUser) => {
+      alert('Profile successfully updated!');
+      this.editPassengerInfo.setValue({
+        firstName: updatedUser.firstName ?? '',
+        lastName: updatedUser.lastName ?? '',
+        email: updatedUser.email ?? '',
+        phoneNumber: updatedUser.phoneNumber ?? '',
+        address: updatedUser.address ?? '',
+        profilePicture: updatedUser.profilePicture ?? 'blank_profile.webp'
+      });
+    });
   }
 
 
@@ -78,5 +89,8 @@ edit(): void {
     // za sada samo prikazujemo izabranu sliku
     // pozivom servisa this.userService.uploadProfilePicture(file);
     this.imageUrl = URL.createObjectURL(file);
+    this.editPassengerInfo.patchValue({
+    profilePicture: file.name 
+  });
   }
 }
