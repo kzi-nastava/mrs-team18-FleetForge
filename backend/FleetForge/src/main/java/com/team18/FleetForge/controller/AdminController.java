@@ -211,7 +211,7 @@ public class AdminController {
 //        return new ResponseEntity<>(adminVehicleChangeStatusResponseDTO,HttpStatus.OK);
 //    }
     @PutMapping("password")
-    public ResponseEntity<String> passwordChange(@PathVariable Long id,@RequestBody AdminPasswordChangeRequestDTO request){
+    public ResponseEntity<String> passwordChange(@RequestBody AdminPasswordChangeRequestDTO request){
        Admin admin=userService.getCurrentAdmin();
        if(admin==null){
            return new ResponseEntity<>(HttpStatus.NOT_FOUND);

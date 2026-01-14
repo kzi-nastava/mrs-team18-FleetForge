@@ -29,3 +29,7 @@ export interface DriverChangeResponseDTO{
     createdAt:Date;
     requestId:number;
 }
+
+export interface PasswordChangeDTO{
+    newPassword:string;
+}

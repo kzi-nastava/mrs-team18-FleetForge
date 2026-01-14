@@ -24,5 +24,10 @@ export class DriverService {
   createVehicleChangeRequest(request:VehicleChangeRequestDTO):Observable<VehicleChangeResponseDTO> {
     return this.http.post<VehicleChangeResponseDTO>(`${this.apiUrl}/update-request-vehicle`, request);
   }
-  
+  changePassword(newPassword:string):Observable<void> {
+    const passwordChangeDTO = {
+      password: newPassword
+    };
+    return this.http.put<void>(`${this.apiUrl}/password`, passwordChangeDTO);
+  }
 }

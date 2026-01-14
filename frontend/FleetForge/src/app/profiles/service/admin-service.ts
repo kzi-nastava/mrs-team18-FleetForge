@@ -18,5 +18,10 @@ export class AdminService {
   changeAdmin(user:UserInformationDTO):Observable<UserInformationDTO> {
     return this.http.put<UserInformationDTO>(`${this.apiUrl}`, user);
   }
-  
+  changePassword(newPassword:string):Observable<void> {
+    const passwordChangeDTO = {
+      password: newPassword
+    };
+    return this.http.put<void>(`${this.apiUrl}/password`, passwordChangeDTO);
+  }
 }
