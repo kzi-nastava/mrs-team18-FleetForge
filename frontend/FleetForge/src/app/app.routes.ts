@@ -12,7 +12,8 @@ import { DriverProfileComponent } from './profiles/driver-profile/driver-profile
 import { PassengerProfileComponent } from './profiles/passenger-profile/passenger-profile.component';
 import { PasswordResetComponent } from './profiles/password-reset/password-reset.component';
 import { DriverHistoryComponent } from './driver/driver-history/driver-history.component';
-import { DriverProfileChangesComponent } from './admin/driver-profile-changes/driver-profile-changes-component/driver-profile-changes.component';
+import { AdminProfileComponent } from './profiles/admin-profile/admin-profile.component';
+import { DriverProfileChangesComponent } from './admin/driver-profile-changes/driver-profile-changes.component';
 
 export const routes: Routes = [
   /** ROUTES WITH NAVBAR */
@@ -21,7 +22,8 @@ export const routes: Routes = [
     component: MainLayoutComponent,
     children: [
       { path: '', component: HomeComponent },
-      { path: 'profile', component: PassengerProfileComponent },
+      { path: 'profile-passenger', component: PassengerProfileComponent },
+      {path: 'profile-admin', component: AdminProfileComponent },
       { path: 'profile-driver', component: DriverProfileComponent },
       { path: 'profile-password-reset', component: PasswordResetComponent },
       { path: 'driver/ride-history', component: DriverHistoryComponent },

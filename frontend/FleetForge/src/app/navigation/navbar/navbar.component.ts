@@ -49,8 +49,11 @@ export class NavbarComponent {
 
   viewProfile(): void {
     this.userRole$.subscribe(role => {
-      if(role === 'PASSENGER'|| role === 'ADMIN'){
-        this.router.navigate(['profile']);
+      if(role === 'PASSENGER'){
+        this.router.navigate(['profile-passenger']);
+      }
+      else if(role === 'ADMIN'){
+        this.router.navigate(['profile-admin']);
       }
       else if(role === 'DRIVER'){
         this.router.navigate(['profile-driver']);

@@ -20,11 +20,11 @@
     <label for="email">Email</label>
     <input id="email" formControlName="email" placeholder="Enter your email" required>
 
-    <label for="number">Phone number</label>
-    <input id="number" type="tel" formControlName="number" placeholder="Enter your phone number">
+    <label for="phoneNumber">Phone number</label>
+    <input id="phoneNumber" type="tel" formControlName="phoneNumber" placeholder="Enter your phone number">
 
-    <label for="homeAddress">Home Address</label>
-    <input id="homeAddress" type="text" formControlName="homeAddress" placeholder="Enter your home address">
+    <label for="address">Home Address</label>
+    <input id="address" type="text" formControlName="address" placeholder="Enter your home address">
 
     <button class="changeBtn" type="submit">Change</button>
   </form>
@@ -41,27 +41,27 @@
     <label for="type">Vehicle type</label>
     <select id="type" formControlName="type" required>
       <option value="" disabled selected>Select vehicle type</option>
-      <option value="standard">Standard</option>
-      <option value="luxury">Luxury</option>
-      <option value="suv">SUV</option>
+      <option value="STANDARD">Standard</option>
+      <option value="LUXURY">Luxury</option>
+      <option value="SUV">SUV</option>
     </select>
 
-    <label for="licensePlateNumber">License plate number</label>
-    <input id="licensePlateNumber" formControlName="licensePlateNumber" placeholder="Enter your license plate number">
+    <label for="registrationNumber">License plate number</label>
+    <input id="registrationNumber" formControlName="registrationNumber" placeholder="Enter your license plate number">
 
-    <label for="passengerNumber">Passenger number</label>
-    <input id="passengerNumber" type="number" formControlName="passengerNumber" placeholder="Enter your passenger number">
+    <label for="space">Passenger number</label>
+    <input id="space" type="number" formControlName="space" placeholder="Enter your passenger number">
 
     <div class="checkbox-row">
       <label class="checkbox">
-        <input id="isBabySeatAvailable" type="checkbox" formControlName="isBabySeatAvailable">
+        <input id="babySeat" type="checkbox" formControlName="babySeat">
         <span>Is baby seat available</span>
       </label>
     </div>
 
     <div class="checkbox-row">
       <label class="checkbox">
-        <input id="isPetFriendly" type="checkbox" formControlName="isPetFriendly">
+        <input id="petFriendly" type="checkbox" formControlName="petFriendly">
         <span>Is pet friendly</span>
       </label>
     </div>

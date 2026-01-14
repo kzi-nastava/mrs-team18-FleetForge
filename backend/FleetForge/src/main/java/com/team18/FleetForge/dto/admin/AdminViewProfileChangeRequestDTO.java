@@ -16,7 +16,6 @@ public class AdminViewProfileChangeRequestDTO {
     private Long requestId;
     private Long driverId;
 
-    private String driverEmail;
     private String firstName;
     private String lastName;
     private String email;
@@ -37,7 +36,6 @@ public class AdminViewProfileChangeRequestDTO {
     public AdminViewProfileChangeRequestDTO(DriverProfileChangeRequest request, Driver driver) {
         this.requestId=request.getId();
         this.driverId=driver.getId();
-        this.driverEmail=driver.getEmail();
         this.firstName=driver.getFirstName();
         this.lastName=driver.getLastName();
         this.email=driver.getEmail();

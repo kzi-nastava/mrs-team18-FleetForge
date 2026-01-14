@@ -8,25 +8,25 @@
 </div>
 @if(!isSliderRight) {
 <div class="driverChangeCard">
-@for(change of changes(); track change.id) {
+@for(change of changes(); track change.requestId) {
     <div class="item">
-        <p class="driverName">{{change.oldFristName}} {{change.oldLastName}}</p>
-        @if(isExpanded(change.id)) {
+        <p class="driverName">{{change.firstName}} {{change.lastName}}</p>
+        @if(isExpanded(change.requestId)) {
         <div class="details" >
             <div class="old">
                 <p class="label">Old</p>
-                <img class="profilePic" [src]="change.oldProfilePictureUrl" alt="Old Profile Picture"/>
-                <p class="value">{{change.oldFristName}}</p>
-                <p class="value">{{change.oldLastName}}</p>
-                <p class="value">{{change.oldEmail}}</p>
-                <p class="value">{{change.oldPhoneNumber}}</p>
-                <p class="value">{{change.oldAddress}}</p>
+                <img class="profilePic" [src]="change.profilePicture" alt="Old Profile Picture"/>
+                <p class="value">{{change.firstName}}</p>
+                <p class="value">{{change.lastName}}</p>
+                <p class="value">{{change.email}}</p>
+                <p class="value">{{change.phoneNumber}}</p>
+                <p class="value">{{change.address}}</p>
                 
             </div>
             <div class="separator"></div>
             <div class="new">
                 <p class="label">New</p>
-                <img class="profilePic" [src]="change.newProfilePictureUrl" alt="New Profile Picture"/>
+                <img class="profilePic" [src]="change.newProfilePicture" alt="New Profile Picture"/>
                 <p class="value">{{change.newFirstName}}</p>
                 <p class="value">{{change.newLastName}}</p>
                 <p class="value">{{change.newEmail}}</p>
@@ -37,12 +37,12 @@
     }
         <div class="card-footer">
         <div class="action-buttons">
-          <button class="approveBtn">Approve</button>
-          <button class="rejectBtn">Reject</button>
+          <button class="approveBtn" (click)="approveDriver(change.requestId,change.driverId)">Approve</button>
+          <button class="rejectBtn" (click)="rejectDriver(change.requestId,change.driverId)">Reject</button>
         </div>
         
-        <button class="viewDetailsBtn" (click)="toggleDetails(change.id)">
-          {{ isExpanded(change.id) ? 'Hide Details' : 'View Details' }}
+        <button class="viewDetailsBtn" (click)="toggleDetails(change.requestId)">
+          {{ isExpanded(change.requestId) ? 'Hide Details' : 'View Details' }}
         </button>
       </div>
     </div>
@@ -50,19 +50,19 @@
 </div>
 } @else {
 <div class="driverChangeCard">
-@for(change of vehicleChanges(); track change.id) {
+@for(change of vehicleChanges(); track change.requestId) {
     <div class="item">
         <p class="driverName">{{change.firstName}} {{change.lastName}}</p>
-        @if(isExpanded(change.id)) {
+        @if(isExpanded(change.requestId)) {
         <div class="details" >
             <div class="old">
                 <p class="label">Old</p>
-                <p class="value">{{change.oldModel}}</p>
-                <p class="value">{{change.oldRegistrationNumber}}</p>
-                <p class="value">{{change.oldType}}</p>
-                <p class="value">{{change.oldSpace}}</p>
-                <p class="value">{{change.oldBabySeat}}</p>
-                <p class="value">{{change.oldPetFriendly}}</p>
+                <p class="value">{{change.model}}</p>
+                <p class="value">{{change.registrationNumber}}</p>
+                <p class="value">{{change.type}}</p>
+                <p class="value">{{change.space}}</p>
+                <p class="value">{{change.babySeat}}</p>
+                <p class="value">{{change.petFriendly}}</p>
                 
             </div>
             <div class="separator"></div>
@@ -79,12 +79,12 @@
     }
         <div class="card-footer">
         <div class="action-buttons">
-          <button class="approveBtn">Approve</button>
-          <button class="rejectBtn">Reject</button>
+          <button class="approveBtn" (click)="approveVehicle(change.requestId,change.vehicleId)">Approve</button>
+          <button class="rejectBtn" (click)="rejectVehicle(change.requestId,change.vehicleId)">Reject</button>
         </div>
         
-        <button class="viewDetailsBtn" (click)="toggleDetails(change.id)">
-          {{ isExpanded(change.id) ? 'Hide Details' : 'View Details' }}
+        <button class="viewDetailsBtn" (click)="toggleDetails(change.requestId)">
+          {{ isExpanded(change.requestId) ? 'Hide Details' : 'View Details' }}
         </button>
       </div>
     </div>

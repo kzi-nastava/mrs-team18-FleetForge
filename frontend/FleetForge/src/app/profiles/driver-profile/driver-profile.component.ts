@@ -4,10 +4,11 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
-import { User } from '../model/user.model';
-import { UserService } from '../service/user-service';
+import { User } from '../../shared/models/user.model';
 import { Vehicle } from '../model/vehicle.model';
 import { RouterLink } from '@angular/router';
+import { DriverService } from '../service/driver-service';
+import { VehicleType } from '../../shared/models/vehicle.model';
 
 @Component({
   selector: 'app-driver-profile',
@@ -22,32 +23,34 @@ import { RouterLink } from '@angular/router';
   encapsulation: ViewEncapsulation.None
 })
 export class DriverProfileComponent {
-editDriver(): void {
 
-    if (this.editDriverInfo.invalid) return;
-    const user: User = {
-       id: Math.random(),
-      firstName: this.editDriverInfo.value.firstName ?? '',
-      lastName: this.editDriverInfo.value.lastName ?? '',
-      email: this.editDriverInfo.value.email ?? '',
-      number: Number(this.editDriverInfo.value.number) || 0,
-      homeAddress: this.editDriverInfo.value.homeAddress ?? ''
-    };
-    this.userService.changeUser(user);
+  constructor(private driverService: DriverService) { }
+
+editDriver(): void {
+  this.driverService.createChangeRequest({
+    id:1,//treba mi id iz ulogovanog korisnika
+    newFirstName: this.editDriverInfo.value.firstName ?? '',
+    newLastName: this.editDriverInfo.value.lastName ?? '',
+    newEmail: this.editDriverInfo.value.email ?? '',
+    newPhoneNumber: this.editDriverInfo.value.phoneNumber ?? '',
+    newAddress: this.editDriverInfo.value.address ?? '',
+    newProfilePicture: this.editDriverInfo.value.profilePicture ?? 'blank_profile.webp'
+  }).subscribe((response) =>  {
+  alert('Profile change request submitted for approval.');}
+  );
 }
 editVehicle(): void {
-  if(this.editVehicleInfo.invalid) return;
-
-  const vehicle: Vehicle={
-    id: Math.random(),
-    model: this.editVehicleInfo.value.model ?? '',
-    type: this.editVehicleInfo.value.type as 'standard' | 'luxury' | 'suv',
-    licensePlateNumber: this.editVehicleInfo.value.licensePlateNumber ?? '',
-    passengerNumber: Number(this.editVehicleInfo.value.passengerNumber) || 0,
-    isBabySeatAvailable: this.editVehicleInfo.value.isBabySeatAvailable ?? false,
-    isPetFriendly: this.editVehicleInfo.value.isPetFriendly ?? false
-  };
-  this.userService.changeVehicle(vehicle);
+  this.driverService.createVehicleChangeRequest({
+    vehicleId:1,//treba mi id iz ulogovanog korisnika
+    newModel: this.editVehicleInfo.value.model ?? '',
+    newType: (this.editVehicleInfo.value.type ?? '') as VehicleType,
+    newRegistrationNumber: this.editVehicleInfo.value.registrationNumber ?? '',
+    newSpace: Number(this.editVehicleInfo.value.space) ?? 0,
+    newBabySeat: this.editVehicleInfo.value.babySeat ?? false,
+    newPetFriendly: this.editVehicleInfo.value.petFriendly ?? false
+  }).subscribe((response) =>  {
+  alert('Vehicle change request submitted for approval.');}
+  );
 }
 
 @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
@@ -64,48 +67,51 @@ editVehicle(): void {
     // za sada samo prikazujemo izabranu sliku
     // pozivom servisa this.userService.uploadProfilePicture(file);
     this.imageUrl = URL.createObjectURL(file);
+    this.editDriverInfo.patchValue({
+    profilePicture: file.name 
+  } );
   }
 
   editDriverInfo=new FormGroup({
     firstName: new FormControl('', Validators.required),
     lastName: new FormControl('', Validators.required),
     email: new FormControl('', Validators.required),
-    number: new FormControl('',Validators.required),
-    homeAddress : new FormControl('',Validators.required)
+    phoneNumber: new FormControl('',Validators.required),
+    address : new FormControl('',Validators.required),
+    profilePicture: new FormControl('')
   });
-  protected userShow: Signal<User>;
-  protected vehicleShow: Signal<Vehicle>;
-  constructor(private userService: UserService) {
-    this.userShow=this.userService.user
-    this.vehicleShow=this.userService.vehicle
-  }
-ngOnInit(): void {
-    const currentUser = this.userShow();
-    this.editDriverInfo.patchValue({
-      firstName: currentUser.firstName,
-      lastName: currentUser.lastName,
-      email: currentUser.email,
-      number: currentUser.number.toString(),
-      homeAddress: currentUser.homeAddress
-    });
-    const currentVehicle = this.vehicleShow();
-    this.editVehicleInfo.patchValue({
-      model: currentVehicle.model,
-      type: currentVehicle.type,
-      licensePlateNumber: currentVehicle.licensePlateNumber,
-      passengerNumber: currentVehicle.passengerNumber.toString(),
-      isBabySeatAvailable: currentVehicle.isBabySeatAvailable,
-      isPetFriendly: currentVehicle.isPetFriendly
-    });
-  }
-  editVehicleInfo=new FormGroup({
+   editVehicleInfo=new FormGroup({
     model: new FormControl('', Validators.required),
     type: new FormControl('', Validators.required),
-    licensePlateNumber: new FormControl('',Validators.required),
-    passengerNumber: new FormControl('',Validators.required),
-    isBabySeatAvailable: new FormControl(false),
-    isPetFriendly: new FormControl(false)
+    registrationNumber: new FormControl('',Validators.required),
+    space: new FormControl('',Validators.required),
+    babySeat: new FormControl(false),
+    petFriendly: new FormControl(false)
   });
+ngOnInit(): void {
+    this.driverService.getCurrentDriver().subscribe((driverData) => {
+       this.editDriverInfo.setValue({
+      firstName: driverData.firstName ?? '',
+      lastName: driverData.lastName ?? '',
+      email: driverData.email ?? '',
+      phoneNumber: driverData.phoneNumber ?? '', 
+      address: driverData.address ?? '',
+      profilePicture: driverData.profilePicture ?? '',
+      
+    });
+
+    this.editVehicleInfo.setValue({
+      model: driverData.vehicle.model ?? '',
+      type: driverData.vehicle.type ?? '',
+      registrationNumber: driverData.vehicle.registrationNumber ?? '',
+      space: (driverData.vehicle.space ?? '').toString(),
+      babySeat: driverData.vehicle.babySeat ?? false,
+      petFriendly: driverData.vehicle.petFriendly ?? false
+    });
+
+  } );
+}
+ 
   // protected vehicleShow: Signal<User>;
   // constructor(private vehicleService: UserService) {
   //   this.vehicleShow=this.vehicleService.user
