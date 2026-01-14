@@ -1,0 +1,105 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
+
+form {
+  max-width: 320px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Profilna slika */
+.profilePic {
+  width: 100px;
+  height: 100px;
+  border-radius: 100%;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 40px;
+  margin-top: 3%;
+  object-fit: cover;
+  cursor: pointer;
+}
+
+/* Input polja - labele u ćošku iznad */
+form label {
+  align-self: flex-start;
+  font-size: 12px;
+  color: #000;
+  font-weight: bold;
+  margin-bottom: 2px;
+  margin-top: 8px;
+  margin-left: 12px;
+  font-family: 'Poppins', sans-serif;
+}
+
+form input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #cccccc;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: 'Poppins', sans-serif;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+form input:focus {
+  border-color: var(--color-primary);
+  border-width: 2px;
+}
+
+form input::placeholder {
+  color: #999;
+  font-size: 13px;
+}
+
+/* Change dugme - narandžasta pozadina, beli tekst */
+button.changeBtn,
+button.changeBtn.mdc-button,
+button.changeBtn.mat-mdc-button {
+  display: block !important;
+  padding: 8px 30px !important;
+  background-color: var(--color-primary) !important;
+  color: white !important;
+  font-size: large !important;
+  font-weight: 600 !important;
+  border-radius: 6px !important;
+  font-family: 'Poppins', sans-serif !important;
+  letter-spacing: 0.02cm !important;
+  border: none !important;
+  cursor: pointer !important;
+  margin-top: 25px !important;
+}
+
+button.changeBtn:hover,
+button.changeBtn.mdc-button:hover,
+button.changeBtn.mat-mdc-button:hover {
+  background-color: var(--color-primary-dark) !important;
+}
+
+/* Reset Password dugme - bela pozadina, narandžasti tekst */
+button.resetPassBtn,
+button.resetPassBtn.mdc-button,
+button.resetPassBtn.mat-mdc-button {
+  display: block !important;
+  margin: 20px auto 0 !important;
+  padding: 8px 30px !important;
+  background-color: white !important;
+  color: var(--color-primary) !important;
+  font-size: large !important;
+  font-weight: 600 !important;
+  border-radius: 6px !important;
+  font-family: 'Poppins', sans-serif !important;
+  letter-spacing: 0.02cm !important;
+  border: 2px solid var(--color-primary) !important;
+  cursor: pointer !important;
+}
+
+button.resetPassBtn:hover,
+button.resetPassBtn.mdc-button:hover,
+button.resetPassBtn.mat-mdc-button:hover {
+  background-color: #fff5f0 !important;
+}

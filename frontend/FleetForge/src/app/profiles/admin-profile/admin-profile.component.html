@@ -1,0 +1,31 @@
+
+
+<img [src]="imageUrl" class="profilePic" (click)="openFilePicker()">
+<input
+  type="file"
+  #fileInput
+  accept="image/*"
+  (change)="onFileSelected($event)"
+  style="display: none;"
+>
+
+<form [formGroup]="editAdminInfo" (ngSubmit)="edit()">
+  <label for="firstName">First Name</label>
+  <input id="firstName" formControlName="firstName" placeholder="Enter your first name" required>
+
+  <label for="lastName">Last Name</label>
+  <input id="lastName" formControlName="lastName" placeholder="Enter your last name" required>
+
+  <label for="email">Email</label>
+  <input id="email" formControlName="email" placeholder="Enter your email" required>
+
+  <label for="phoneNumber">Phone number</label>
+  <input id="phoneNumber" type="tel" formControlName="phoneNumber" placeholder="Enter your phone number">
+
+  <label for="address">Home address</label>
+  <input id="address" type="text" formControlName="address" placeholder="Enter your home address">
+
+  <button class="changeBtn" type="submit">Change</button>
+</form>
+
+<button class="resetPassBtn" routerLink="/profile-password-reset">Reset password</button>
