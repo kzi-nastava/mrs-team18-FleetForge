@@ -4,8 +4,10 @@ package com.team18.FleetForge.controller;
 import com.team18.FleetForge.dto.RouteDTO;
 import com.team18.FleetForge.dto.UserSummaryDTO;
 import com.team18.FleetForge.dto.admin.*;
+import com.team18.FleetForge.dto.passenger.PassengerGetResponseDTO;
 import com.team18.FleetForge.dto.ride.view.AdminRideHistoryItemDTO;
 import com.team18.FleetForge.dto.ride.view.RideDetailsDTO;
+import com.team18.FleetForge.dto.vehicle.VehicleChangeInformationResponseDTO;
 import com.team18.FleetForge.model.DriverProfileChangeRequest;
 import com.team18.FleetForge.model.GeoPoint;
 import com.team18.FleetForge.model.users.Admin;
@@ -14,9 +16,19 @@ import com.team18.FleetForge.model.Vehicle;
 import com.team18.FleetForge.model.VehicleInformationChangeRequest;
 import com.team18.FleetForge.model.enums.InformationChangeRequestStatus;
 import com.team18.FleetForge.model.enums.VehicleType;
+import com.team18.FleetForge.model.users.Passenger;
+import com.team18.FleetForge.model.users.User;
+import com.team18.FleetForge.service.DriverProfileChangeRequestService;
+import com.team18.FleetForge.service.UserService;
+import com.team18.FleetForge.service.VehicleInfoChangeReqService;
+import com.team18.FleetForge.service.VehicleService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -25,177 +37,157 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin")
+@RequiredArgsConstructor
 public class AdminController {
+    private final UserService userService;
+    private final DriverProfileChangeRequestService driverChangeRequestService;
+    private final VehicleInfoChangeReqService vehicleChangeService;
+    private final VehicleService vehicleService;
 
+    @GetMapping
+    public ResponseEntity<AdminGetResponseDTO> getCurrentAdmin(){
+        Admin admin = userService.getCurrentAdmin();
+        if(admin == null){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        AdminGetResponseDTO response = new AdminGetResponseDTO(admin);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping
+    public ResponseEntity<AdminChangeInformationResponseDTO> changeCurrentAdmin(@RequestBody AdminChangeInformationRequestDTO adminChangeInformationRequestDTO){
+        Admin admin=userService.getCurrentAdmin();
+        if(admin==null){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        admin.setFirstName(adminChangeInformationRequestDTO.getFirstName());
+        admin.setLastName(adminChangeInformationRequestDTO.getLastName());
+        admin.setEmail(adminChangeInformationRequestDTO.getEmail());
+        admin.setAddress(adminChangeInformationRequestDTO.getAddress());
+        admin.setPhoneNumber(adminChangeInformationRequestDTO.getPhoneNumber());
+        admin.setProfilePicture(adminChangeInformationRequestDTO.getProfilePicture());
+
+        userService.save(admin);
+        AdminChangeInformationResponseDTO adminChangeInformationResponseDTO = new AdminChangeInformationResponseDTO(admin);
+        return ResponseEntity.ok(adminChangeInformationResponseDTO);
+
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<AdminGetResponseDTO> getAdmin(@PathVariable Long id) {
-        Admin foundAdmin=new Admin();
-        foundAdmin.setId(id);
-        foundAdmin.setFirstName("Admin");
-        foundAdmin.setLastName("Admin");
-        foundAdmin.setPassword("admin");
-        foundAdmin.setEmail("admin");
-        foundAdmin.setPhoneNumber("123456789");
-        foundAdmin.setAddress("address");
-        foundAdmin.setProfilePicture("profilePicture");
-
+        Admin foundAdmin=(Admin) userService.getUserById(id);
         AdminGetResponseDTO adminGetResponseDTO = new AdminGetResponseDTO(foundAdmin);
-
         return new ResponseEntity<>(adminGetResponseDTO, HttpStatus.OK);
     }
     @PutMapping("/{id}")
     public ResponseEntity<AdminChangeInformationResponseDTO> changeUser
-            (@RequestBody AdminChangeInformationRequestDTO adminChangeInformationRequestDTO, @PathVariable String id) {
-        //prvo ga posle trazim preko id i postavim nove podatke
-        Admin adminToChange = Admin.builder()
-                .firstName(adminChangeInformationRequestDTO.getFirstName())
-                .lastName(adminChangeInformationRequestDTO.getLastName())
-                .email(adminChangeInformationRequestDTO.getEmail())
-                .phoneNumber(adminChangeInformationRequestDTO.getPhoneNumber())
-                .address(adminChangeInformationRequestDTO.getAddress())
-                .profilePicture(adminChangeInformationRequestDTO.getProfilePicture())
-                .build();
-
-        AdminChangeInformationResponseDTO adminChanged = new AdminChangeInformationResponseDTO(adminToChange);
+            (@RequestBody AdminChangeInformationRequestDTO adminChangeInformationRequestDTO, @PathVariable Long id) {
+        Admin admin=(Admin) userService.getUserById(id);
+        if(admin==null){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        admin.setFirstName(adminChangeInformationRequestDTO.getFirstName());
+        admin.setLastName(adminChangeInformationRequestDTO.getLastName());
+        admin.setEmail(adminChangeInformationRequestDTO.getEmail());
+        admin.setAddress(adminChangeInformationRequestDTO.getAddress());
+        admin.setPhoneNumber(adminChangeInformationRequestDTO.getPhoneNumber());
+        admin.setProfilePicture(adminChangeInformationRequestDTO.getProfilePicture());
+        userService.save(admin);
+        AdminChangeInformationResponseDTO adminChanged = new AdminChangeInformationResponseDTO(admin);
         return new ResponseEntity<>(adminChanged, HttpStatus.OK);
 
     }
+    @Transactional
     @PutMapping("/{requestId}/driver-info")
     public ResponseEntity<AdminDriverVehicleChangeStatusResponseDTO> driverInfoChange
             (@PathVariable Long requestId,@RequestBody AdminDriverVehicleInfoChangeDTO adminDriverVehicleInfoChangeDTO) {
-            //pronadje se po id driverprofilechangerequest preko requestId-a i stavi accepted na status i azurira updatedAt
+            DriverProfileChangeRequest request=driverChangeRequestService.findById(requestId);
+            request.setUpdatedAt(LocalDateTime.now());
+            AdminDriverVehicleChangeStatusResponseDTO responseDTO=new AdminDriverVehicleChangeStatusResponseDTO();
+
         if(adminDriverVehicleInfoChangeDTO.isChange()) {
-            DriverProfileChangeRequest foundReq = new DriverProfileChangeRequest();
-            foundReq.setNewFirstName("Novo Ime");
-            foundReq.setNewLastName("Novo Prezime");
-            foundReq.setNewEmail("Novi email");
-            foundReq.setNewPhoneNumber("123456789");
-            foundReq.setNewAddress("Nova Adresa");
-            foundReq.setNewProfilePicture("profilePicture");
-            foundReq.setStatus(InformationChangeRequestStatus.APPROVED);
-            foundReq.setUpdatedAt(LocalDateTime.now());
-            //pronaci drivera moze sad i preko ida jer sad postavljen
-            Driver foundDriver = new Driver();
-            foundDriver.setId(1L);
+            Driver driverToChange= (Driver)userService.getUserById(request.getDriver().getId());
+            driverToChange.setFirstName(request.getNewFirstName());
+            driverToChange.setLastName(request.getNewLastName());
+            driverToChange.setEmail(request.getNewEmail());
+            driverToChange.setAddress(request.getNewAddress());
+            driverToChange.setPhoneNumber(request.getNewPhoneNumber());
+            driverToChange.setProfilePicture(request.getNewProfilePicture());
 
-            foundDriver.setFirstName(foundReq.getNewFirstName());
-            foundDriver.setLastName(foundReq.getNewLastName());
-            foundDriver.setEmail(foundReq.getNewEmail());
-            foundDriver.setPhoneNumber(foundReq.getNewPhoneNumber());
-            foundDriver.setAddress(foundReq.getNewAddress());
-            foundDriver.setProfilePicture(foundReq.getNewProfilePicture());
+            userService.save(driverToChange);
 
-            // sacuvati drivera
-            AdminDriverVehicleChangeStatusResponseDTO adminDriverVehicleChangeStatusResponseDTO = new AdminDriverVehicleChangeStatusResponseDTO();
-            adminDriverVehicleChangeStatusResponseDTO.setId(foundDriver.getId());
-            adminDriverVehicleChangeStatusResponseDTO.setStatus(foundReq.getStatus());
-
-            return new ResponseEntity<>(adminDriverVehicleChangeStatusResponseDTO, HttpStatus.OK);
+            request.setStatus(InformationChangeRequestStatus.APPROVED);
+            responseDTO.setStatus(InformationChangeRequestStatus.APPROVED);
+            responseDTO.setId(requestId);
+            return  ResponseEntity.ok(responseDTO);
         }
         else{
-            DriverProfileChangeRequest foundReq=new DriverProfileChangeRequest();
-            foundReq.setStatus(InformationChangeRequestStatus.REJECTED);
-            foundReq.setUpdatedAt(LocalDateTime.now());
-            //pronaci drivera moze sad i preko ida jer sad postavljen
-            Driver foundDriver= new Driver();
-            foundDriver.setId(1L);
-
-
-            // sacuvati drivera
-            AdminDriverVehicleChangeStatusResponseDTO adminDriverVehicleChangeStatusResponseDTO =new AdminDriverVehicleChangeStatusResponseDTO();
-            adminDriverVehicleChangeStatusResponseDTO.setId(foundDriver.getId());
-            adminDriverVehicleChangeStatusResponseDTO.setStatus(foundReq.getStatus());
-
-            return new ResponseEntity<>(adminDriverVehicleChangeStatusResponseDTO,HttpStatus.OK);
+            request.setStatus(InformationChangeRequestStatus.REJECTED);
+            responseDTO.setStatus(InformationChangeRequestStatus.REJECTED);
+            responseDTO.setId(requestId);
+            return  ResponseEntity.ok(responseDTO);
         }
     }
 
 
 
     @GetMapping("/profile-change-requests")
-    public ResponseEntity<List<AdminViewProfileChangeRequestDTO>> getPendingRequests(
-            @RequestParam("status")String status) {
-
-        AdminViewProfileChangeRequestDTO adminViewProfileChangeRequestDTO=new AdminViewProfileChangeRequestDTO();
-        adminViewProfileChangeRequestDTO.setStatus(InformationChangeRequestStatus.PENDING);
-        adminViewProfileChangeRequestDTO.setDriverId(1L);
-        adminViewProfileChangeRequestDTO.setRequestId(1L);
-        adminViewProfileChangeRequestDTO.setNewFirstName("ime");
-        adminViewProfileChangeRequestDTO.setNewLastName("prezime");
-        adminViewProfileChangeRequestDTO.setCreatedAt(LocalDateTime.now());
-        adminViewProfileChangeRequestDTO.setDriverId(1L);
-        adminViewProfileChangeRequestDTO.setNewAddress("adresa1");
-        adminViewProfileChangeRequestDTO.setNewEmail("email1");
-        adminViewProfileChangeRequestDTO.setNewPhoneNumber("4324324");
-        adminViewProfileChangeRequestDTO.setNewProfilePicture("url1");
-
-        adminViewProfileChangeRequestDTO.setFirstName("ime");
-        adminViewProfileChangeRequestDTO.setLastName("prezime");
-        adminViewProfileChangeRequestDTO.setEmail("email1");
-        adminViewProfileChangeRequestDTO.setPhoneNumber("4324324");
-        adminViewProfileChangeRequestDTO.setAddress("adresa1");
-        adminViewProfileChangeRequestDTO.setProfilePicture("url1");
-
-        List<AdminViewProfileChangeRequestDTO> adminViewProfileChangeRequestDTOList=new ArrayList<>();
-        adminViewProfileChangeRequestDTOList.add(adminViewProfileChangeRequestDTO);
-
-        return new ResponseEntity<>(adminViewProfileChangeRequestDTOList, HttpStatus.OK);
+    public ResponseEntity<List<AdminViewProfileChangeRequestDTO>> getPendingRequests() {
 
 
+        List<DriverProfileChangeRequest> requests=driverChangeRequestService.findAllPending();
+        List<AdminViewProfileChangeRequestDTO> responseDTOs=new ArrayList<>();
+        for(DriverProfileChangeRequest request:requests){
+            AdminViewProfileChangeRequestDTO responseDTO=new AdminViewProfileChangeRequestDTO(request,request.getDriver());
+            responseDTOs.add(responseDTO);
+        }
+
+        return new ResponseEntity<>(responseDTOs, HttpStatus.OK);
 
     }
 
-
+@Transactional
     @PutMapping("/{requestId}/vehicle-info")
     public ResponseEntity<AdminDriverVehicleChangeStatusResponseDTO> vehicleInfoChange
             (@PathVariable Long requestId,@RequestBody  AdminDriverVehicleInfoChangeDTO adminDriverVehicleInfoChangeDTO) {
-        //pronadje se po id driverprofilechangerequest preko requestId-a i stavi accepted na status i azurira updatedAt
+        VehicleInformationChangeRequest request=vehicleChangeService.findById(requestId);
+        request.setUpdatedAt(LocalDateTime.now());
+        AdminDriverVehicleChangeStatusResponseDTO responseDTO=new AdminDriverVehicleChangeStatusResponseDTO();
         if(adminDriverVehicleInfoChangeDTO.isChange()) {
-            VehicleInformationChangeRequest foundReq = new VehicleInformationChangeRequest();
-            foundReq.setNewModel("model");
-            foundReq.setNewRegistrationNumber("registrationNumber");
-            foundReq.setNewType(VehicleType.VAN);
-            foundReq.setNewSpace(3);
-            foundReq.setNewBabySeat(true);
-            foundReq.setNewPetFriendly(true);
-            foundReq.setStatus(InformationChangeRequestStatus.APPROVED);
-            foundReq.setUpdatedAt(LocalDateTime.now());
-            //pronaci drivera moze sad i preko ida jer sad postavljen
-            Vehicle foundVehicle = new Vehicle();
-            foundVehicle.setId(1L);
-
-            foundVehicle.setModel(foundReq.getNewModel());
-            foundVehicle.setRegistrationNumber(foundReq.getNewRegistrationNumber());
-            foundVehicle.setType(foundReq.getNewType());
-            foundVehicle.setSpace(foundReq.getNewSpace());
-            foundVehicle.setBabySeat(foundReq.isNewBabySeat());
-            foundVehicle.setPetFriendly(foundReq.isNewPetFriendly());
+            Vehicle vehicleToChange= vehicleService.findById(request.getVehicle().getId());
+            vehicleToChange.setModel(request.getNewModel());
+            vehicleToChange.setBabySeat(request.isNewBabySeat());
+            vehicleToChange.setSpace(request.getNewSpace());
+            vehicleToChange.setType(request.getNewType());
+            vehicleToChange.setRegistrationNumber(request.getNewRegistrationNumber());
+            vehicleToChange.setPetFriendly(request.isNewPetFriendly());
+            vehicleService.save(vehicleToChange);
+            request.setStatus(InformationChangeRequestStatus.APPROVED);
+            responseDTO.setStatus(InformationChangeRequestStatus.APPROVED);
+            responseDTO.setId(requestId);
 
 
-            // sacuvati drivera
-            AdminDriverVehicleChangeStatusResponseDTO adminDriverVehicleChangeStatusResponseDTO = new AdminDriverVehicleChangeStatusResponseDTO();
-            adminDriverVehicleChangeStatusResponseDTO.setId(foundVehicle.getId());
-            adminDriverVehicleChangeStatusResponseDTO.setStatus(foundReq.getStatus());
-
-            return new ResponseEntity<>(adminDriverVehicleChangeStatusResponseDTO, HttpStatus.OK);
+            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
         }
         else{
-            VehicleInformationChangeRequest foundReq=new VehicleInformationChangeRequest();
-        foundReq.setStatus(InformationChangeRequestStatus.REJECTED);
-        foundReq.setUpdatedAt(LocalDateTime.now());
-        //pronaci vehicle moze sad i preko ida jer sad postavljen
-        Vehicle foundVehicle = new Vehicle();
-        foundVehicle.setId(1L);
+            request.setStatus(InformationChangeRequestStatus.REJECTED);
+            responseDTO.setStatus(InformationChangeRequestStatus.REJECTED);
+            responseDTO.setId(requestId);
 
 
-        // sacuvati drivera
-        AdminDriverVehicleChangeStatusResponseDTO adminDriverVehicleChangeStatusResponseDTO =new AdminDriverVehicleChangeStatusResponseDTO();
-        adminDriverVehicleChangeStatusResponseDTO.setId(foundVehicle.getId());
-        adminDriverVehicleChangeStatusResponseDTO.setStatus(foundReq.getStatus());
-
-        return new ResponseEntity<>(adminDriverVehicleChangeStatusResponseDTO,HttpStatus.OK);
+        return new ResponseEntity<>(responseDTO,HttpStatus.OK);
         }
+    }
+    @GetMapping("/vehicle-change-requests")
+    public ResponseEntity<List<VehicleChangeInformationResponseDTO>> getVehicleChangeRequests() {
+        List<VehicleInformationChangeRequest> requests=vehicleChangeService.findAllPending();
+        List<VehicleChangeInformationResponseDTO> responseDTOs=new ArrayList<>();
+        for(VehicleInformationChangeRequest request:requests){
+            VehicleChangeInformationResponseDTO responseDTO=new VehicleChangeInformationResponseDTO(request,request.getVehicle());
+            responseDTOs.add(responseDTO);
+
+        }
+        return new ResponseEntity<>(responseDTOs, HttpStatus.OK);
     }
 
 //    @PutMapping("/{requestId}/reject-vehicle")
@@ -217,12 +209,13 @@ public class AdminController {
 //
 //        return new ResponseEntity<>(adminVehicleChangeStatusResponseDTO,HttpStatus.OK);
 //    }
-    @PutMapping("/{id}/password")
+    @PutMapping("password")
     public ResponseEntity<String> passwordChange(@PathVariable Long id,@RequestBody AdminPasswordChangeRequestDTO request){
-        //pronaci admina prvo preko id-a
-        Admin foundAdmin=new Admin();
-        foundAdmin.setPassword(request.getNewPassword());
-
+       Admin admin=userService.getCurrentAdmin();
+       if(admin==null){
+           return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+       }
+       admin.setPassword(request.getNewPassword());
         return ResponseEntity.ok("password changed");
     }
 
