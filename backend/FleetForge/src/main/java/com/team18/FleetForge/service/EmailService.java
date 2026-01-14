@@ -25,7 +25,7 @@ public class EmailService {
     public void sendEmail(String to, String subject, String body) {
 
         Email from = new Email(fromEmail);
-        Email toEmail = new Email(to);
+        Email toEmail = new Email("ognjenvujovic04@gmail.com"); //todo set "to" instead of hardcoded
         Content content = new Content("text/plain", body);
         Mail mail = new Mail(from, subject, toEmail, content);
 

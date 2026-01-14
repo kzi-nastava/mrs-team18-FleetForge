@@ -135,25 +135,26 @@ public class AuthController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-
     /**
-     * POST /api/auth/activations
-     * Request:
+     * GET /api/auth/activations?token=...
+     * Query Parameter:
      *  - token
      * Response:
-     *  - 204 NO_CONTENT on successful activation
-     *  - 400 BAD_REQUEST if token is invalid or expired
+     *  - 204 NO_CONTENT on success
+     *  - 400 BAD_REQUEST if invalid or expired
      */
-    @PostMapping(
-            value = "/activations",
-            consumes = MediaType.APPLICATION_JSON_VALUE
-    )
-    public ResponseEntity<Void> activateAccount(
-            @RequestBody ActivationRequestDTO request
-    ) {
-        // Dummy token validation
+    @GetMapping("/activations")
+    public ResponseEntity<Void> activateAccount(@RequestParam String token) {
+
+        boolean activated = authService.activateAccount(token);
+
+        if (!activated) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
 
     /**
      * GET /api/auth/email-availability
