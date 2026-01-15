@@ -54,6 +54,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/register").permitAll() // Registration is public
                         .requestMatchers("/api/auth/email-availability").permitAll() // Email checking is public
                         .requestMatchers("/api/unregistered-users/**").permitAll() // Guests features are public
+                        .requestMatchers("/api/drivers/set-password").permitAll()
+                        .requestMatchers("/api/drivers/validate-token").permitAll()
                         .anyRequest().authenticated() // Everything else requires a token
                 ).headers(headers -> headers
                                 .frameOptions(frameOptions -> frameOptions.sameOrigin()));
