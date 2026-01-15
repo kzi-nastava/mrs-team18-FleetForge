@@ -86,39 +86,23 @@ public class AuthService {
     }
 
     public boolean activateAccount(String token) {
-
-        Optional<ActivationToken> opt = activationTokenRepository.findByToken(token);
-
-        if (opt.isEmpty()) {
+        Optional<User> userOpt = validateAndGetUserFromToken(token);
+        if (userOpt.isEmpty()) {
             return false;
         }
 
-        ActivationToken activationToken = opt.get();
-
-        if (activationToken.isUsed()) {
-            return false;
-        }
-
-        if (activationToken.getExpiresAt().isBefore(LocalDateTime.now())) {
-            return false;
-        }
-
-        User user = activationToken.getUser();
+        User user = userOpt.get();
         user.setActivated(true);
-
-        activationToken.setUsed(true);
-
         userRepository.save(user);
-        activationTokenRepository.save(activationToken);
 
-        return true;
+        return markTokenAsUsed(token);
     }
 
-    public boolean createPasswordReset(String email) {
+    public void createPasswordReset(String email) {
 
         Optional<User> optUser = userRepository.findByEmail(email);
 
-        if (optUser.isEmpty()) return false;
+        if (optUser.isEmpty()) return;
 
         User user = optUser.get();
 
@@ -142,34 +126,47 @@ public class AuthService {
                         link;
 
         emailService.sendEmail(user.getEmail(), "Password Reset", body);
-        return true;
     }
 
 
     public boolean resetPassword(String token, String newPassword) {
+        Optional<User> userOpt = validateAndGetUserFromToken(token);
+        if (userOpt.isEmpty()) {
+            return false;
+        }
 
+        User user = userOpt.get();
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        return markTokenAsUsed(token);
+    }
+
+    private Optional<User> validateAndGetUserFromToken(String token) {
         Optional<ActivationToken> opt = activationTokenRepository.findByToken(token);
 
-        if (opt.isEmpty()) return false;
+        if (opt.isEmpty() ||
+                opt.get().isUsed() ||
+                opt.get().getExpiresAt().isBefore(LocalDateTime.now())) {
+            return Optional.empty();
+        }
 
-        ActivationToken prt = opt.get();
+        return Optional.of(opt.get().getUser());
+    }
 
-        if (prt.isUsed()) return false;
+    private boolean markTokenAsUsed(String token) {
+        Optional<ActivationToken> tokenOpt = activationTokenRepository.findByToken(token);
 
-        if (prt.getExpiresAt().isBefore(LocalDateTime.now())) return false;
+        if (tokenOpt.isEmpty()) {
+            return false;
+        }
 
-        User user = prt.getUser();
-        user.setPassword(passwordEncoder.encode(newPassword));
-
-        prt.setUsed(true);
-
-        userRepository.save(user);
-        activationTokenRepository.save(prt);
+        ActivationToken activationToken = tokenOpt.get();
+        activationToken.setUsed(true);
+        activationTokenRepository.save(activationToken);
 
         return true;
     }
-
-
 
     public User findByEmail(String email) {
         return userRepository.findByEmail(email).orElse(null);
