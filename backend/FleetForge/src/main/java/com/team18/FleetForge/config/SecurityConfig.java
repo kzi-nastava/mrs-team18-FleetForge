@@ -50,12 +50,21 @@ public class SecurityConfig {
                 // Define endpoint protections
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/h2-console/**").permitAll()
-                        .requestMatchers("/api/auth/login").permitAll() // Login is public
-                        .requestMatchers("/api/auth/register").permitAll() // Registration is public
-                        .requestMatchers("/api/auth/email-availability").permitAll() // Email checking is public
-                        .requestMatchers("/api/unregistered-users/**").permitAll() // Guests features are public
-                        .anyRequest().authenticated() // Everything else requires a token
-                ).headers(headers -> headers
+
+                        // Public images
+                        .requestMatchers("/uploads/**").permitAll()
+
+                        // Public auth endpoints
+                        .requestMatchers("/api/auth/login").permitAll()
+                        .requestMatchers("/api/auth/register").permitAll()
+                        .requestMatchers("/api/auth/email-availability").permitAll()
+                        .requestMatchers("/api/auth/activations").permitAll()
+                        .requestMatchers("/api/unregistered-users/**").permitAll()
+                        .requestMatchers("/error").permitAll()
+
+                        .anyRequest().authenticated()
+                )
+                .headers(headers -> headers
                                 .frameOptions(frameOptions -> frameOptions.sameOrigin()));
 
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
