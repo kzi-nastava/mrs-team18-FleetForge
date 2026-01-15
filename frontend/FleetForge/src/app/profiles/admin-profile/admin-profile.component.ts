@@ -1,10 +1,11 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AdminService } from '../service/admin-service';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-admin-profile',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule,RouterModule],
   templateUrl: './admin-profile.component.html',
   styleUrl: './admin-profile.component.css',
 })

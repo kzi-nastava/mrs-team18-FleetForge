@@ -112,6 +112,11 @@ export const SIDEBAR_MENU_CONFIG: Record<UserRole, SidebarMenuItem[]> = {
       label:'Driver Changes',
       icon:'🛠',
       path: '/admin/driver-changes'
+    },
+    {
+      label:'Register new driver',
+      icon:'➕',
+      path: '/admin/register-new-driver'
     }
   ]
 };

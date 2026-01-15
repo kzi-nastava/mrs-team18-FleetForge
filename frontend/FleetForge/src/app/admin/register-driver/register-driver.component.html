@@ -1,0 +1,137 @@
+<div class="register-container">
+    <div class="picture" *ngIf="!showVehicleForm">
+  <img [src]="imageUrl" class="profilePic" (click)="openFilePicker()">
+  <input
+    type="file"
+    #fileInput
+    accept="image/*"
+    (change)="onFileSelected($event)"
+    style="display: none;">
+    </div>
+        <form [formGroup]="registerDriverForm" (ngSubmit)="registerDriver()">
+            <div class="driverInfo"  [formGroup]="driverInfoFormGroup" *ngIf="!showVehicleForm">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="firstName">First Name*</label>
+                    <input id="firstName" type="text" placeholder="Enter your first name" formControlName="firstName"  />
+                    <small class="error"
+    *ngIf="driverInfoFormGroup.get('firstName')?.invalid && driverInfoFormGroup.get('firstName')?.touched">
+    First name is required
+  </small>
+                </div>
+
+                <div class="form-group">
+                    <label for="lastName">Last Name*</label>
+                    <input id="lastName" type="text" placeholder="Enter your last name" formControlName="lastName"  />
+                    <small class="error"
+    *ngIf="driverInfoFormGroup.get('lastName')?.invalid && driverInfoFormGroup.get('lastName')?.touched">
+    Last name is required
+  </small>
+                </div>
+
+                <!-- Row 2 -->
+                <div class="form-group">
+                    <label for="email">Email*</label>
+                    <input id="email" type="email" placeholder="Enter your email" formControlName="email"  />
+                    <small class="error"
+    *ngIf="driverInfoFormGroup.get('email')?.invalid && driverInfoFormGroup.get('email')?.touched">
+    Valid email is required
+    </small>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone Number*</label>
+                    <input id="phone" type="tel" placeholder="Enter your phone number" formControlName="phoneNumber"  />
+                    <small class="error"
+    *ngIf="driverInfoFormGroup.get('phoneNumber')?.invalid && driverInfoFormGroup.get('phoneNumber')?.touched">
+    Phone number is required
+    </small>
+                </div>
+
+               
+
+                <!-- Row 4 -->
+                <div class="form-group">
+                    <label for="address">Home Address*</label>
+                    <input id="address" type="text" placeholder="Enter your full address" formControlName="address"  />
+                <small class="error"
+    *ngIf="driverInfoFormGroup.get('address')?.invalid && driverInfoFormGroup.get('address')?.touched">
+    Address is required
+    </small>
+                </div>
+
+               </div>
+               <button class="nextButton" type="button" (click)="goToVehicleForm()">Next</button>
+        </div>
+    
+            
+
+            <div class="vehicleInfo" [formGroup]="vehicleInfo" *ngIf="showVehicleForm">
+                <span class="vehicleText">Vehicle</span>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="model">Model*</label>
+                    <input id="model" type="text" placeholder="Enter your vehicle model" formControlName="model"  />
+                     <small class="error"
+    *ngIf="vehicleInfo.get('model')?.invalid && vehicleInfo.get('model')?.touched">
+    Model is required
+    </small>
+                </div>
+
+                <div class="form-group">
+                    <label for="type">Vehicle type*</label>
+    <select id="type" formControlName="type" required>
+      <option value="" disabled selected>Select vehicle type</option>
+      <option value="STANDARD">Standard</option>
+      <option value="LUXURY">Luxury</option>
+      <option value="SUV">SUV</option>
+    </select>
+    <small class="error"
+    *ngIf="vehicleInfo.get('type')?.invalid && vehicleInfo.get('type')?.touched">
+    Vehicle type is required
+    </small>
+                </div>
+
+                <!-- Row 2 -->
+                <div class="form-group">
+                    <label for="registrationNumber">Registration Number*</label>
+                    <input id="registrationNumber" type="text" placeholder="Enter your vehicle registration number" formControlName="registrationNumber"  />
+                     <small class="error"
+    *ngIf="vehicleInfo.get('registrationNumber')?.invalid && vehicleInfo.get('registrationNumber')?.touched">
+    Registration number is required
+    </small>
+                </div>
+
+                <div class="form-group">
+                    <label for="space">Space*</label>
+                    <input id="space" type="number" placeholder="Enter your vehicle space" formControlName="space"  />
+                        <small class="error"
+    *ngIf="vehicleInfo.get('space')?.invalid && vehicleInfo.get('space')?.touched">
+    Space is required
+    </small>
+                </div>
+
+                <!-- Row 3 -->
+                <div class="form-group">
+                     <div class="checkbox-row">
+      <label class="checkbox">
+        <input id="babySeat" type="checkbox" formControlName="babySeat">
+        <span>Is baby seat available</span>
+      </label>
+    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="checkbox-row">
+      <label class="checkbox">
+        <input id="petFriendly" type="checkbox" formControlName="petFriendly">
+        <span>Is pet friendly</span>
+      </label>
+    </div>
+                </div>
+            <button class="backButton" type="button" (click)="goToDriverForm()">Back</button>
+            <button type="submit" class="registerButton" >Register</button>
+            </div>
+            </div>
+        </form>
+
