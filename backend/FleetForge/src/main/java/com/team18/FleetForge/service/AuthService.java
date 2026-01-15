@@ -114,6 +114,63 @@ public class AuthService {
         return true;
     }
 
+    public boolean createPasswordReset(String email) {
+
+        Optional<User> optUser = userRepository.findByEmail(email);
+
+        if (optUser.isEmpty()) return false;
+
+        User user = optUser.get();
+
+        String token = UUID.randomUUID().toString();
+
+        ActivationToken resetToken = ActivationToken.builder()
+                .token(token)
+                .user(user)
+                .expiresAt(LocalDateTime.now().plusHours(1))
+                .used(false)
+                .build();
+
+        activationTokenRepository.save(resetToken);
+
+        String link = "http://localhost:8080/api/auth" + "/reset-password?token=" + token;//todo remove later
+
+        String body =
+                "Hello " + user.getFirstName() + ",\n\n" +
+                        "You requested a password reset.\n" +
+                        "Click the link below:\n" +
+                        link;
+
+        emailService.sendEmail(user.getEmail(), "Password Reset", body);
+        return true;
+    }
+
+
+    public boolean resetPassword(String token, String newPassword) {
+
+        Optional<ActivationToken> opt = activationTokenRepository.findByToken(token);
+
+        if (opt.isEmpty()) return false;
+
+        ActivationToken prt = opt.get();
+
+        if (prt.isUsed()) return false;
+
+        if (prt.getExpiresAt().isBefore(LocalDateTime.now())) return false;
+
+        User user = prt.getUser();
+        user.setPassword(passwordEncoder.encode(newPassword));
+
+        prt.setUsed(true);
+
+        userRepository.save(user);
+        activationTokenRepository.save(prt);
+
+        return true;
+    }
+
+
+
     public User findByEmail(String email) {
         return userRepository.findByEmail(email).orElse(null);
     }
