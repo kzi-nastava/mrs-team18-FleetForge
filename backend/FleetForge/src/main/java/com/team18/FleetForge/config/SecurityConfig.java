@@ -58,6 +58,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers("/api/auth/register").permitAll()
                         .requestMatchers("/api/auth/email-availability").permitAll()
+                        .requestMatchers("/api/auth/activations").permitAll()
                         .requestMatchers("/api/unregistered-users/**").permitAll()
                         .requestMatchers("/error").permitAll()
 

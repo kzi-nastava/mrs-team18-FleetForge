@@ -1,30 +1,67 @@
-### Register a new passenger account
+### Register a new passenger account (without profile picture)
 POST http://localhost:8080/api/auth/register
-Content-Type: application/json
+Content-Type: multipart/form-data; boundary=BOUNDARY
 
-{
-  "email": "test.passenger@example.com",
-  "password": "Password123",
-  "firstName": "John",
-  "lastName": "Doe",
-  "address": "123 Main St, Cityville",
-  "phoneNumber": "+381601234567",
-  "profilePicture": "https://example.com/profile.png"
-}
+--BOUNDARY
+Content-Disposition: form-data; name="email"
 
-### Try registring with the existing email again
+test.passenger@example.com
+--BOUNDARY
+Content-Disposition: form-data; name="password"
+
+Password123
+--BOUNDARY
+Content-Disposition: form-data; name="firstName"
+
+John
+--BOUNDARY
+Content-Disposition: form-data; name="lastName"
+
+Doe
+--BOUNDARY
+Content-Disposition: form-data; name="address"
+
+123 Main St, Cityville
+--BOUNDARY
+Content-Disposition: form-data; name="phoneNumber"
+
++381601234567
+--BOUNDARY--
+
+### Register a new passenger account (with profile picture)
 POST http://localhost:8080/api/auth/register
-Content-Type: application/json
+Content-Type: multipart/form-data; boundary=BOUNDARY
 
-{
-  "email": "passenger@test.com",
-  "password": "Password123",
-  "firstName": "John",
-  "lastName": "Doe",
-  "address": "123 Main St, Cityville",
-  "phoneNumber": "+381601234567",
-  "profilePicture": "https://example.com/profile.png"
-}
+--BOUNDARY
+Content-Disposition: form-data; name="email"
+
+test.passenger2@example.com
+--BOUNDARY
+Content-Disposition: form-data; name="password"
+
+Password123
+--BOUNDARY
+Content-Disposition: form-data; name="firstName"
+
+Jane
+--BOUNDARY
+Content-Disposition: form-data; name="lastName"
+
+Smith
+--BOUNDARY
+Content-Disposition: form-data; name="address"
+
+456 Oak Ave, Townsville
+--BOUNDARY
+Content-Disposition: form-data; name="phoneNumber"
+
++381607654321
+--BOUNDARY
+Content-Disposition: form-data; name="profilePicture"; filename="profile.jpg"
+Content-Type: image/jpeg
+
+< ./example.png
+--BOUNDARY--
 
 ### Check email availability for a new email
 GET http://localhost:8080/api/auth/email-availability?email=passenger5@test.com
@@ -32,12 +69,5 @@ GET http://localhost:8080/api/auth/email-availability?email=passenger5@test.com
 ### Check email availability for an existing email
 GET http://localhost:8080/api/auth/email-availability?email=passenger@test.com
 
-
-
 ### Activate the newly registered account
-POST http://localhost:8080/api/auth/activations
-Content-Type: application/json
-
-{
-  "token": "test.passenger@example.com"
-}
+GET http://localhost:8080/api/auth/activations?token=07c1577a-5a36-43a5-964a-b60901d5eb22
