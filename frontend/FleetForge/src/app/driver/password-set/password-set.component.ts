@@ -12,7 +12,11 @@ export class PasswordSetComponent {
 resetPassword(): void {
 
 }
+<<<<<<< Updated upstream
 editUsersPassword=new FormGroup({
+=======
+editUsersPassword =new FormGroup({
+>>>>>>> Stashed changes
     newPassword: new FormControl('', Validators.required),
     repeatPassword: new FormControl('', Validators.required)
   });
