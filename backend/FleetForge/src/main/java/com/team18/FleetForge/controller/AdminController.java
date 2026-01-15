@@ -191,25 +191,6 @@ public class AdminController {
         return new ResponseEntity<>(responseDTOs, HttpStatus.OK);
     }
 
-//    @PutMapping("/{requestId}/reject-vehicle")
-//    public ResponseEntity<AdminVehicleChangeStatusResponseDTO> vehicleChangeReject
-//            (@PathVariable Long requestId) {
-//        //pronadje se po id vehicleinfochangereq preko requestId-a i stavi accepted na status i azurira updatedAt
-//        VehicleInformationChangeRequest foundReq=new VehicleInformationChangeRequest();
-//        foundReq.setStatus(InformationChangeRequestStatus.REJECTED);
-//        foundReq.setUpdatedAt(LocalDateTime.now());
-//        //pronaci vehicle moze sad i preko ida jer sad postavljen
-//        Vehicle foundVehicle = new Vehicle();
-//        foundVehicle.setId(1L);
-//
-//
-//        // sacuvati drivera
-//        AdminVehicleChangeStatusResponseDTO adminVehicleChangeStatusResponseDTO =new AdminVehicleChangeStatusResponseDTO();
-//        adminVehicleChangeStatusResponseDTO.setVehicleId(foundVehicle.getId());
-//        adminVehicleChangeStatusResponseDTO.setStatus(foundReq.getStatus());
-//
-//        return new ResponseEntity<>(adminVehicleChangeStatusResponseDTO,HttpStatus.OK);
-//    }
     @PutMapping("password")
     public ResponseEntity<String> passwordChange(@RequestBody AdminPasswordChangeRequestDTO request){
        Admin admin=userService.getCurrentAdmin();

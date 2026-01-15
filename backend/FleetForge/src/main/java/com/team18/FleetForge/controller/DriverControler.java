@@ -1,21 +1,19 @@
 package com.team18.FleetForge.controller;
 
+import com.team18.FleetForge.dto.auth.SetPasswordRequestDTO;
+import com.team18.FleetForge.dto.auth.SetPasswordResponseDTO;
+import com.team18.FleetForge.dto.auth.ValidateTokenResponseDTO;
 import com.team18.FleetForge.dto.driver.*;
 import com.team18.FleetForge.dto.vehicle.VehicleCreateResponseDTO;
 import com.team18.FleetForge.dto.vehicle.VehicleInformationChangeRequestDTO;
 import com.team18.FleetForge.dto.vehicle.VehicleInformationChangeResponseDTO;
-import com.team18.FleetForge.model.DriverProfileChangeRequest;
-import com.team18.FleetForge.model.DriverSession;
+import com.team18.FleetForge.model.*;
 import com.team18.FleetForge.model.users.Driver;
 import com.team18.FleetForge.model.users.User;
-import com.team18.FleetForge.model.Vehicle;
-import com.team18.FleetForge.model.VehicleInformationChangeRequest;
 import com.team18.FleetForge.model.enums.InformationChangeRequestStatus;
-import com.team18.FleetForge.service.RideService;
-import com.team18.FleetForge.service.UserService;
-import com.team18.FleetForge.service.DriverProfileChangeRequestService;
-import com.team18.FleetForge.service.VehicleInfoChangeReqService;
+import com.team18.FleetForge.service.*;
 import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.Email;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -30,6 +28,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/drivers")
@@ -39,6 +39,9 @@ public class DriverControler {
     private final RideService rideService;
     private final DriverProfileChangeRequestService driverChangeRequestService;
     private final VehicleInfoChangeReqService vehicleChangeService;
+    private final AuthService  authService;
+    private final EmailService emailService;
+    private final ActivationTokenService activationTokenService;
 
     @GetMapping
 
@@ -62,24 +65,17 @@ public class DriverControler {
 
     @PostMapping
     public ResponseEntity<DriverCreateResponseDTO> createDriver(@RequestBody DriverCreateRequestDTO request) {
-        DriverCreateResponseDTO driverCreateResponseDTO = new DriverCreateResponseDTO();
-        driverCreateResponseDTO.setFirstName(request.getFirstName());
-        driverCreateResponseDTO.setLastName(request.getLastName());
-        driverCreateResponseDTO.setEmail(request.getEmail());
-        driverCreateResponseDTO.setPhone(request.getPhone());
-        driverCreateResponseDTO.setAddress(request.getAddress());
+        Driver driver=userService.createDriver(request);
 
-        VehicleCreateResponseDTO vehicleCreateResponseDTO = new VehicleCreateResponseDTO();
-        vehicleCreateResponseDTO.setType(request.getVehicle().getType());
-        vehicleCreateResponseDTO.setRegistrationNumber(request.getVehicle().getRegistrationNumber());
-        vehicleCreateResponseDTO.setModel(request.getVehicle().getModel());
-        vehicleCreateResponseDTO.setSpace(request.getVehicle().getSpace());
-        vehicleCreateResponseDTO.setPetFriendly(request.getVehicle().isPetFriendly());
-        vehicleCreateResponseDTO.setBabySeat(request.getVehicle().isBabySeat());
+        DriverCreateResponseDTO response= new DriverCreateResponseDTO();
 
-        driverCreateResponseDTO.setVehicle(vehicleCreateResponseDTO);
-        //treba sacuvati sve posle u bazi
-        return new ResponseEntity<>(driverCreateResponseDTO, HttpStatus.CREATED);
+
+       ActivationToken token=activationTokenService.createTokenPasswordSetDriver(driver);
+        emailService.sendEmail("v.vitomirovic@gmail.com","Password set","http://localhost:4200/password-set?token="+token);
+        System.out.println("http://localhost:4200/password-set?token="+token.getToken());
+        activationTokenService.saveActivationToken(token);
+        response.setToken(token.getToken());
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 
@@ -226,14 +222,36 @@ public class DriverControler {
         return new ResponseEntity<>(vehicleInformationChangeResponseDTO, HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}/password")
-    public ResponseEntity<String> passwordChange(@PathVariable Long id, @RequestBody DriverPasswordChangeRequestDTO request) {
-        //pronaci drivera prvo preko id-a
-        Driver foundDriver = new Driver();
+    @PutMapping("/password")
+    public ResponseEntity<String> passwordChange(@RequestBody DriverPasswordChangeRequestDTO request) {
+        Driver foundDriver = userService.getCurrentDriver();
+
         foundDriver.setPassword(request.getNewPassword());
+
+        userService.save(foundDriver);
 
         return ResponseEntity.ok("password changed");
     }
+
+    @PostMapping("/set-password")
+    public ResponseEntity<SetPasswordResponseDTO> setPassword(@RequestBody SetPasswordRequestDTO request) {
+
+        Optional<ActivationToken> activationToken = authService.findByToken(request.getToken());
+        if(activationToken.isEmpty()){
+            SetPasswordResponseDTO setPasswordResponseDTO = new SetPasswordResponseDTO();
+            setPasswordResponseDTO.setSuccess(Boolean.FALSE);
+            return ResponseEntity.ok(setPasswordResponseDTO);
+        }
+        ActivationToken at=activationToken.get();
+        Driver driver = (Driver) at.getUser();
+
+        driver.setPassword(request.getPassword());
+        userService.save(driver);
+        SetPasswordResponseDTO setPasswordResponseDTO = new SetPasswordResponseDTO();
+        setPasswordResponseDTO.setSuccess(Boolean.TRUE);
+        return ResponseEntity.ok(setPasswordResponseDTO);
+    }
+
 
     /**
      * GET /api/drivers/ride-history
