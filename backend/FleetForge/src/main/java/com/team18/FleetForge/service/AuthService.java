@@ -117,4 +117,8 @@ public class AuthService {
     public User findByEmail(String email) {
         return userRepository.findByEmail(email).orElse(null);
     }
+
+    public Optional<ActivationToken> findByToken(String token) {
+        return activationTokenRepository.findByToken(token);
+    }
 }

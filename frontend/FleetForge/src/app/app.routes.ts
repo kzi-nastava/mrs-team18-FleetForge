@@ -14,6 +14,7 @@ import { PasswordResetComponent } from './profiles/password-reset/password-reset
 import { DriverHistoryComponent } from './driver/driver-history/driver-history.component';
 import { AdminProfileComponent } from './profiles/admin-profile/admin-profile.component';
 import { DriverProfileChangesComponent } from './admin/driver-profile-changes/driver-profile-changes.component';
+import { PasswordSetComponent } from './driver/password-set/password-set.component';
 import { RegisterDriverComponent } from './admin/register-driver/register-driver.component';
 
 export const routes: Routes = [

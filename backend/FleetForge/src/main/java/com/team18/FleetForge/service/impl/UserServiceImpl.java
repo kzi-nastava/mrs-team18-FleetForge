@@ -1,5 +1,8 @@
 package com.team18.FleetForge.service.impl;
 
+import com.team18.FleetForge.dto.driver.DriverCreateRequestDTO;
+import com.team18.FleetForge.model.Vehicle;
+import com.team18.FleetForge.model.enums.Role;
 import com.team18.FleetForge.model.users.Admin;
 import com.team18.FleetForge.model.users.Driver;
 import com.team18.FleetForge.model.users.Passenger;
@@ -11,6 +14,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -60,5 +65,35 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserById(Long id) {
         return repo.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    @Override
+    public Driver createDriver(DriverCreateRequestDTO driver) {
+        Driver driverEntity = new Driver();
+        driverEntity.setFirstName(driver.getFirstName());
+        driverEntity.setLastName(driver.getLastName());
+        driverEntity.setEmail(driver.getEmail());
+        driverEntity.setPhoneNumber(driver.getPhoneNumber());
+        driverEntity.setAddress(driver.getAddress());
+        driverEntity.setAvailable(true);
+        driverEntity.setProfilePicture(driver.getProfilePicture());
+        driverEntity.setBlocked(false);
+        driverEntity.setActive(false);
+        String temporaryPassword = UUID.randomUUID().toString();
+        driverEntity.setPassword(temporaryPassword);
+        driverEntity.setRole(Role.ROLE_DRIVER);
+
+        Vehicle vehicleEntity = new Vehicle();
+        vehicleEntity.setModel(driver.getVehicle().getModel());
+        vehicleEntity.setType(driver.getVehicle().getType());
+        vehicleEntity.setSpace(driver.getVehicle().getSpace());
+        vehicleEntity.setRegistrationNumber(driver.getVehicle().getRegistrationNumber());
+        vehicleEntity.setPetFriendly(driver.getVehicle().isPetFriendly());
+        vehicleEntity.setBabySeat(driver.getVehicle().isBabySeat());
+
+        driverEntity.setVehicle(vehicleEntity);
+
+        repo.save(driverEntity);
+        return  driverEntity;
     }
 }
