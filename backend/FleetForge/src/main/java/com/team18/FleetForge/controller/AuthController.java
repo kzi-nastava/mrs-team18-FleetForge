@@ -14,6 +14,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 import java.util.Map;
 import java.util.Collections;
 
@@ -121,20 +124,43 @@ public class AuthController {
      */
     @PostMapping(
             value = "/register",
-            consumes = MediaType.APPLICATION_JSON_VALUE
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
-    public ResponseEntity<Void> register(
-            @RequestBody RegisterRequestDTO request
+    public ResponseEntity<?> register(
+            @RequestParam("email") String email,
+            @RequestParam("password") String password,
+            @RequestParam("firstName") String firstName,
+            @RequestParam("lastName") String lastName,
+            @RequestParam("address") String address,
+            @RequestParam("phoneNumber") String phoneNumber,
+            @RequestParam(value = "profilePicture", required = false) MultipartFile profilePicture
     ) {
-        User existUser = authService.findByEmail(request.getEmail());
+        User existUser = authService.findByEmail(email);
 
         if (existUser != null) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
 
-        authService.registerPassenger(request);
+        RegisterRequestDTO request = RegisterRequestDTO.builder()
+                .email(email)
+                .password(password)
+                .firstName(firstName)
+                .lastName(lastName)
+                .address(address)
+                .phoneNumber(phoneNumber)
+                .build();
 
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        try {
+            authService.registerPassenger(request, profilePicture);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(Map.of("message", "Registration successful. Please check your email."));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", e.getMessage()));
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to upload profile picture"));
+        }
     }
 
     /**
@@ -147,6 +173,7 @@ public class AuthController {
      */
     @GetMapping("/activations")
     public ResponseEntity<Void> activateAccount(@RequestParam String token) {
+        System.out.println("FFLOG: Activating token: " + token);
 
         boolean activated = authService.activateAccount(token);
 

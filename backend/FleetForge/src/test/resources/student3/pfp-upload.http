@@ -1,0 +1,26 @@
+### Login to get JWT token
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "driver1@test.com",
+  "password": "driver123"
+}
+
+> {% client.global.set("token", response.body.token); %}
+
+### Upload profile picture
+POST http://localhost:8080/api/users/profile-picture
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=BOUNDARY
+
+--BOUNDARY
+Content-Disposition: form-data; name="file"; filename="example.png"
+Content-Type: image/jpeg
+
+< ./example.png
+--BOUNDARY--
+
+
+### Get uploaded profile picture (manual test)
+GET http://localhost:8080/uploads/pfp/driver1@test.com.png

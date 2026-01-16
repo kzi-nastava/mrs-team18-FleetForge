@@ -15,7 +15,7 @@ Accept: application/json
 
 {
   "email": "test.passenger@example.com",
-  "password": "Password12"
+  "password": "Password123"
 }
 
 ### Successful login

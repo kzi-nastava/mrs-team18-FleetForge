@@ -12,7 +12,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -26,11 +28,12 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final ActivationTokenRepository activationTokenRepository;
     private final EmailService emailService;
+    private final ProfilePictureService profilePictureService;
 
     @Value("${app.frontend.url}")
     private String frontendUrl;
 
-    public void registerPassenger(RegisterRequestDTO request) {
+    public void registerPassenger(RegisterRequestDTO request, MultipartFile profilePicture) throws IOException {
 
         if (userRepository.findByEmail(request.getEmail()).isPresent())
             throw new RuntimeException("Email already exists");
@@ -42,14 +45,20 @@ public class AuthService {
                 .lastName(request.getLastName())
                 .address(request.getAddress())
                 .phoneNumber(request.getPhoneNumber())
-                .profilePicture("default.png")
+                .profilePicture("/uploads/pfp/default.png")
                 .role(Role.ROLE_PASSENGER)
                 .isBlocked(false)
-                .isActivated(true)
+                .isActivated(false)
                 .build();
 
-        passengerRepository.save(passenger);
-        createAndSendActivation(passenger);
+        Passenger savedPassenger = passengerRepository.save(passenger);
+
+        // Handle profile picture upload if provided
+        if (profilePicture != null && !profilePicture.isEmpty()) {
+            profilePictureService.uploadProfilePicture(savedPassenger, profilePicture);
+        }
+
+        createAndSendActivation(savedPassenger);
     }
 
     private void createAndSendActivation(User user) {
@@ -65,7 +74,7 @@ public class AuthService {
 
         activationTokenRepository.save(activationToken);
 
-        String link = frontendUrl + "/activations?token=" + token;
+        String link = "http://localhost:8080/api/auth" + "/activations?token=" + token;//todo remove later
 
         String body =
                 "Hello " + user.getFirstName() + ",\n\n" +
