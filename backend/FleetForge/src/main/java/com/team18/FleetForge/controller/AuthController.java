@@ -84,7 +84,7 @@ public class AuthController {
     public ResponseEntity<Void> requestPasswordReset(
             @RequestBody ForgotPasswordRequestDTO request
     ) {
-        // For now send 202 later send email
+        authService.createPasswordReset(request.getEmail());
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
@@ -104,7 +104,15 @@ public class AuthController {
     public ResponseEntity<Void> resetPassword(
             @RequestBody ResetPasswordRequestDTO request
     ) {
-        // Dummy token validation
+        boolean success = authService.resetPassword(
+                request.getToken(),
+                request.getNewPassword()
+        );
+
+        if (!success) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -173,7 +181,6 @@ public class AuthController {
      */
     @GetMapping("/activations")
     public ResponseEntity<Void> activateAccount(@RequestParam String token) {
-        System.out.println("FFLOG: Activating token: " + token);
 
         boolean activated = authService.activateAccount(token);
 

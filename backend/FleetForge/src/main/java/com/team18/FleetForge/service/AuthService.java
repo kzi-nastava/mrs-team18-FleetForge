@@ -86,29 +86,83 @@ public class AuthService {
     }
 
     public boolean activateAccount(String token) {
+        Optional<User> userOpt = validateAndGetUserFromToken(token);
+        if (userOpt.isEmpty()) {
+            return false;
+        }
 
+        User user = userOpt.get();
+        user.setActivated(true);
+        userRepository.save(user);
+
+        return markTokenAsUsed(token);
+    }
+
+    public void createPasswordReset(String email) {
+
+        Optional<User> optUser = userRepository.findByEmail(email);
+
+        if (optUser.isEmpty()) return;
+
+        User user = optUser.get();
+
+        String token = UUID.randomUUID().toString();
+
+        ActivationToken resetToken = ActivationToken.builder()
+                .token(token)
+                .user(user)
+                .expiresAt(LocalDateTime.now().plusHours(1))
+                .used(false)
+                .build();
+
+        activationTokenRepository.save(resetToken);
+
+        String link = "http://localhost:8080/api/auth" + "/reset-password?token=" + token;//todo remove later
+
+        String body =
+                "Hello " + user.getFirstName() + ",\n\n" +
+                        "You requested a password reset.\n" +
+                        "Click the link below:\n" +
+                        link;
+
+        emailService.sendEmail(user.getEmail(), "Password Reset", body);
+    }
+
+
+    public boolean resetPassword(String token, String newPassword) {
+        Optional<User> userOpt = validateAndGetUserFromToken(token);
+        if (userOpt.isEmpty()) {
+            return false;
+        }
+
+        User user = userOpt.get();
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        return markTokenAsUsed(token);
+    }
+
+    private Optional<User> validateAndGetUserFromToken(String token) {
         Optional<ActivationToken> opt = activationTokenRepository.findByToken(token);
 
-        if (opt.isEmpty()) {
+        if (opt.isEmpty() ||
+                opt.get().isUsed() ||
+                opt.get().getExpiresAt().isBefore(LocalDateTime.now())) {
+            return Optional.empty();
+        }
+
+        return Optional.of(opt.get().getUser());
+    }
+
+    private boolean markTokenAsUsed(String token) {
+        Optional<ActivationToken> tokenOpt = activationTokenRepository.findByToken(token);
+
+        if (tokenOpt.isEmpty()) {
             return false;
         }
 
-        ActivationToken activationToken = opt.get();
-
-        if (activationToken.isUsed()) {
-            return false;
-        }
-
-        if (activationToken.getExpiresAt().isBefore(LocalDateTime.now())) {
-            return false;
-        }
-
-        User user = activationToken.getUser();
-        user.setActivated(true);
-
+        ActivationToken activationToken = tokenOpt.get();
         activationToken.setUsed(true);
-
-        userRepository.save(user);
         activationTokenRepository.save(activationToken);
 
         return true;
