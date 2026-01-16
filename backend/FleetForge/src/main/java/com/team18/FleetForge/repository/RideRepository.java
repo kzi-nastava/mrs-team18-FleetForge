@@ -1,5 +1,6 @@
 package com.team18.FleetForge.repository;
 
+import com.team18.FleetForge.model.enums.RideStatus;
 import com.team18.FleetForge.model.ride.Ride;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RideRepository extends JpaRepository<Ride, Long> {
@@ -43,4 +45,20 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
             "AND r.status IN ('PENDING', 'ACCEPTED', 'IN_PROGRESS') " +
             "ORDER BY r.startTime ASC")
     List<Ride> findActiveRidesByDriverId(@Param("driverId") Long driverId);
+
+
+    Optional<Ride> findByIdAndStatus(Long id, RideStatus status);
+
+    // Find all rides by status
+    List<Ride> findByStatus(RideStatus status);
+
+    // Find active ride for a passenger (including linked passengers)
+    @Query("SELECT r FROM Ride r WHERE r.status = :status " +
+            "AND (r.passenger.id = :passengerId OR :passengerId IN " +
+            "(SELECT lp.id FROM r.linkedPassengers lp))")
+    Optional<Ride> findActiveRideByPassengerId(
+            @Param("passengerId") Long passengerId,
+            @Param("status") RideStatus status
+    );
+
 }

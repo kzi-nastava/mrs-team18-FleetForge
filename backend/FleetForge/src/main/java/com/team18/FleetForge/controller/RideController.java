@@ -158,35 +158,6 @@ public class RideController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    /**
-     * POST /api/rides/{rideId}/report-inconsistency
-     * Request Body:
-     *  - comment (String)
-     *  - currentLocation (GeoPoint, optional)
-     * Response:
-     *  - reportId (Long)
-     *  - message (String)
-     *  - reportedAt (LocalDateTime)
-     */
-    @PostMapping(
-            value = "/{rideId}/report-inconsistency",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    public ResponseEntity<InconsistencyReportResponseDTO> reportInconsistency(
-            @PathVariable Long rideId,
-            @Valid @RequestBody InconsistencyReportDTO request
-    ) {
-
-        InconsistencyReportResponseDTO response = InconsistencyReportResponseDTO.builder()
-                .reportId(123L)
-                .message("Inconsistency report submitted successfully")
-                .reportedAt(LocalDateTime.now())
-                .build();
-
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
-    }
-
     @PostMapping("/create")
     public ResponseEntity<RideCreateResponseDTO> createRide(@RequestBody RideCreateRequestDTO request) {
         Route route = new Route();
