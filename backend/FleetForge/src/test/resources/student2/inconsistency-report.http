@@ -1,0 +1,17 @@
+### Login
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "passenger3@test.com",
+  "password": "passenger123"
+}
+
+### Report Inconsistency
+POST http://localhost:8080/api/rides/report-inconsistency
+Content-Type: application/json
+Authorization: Bearer ACCESS_TOKEN_PLACEHOLDER
+
+{
+  "comment": "Driver is taking wrong route"
+}

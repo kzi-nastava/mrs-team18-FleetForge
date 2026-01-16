@@ -210,7 +210,7 @@ public class DataLoader implements CommandLineRunner {
                 LocalDateTime.now().minusDays(3).withHour(20).withMinute(0),
                 LocalDateTime.now().minusDays(3).withHour(20).withMinute(25),
                 6.0, 25.0, 960.0,
-                RideStatus.COMPLETED, true, null, null
+                RideStatus.IN_PROGRESS, true, null, null
         );
         ride6.setPanicActivatedAt(LocalDateTime.now().minusDays(3).withHour(20).withMinute(10));
         rideRepository.save(ride6);
