@@ -131,8 +131,8 @@ public class DataLoader implements CommandLineRunner {
         passenger4 = passengerRepository.save(passenger4);
 
         Admin admin = new Admin();
-        admin.setEmail("admin@test.com");
-        admin.setPassword(passwordEncoder.encode("admin123"));
+        admin.setEmail("admin");
+        admin.setPassword(passwordEncoder.encode("123"));
         admin.setFirstName("System");
         admin.setLastName("Admin");
         admin.setPhoneNumber("+381640000000");
