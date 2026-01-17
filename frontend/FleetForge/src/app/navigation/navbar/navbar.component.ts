@@ -44,6 +44,8 @@ export class NavbarComponent {
     this.sidebarService.setAuthenticated(false);
     this.sidebarService.setUserRole(null);
     this.showProfileMenu = false;
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
     this.router.navigate(['/']);
   }
 

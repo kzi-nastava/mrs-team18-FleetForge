@@ -1,34 +1,46 @@
 <div class="login-page">
-   <app-logo></app-logo>
+  <app-logo></app-logo>
 
   <div class="login-container">
     <p class="subtitle">Please enter your details</p>
     <h1 class="title">Welcome back</h1>
 
-    <form>
-      <label for="username">Username</label>
-      <input id="username" type="text" placeholder="Enter your username" required />
+    <form #loginForm="ngForm" (ngSubmit)="login(loginForm)">
 
-      <label for="password">Password</label>
-      <input id="password" type="password" placeholder="Enter your password" required />
+      <label>Email</label>
+      <input type="email" name="email" [(ngModel)]="email" required email #emailCtrl="ngModel"
+        [class.invalid]="(emailCtrl.invalid && emailCtrl.touched) || (emailCtrl.invalid && submitted)" />
 
+      <div class="error-message" *ngIf="(emailCtrl.invalid && emailCtrl.touched) || (emailCtrl.invalid && submitted)">
+        <span *ngIf="emailCtrl.errors?.['required']">Email is required.</span>
+        <span *ngIf="emailCtrl.errors?.['email'] && !emailCtrl.errors?.['required']">Please enter a valid email
+          address.</span>
+      </div>
+
+      <label>Password</label>
+      <input type="password" name="password" [(ngModel)]="password" required #passwordCtrl="ngModel"
+        [class.invalid]="(passwordCtrl.invalid && passwordCtrl.touched) || (passwordCtrl.invalid && submitted)" />
+
+      <div class="error-message"
+        *ngIf="(passwordCtrl.invalid && passwordCtrl.touched) || (passwordCtrl.invalid && submitted)">
+        Password is required.
+      </div>
+      
       <a href="/forgot-password" class="forgot-password">Forgot password?</a>
-      <button type="submit">Login</button>
+
+      <button type="submit">
+        Login
+      </button>
+      <div *ngIf="error" class="error-message error-message-server">
+        {{ error }}
+      </div>
     </form>
 
-    <!-- Temporary Mock Login Buttons for Testing -->
-    <div class="mock-login-section">
-      <p style="margin-top: 20px; font-size: 14px; color: #666;">Quick Test Login:</p>
-      <div style="display: flex; gap: 10px; margin-top: 10px;">
-        <button type="button" (click)="loginAsPassenger()" style="background: #28a745;">Login as PSNR.</button>
-        <button type="button" (click)="loginAsDriver()" style="background: #007bff;">Login as DRIVER</button>
-        <button type="button" (click)="loginAsAdmin()" style="background: #dc3545;">Login as ADMIN</button>
-      </div>
-    </div>
 
     <p class="register">
-      Don’t have an account?
+      Don't have an account?
       <a href="/register">Register</a>
     </p>
+
   </div>
 </div>

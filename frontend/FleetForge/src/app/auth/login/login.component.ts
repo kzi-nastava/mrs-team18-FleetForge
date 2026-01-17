@@ -1,41 +1,74 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { LogoComponent } from '../../shared/logo/logo.component';
 import { SidebarService } from '../../navigation/sidebar/sidebar.service';
-import { UserRole } from '../../navigation/sidebar/sidebar-config';
+import { AuthService } from '../../services/auth.service';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-login',
-  imports: [LogoComponent],
+  standalone: true,
+  imports: [
+    LogoComponent,
+    CommonModule,
+    FormsModule
+  ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
 })
 export class LoginComponent {
+
+  email = '';
+  password = '';
+  error = '';
+  submitted = false;
+
+  ngOnInit() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+  }
+
   constructor(
     private sidebarService: SidebarService,
-    private router: Router
+    private router: Router,
+    private authService: AuthService,
+    private cdr: ChangeDetectorRef 
   ) {}
 
-  // Mock login - simulates successful login for testing
-  mockLogin(role: UserRole): void {
-    // Set authentication state
-    this.sidebarService.setAuthenticated(true);
-    // Set user role
-    this.sidebarService.setUserRole(role);
-    // Navigate to home page
-    this.router.navigate(['/']);
+  login(form: any): void {
+    this.submitted = true;
+
+    if (form.invalid) {
+      Object.keys(form.controls).forEach(key => {
+        form.controls[key].markAsTouched();
+      });
+      return;
+    }
+
+    this.error = '';
+
+    this.authService.login({
+      email: this.email,
+      password: this.password
+    }).subscribe({
+      next: (response) => {
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('role', response.role);
+
+        this.sidebarService.setAuthenticated(true);
+        this.sidebarService.setUserRole(
+          response.role.replace('ROLE_', '') as any
+        );
+
+        this.router.navigate(['/']);
+      },
+      error: () => {
+        this.error = 'Invalid email or password! Please try again.';
+        this.submitted = false; 
+        this.cdr.detectChanges();
+      }
+    });
   }
 
-  // Quick test methods for each role
-  loginAsPassenger(): void {
-    this.mockLogin('PASSENGER');
-  }
-
-  loginAsDriver(): void {
-    this.mockLogin('DRIVER');
-  }
-
-  loginAsAdmin(): void {
-    this.mockLogin('ADMIN');
-  }
 }

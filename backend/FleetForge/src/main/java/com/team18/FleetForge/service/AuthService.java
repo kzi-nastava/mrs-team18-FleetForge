@@ -117,7 +117,7 @@ public class AuthService {
 
         activationTokenRepository.save(resetToken);
 
-        String link = "http://localhost:8080/api/auth" + "/reset-password?token=" + token;//todo remove later
+        String link = frontendUrl + "/reset-password?token=" + token;
 
         String body =
                 "Hello " + user.getFirstName() + ",\n\n" +

@@ -77,3 +77,13 @@ button:hover {
   text-decoration: none;
   font-weight: 500;
 }
+
+.error-message {
+  color: var(--color-error);
+  font-size: 13px;
+  text-align: center;
+}
+
+input.invalid {
+  border: 1px solid #e74c3c;
+}

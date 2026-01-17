@@ -30,22 +30,38 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         if (header != null && header.startsWith("Bearer ")) {
             String token = header.substring(7);
-            String username = jwtTokenUtils.getUsernameFromToken(token);
 
-            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                var userDetails = userDetailsService.loadUserByUsername(username);
+            try {
+                String username = jwtTokenUtils.getUsernameFromToken(token);
 
-                if (jwtTokenUtils.validateToken(token, username)) {
-                    UsernamePasswordAuthenticationToken auth =
-                            new UsernamePasswordAuthenticationToken(
-                                    userDetails, null, userDetails.getAuthorities());
+                if (username != null &&
+                        SecurityContextHolder.getContext().getAuthentication() == null) {
 
-                    auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(auth);
+                    var userDetails = userDetailsService.loadUserByUsername(username);
+
+                    if (jwtTokenUtils.validateToken(token, username)) {
+                        UsernamePasswordAuthenticationToken auth =
+                                new UsernamePasswordAuthenticationToken(
+                                        userDetails, null, userDetails.getAuthorities());
+
+                        auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(auth);
+                    }
                 }
+
+            } catch (Exception e) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json");
+                response.getWriter().write("""
+                {
+                  "error": "Invalid or expired token"
+                }
+            """);
+                return;
             }
         }
 
         chain.doFilter(request, response);
     }
+
 }
