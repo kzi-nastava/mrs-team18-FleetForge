@@ -12,7 +12,8 @@ public class DriverCreateRequestDTO {
     private String firstName;
     private String lastName;
     private String email;
-    private int phone;
+    private String phoneNumber;
     private String address;
+    private String profilePicture;
     VehicleCreateRequestDTO vehicle;
 }

@@ -1,6 +1,7 @@
 package com.team18.FleetForge.controller;
 
 import com.team18.FleetForge.dto.auth.*;
+import com.team18.FleetForge.model.ActivationToken;
 import com.team18.FleetForge.model.users.User;
 import com.team18.FleetForge.service.AuthService;
 import com.team18.FleetForge.util.JwtTokenUtils;
@@ -21,6 +22,7 @@ import java.util.Collections;
 
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -82,7 +84,7 @@ public class AuthController {
     public ResponseEntity<Void> requestPasswordReset(
             @RequestBody ForgotPasswordRequestDTO request
     ) {
-        // For now send 202 later send email
+        authService.createPasswordReset(request.getEmail());
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
@@ -102,7 +104,15 @@ public class AuthController {
     public ResponseEntity<Void> resetPassword(
             @RequestBody ResetPasswordRequestDTO request
     ) {
-        // Dummy token validation
+        boolean success = authService.resetPassword(
+                request.getToken(),
+                request.getNewPassword()
+        );
+
+        if (!success) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -171,7 +181,6 @@ public class AuthController {
      */
     @GetMapping("/activations")
     public ResponseEntity<Void> activateAccount(@RequestParam String token) {
-        System.out.println("FFLOG: Activating token: " + token);
 
         boolean activated = authService.activateAccount(token);
 
@@ -202,5 +211,19 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/validate-token")
+    public ResponseEntity<ValidateTokenResponseDTO> validateToken(@RequestParam String token) {
+        Optional<ActivationToken> activationToken = authService.findByToken(token);
+        if(activationToken.isEmpty()){
+            ValidateTokenResponseDTO validateTokenResponseDTO = new ValidateTokenResponseDTO();
+            validateTokenResponseDTO.setSuccess(Boolean.FALSE);
+            validateTokenResponseDTO.setToken(token);
+            return ResponseEntity.ok(validateTokenResponseDTO);
+        }
+        ValidateTokenResponseDTO validateTokenResponseDTO = new ValidateTokenResponseDTO();
+        validateTokenResponseDTO.setSuccess(Boolean.TRUE);
+        validateTokenResponseDTO.setToken(token);
+        return ResponseEntity.ok(validateTokenResponseDTO);
 
+    }
 }

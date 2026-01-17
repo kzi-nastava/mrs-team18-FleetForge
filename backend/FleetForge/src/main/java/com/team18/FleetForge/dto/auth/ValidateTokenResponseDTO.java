@@ -1,13 +1,15 @@
-package com.team18.FleetForge.dto.driver;
+package com.team18.FleetForge.dto.auth;
 
-import com.team18.FleetForge.dto.vehicle.VehicleCreateResponseDTO;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DriverCreateResponseDTO {
+public class ValidateTokenResponseDTO {
     private String token;
+    private boolean success;
 }
