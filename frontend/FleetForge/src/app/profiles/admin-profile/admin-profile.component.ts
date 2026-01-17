@@ -31,8 +31,9 @@ export class AdminProfileComponent implements OnInit {
         email: adminData.email ?? '',
         phoneNumber: adminData.phoneNumber ?? '',
         address: adminData.address ?? '',
-        profilePicture: adminData.profilePicture ?? ''
+        profilePicture: "http://localhost:8080" + (adminData.profilePicture ?? 'blank_profile.webp')
       });
+      this.imageUrl="http://localhost:8080"+ (adminData.profilePicture ?? 'blank_profile.webp');
     });
   }
 
@@ -54,7 +55,7 @@ export class AdminProfileComponent implements OnInit {
         email: updatedAdmin.email ?? '',
         phoneNumber: updatedAdmin.phoneNumber ?? '',
         address: updatedAdmin.address ?? '',
-        profilePicture: updatedAdmin.profilePicture ?? 'blank_profile.webp'
+        profilePicture: "http://localhost:8080" + (updatedAdmin.profilePicture ?? 'blank_profile.webp')
       });
     });
   }

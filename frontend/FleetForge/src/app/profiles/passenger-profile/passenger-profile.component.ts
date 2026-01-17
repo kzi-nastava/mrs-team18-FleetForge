@@ -44,8 +44,10 @@ export class PassengerProfileComponent implements OnInit {
       email: userData.email ?? '',
       phoneNumber: userData.phoneNumber ?? '', 
       address: userData.address ?? '',
-      profilePicture: userData.profilePicture ?? ''
+      profilePicture: "http://localhost:8080" + (userData.profilePicture ?? 'blank_profile.webp')
     });
+    this.imageUrl="http://localhost:8080"+ (userData.profilePicture ?? 'blank_profile.webp');
+    
     });
   }
 
@@ -67,7 +69,7 @@ edit(): void {
         email: updatedUser.email ?? '',
         phoneNumber: updatedUser.phoneNumber ?? '',
         address: updatedUser.address ?? '',
-        profilePicture: updatedUser.profilePicture ?? 'blank_profile.webp'
+        profilePicture: "http://localhost:8080" + (updatedUser.profilePicture ?? 'blank_profile.webp')
       });
     });
   }

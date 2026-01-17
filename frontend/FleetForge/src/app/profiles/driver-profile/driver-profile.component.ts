@@ -96,7 +96,7 @@ ngOnInit(): void {
       email: driverData.email ?? '',
       phoneNumber: driverData.phoneNumber ?? '', 
       address: driverData.address ?? '',
-      profilePicture: driverData.profilePicture ?? '',
+      profilePicture: "http://localhost:8080" + (driverData.profilePicture ?? 'blank_profile.webp')
       
     });
 
@@ -108,8 +108,10 @@ ngOnInit(): void {
       babySeat: driverData.vehicle.babySeat ?? false,
       petFriendly: driverData.vehicle.petFriendly ?? false
     });
-
-  } );
+    this.imageUrl="http://localhost:8080"+ (driverData.profilePicture ?? 'blank_profile.webp');
+  } 
+  
+);
 }
  
   // protected vehicleShow: Signal<User>;
