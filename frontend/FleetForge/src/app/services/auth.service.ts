@@ -35,4 +35,9 @@ export class AuthService {
       data
     );
   }
+  
+  resetPassword(data: { token: string; newPassword: string }): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/password-resets`, data);
+  }
+
 }
