@@ -21,8 +21,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -42,9 +44,10 @@ public class DriverControler {
     private final AuthService  authService;
     private final EmailService emailService;
     private final ActivationTokenService activationTokenService;
+    private final ProfilePictureService profilePictureService;
+    private final PasswordEncoder passwordEncoder;
 
     @GetMapping
-
     public ResponseEntity<DriverGetResponseDTO> getCurrentDriver(){
         Driver driver=userService.getCurrentDriver();
         if(driver==null){
@@ -64,20 +67,14 @@ public class DriverControler {
     }
 
     @PostMapping
-    public ResponseEntity<DriverCreateResponseDTO> createDriver(@RequestBody DriverCreateRequestDTO request) {
+    public ResponseEntity<DriverCreateResponseDTO> createDriver(@RequestBody DriverCreateRequestDTO request) throws IOException {
         Driver driver=userService.createDriver(request);
-
-        DriverCreateResponseDTO response= new DriverCreateResponseDTO();
-
-
        ActivationToken token=activationTokenService.createTokenPasswordSetDriver(driver);
-        emailService.sendEmail("v.vitomirovic@gmail.com","Password set","http://localhost:4200/password-set?token="+token);
-        System.out.println("http://localhost:4200/password-set?token="+token.getToken());
+        emailService.sendEmail("v.vitomirovic@gmail.com","Password set","http://localhost:4200/set-password?token="+token.getToken());
         activationTokenService.saveActivationToken(token);
-        response.setToken(token.getToken());
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        DriverCreateResponseDTO driverCreateResponseDTO = new DriverCreateResponseDTO(driver);
+        return new ResponseEntity<>(driverCreateResponseDTO, HttpStatus.CREATED);
     }
-
 
     /**
      * PUT /api/drivers/{id}/availability
@@ -226,7 +223,7 @@ public class DriverControler {
     public ResponseEntity<String> passwordChange(@RequestBody DriverPasswordChangeRequestDTO request) {
         Driver foundDriver = userService.getCurrentDriver();
 
-        foundDriver.setPassword(request.getNewPassword());
+        foundDriver.setPassword(passwordEncoder.encode(request.getNewPassword()));
 
         userService.save(foundDriver);
 
@@ -245,8 +242,10 @@ public class DriverControler {
         ActivationToken at=activationToken.get();
         Driver driver = (Driver) at.getUser();
 
-        driver.setPassword(request.getPassword());
+        driver.setPassword(passwordEncoder.encode(request.getPassword()));
         userService.save(driver);
+        at.setUsed(true);
+        activationTokenService.saveActivationToken(at);
         SetPasswordResponseDTO setPasswordResponseDTO = new SetPasswordResponseDTO();
         setPasswordResponseDTO.setSuccess(Boolean.TRUE);
         return ResponseEntity.ok(setPasswordResponseDTO);

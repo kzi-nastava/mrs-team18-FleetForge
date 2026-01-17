@@ -12,6 +12,7 @@ import com.team18.FleetForge.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,8 +23,7 @@ import java.util.UUID;
 @Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
     private final UserRepository repo;
-
-
+    private final PasswordEncoder passwordEncoder;
 
 
     @Override
@@ -76,11 +76,11 @@ public class UserServiceImpl implements UserService {
         driverEntity.setPhoneNumber(driver.getPhoneNumber());
         driverEntity.setAddress(driver.getAddress());
         driverEntity.setAvailable(true);
-        driverEntity.setProfilePicture(driver.getProfilePicture());
         driverEntity.setBlocked(false);
         driverEntity.setActive(false);
+        driverEntity.setActivated(true);
         String temporaryPassword = UUID.randomUUID().toString();
-        driverEntity.setPassword(temporaryPassword);
+        driverEntity.setPassword(passwordEncoder.encode(temporaryPassword));
         driverEntity.setRole(Role.ROLE_DRIVER);
 
         Vehicle vehicleEntity = new Vehicle();

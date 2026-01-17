@@ -220,6 +220,13 @@ public class AuthController {
             validateTokenResponseDTO.setToken(token);
             return ResponseEntity.ok(validateTokenResponseDTO);
         }
+        ActivationToken at= activationToken.get();
+        if(at.isUsed()||at.getExpiresAt().isBefore(LocalDateTime.now())){
+            ValidateTokenResponseDTO validateTokenResponseDTO = new ValidateTokenResponseDTO();
+            validateTokenResponseDTO.setSuccess(Boolean.FALSE);
+            validateTokenResponseDTO.setToken(token);
+            return ResponseEntity.ok(validateTokenResponseDTO);
+        }
         ValidateTokenResponseDTO validateTokenResponseDTO = new ValidateTokenResponseDTO();
         validateTokenResponseDTO.setSuccess(Boolean.TRUE);
         validateTokenResponseDTO.setToken(token);
