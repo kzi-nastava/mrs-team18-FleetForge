@@ -100,10 +100,13 @@
                 <div class="form-group">
                     <label for="profilePicture">Profile Picture (Optional)</label>
                     <div class="file-input-container">
-                        <input id="profilePicture" type="file" accept="image/*" class="file-input" />
+                        <input id="profilePicture" type="file" accept="image/*" class="file-input"
+                            (change)="onProfilePictureSelected($event)" />
                         <label for="profilePicture" class="file-label">
                             <span class="file-button">Choose File</span>
-                            <span class="file-name">No file chosen</span>
+                            <span class="file-name">
+                                {{ selectedProfilePicture?.name || 'No file chosen' }}
+                            </span>
                         </label>
                     </div>
                 </div>

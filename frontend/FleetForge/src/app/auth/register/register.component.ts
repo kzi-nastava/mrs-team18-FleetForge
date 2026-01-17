@@ -22,6 +22,8 @@ export class RegisterComponent {
   password = '';
   confirmPassword = '';
   address = '';
+  selectedProfilePicture: File | null = null;
+
 
   serverError = '';
 
@@ -58,10 +60,14 @@ export class RegisterComponent {
     formData.append('address', this.address);
     formData.append('phoneNumber', this.phone);
 
+    if (this.selectedProfilePicture) {
+      formData.append('profilePicture', this.selectedProfilePicture);
+    }
+
     this.authService.register(formData).subscribe({
       next: () => {
         this.popupSuccess = true;
-        this.popupMessage = 'Registration request successfuly submitted. The verification email has been sent.';
+        this.popupMessage = 'Registration request successfully submitted. The verification email has been sent.';
         this.showPopup = true;
         this.cdr.detectChanges();
       },
@@ -74,6 +80,7 @@ export class RegisterComponent {
     });
   }
 
+
   closePopup() {
     this.showPopup = false;
 
@@ -81,8 +88,17 @@ export class RegisterComponent {
       this.router.navigate(['/login']);
     }
   }
+
   passwordsDoNotMatch() {
     return this.password !== this.confirmPassword;
   }
+
+  onProfilePictureSelected(event: Event) {
+  const input = event.target as HTMLInputElement;
+  if (input.files && input.files.length > 0) {
+    this.selectedProfilePicture = input.files[0];
+  }
+}
+
 
 }
