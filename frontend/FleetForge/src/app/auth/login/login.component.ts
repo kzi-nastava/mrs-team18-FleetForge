@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { LogoComponent } from '../../shared/logo/logo.component';
 import { SidebarService } from '../../navigation/sidebar/sidebar.service';
@@ -22,14 +22,30 @@ export class LoginComponent {
   email = '';
   password = '';
   error = '';
+  submitted = false;
+
+  ngOnInit() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+  }
 
   constructor(
     private sidebarService: SidebarService,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private cdr: ChangeDetectorRef 
   ) {}
 
-  login(): void {
+  login(form: any): void {
+    this.submitted = true;
+
+    if (form.invalid) {
+      Object.keys(form.controls).forEach(key => {
+        form.controls[key].markAsTouched();
+      });
+      return;
+    }
+
     this.error = '';
 
     this.authService.login({
@@ -48,8 +64,11 @@ export class LoginComponent {
         this.router.navigate(['/']);
       },
       error: () => {
-        this.error = 'Invalid email or password';
+        this.error = 'Invalid email or password! Please try again.';
+        this.submitted = false; 
+        this.cdr.detectChanges();
       }
     });
   }
+
 }

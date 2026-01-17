@@ -8,5 +8,8 @@ import { LogoComponent } from '../../shared/logo/logo.component';
   styleUrl: './reset-password.component.css',
 })
 export class ResetPasswordComponent {
-
+  ngOnInit() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+  }
 }

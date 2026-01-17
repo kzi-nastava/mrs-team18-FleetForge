@@ -10,6 +10,10 @@ import { Router } from '@angular/router';
 })
 export class ForgotPasswordComponent {
 constructor(private router: Router) {}
+  ngOnInit() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+  }
 
   navigateToResetPassword() {
     this.router.navigate(['/reset-password']);

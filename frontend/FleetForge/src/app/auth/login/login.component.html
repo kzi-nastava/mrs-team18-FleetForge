@@ -5,21 +5,40 @@
     <p class="subtitle">Please enter your details</p>
     <h1 class="title">Welcome back</h1>
 
-    <form>
-      <label for="email">Email</label>
-      <input id="email" name="email" type="email" [(ngModel)]="email" placeholder="Enter your email" required />
+    <form #loginForm="ngForm" (ngSubmit)="login(loginForm)">
 
-      <label for="password">Password</label>
-      <input id="password" name="password" type="password" [(ngModel)]="password" placeholder="Enter your password"
-        required />
+      <label>Email</label>
+      <input type="email" name="email" [(ngModel)]="email" required email #emailCtrl="ngModel"
+        [class.invalid]="(emailCtrl.invalid && emailCtrl.touched) || (emailCtrl.invalid && submitted)" />
 
-      <button type="button" (click)="login()">Login</button>
+      <div class="error-message" *ngIf="(emailCtrl.invalid && emailCtrl.touched) || (emailCtrl.invalid && submitted)">
+        <span *ngIf="emailCtrl.errors?.['required']">Email is required.</span>
+        <span *ngIf="emailCtrl.errors?.['email'] && !emailCtrl.errors?.['required']">Please enter a valid email
+          address.</span>
+      </div>
+
+      <label>Password</label>
+      <input type="password" name="password" [(ngModel)]="password" required #passwordCtrl="ngModel"
+        [class.invalid]="(passwordCtrl.invalid && passwordCtrl.touched) || (passwordCtrl.invalid && submitted)" />
+
+      <div class="error-message"
+        *ngIf="(passwordCtrl.invalid && passwordCtrl.touched) || (passwordCtrl.invalid && submitted)">
+        Password is required.
+      </div>
+      
+      <a href="/forgot-password" class="forgot-password">Forgot password?</a>
+
+      <button type="submit">
+        Login
+      </button>
+      <div *ngIf="error" class="error-message error-message-server">
+        {{ error }}
+      </div>
     </form>
 
-    <div *ngIf="error" class="error">{{ error }}</div>
 
     <p class="register">
-      Don’t have an account?
+      Don't have an account?
       <a href="/register">Register</a>
     </p>
 
