@@ -23,6 +23,7 @@ import { PassengerService } from '../service/passenger-service';
   encapsulation: ViewEncapsulation.None
 })
 export class PassengerProfileComponent implements OnInit {
+  formData = new FormData();
   editPassengerInfo=new FormGroup({
     firstName: new FormControl('', Validators.required),
     lastName: new FormControl('', Validators.required),
@@ -58,19 +59,13 @@ edit(): void {
       lastName: this.editPassengerInfo.value.lastName ?? '',
       email: this.editPassengerInfo.value.email ?? '',
       phoneNumber: this.editPassengerInfo.value.phoneNumber ?? '',
-      address: this.editPassengerInfo.value.address ?? '',
-      profilePicture: this.editPassengerInfo.value.profilePicture ?? 'blank_profile.webp'
+      address: this.editPassengerInfo.value.address ?? ''
     })
     .subscribe((updatedUser) => {
-      alert('Profile successfully updated!');
-      this.editPassengerInfo.setValue({
-        firstName: updatedUser.firstName ?? '',
-        lastName: updatedUser.lastName ?? '',
-        email: updatedUser.email ?? '',
-        phoneNumber: updatedUser.phoneNumber ?? '',
-        address: updatedUser.address ?? '',
-        profilePicture: "http://localhost:8080" + (updatedUser.profilePicture ?? 'blank_profile.webp')
-      });
+      if(this.formData.has('file')) {
+        this.passengerService.uploadProfilePicture(this.formData).subscribe(); 
+      }
+      alert('Passenger information updated successfully.');
     });
   }
 
@@ -83,14 +78,15 @@ edit(): void {
     this.fileInput.nativeElement.click();
   }
   onFileSelected(event: Event): void {
+    if(this.formData.has('file')){
+      this.formData.delete('file');
+    }
     const input = event.target as HTMLInputElement;
     if (!input.files || input.files.length === 0) return;
 
     const file = input.files[0];
-    // ovde treba sacuvati sliku na server ili u bazu podataka
-    // za sada samo prikazujemo izabranu sliku
-    // pozivom servisa this.userService.uploadProfilePicture(file);
     this.imageUrl = URL.createObjectURL(file);
+    this.formData.set('file', file);
     this.editPassengerInfo.patchValue({
     profilePicture: file.name 
   });

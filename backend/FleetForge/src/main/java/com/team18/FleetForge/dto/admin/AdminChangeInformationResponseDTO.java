@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AdminChangeInformationResponseDTO {
-
+    private Long id;
     private  String firstName;
     private String lastName;
     private String email;

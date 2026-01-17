@@ -11,7 +11,7 @@ import { RouterModule } from '@angular/router';
 })
 export class AdminProfileComponent implements OnInit {
   adminId: number = 0;
-  
+  formData = new FormData();
   editAdminInfo=new FormGroup({
     firstName: new FormControl('', Validators.required),
     lastName: new FormControl('', Validators.required),
@@ -44,19 +44,13 @@ export class AdminProfileComponent implements OnInit {
       lastName: this.editAdminInfo.value.lastName ?? '',
       email: this.editAdminInfo.value.email ?? '',
       phoneNumber: this.editAdminInfo.value.phoneNumber ?? '',
-      address: this.editAdminInfo.value.address ?? '',
-      profilePicture: this.editAdminInfo.value.profilePicture ?? 'blank_profile.webp'
+      address: this.editAdminInfo.value.address ?? ''
     })
     .subscribe((updatedAdmin) => {
-      alert('Profile successfully updated!');
-      this.editAdminInfo.setValue({
-        firstName: updatedAdmin.firstName ?? '',
-        lastName: updatedAdmin.lastName ?? '',
-        email: updatedAdmin.email ?? '',
-        phoneNumber: updatedAdmin.phoneNumber ?? '',
-        address: updatedAdmin.address ?? '',
-        profilePicture: "http://localhost:8080" + (updatedAdmin.profilePicture ?? 'blank_profile.webp')
-      });
+      if(this.formData.has('file')) {
+        this.adminService.uploadProfilePicture(this.formData).subscribe(); 
+      }
+      alert('Admin information updated successfully.');
     });
   }
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
@@ -65,14 +59,15 @@ export class AdminProfileComponent implements OnInit {
     this.fileInput.nativeElement.click();
   }
   onFileSelected(event: Event): void {
+    if(this.formData.has('file')){
+      this.formData.delete('file');
+    }
     const input = event.target as HTMLInputElement;
     if (!input.files || input.files.length === 0) return;
 
     const file = input.files[0];
-    // ovde treba sacuvati sliku na server ili u bazu podataka
-    // za sada samo prikazujemo izabranu sliku
-    // pozivom servisa this.userService.uploadProfilePicture(file);
     this.imageUrl = URL.createObjectURL(file);
+    this.formData.set('file', file);
     this.editAdminInfo.patchValue({
     profilePicture: file.name 
   } );
