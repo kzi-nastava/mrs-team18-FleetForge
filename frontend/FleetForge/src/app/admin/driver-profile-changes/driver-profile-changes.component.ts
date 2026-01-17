@@ -1,6 +1,6 @@
 import { Component, OnInit, Signal, signal, WritableSignal } from '@angular/core';
 import { DriverProfileChangePendingRequestsDTO, VehicleProfileChangePendingRequestsDTO } from '../../shared/dtos/driver-profile-requests.dtos';
-import { DriverProfileChangesService } from '../service/driver-profile-changes-service';
+import { DriverProfileChangesService } from '../service/driver-profile-changes/driver-profile-changes-service';
 
 @Component({
   selector: 'app-driver-profile-changes',
