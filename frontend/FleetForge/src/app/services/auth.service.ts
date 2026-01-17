@@ -13,6 +13,10 @@ export interface LoginResponse {
   loggedInAt: string;
 }
 
+export interface PasswordResetRequest {
+  email: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -23,5 +27,12 @@ export class AuthService {
 
   login(data: LoginRequest): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${this.apiUrl}/login`, data);
+  }
+
+  requestPasswordReset(data: PasswordResetRequest): Observable<void> {
+    return this.http.post<void>(
+      `${this.apiUrl}/password-reset-requests`,
+      data
+    );
   }
 }

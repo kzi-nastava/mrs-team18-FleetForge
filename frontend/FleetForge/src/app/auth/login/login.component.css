@@ -83,3 +83,7 @@ button:hover {
   font-size: 13px;
   text-align: center;
 }
+
+input.invalid {
+  border: 1px solid #e74c3c;
+}
