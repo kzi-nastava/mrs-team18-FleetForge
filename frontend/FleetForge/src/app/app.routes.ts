@@ -30,7 +30,8 @@ export const routes: Routes = [
       { path: 'profile-password-reset', component: PasswordResetComponent },
       { path: 'driver/ride-history', component: DriverHistoryComponent },
       { path: 'admin/driver-changes', component: DriverProfileChangesComponent },
-      {path: 'admin/register-new-driver', component: RegisterDriverComponent}
+      {path: 'admin/register-new-driver', component: RegisterDriverComponent},
+      {path: 'set-password', component: PasswordSetComponent}
     ]
   },
 
