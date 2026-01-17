@@ -40,4 +40,7 @@ export class AuthService {
     return this.http.post<void>(`${this.apiUrl}/password-resets`, data);
   }
 
+  register(data: FormData) {
+  return this.http.post<void>(`${this.apiUrl}/register`, data);
+  }
 }

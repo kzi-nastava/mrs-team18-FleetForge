@@ -6,46 +6,95 @@
     </div>
 
     <div class="register-container">
-        <form>
+        <form #registerForm="ngForm" (ngSubmit)="register(registerForm)">
+
             <div class="form-grid">
                 <!-- Row 1 -->
 
                 <div class="form-group">
                     <label for="firstName">First Name*</label>
-                    <input id="firstName" type="text" placeholder="Enter your first name" required />
+                    <input type="text" name="firstName" [(ngModel)]="firstName" required pattern="^[A-Za-z]+$"
+                        #fn="ngModel" [class.invalid]="(fn.invalid && fn.touched) || (fn.invalid && submitted)" />
+
+                    <div class="error-message" *ngIf="(fn.invalid && fn.touched) || (fn.invalid && submitted)">
+                        <span *ngIf="fn.errors?.['required']">First name is required.</span>
+                        <span *ngIf="fn.errors?.['pattern']">Only letters are allowed.</span>
+                    </div>
+
                 </div>
 
                 <div class="form-group">
                     <label for="lastName">Last Name*</label>
-                    <input id="lastName" type="text" placeholder="Enter your last name" required />
+                    <input type="text" name="lastName" [(ngModel)]="lastName" required pattern="^[A-Za-z]+$"
+                        #ln="ngModel" [class.invalid]="(ln.invalid && ln.touched) || (ln.invalid && submitted)" />
+
+                    <div class="error-message" *ngIf="(ln.invalid && ln.touched) || (ln.invalid && submitted)">
+                        <span *ngIf="ln.errors?.['required']">Last name is required.</span>
+                        <span *ngIf="ln.errors?.['pattern']">Only letters are allowed.</span>
+                    </div>
+
                 </div>
 
                 <!-- Row 2 -->
                 <div class="form-group">
-                    <label for="email">Email*</label>
-                    <input id="email" type="email" placeholder="Enter your email" required />
+                    <label>Email*</label>
+                    <input type="email" name="email" [(ngModel)]="email" required email #em="ngModel"
+                        [class.invalid]="(em.invalid && em.touched) || (em.invalid && submitted)">
+                    <div class="error-message" *ngIf="(em.invalid && em.touched) || (em.invalid && submitted)">
+                        <span *ngIf="em.errors?.['required']">Email is required.</span>
+                        <span *ngIf="em.errors?.['email']">Invalid email format.</span>
+                    </div>
                 </div>
 
                 <div class="form-group">
                     <label for="phone">Phone Number*</label>
-                    <input id="phone" type="tel" placeholder="Enter your phone number" required />
+                    <input type="tel" name="phone" [(ngModel)]="phone" required pattern="^\+?[0-9]+$" #ph="ngModel"
+                        [class.invalid]="(ph.invalid && ph.touched) || (ph.invalid && submitted)" />
+
+                    <div class="error-message" *ngIf="(ph.invalid && ph.touched) || (ph.invalid && submitted)">
+                        <span *ngIf="ph.errors?.['required']">Phone number is required.</span>
+                        <span *ngIf="ph.errors?.['pattern']">Only numbers and '+' are allowed.</span>
+                    </div>
+
                 </div>
 
                 <!-- Row 3 -->
                 <div class="form-group">
                     <label for="password">Password*</label>
-                    <input id="password" type="password" placeholder="Create a password" required />
+                    <input type="password" name="password" [(ngModel)]="password" required minlength="6" #pw="ngModel"
+                        [class.invalid]="(pw.invalid && pw.touched) || (pw.invalid && submitted)" />
+
+                    <div class="error-message" *ngIf="(pw.invalid && pw.touched) || (pw.invalid && submitted)">
+                        <span *ngIf="pw.errors?.['required']">Password is required.</span>
+                        <span *ngIf="pw.errors?.['minlength']">Password must be at least 6 characters.</span>
+                    </div>
+
                 </div>
 
                 <div class="form-group">
-                    <label for="confirmPassword">Confirm Password*</label>
-                    <input id="confirmPassword" type="password" placeholder="Re-enter your password" required />
+
+                    <label>Confirm Password*</label>
+
+                    <input type="password" name="confirmPassword" [(ngModel)]="confirmPassword" required #cp="ngModel"
+                        [class.invalid]="((cp.invalid || passwordsDoNotMatch()) && cp.touched) || ((cp.invalid || passwordsDoNotMatch()) && submitted)" />
+
+                    <div class="error-message"
+                        *ngIf="((cp.invalid || passwordsDoNotMatch()) && cp.touched) || ((cp.invalid || passwordsDoNotMatch()) && submitted)">
+                        <span *ngIf="cp.errors?.['required']">Confirm password is required.</span>
+                        <span *ngIf="!cp.errors?.['required'] && passwordsDoNotMatch()">
+                            Passwords do not match.
+                        </span>
+                    </div>
+
                 </div>
 
-                <!-- Row 4 -->
+
+
+
                 <div class="form-group">
-                    <label for="address">Home Address*</label>
-                    <input id="address" type="text" placeholder="Enter your full address" required />
+                    <label>Address*</label>
+                    <input type="text" name="address" [(ngModel)]="address" required #ad="ngModel"
+                        [class.invalid]="(ad.invalid && ad.touched) || (ad.invalid && submitted)">
                 </div>
 
                 <div class="form-group">
@@ -60,13 +109,22 @@
                 </div>
             </div>
 
-            <p class="terms">
-                By signing up you agree to
-                <a href="#">terms and conditions</a> and <a href="#">privacy policy</a>
-            </p>
-
             <button type="submit">Register</button>
+
+            <div *ngIf="serverError" class="error-message error-message-server">
+                {{ serverError }}
+            </div>
+
         </form>
+
+        <!-- POPUP -->
+        <div class="popup-overlay" *ngIf="showPopup">
+            <div class="popup-box">
+                <h2 class="popup-title">{{ popupSuccess ? 'Success' : 'Error' }}</h2>
+                <p class="popup-message">{{ popupMessage }}</p>
+                <button class="popup-button" (click)="closePopup()">OK</button>
+            </div>
+        </div>
 
         <p class="login-link">
             Already have an account?

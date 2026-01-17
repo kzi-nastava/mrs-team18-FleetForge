@@ -67,7 +67,7 @@ Content-Type: image/jpeg
 GET http://localhost:8080/api/auth/email-availability?email=passenger5@test.com
 
 ### Check email availability for an existing email
-GET http://localhost:8080/api/auth/email-availability?email=passenger@test.com
+GET http://localhost:8080/api/auth/email-availability?email=driver1@test.com
 
 ### Activate the newly registered account
 GET http://localhost:8080/api/auth/activations?token=07c1577a-5a36-43a5-964a-b60901d5eb22
