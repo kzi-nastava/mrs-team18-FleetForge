@@ -26,3 +26,12 @@ export interface VehicleChangeResponseDTO{
 }
 
 export { VehicleType };
+
+export interface VehicleCreateRequestDTO{
+    model:string;
+        type:VehicleType;
+        registrationNumber:string;
+        space:number;
+        babySeat:boolean;
+        petFriendly:boolean;
+}

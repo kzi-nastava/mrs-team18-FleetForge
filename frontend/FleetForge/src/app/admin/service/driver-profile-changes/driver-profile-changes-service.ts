@@ -1,10 +1,7 @@
 import { Injectable, OnInit, signal } from '@angular/core';
-import { DriverProfileChangeRequest } from '../../shared/models/driver-profile-change-request';
-import { VehicleProfileChangeRequest } from '../../shared/models/vehicle-profile-change-request';
-import { AdminService } from '../../profiles/service/admin-service';
 import { HttpClient } from '@angular/common/http';
-import { ChangeAcceptanceDTO, ChangeAcceptanceResponseDTO, DriverProfileChangePendingRequestsDTO, VehicleProfileChangePendingRequestsDTO } from '../../shared/dtos/driver-profile-requests.dtos';
 import { Observable } from 'rxjs';
+import { ChangeAcceptanceDTO, ChangeAcceptanceResponseDTO, DriverProfileChangePendingRequestsDTO, VehicleProfileChangePendingRequestsDTO } from '../../../shared/dtos/driver-profile-requests.dtos';
 
 @Injectable({
   providedIn: 'root',
