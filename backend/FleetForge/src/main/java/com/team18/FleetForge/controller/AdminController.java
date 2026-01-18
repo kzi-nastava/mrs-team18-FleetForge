@@ -18,10 +18,7 @@ import com.team18.FleetForge.model.enums.InformationChangeRequestStatus;
 import com.team18.FleetForge.model.enums.VehicleType;
 import com.team18.FleetForge.model.users.Passenger;
 import com.team18.FleetForge.model.users.User;
-import com.team18.FleetForge.service.DriverProfileChangeRequestService;
-import com.team18.FleetForge.service.UserService;
-import com.team18.FleetForge.service.VehicleInfoChangeReqService;
-import com.team18.FleetForge.service.VehicleService;
+import com.team18.FleetForge.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -31,6 +28,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +41,7 @@ public class AdminController {
     private final DriverProfileChangeRequestService driverChangeRequestService;
     private final VehicleInfoChangeReqService vehicleChangeService;
     private final VehicleService vehicleService;
+    private final ProfilePictureService profilePictureService;
 
     @GetMapping
     public ResponseEntity<AdminGetResponseDTO> getCurrentAdmin(){
@@ -55,7 +54,7 @@ public class AdminController {
     }
 
     @PutMapping
-    public ResponseEntity<AdminChangeInformationResponseDTO> changeCurrentAdmin(@RequestBody AdminChangeInformationRequestDTO adminChangeInformationRequestDTO){
+    public ResponseEntity<AdminChangeInformationResponseDTO> changeCurrentAdmin(@RequestBody AdminChangeInformationRequestDTO adminChangeInformationRequestDTO) throws IOException {
         Admin admin=userService.getCurrentAdmin();
         if(admin==null){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -65,7 +64,6 @@ public class AdminController {
         admin.setEmail(adminChangeInformationRequestDTO.getEmail());
         admin.setAddress(adminChangeInformationRequestDTO.getAddress());
         admin.setPhoneNumber(adminChangeInformationRequestDTO.getPhoneNumber());
-        admin.setProfilePicture(adminChangeInformationRequestDTO.getProfilePicture());
 
         userService.save(admin);
         AdminChangeInformationResponseDTO adminChangeInformationResponseDTO = new AdminChangeInformationResponseDTO(admin);
@@ -81,7 +79,7 @@ public class AdminController {
     }
     @PutMapping("/{id}")
     public ResponseEntity<AdminChangeInformationResponseDTO> changeUser
-            (@RequestBody AdminChangeInformationRequestDTO adminChangeInformationRequestDTO, @PathVariable Long id) {
+            (@RequestBody AdminChangeInformationRequestDTO adminChangeInformationRequestDTO, @PathVariable Long id) throws IOException {
         Admin admin=(Admin) userService.getUserById(id);
         if(admin==null){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -91,7 +89,6 @@ public class AdminController {
         admin.setEmail(adminChangeInformationRequestDTO.getEmail());
         admin.setAddress(adminChangeInformationRequestDTO.getAddress());
         admin.setPhoneNumber(adminChangeInformationRequestDTO.getPhoneNumber());
-        admin.setProfilePicture(adminChangeInformationRequestDTO.getProfilePicture());
         userService.save(admin);
         AdminChangeInformationResponseDTO adminChanged = new AdminChangeInformationResponseDTO(admin);
         return new ResponseEntity<>(adminChanged, HttpStatus.OK);

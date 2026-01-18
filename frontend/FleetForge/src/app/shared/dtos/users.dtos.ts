@@ -3,6 +3,7 @@ import { InformationChangeRequestStatus } from "../enums/information-change-requ
 import { VehicleInformationDTO } from "./vehicle.dtos";
 
 export interface UserInformationDTO{
+    id:number;
     firstName:string;
     lastName:string;
     email:string;
@@ -32,4 +33,12 @@ export interface DriverChangeResponseDTO{
 
 export interface PasswordChangeDTO{
     newPassword:string;
+}
+
+export interface UserInformationChangeDTO{
+    firstName:string;
+    lastName:string;
+    email:string;
+    phoneNumber:string;
+    address:string;
 }
