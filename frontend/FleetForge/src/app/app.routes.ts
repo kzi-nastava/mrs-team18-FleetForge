@@ -17,6 +17,7 @@ import { DriverProfileChangesComponent } from './admin/driver-profile-changes/dr
 import { PasswordSetComponent } from './driver/password-set/password-set.component';
 import { RegisterDriverComponent } from './admin/register-driver/register-driver.component';
 import { ActivateAccountComponent } from './auth/activate-account/activate-account.component';
+import { PassengerHomeComponent } from './passenger/passenger-home/passenger-home.component';
 
 export const routes: Routes = [
   /** ROUTES WITH NAVBAR */
@@ -32,7 +33,8 @@ export const routes: Routes = [
       { path: 'driver/ride-history', component: DriverHistoryComponent },
       { path: 'admin/driver-changes', component: DriverProfileChangesComponent },
       {path: 'admin/register-new-driver', component: RegisterDriverComponent},
-      {path: 'set-password', component: PasswordSetComponent}
+      {path: 'set-password', component: PasswordSetComponent},
+      {path: 'passenger/passenger-home', component: PassengerHomeComponent}
     ]
   },
 
