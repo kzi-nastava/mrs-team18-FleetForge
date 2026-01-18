@@ -40,4 +40,22 @@ export class AuthService {
     return this.http.post<void>(`${this.apiUrl}/password-resets`, data);
   }
 
+  register(data: FormData) {
+    return this.http.post<void>(`${this.apiUrl}/register`, data);
+  }
+
+  checkEmailAvailability(email: string) {
+    return this.http.get<{ available: boolean }>(
+      `${this.apiUrl}/email-availability`,
+      { params: { email } }
+    );
+  } 
+
+  activateAccount(token: string) {
+    return this.http.get(
+      `http://localhost:8080/api/auth/activations?token=${token}`,
+      { observe: 'response' }
+    );
+  }
+
 }

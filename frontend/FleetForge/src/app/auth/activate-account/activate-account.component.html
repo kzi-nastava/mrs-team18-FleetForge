@@ -1,0 +1,40 @@
+<div class="reset-password-page">
+  <app-logo></app-logo>
+
+  <div class="reset-password-container">
+
+    <!-- Loading -->
+    <div *ngIf="loading">
+      <p class="subtitle">Please wait</p>
+      <h1 class="title">Activating your account...</h1>
+      <p class="info-text">We are verifying your email address.</p>
+    </div>
+
+    <!-- Success -->
+    <div *ngIf="!loading && success">
+      <p class="subtitle">Success</p>
+      <h1 class="title">Account Activated</h1>
+      <p class="info-text">
+        Your account has been successfully activated. You may now log in.
+      </p>
+
+      <button class="action-button" (click)="goToLogin()">
+        Go to Login
+      </button>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="!loading && !success">
+      <p class="subtitle">Error</p>
+      <h1 class="title">Activation Failed</h1>
+      <p class="error-text">
+        {{ errorMessage }}
+      </p>
+
+      <button class="action-button" (click)="goToLogin()">
+        Go to Login
+      </button>
+    </div>
+
+  </div>
+</div>
