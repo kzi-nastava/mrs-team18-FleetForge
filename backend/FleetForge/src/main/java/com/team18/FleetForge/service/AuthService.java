@@ -74,7 +74,7 @@ public class AuthService {
 
         activationTokenRepository.save(activationToken);
 
-        String link = "http://localhost:8080/api/auth" + "/activations?token=" + token;//todo remove later
+        String link = frontendUrl + "/activate-account?token=" + token;
 
         String body =
                 "Hello " + user.getFirstName() + ",\n\n" +

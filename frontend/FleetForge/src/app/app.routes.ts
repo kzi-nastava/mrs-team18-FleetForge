@@ -16,6 +16,7 @@ import { AdminProfileComponent } from './profiles/admin-profile/admin-profile.co
 import { DriverProfileChangesComponent } from './admin/driver-profile-changes/driver-profile-changes.component';
 import { PasswordSetComponent } from './driver/password-set/password-set.component';
 import { RegisterDriverComponent } from './admin/register-driver/register-driver.component';
+import { ActivateAccountComponent } from './auth/activate-account/activate-account.component';
 
 export const routes: Routes = [
   /** ROUTES WITH NAVBAR */
@@ -42,7 +43,8 @@ export const routes: Routes = [
       { path: 'login', component: LoginComponent },
       { path: 'register', component: RegisterComponent },
       { path: 'forgot-password', component: ForgotPasswordComponent },
-      { path: 'reset-password', component: ResetPasswordComponent }
+      { path: 'reset-password', component: ResetPasswordComponent },
+      { path: 'activate-account', component: ActivateAccountComponent }
     ]
   }
 ];

@@ -51,4 +51,11 @@ export class AuthService {
     );
   } 
 
+  activateAccount(token: string) {
+    return this.http.get(
+      `http://localhost:8080/api/auth/activations?token=${token}`,
+      { observe: 'response' }
+    );
+  }
+
 }
