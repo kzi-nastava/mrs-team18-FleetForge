@@ -23,7 +23,9 @@ export class RegisterComponent {
   confirmPassword = '';
   address = '';
   selectedProfilePicture: File | null = null;
-
+  
+  emailAvailable: boolean | null = null;
+  checkingEmail = false;
 
   serverError = '';
 
@@ -45,7 +47,7 @@ export class RegisterComponent {
   register(form: any) {
     this.submitted = true;
 
-    if (form.invalid || this.password !== this.confirmPassword) {
+    if (form.invalid || this.password !== this.confirmPassword || this.emailAvailable === false) {
       Object.keys(form.controls).forEach(key => {
         form.controls[key].markAsTouched();
       });
@@ -94,11 +96,27 @@ export class RegisterComponent {
   }
 
   onProfilePictureSelected(event: Event) {
-  const input = event.target as HTMLInputElement;
-  if (input.files && input.files.length > 0) {
-    this.selectedProfilePicture = input.files[0];
+      const input = event.target as HTMLInputElement;
+      if (input.files && input.files.length > 0) {
+        this.selectedProfilePicture = input.files[0];
+      }
+    }
+
+    checkEmailAvailability() {
+    if (!this.email) return;
+
+    this.checkingEmail = true;
+
+    this.authService.checkEmailAvailability(this.email).subscribe({
+      next: (res) => {
+        this.emailAvailable = res.available;
+        this.checkingEmail = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.emailAvailable = null;
+        this.checkingEmail = false;
+      }
+    });
   }
-}
-
-
 }

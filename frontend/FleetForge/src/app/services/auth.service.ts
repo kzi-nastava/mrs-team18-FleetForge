@@ -41,6 +41,14 @@ export class AuthService {
   }
 
   register(data: FormData) {
-  return this.http.post<void>(`${this.apiUrl}/register`, data);
+    return this.http.post<void>(`${this.apiUrl}/register`, data);
   }
+
+  checkEmailAvailability(email: string) {
+    return this.http.get<{ available: boolean }>(
+      `${this.apiUrl}/email-availability`,
+      { params: { email } }
+    );
+  } 
+
 }
