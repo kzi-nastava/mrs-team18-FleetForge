@@ -130,16 +130,18 @@ public class DriverControler {
         return new ResponseEntity<>(driverProfileChangeResponseDTO, HttpStatus.CREATED);
     }
 
-    @PostMapping("/{id}/online")
-    public ResponseEntity<DriverSessionResponseDTO> startSession(@PathVariable Long id) {
+    @PostMapping("/online")
+    public ResponseEntity<DriverSessionResponseDTO> startSession() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Driver driver = (Driver) authentication.getPrincipal();
         DriverSession newSession = new DriverSession();
-        newSession.setDriverId(id);
+        newSession.setDriver(driver);
         newSession.setStartedAt(LocalDateTime.now());
         //sacuvaj
 
         DriverSessionResponseDTO driverSessionResponseDTO = new DriverSessionResponseDTO();
         // driverSessionResponseDTO.setSessionId(newSession.getId()); //moze posle sa bazom kad se kljuc generise
-        driverSessionResponseDTO.setDriverId(id);
+        driverSessionResponseDTO.setDriverId(driver.getId());
         driverSessionResponseDTO.setStartedAt(newSession.getStartedAt());
         driverSessionResponseDTO.setActive(true);
         return new ResponseEntity<>(driverSessionResponseDTO, HttpStatus.OK);
@@ -147,17 +149,20 @@ public class DriverControler {
 
     }
 
-    @PutMapping("/{id}/offline")
-    public ResponseEntity<DriverSessionResponseDTO> stopSession(@PathVariable Long id, @RequestBody DriverSessionEndRequestDTO request) {
+    @PutMapping("/offline")
+    public ResponseEntity<DriverSessionResponseDTO> stopSession(@RequestBody DriverSessionEndRequestDTO request) {
         //preko session id iz request.getId() nadjem session
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Driver driver = (Driver) authentication.getPrincipal();
+        DriverSession newSession = new DriverSession();
         Long sessionId = request.getSessionId();
         DriverSession foundSession = new DriverSession();
-        foundSession.setDriverId(id);
+        foundSession.setDriver(driver);
         foundSession.setStartedAt(LocalDateTime.now()); //samo za prikaz je .now inace se uzima iz ucitane sesije
         foundSession.setEndedAt(LocalDateTime.now());
         //sacuvam
         DriverSessionResponseDTO driverSessionResponseDTO = new DriverSessionResponseDTO();
-        driverSessionResponseDTO.setDriverId(id);
+        driverSessionResponseDTO.setDriverId(driver.getId());
         driverSessionResponseDTO.setStartedAt(foundSession.getStartedAt());
         driverSessionResponseDTO.setEndedAt(foundSession.getEndedAt());
         driverSessionResponseDTO.setActive(false);
