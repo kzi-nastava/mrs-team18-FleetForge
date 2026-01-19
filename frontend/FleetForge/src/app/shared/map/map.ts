@@ -2,7 +2,7 @@ import { Component, AfterViewInit, Input, EventEmitter, Output } from '@angular/
 import * as L from 'leaflet';
 import { VehicleLocationDTO } from '../models/vehicle.model';
 import { NominatimService } from '../services/nominatim';
-import { Observable } from 'rxjs';
+import { RoutingService } from './service/routing.service';
 
 @Component({
   selector: 'app-map',
@@ -13,6 +13,9 @@ import { Observable } from 'rxjs';
 export class MapComponent implements AfterViewInit {
   private _vehicles: VehicleLocationDTO[] = [];
   private markers: L.Marker[] = [];
+  private startPoint = L.latLng(45.2454929618196, 19.836663741992545);
+  private endPoint = L.latLng(45.2462264156403, 19.852365232320707);
+  
   @Output() mapClick = new EventEmitter<{address:string, lat:number, lng:number}>();
   @Input() set vehicles(value: VehicleLocationDTO[]) {
     this._vehicles = value;
@@ -53,6 +56,11 @@ export class MapComponent implements AfterViewInit {
     });
 
     this.registerOnClick();
+
+    // todo remove later
+    RoutingService.addRoute(this.map, this.startPoint, this.endPoint);
+    this.setMarkerWithCoords("Start Point", this.startPoint.lat, this.startPoint.lng);
+    this.setMarkerWithCoords("Destination", this.endPoint.lat, this.endPoint.lng);
   }
 
   private updateMarkerSizes(): void {
@@ -69,18 +77,24 @@ export class MapComponent implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-     let DefaultIcon = L.icon({
-      iconUrl: 'https://unpkg.com/leaflet@1.6.0/dist/images/marker-icon.png',
-    });
+  const DefaultIcon = L.icon({
+    iconUrl: 'https://unpkg.com/leaflet@1.6.0/dist/images/marker-icon.png',
+    shadowUrl: 'https://unpkg.com/leaflet@1.6.0/dist/images/marker-shadow.png',
+    iconSize: [25, 41],      
+    iconAnchor: [12, 41],    
+    popupAnchor: [1, -34],   
+    shadowSize: [41, 41]     
+  });
 
-    L.Marker.prototype.options.icon = DefaultIcon;
-    this.initMap();
-    
-    if (this.vehicles.length > 0) {
-      this.displayVehicles();
-    }
+  L.Marker.prototype.options.icon = DefaultIcon;
+  this.initMap();
+  
+  if (this.vehicles.length > 0) {
+    this.displayVehicles();
   }
-   registerOnClick(): void {
+}
+
+  registerOnClick(): void {
     this.map.on('click', (e: any) => {
       const coord = e.latlng;
       const lat = coord.lat;
@@ -113,6 +127,7 @@ export class MapComponent implements AfterViewInit {
       }
     });
   }
+  
   removeMarker(address: string): void {
     this.markers = this.markers.filter(marker => {
       if ((marker as any).customAddress === address) {
@@ -122,6 +137,7 @@ export class MapComponent implements AfterViewInit {
       return true; 
     });
   }
+
   setMarkerWithCoords(address: string, lat: number, lng: number): void {
     const newMarker = L.marker([lat, lng]);
     (newMarker as any).customAddress = address;
@@ -129,6 +145,7 @@ export class MapComponent implements AfterViewInit {
     this.markers.push(newMarker);
     newMarker.bindPopup(address).openPopup();
   }
+
   private displayVehicles(): void {
     console.log('displayVehicles called. Map exists:', !!this.map, 'Vehicles count:', this.vehicles.length);
     if (!this.map) return;
