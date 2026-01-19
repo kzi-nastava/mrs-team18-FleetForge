@@ -57,8 +57,10 @@ export class MapComponent implements AfterViewInit {
 
     this.registerOnClick();
 
-    // Use the RoutingService for route creation
+    // todo remove later
     RoutingService.addRoute(this.map, this.startPoint, this.endPoint);
+    this.setMarkerWithCoords("Start Point", this.startPoint.lat, this.startPoint.lng);
+    this.setMarkerWithCoords("Destination", this.endPoint.lat, this.endPoint.lng);
   }
 
   private updateMarkerSizes(): void {
@@ -75,17 +77,22 @@ export class MapComponent implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-     let DefaultIcon = L.icon({
-      iconUrl: 'https://unpkg.com/leaflet@1.6.0/dist/images/marker-icon.png',
-    });
+  const DefaultIcon = L.icon({
+    iconUrl: 'https://unpkg.com/leaflet@1.6.0/dist/images/marker-icon.png',
+    shadowUrl: 'https://unpkg.com/leaflet@1.6.0/dist/images/marker-shadow.png',
+    iconSize: [25, 41],      
+    iconAnchor: [12, 41],    
+    popupAnchor: [1, -34],   
+    shadowSize: [41, 41]     
+  });
 
-    L.Marker.prototype.options.icon = DefaultIcon;
-    this.initMap();
-    
-    if (this.vehicles.length > 0) {
-      this.displayVehicles();
-    }
+  L.Marker.prototype.options.icon = DefaultIcon;
+  this.initMap();
+  
+  if (this.vehicles.length > 0) {
+    this.displayVehicles();
   }
+}
 
   registerOnClick(): void {
     this.map.on('click', (e: any) => {
