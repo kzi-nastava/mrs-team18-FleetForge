@@ -88,23 +88,7 @@ export class MapComponent implements AfterViewInit {
       console.log(
         'You clicked the map at latitude: ' + lat + ' and longitude: ' + lng
       );
-
-      const newMarker = L.marker([lat, lng]);
-
-      
-
-      newMarker.addTo(this.map);
-      this.markers.push(newMarker);
       this.nominatimService.reverseSearch(lat, lng).subscribe((data) => {
-        let addressStr = data.address.road;
-          if (data.address.house_number) {
-            addressStr += ' ' + data.address.house_number;
-          }
-          (newMarker as any).customAddress = addressStr;
-        console.log('Reverse geocoding data:', data);
-        if (data && data.display_name) {
-          newMarker.bindPopup(data.address.road + ' ' + data.address.house_number+', ' + data.address.city).openPopup();
-        }
         if(data.address.house_number==undefined){
           this.mapClick.emit({address: data.address.road});
         }else{
