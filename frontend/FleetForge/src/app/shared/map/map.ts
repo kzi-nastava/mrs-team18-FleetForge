@@ -1,9 +1,8 @@
 import { Component, AfterViewInit, Input, EventEmitter, Output } from '@angular/core';
 import * as L from 'leaflet';
-import 'leaflet-routing-machine';
 import { VehicleLocationDTO } from '../models/vehicle.model';
 import { NominatimService } from '../services/nominatim';
-import { environment } from '../../../environments/environment';
+import { RoutingService } from './service/routing.service';
 
 @Component({
   selector: 'app-map',
@@ -57,9 +56,9 @@ export class MapComponent implements AfterViewInit {
     });
 
     this.registerOnClick();
-    
-    // Initialize routing after map is created
-    this.setRoute();
+
+    // Use the RoutingService for route creation
+    RoutingService.addRoute(this.map, this.startPoint, this.endPoint);
   }
 
   private updateMarkerSizes(): void {
@@ -188,30 +187,6 @@ export class MapComponent implements AfterViewInit {
       .bindPopup(popupContent);
 
     return marker;
-  }
-
-  setRoute(): void {
-    const routeControl = L.Routing.control({
-      waypoints: [this.startPoint, this.endPoint],
-      router: L.Routing.mapbox(environment.MAPBOX_API_KEY, {
-        profile: 'mapbox/driving'
-      }),
-      collapsible: false,
-      plan: L.Routing.plan([this.startPoint, this.endPoint], {
-        addWaypoints: false
-      })
-    });
-
-    routeControl.addTo(this.map);
-
-    // Remove the routing panel
-    const removePanel = () => {
-      const container = document.querySelector('.leaflet-routing-container');
-      if (container) container.remove();
-    };
-
-    removePanel();
-
   }
 
 }
