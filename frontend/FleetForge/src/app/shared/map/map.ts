@@ -1,8 +1,9 @@
 import { Component, AfterViewInit, Input, EventEmitter, Output } from '@angular/core';
 import * as L from 'leaflet';
+import 'leaflet-routing-machine';
 import { VehicleLocationDTO } from '../models/vehicle.model';
 import { NominatimService } from '../services/nominatim';
-import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-map',
@@ -13,6 +14,9 @@ import { Observable } from 'rxjs';
 export class MapComponent implements AfterViewInit {
   private _vehicles: VehicleLocationDTO[] = [];
   private markers: L.Marker[] = [];
+  private startPoint = L.latLng(45.2454929618196, 19.836663741992545);
+  private endPoint = L.latLng(45.2462264156403, 19.852365232320707);
+  
   @Output() mapClick = new EventEmitter<{address:string, lat:number, lng:number}>();
   @Input() set vehicles(value: VehicleLocationDTO[]) {
     this._vehicles = value;
@@ -53,6 +57,9 @@ export class MapComponent implements AfterViewInit {
     });
 
     this.registerOnClick();
+    
+    // Initialize routing after map is created
+    this.setRoute();
   }
 
   private updateMarkerSizes(): void {
@@ -80,7 +87,8 @@ export class MapComponent implements AfterViewInit {
       this.displayVehicles();
     }
   }
-   registerOnClick(): void {
+
+  registerOnClick(): void {
     this.map.on('click', (e: any) => {
       const coord = e.latlng;
       const lat = coord.lat;
@@ -113,6 +121,7 @@ export class MapComponent implements AfterViewInit {
       }
     });
   }
+  
   removeMarker(address: string): void {
     this.markers = this.markers.filter(marker => {
       if ((marker as any).customAddress === address) {
@@ -122,6 +131,7 @@ export class MapComponent implements AfterViewInit {
       return true; 
     });
   }
+
   setMarkerWithCoords(address: string, lat: number, lng: number): void {
     const newMarker = L.marker([lat, lng]);
     (newMarker as any).customAddress = address;
@@ -129,6 +139,7 @@ export class MapComponent implements AfterViewInit {
     this.markers.push(newMarker);
     newMarker.bindPopup(address).openPopup();
   }
+
   private displayVehicles(): void {
     console.log('displayVehicles called. Map exists:', !!this.map, 'Vehicles count:', this.vehicles.length);
     if (!this.map) return;
@@ -177,6 +188,30 @@ export class MapComponent implements AfterViewInit {
       .bindPopup(popupContent);
 
     return marker;
+  }
+
+  setRoute(): void {
+    const routeControl = L.Routing.control({
+      waypoints: [this.startPoint, this.endPoint],
+      router: L.Routing.mapbox(environment.MAPBOX_API_KEY, {
+        profile: 'mapbox/driving'
+      }),
+      collapsible: false,
+      plan: L.Routing.plan([this.startPoint, this.endPoint], {
+        addWaypoints: false
+      })
+    });
+
+    routeControl.addTo(this.map);
+
+    // Remove the routing panel
+    const removePanel = () => {
+      const container = document.querySelector('.leaflet-routing-container');
+      if (container) container.remove();
+    };
+
+    removePanel();
+
   }
 
 }
