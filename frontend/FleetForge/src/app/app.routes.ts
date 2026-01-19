@@ -19,7 +19,8 @@ import { RegisterDriverComponent } from './admin/register-driver/register-driver
 import { ActivateAccountComponent } from './auth/activate-account/activate-account.component';
 import { PassengerHomeComponent } from './passenger/passenger-home/passenger-home.component';
 
-import { authGuard, guestGuard, roleGuard } from './auth/auth-guard';
+import { authGuard, guestGuard, roleGuard } from './auth/guard/auth-guard';
+import { homeRedirectGuard } from './auth/guard/home-redirect-guard';
 
 export const routes: Routes = [
   /** ROUTES WITH NAVBAR */
@@ -27,8 +28,13 @@ export const routes: Routes = [
     path: '',
     component: MainLayoutComponent,
     children: [
-      // Home page - accessible by everyone (no guard)
-      { path: '', component: HomeComponent },
+      // Home page - accessible by everyone (no guard)            
+      {
+        path: '',
+        component: HomeComponent,
+        canActivate: [homeRedirectGuard]
+      },
+
       
       // Passenger routes - require authentication and PASSENGER role
       { 
