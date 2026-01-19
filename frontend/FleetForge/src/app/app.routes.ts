@@ -19,35 +19,102 @@ import { RegisterDriverComponent } from './admin/register-driver/register-driver
 import { ActivateAccountComponent } from './auth/activate-account/activate-account.component';
 import { PassengerHomeComponent } from './passenger/passenger-home/passenger-home.component';
 
+import { authGuard, guestGuard, roleGuard } from './auth/auth-guard';
+
 export const routes: Routes = [
   /** ROUTES WITH NAVBAR */
   {
     path: '',
     component: MainLayoutComponent,
     children: [
+      // Home page - accessible by everyone (no guard)
       { path: '', component: HomeComponent },
-      { path: 'profile-passenger', component: PassengerProfileComponent },
-      {path: 'profile-admin', component: AdminProfileComponent },
-      { path: 'profile-driver', component: DriverProfileComponent },
-      { path: 'profile-password-reset', component: PasswordResetComponent },
-      { path: 'driver/ride-history', component: DriverHistoryComponent },
-      { path: 'admin/driver-changes', component: DriverProfileChangesComponent },
-      {path: 'admin/register-new-driver', component: RegisterDriverComponent},
-      {path: 'set-password', component: PasswordSetComponent},
-      {path: 'passenger/passenger-home', component: PassengerHomeComponent}
+      
+      // Passenger routes - require authentication and PASSENGER role
+      { 
+        path: 'profile-passenger', 
+        component: PassengerProfileComponent,
+        canActivate: [authGuard, roleGuard(['PASSENGER'])]
+      },
+      { 
+        path: 'passenger/passenger-home', 
+        component: PassengerHomeComponent,
+        canActivate: [authGuard, roleGuard(['PASSENGER'])]
+      },
+      
+      // Admin routes - require authentication and ADMIN role
+      { 
+        path: 'profile-admin', 
+        component: AdminProfileComponent,
+        canActivate: [authGuard, roleGuard(['ADMIN'])]
+      },
+      { 
+        path: 'admin/driver-changes', 
+        component: DriverProfileChangesComponent,
+        canActivate: [authGuard, roleGuard(['ADMIN'])]
+      },
+      { 
+        path: 'admin/register-new-driver', 
+        component: RegisterDriverComponent,
+        canActivate: [authGuard, roleGuard(['ADMIN'])]
+      },
+      
+      // Driver routes - require authentication and DRIVER role
+      { 
+        path: 'profile-driver', 
+        component: DriverProfileComponent,
+        canActivate: [authGuard, roleGuard(['DRIVER'])]
+      },
+      { 
+        path: 'driver/ride-history', 
+        component: DriverHistoryComponent,
+        canActivate: [authGuard, roleGuard(['DRIVER'])]
+      },
+      { 
+        path: 'set-password', 
+        component: PasswordSetComponent,
+        canActivate: [authGuard, roleGuard(['DRIVER'])]
+      },
+      
+      // Password reset - accessible by all authenticated users
+      { 
+        path: 'profile-password-reset', 
+        component: PasswordResetComponent,
+        canActivate: [authGuard]
+      }
     ]
   },
 
-  /** ROUTES WITHOUT NAVBAR (AUTH) */
+  /** ROUTES WITHOUT NAVBAR (AUTH) - accessible only to guests */
   {
     path: '',
     component: AuthLayoutComponent,
     children: [
-      { path: 'login', component: LoginComponent },
-      { path: 'register', component: RegisterComponent },
-      { path: 'forgot-password', component: ForgotPasswordComponent },
-      { path: 'reset-password', component: ResetPasswordComponent },
-      { path: 'activate-account', component: ActivateAccountComponent }
+      { 
+        path: 'login', 
+        component: LoginComponent,
+        canActivate: [guestGuard]
+      },
+      { 
+        path: 'register', 
+        component: RegisterComponent,
+        canActivate: [guestGuard]
+      },
+      { 
+        path: 'forgot-password', 
+        component: ForgotPasswordComponent,
+        canActivate: [guestGuard]
+      },
+      { 
+        path: 'reset-password', 
+        component: ResetPasswordComponent
+        // No guard - token-based access
+      },
+      { 
+        path: 'activate-account', 
+        component: ActivateAccountComponent
+        // No guard - token-based access
+      }
     ]
   }
 ];

@@ -1,7 +1,7 @@
 import { Component, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LogoComponent } from '../../shared/logo/logo.component';
-import { AuthService } from '../../services/auth.service';
+import { AuthService } from '../service/auth.service';
 import { CommonModule } from '@angular/common';
 
 @Component({
