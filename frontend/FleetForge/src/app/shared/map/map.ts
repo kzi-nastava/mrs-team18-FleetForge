@@ -1,6 +1,8 @@
-import { Component, AfterViewInit, Input } from '@angular/core';
+import { Component, AfterViewInit, Input, EventEmitter, Output } from '@angular/core';
 import * as L from 'leaflet';
 import { VehicleLocationDTO } from '../models/vehicle.model';
+import { NominatimService } from '../services/nominatim';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-map',
@@ -10,7 +12,8 @@ import { VehicleLocationDTO } from '../models/vehicle.model';
 })
 export class MapComponent implements AfterViewInit {
   private _vehicles: VehicleLocationDTO[] = [];
-  
+  private markers: L.Marker[] = [];
+  @Output() mapClick = new EventEmitter<{address:string, lat:number, lng:number}>();
   @Input() set vehicles(value: VehicleLocationDTO[]) {
     this._vehicles = value;
     console.log('Vehicles input changed:', value);
@@ -23,10 +26,10 @@ export class MapComponent implements AfterViewInit {
     return this._vehicles;
   }
   
-  private map!: L.Map;
+  public map!: L.Map;
   private vehicleMarkers: L.Marker[] = [];
 
-  constructor() {}
+  constructor(private nominatimService: NominatimService) {}
 
   private initMap(): void {
     this.map = L.map('map', {
@@ -48,6 +51,8 @@ export class MapComponent implements AfterViewInit {
     this.map.on('zoom', () => {
       this.updateMarkerSizes();
     });
+
+    this.registerOnClick();
   }
 
   private updateMarkerSizes(): void {
@@ -64,14 +69,66 @@ export class MapComponent implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
+     let DefaultIcon = L.icon({
+      iconUrl: 'https://unpkg.com/leaflet@1.6.0/dist/images/marker-icon.png',
+    });
+
+    L.Marker.prototype.options.icon = DefaultIcon;
     this.initMap();
     
     if (this.vehicles.length > 0) {
       this.displayVehicles();
     }
   }
+   registerOnClick(): void {
+    this.map.on('click', (e: any) => {
+      const coord = e.latlng;
+      const lat = coord.lat;
+      const lng = coord.lng;
+      console.log(
+        'You clicked the map at latitude: ' + lat + ' and longitude: ' + lng
+      );
+      this.nominatimService.reverseSearch(lat, lng).subscribe((data) => {
+        if(data.address.house_number==undefined){
+          this.mapClick.emit({address: data.address.road, lat: lat, lng: lng});
+        }else{
+          this.mapClick.emit({address: data.address.road + ' ' + data.address.house_number, lat: lat, lng: lng});
+        }
+      });
+    });
+  }
 
-
+  setMarker(address: string): void {
+    this.nominatimService.search(address+" Novi Sad").subscribe((data) => {
+      console.log('Geocoding data:', data);
+      if (data && data.length > 0) {
+        const lat = parseFloat(data[0].lat);
+        const lon = parseFloat(data[0].lon);
+        const newMarker = L.marker([lat, lon]);
+      
+      (newMarker as any).customAddress = address;
+        newMarker.addTo(this.map);
+        this.markers.push(newMarker);
+        newMarker.bindPopup(address).openPopup();
+      }
+    });
+  }
+  removeMarker(address: string): void {
+    this.markers = this.markers.filter(marker => {
+      if ((marker as any).customAddress === address) {
+        this.map.removeLayer(marker); 
+        return false; 
+      }
+      return true; 
+    });
+  }
+  setMarkerWithCoords(address: string, lat: number, lng: number): void {
+    const newMarker = L.marker([lat, lng]);
+    (newMarker as any).customAddress = address;
+    newMarker.addTo(this.map);
+    this.markers.push(newMarker);
+    newMarker.bindPopup(address).openPopup();
+  }
   private displayVehicles(): void {
     console.log('displayVehicles called. Map exists:', !!this.map, 'Vehicles count:', this.vehicles.length);
     if (!this.map) return;

@@ -1,0 +1,429 @@
+.home-container {
+  width: 100%;
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+}
+
+.hero-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 80px 60px;
+  max-width: 1400px;
+  margin: 0 auto;
+  gap: 60px;
+}
+
+.hero-content {
+  flex: 1;
+  z-index: 1;
+}
+
+.hero-content h1 {
+  font-size: 56px;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0 0 40px 0;
+  line-height: 1.2;
+}
+
+.hero-buttons {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 14px 32px;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 153, 0, 0.3);
+}
+
+.btn-secondary {
+  background-color: var(--color-secondary);
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-secondary);
+  opacity: 0.9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(62, 88, 85, 0.3);
+}
+
+.hero-image {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hero-image img {
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+@media (max-width: 768px) {
+  .hero-section {
+    flex-direction: column;
+    padding: 40px 20px;
+    gap: 30px;
+  }
+
+  .hero-content h1 {
+    font-size: 36px;
+  }
+
+  .hero-buttons {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .find-vehicle-container {
+    flex-direction: column;
+  }
+
+  .form-section,
+  .map-section {
+    width: 100%;
+    height: auto;
+  }
+}
+
+/* Find Your Vehicle Section */
+.find-vehicle-section {
+  background-color: var(--color-background-black);
+  padding: 60px 20px;
+}
+
+.find-vehicle-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  gap: 40px;
+  align-items: stretch;
+  border: 3px solid var(--color-primary);
+  border-radius: 16px;
+  padding: 40px;
+  background-color: var(--color-background-black);
+}
+
+.form-section {
+  flex: 0 0 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-section h2 {
+  color: var(--color-primary);
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 0 10px 0;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.form-group input {
+  padding: 12px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background-color: var(--color-background-white);
+  font-size: 14px;
+  color: #333;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.form-group input:focus {
+  border-color: var(--color-primary);
+}
+
+.form-group input::placeholder {
+  color: var(--color-text-gray);
+}
+
+.waypoint-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.waypoint-input-wrapper input {
+  width: 100%;
+  padding-left: 60px;
+}
+
+.btn-add-waypoint {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  background-color: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  color: var(--color-text-gray);
+  font-size: 24px;
+  font-weight: 300;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.btn-add-waypoint:hover {
+  background-color: var(--color-background-gray);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.button-group {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.btn-estimate {
+  flex: 1;
+  padding: 12px;
+  background-color: transparent;
+  border: 2px solid var(--color-primary);
+  color: var(--color-primary);
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-estimate:hover {
+  background-color: var(--color-primary);
+  color: #ffffff;
+}
+
+.btn-order {
+  flex: 1;
+  padding: 12px;
+  background-color: var(--color-primary);
+  border: 2px solid var(--color-primary);
+  color: #ffffff;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-order:hover {
+  background-color: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+}
+
+.map-section {
+  flex: 1;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  display: flex;
+}
+
+.map-section app-map {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@media (max-width: 968px) {
+  .find-vehicle-container {
+    flex-direction: column;
+    padding: 30px 20px;
+  }
+
+  .form-section {
+    flex: 1;
+    width: 100%;
+  }
+
+  .map-section {
+    width: 100%;
+    min-height: 400px;
+  }
+}
+
+.newWaypoints{
+    border: 2px solid var(--color-primary);
+    padding: 10px;
+    height: 200px;
+    overflow: auto;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge legacy */
+}
+
+.newWaypoints::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+.datetimeNow{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.datetimeNow input[type="datetime-local"] {
+  flex: 1;
+  min-width: 0;
+}
+
+.now-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  column-gap: 8px;
+  white-space: nowrap;
+}
+
+.form-group input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.now-toggle label {
+  margin: 0;
+  cursor: pointer;
+}
+
+.passenger-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.passenger-input-wrapper input {
+  width: 100%;
+  padding-left: 60px;
+}
+
+.btn-add-passenger {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  color: var(--color-text-gray);
+  font-size: 24px;
+  font-weight: 300;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.btn-add-passenger:hover {
+  background-color: var(--color-background-gray);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+.newPassengers{
+    border: 2px solid var(--color-primary);
+    padding: 10px;
+    height: 200px;
+    overflow: auto;
+    scrollbar-width: none; 
+    -ms-overflow-style: none; 
+}
+
+.newPassengers::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+
+form select {
+  width: 100%;
+  padding: 10px 36px 10px 12px;
+  border: 1px solid #cccccc;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: 'Poppins', sans-serif;
+  outline: none;
+  background-color: #fff;
+  color: #000;
+  transition: border-color 0.2s;
+  
+  
+}
+
+
+
+form select:invalid {
+  color: #999; 
+}
+
+form select option {
+  color: #000;
+}
+
+form select option[disabled] {
+  color: #999;
+}
+
+.additionalCriteria{
+    border: 2px solid var(--color-primary);
+    padding: 10px;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    
+}
+
+.additionalCriteriaLabel{
+    display: block;
+    text-align: center;
+    margin: 0;
+}
+
+

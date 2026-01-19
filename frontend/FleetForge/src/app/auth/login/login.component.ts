@@ -61,6 +61,10 @@ export class LoginComponent {
           response.role.replace('ROLE_', '') as any
         );
 
+        if(response.role === 'ROLE_PASSENGER') {
+          this.router.navigate(['/passenger/passenger-home']);
+          return;
+        }
         this.router.navigate(['/']);
       },
       error: () => {
