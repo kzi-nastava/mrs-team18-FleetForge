@@ -13,7 +13,7 @@ import { Observable } from 'rxjs';
 export class MapComponent implements AfterViewInit {
   private _vehicles: VehicleLocationDTO[] = [];
   private markers: L.Marker[] = [];
-  @Output() mapClick = new EventEmitter<{address:string}>();
+  @Output() mapClick = new EventEmitter<{address:string, lat:number, lng:number}>();
   @Input() set vehicles(value: VehicleLocationDTO[]) {
     this._vehicles = value;
     console.log('Vehicles input changed:', value);
@@ -90,9 +90,9 @@ export class MapComponent implements AfterViewInit {
       );
       this.nominatimService.reverseSearch(lat, lng).subscribe((data) => {
         if(data.address.house_number==undefined){
-          this.mapClick.emit({address: data.address.road});
+          this.mapClick.emit({address: data.address.road, lat: lat, lng: lng});
         }else{
-          this.mapClick.emit({address: data.address.road + ' ' + data.address.house_number});
+          this.mapClick.emit({address: data.address.road + ' ' + data.address.house_number, lat: lat, lng: lng});
         }
       });
     });
@@ -121,6 +121,13 @@ export class MapComponent implements AfterViewInit {
       }
       return true; 
     });
+  }
+  setMarkerWithCoords(address: string, lat: number, lng: number): void {
+    const newMarker = L.marker([lat, lng]);
+    (newMarker as any).customAddress = address;
+    newMarker.addTo(this.map);
+    this.markers.push(newMarker);
+    newMarker.bindPopup(address).openPopup();
   }
   private displayVehicles(): void {
     console.log('displayVehicles called. Map exists:', !!this.map, 'Vehicles count:', this.vehicles.length);

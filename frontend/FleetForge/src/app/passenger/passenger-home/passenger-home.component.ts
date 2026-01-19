@@ -113,8 +113,8 @@ vehicles: VehicleLocationDTO[] = [];
     }
   }
 
-  handleMapClick(event: {address:string}): void {
-    this.mapComponent.setMarker(event.address);
+  handleMapClick(event: {address:string, lat:number, lng:number}): void {
+    this.mapComponent.setMarkerWithCoords(event.address, event.lat, event.lng); 
     document.getElementById("addWaypoint")?.click();
     const waypointElement = document.getElementById('waypoint' + this.waypointsNumber) as HTMLInputElement;
     if (waypointElement) {
