@@ -2,7 +2,7 @@ import { Component, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { LogoComponent } from '../../shared/logo/logo.component';
 import { SidebarService } from '../../navigation/sidebar/sidebar.service';
-import { AuthService } from '../../services/auth.service';
+import { AuthService } from '../service/auth.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 

@@ -63,7 +63,8 @@ public class AuthController {
 
         LoginResponseDTO response = LoginResponseDTO.builder()
                 .token(token)
-                .role(role)
+                //remove ROLE_ from role
+                .role(role.replace("ROLE_", ""))
                 .loggedInAt(LocalDateTime.now())
                 .build();
 
