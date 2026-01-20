@@ -14,6 +14,7 @@ import com.team18.FleetForge.model.users.User;
 import com.team18.FleetForge.repository.RideRepository;
 import com.team18.FleetForge.repository.UserRepository;
 import com.team18.FleetForge.service.DriverService;
+import com.team18.FleetForge.service.PriceCalculationService;
 import com.team18.FleetForge.service.RideService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +41,7 @@ public class RideServiceImpl implements RideService {
     private final RideRepository rideRepository;
     private final UserRepository userRepository;
     private final DriverService driverService;
+    private final PriceCalculationService priceCalculationService;
 
     @Override
     public List<DriverRideHistoryDTO> getDriverRideHistory(Long driverId, LocalDate startDate) {
@@ -219,7 +221,10 @@ public class RideServiceImpl implements RideService {
         ride.setEndAddress(rideCreateRequestDTO.getEndAddress());
         ride.setTotalDistance(rideCreateRequestDTO.getTotalDistance());
         ride.setEstimatedDuration(rideCreateRequestDTO.getEstimatedDuration());
-        ride.setTotalCost(calculatePrice(ride.getVehicleType(),ride.getTotalDistance()));
+        ride.setTotalCost(priceCalculationService.calculatePrice(
+                rideCreateRequestDTO.getTotalDistance(),
+                rideCreateRequestDTO.getVehicleType()
+        ));
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Passenger passenger = (Passenger) authentication.getPrincipal();
@@ -230,14 +235,4 @@ public class RideServiceImpl implements RideService {
         return ride;
     }
 
-    private double calculatePrice(VehicleType vehicleType,double distance){
-        double price = 0;
-        switch (vehicleType){
-            case VAN -> price+=120;
-            case LUXURY -> price+=200;
-            case STANDARD -> price+=100;
-            default -> price+=100;
-        }
-        return price+120*distance;
-    }
 }

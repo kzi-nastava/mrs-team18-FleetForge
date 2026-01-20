@@ -1,30 +1,27 @@
 package com.team18.FleetForge.controller;
 
-
 import com.team18.FleetForge.dto.ride.estimate.RideEstimateRequestDTO;
 import com.team18.FleetForge.dto.ride.estimate.RideEstimateResponseDTO;
-import com.team18.FleetForge.dto.RouteDTO;
-import com.team18.FleetForge.model.GeoPoint;
-import org.springframework.http.HttpStatus;
+import com.team18.FleetForge.model.enums.VehicleType;
+import com.team18.FleetForge.service.PriceCalculationService;
+import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
+@AllArgsConstructor
 @RestController
 @RequestMapping("/api/ride-estimates")
 public class RideEstimateController {
 
+    private final PriceCalculationService priceCalculationService;
+
     /**
      * POST /api/ride-estimates
      * Request Body:
-     *  - startLocation (GeoPoint)
-     *  - destinationLocation (GeoPoint)
-     *  - waypoints (List<GeoPoint>)
+     *  - distanceKm (double)
      * Response:
-     *  - route (RouteDTO with geometry, distance, duration)
-     *  - estimatedCost (double)
+     *  - estimatedPrice (double)
      */
     @PostMapping(
             consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -33,24 +30,12 @@ public class RideEstimateController {
     public ResponseEntity<RideEstimateResponseDTO> estimateRide(
             @RequestBody RideEstimateRequestDTO request
     ) {
-        // Dummy geometry (as returned by OSM-based routers)
-        List<GeoPoint> geometry = List.of(
-                request.getStartLocation(),
-                new GeoPoint(45.2685, 19.8400),
-                new GeoPoint(45.2700, 19.8500),
-                request.getDestinationLocation()
+        double price = priceCalculationService.calculatePrice(
+                request.getDistanceKm(),
+                VehicleType.STANDARD
         );
-
-        RouteDTO route = RouteDTO.builder()
-                .geometry(geometry)
-                .distanceMeters(5100)
-                .durationSeconds(890)
-                .build();
-
         RideEstimateResponseDTO response = new RideEstimateResponseDTO();
-        response.setRoute(route);
-        response.setEstimatedCost(780.00);
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        response.setEstimatedPrice(price);
+        return ResponseEntity.ok(response);
     }
 }

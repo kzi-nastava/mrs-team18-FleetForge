@@ -32,7 +32,11 @@ export class MapComponent implements AfterViewInit {
   public map!: L.Map;
   private vehicleMarkers: L.Marker[] = [];
 
-  constructor(private nominatimService: NominatimService) {}
+  constructor(
+    private nominatimService: NominatimService,
+    private routingService: RoutingService
+  ) {}
+
 
   private initMap(): void {
     this.map = L.map('map', {
@@ -58,7 +62,7 @@ export class MapComponent implements AfterViewInit {
     this.registerOnClick();
 
     // todo remove later
-    RoutingService.addRoute(this.map, this.startPoint, this.endPoint);
+    this.routingService.addRoute(this.map, this.startPoint, this.endPoint);
     this.setMarkerWithCoords("Start Point", this.startPoint.lat, this.startPoint.lng);
     this.setMarkerWithCoords("Destination", this.endPoint.lat, this.endPoint.lng);
   }
