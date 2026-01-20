@@ -25,6 +25,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,6 +43,7 @@ public class AdminController {
     private final VehicleInfoChangeReqService vehicleChangeService;
     private final VehicleService vehicleService;
     private final ProfilePictureService profilePictureService;
+    private final PasswordEncoder passwordEncoder;
 
     @GetMapping
     public ResponseEntity<AdminGetResponseDTO> getCurrentAdmin(){
@@ -109,7 +111,6 @@ public class AdminController {
             driverToChange.setEmail(request.getNewEmail());
             driverToChange.setAddress(request.getNewAddress());
             driverToChange.setPhoneNumber(request.getNewPhoneNumber());
-            driverToChange.setProfilePicture(request.getNewProfilePicture());
 
             userService.save(driverToChange);
 
@@ -189,13 +190,14 @@ public class AdminController {
     }
 
     @PutMapping("password")
-    public ResponseEntity<String> passwordChange(@RequestBody AdminPasswordChangeRequestDTO request){
+    public ResponseEntity<Void> passwordChange(@RequestBody AdminPasswordChangeRequestDTO request){
        Admin admin=userService.getCurrentAdmin();
        if(admin==null){
            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
        }
-       admin.setPassword(request.getNewPassword());
-        return ResponseEntity.ok("password changed");
+       admin.setPassword(passwordEncoder.encode(request.getNewPassword()));
+       userService.save(admin);
+       return new ResponseEntity<>(HttpStatus.OK);
     }
 
     /**
