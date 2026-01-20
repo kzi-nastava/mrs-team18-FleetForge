@@ -169,16 +169,6 @@ public class RideController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    private double calculatePrice(Route route,RideCreateRequestDTO request) {
-        double km=20;
-        double price=120*km;
-        switch (request.getVehicleType()){
-            case VAN -> price+=250;
-            default -> price+=500;
-        }
-        return price;
-
-    }
 //    Authentication authentication = authenticationManager.authenticate(
 //            new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword())
 //    );
