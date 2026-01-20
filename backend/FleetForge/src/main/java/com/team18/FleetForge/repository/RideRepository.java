@@ -2,6 +2,8 @@ package com.team18.FleetForge.repository;
 
 import com.team18.FleetForge.model.enums.RideStatus;
 import com.team18.FleetForge.model.ride.Ride;
+import com.team18.FleetForge.model.users.Driver;
+import lombok.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -61,4 +63,8 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
             @Param("status") RideStatus status
     );
 
+    @NonNull
+    List<Ride> findAllByStatus(RideStatus status);
+    List<Ride> findAllByDriver(Driver driver);
+    List<Ride> findAllByDriverAndStatus(Driver driver, RideStatus status);
 }
