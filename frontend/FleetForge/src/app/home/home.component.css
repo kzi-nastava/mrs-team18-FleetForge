@@ -143,6 +143,7 @@
 }
 
 .form-group {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -279,4 +280,29 @@
     width: 100%;
     min-height: 400px;
   }
+}
+
+.suggestions {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 0 0;
+  border: 1px solid #ccc;
+  max-height: 160px;
+  overflow-y: auto;
+  position: absolute;
+  background: white;
+  width: 100%;
+  z-index: 1000;
+  top: 100%;
+  left: 0;
+}
+
+
+.suggestions li {
+  padding: 8px;
+  cursor: pointer;
+}
+
+.suggestions li:hover {
+  background: #f2f2f2;
 }

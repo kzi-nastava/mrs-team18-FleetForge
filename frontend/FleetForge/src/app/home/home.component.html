@@ -16,22 +16,64 @@
     <div class="find-vehicle-container">
       <div class="form-section">
         <h2>Find Your Vehicle</h2>
+
+        <!-- Pick Up Address -->
         <div class="form-group">
           <label for="pickup">Pick Up Address</label>
-          <input type="text" id="pickup" placeholder="Pick Destination" />
+          <input
+            type="text"
+            id="pickup"
+            placeholder="Pick Destination"
+            [(ngModel)]="pickupQuery"
+            (input)="onPickupInput()"
+            autocomplete="off"
+          />
+          <ul class="suggestions" *ngIf="showPickupSuggestions && pickupSuggestions.length">
+            <li *ngFor="let suggestion of pickupSuggestions" (click)="selectPickup(suggestion)">
+              {{ formatSuggestion(suggestion) }}
+            </li>
+          </ul>
         </div>
+
+        <!-- Waypoint -->
         <div class="form-group">
           <label for="waypoint">Add New Waypoint</label>
           <div class="waypoint-input-wrapper">
             <button class="btn-add-waypoint" type="button">+</button>
-            <input type="text" id="waypoint" placeholder="New Waypoint" />
+            <input
+              type="text"
+              id="waypoint"
+              placeholder="New Waypoint"
+              [(ngModel)]="waypointQuery"
+              (input)="onWaypointInput()"
+              autocomplete="off"
+            />
           </div>
+          <ul class="suggestions" *ngIf="showWaypointSuggestions && waypointSuggestions.length">
+            <li *ngFor="let suggestion of waypointSuggestions" (click)="selectWaypoint(suggestion)">
+              {{ formatSuggestion(suggestion) }}
+            </li>
+          </ul>
         </div>
+
+        <!-- Drop Off Address -->
         <div class="form-group">
           <label for="dropoff">Drop Off Address</label>
-          <input type="text" id="dropoff" placeholder="Pick Destination" />
+          <input
+            type="text"
+            id="dropoff"
+            placeholder="Pick Destination"
+            [(ngModel)]="dropoffQuery"
+            (input)="onDropoffInput()"
+            autocomplete="off"
+          />
+          <ul class="suggestions" *ngIf="showDropoffSuggestions && dropoffSuggestions.length">
+            <li *ngFor="let suggestion of dropoffSuggestions" (click)="selectDropoff(suggestion)">
+              {{ formatSuggestion(suggestion) }}
+            </li>
+          </ul>
         </div>
-        
+
         <div class="button-group">
           <button class="btn btn-estimate">Estimate</button>
           <button class="btn btn-order">Order</button>

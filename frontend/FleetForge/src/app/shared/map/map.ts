@@ -62,9 +62,9 @@ export class MapComponent implements AfterViewInit {
     this.registerOnClick();
 
     // todo remove later
-    this.routingService.addRoute(this.map, this.startPoint, this.endPoint);
-    this.setMarkerWithCoords("Start Point", this.startPoint.lat, this.startPoint.lng);
-    this.setMarkerWithCoords("Destination", this.endPoint.lat, this.endPoint.lng);
+    // this.routingService.addRoute(this.map, this.startPoint, this.endPoint);
+    // this.setMarkerWithCoords("Start Point", this.startPoint.lat, this.startPoint.lng);
+    // this.setMarkerWithCoords("Destination", this.endPoint.lat, this.endPoint.lng);
   }
 
   private updateMarkerSizes(): void {
