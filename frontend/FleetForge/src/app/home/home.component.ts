@@ -231,9 +231,30 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   onLocationInput(field: LocationField): void {
+    if (!field.query || field.query.trim().length === 0) {
+      this.clearFieldLocation(field);
+      return;
+    }
+
     field.searchSubject.next(field.query);
     this.persistState();
   }
+
+  private clearFieldLocation(field: LocationField): void {
+    field.query = '';
+    field.coordinates = undefined;
+    field.suggestions = [];
+    field.showSuggestions = false;
+
+    if (this.mapComponent) {
+      this.mapComponent.removeLocationMarker(field.id);
+    }
+
+    this.updateRoute();
+    this.persistState();
+    this.cdr.markForCheck();
+  }
+
 
   selectSuggestion(field: LocationField, feature: PhotonFeature): void {
     const displayName = this.getDisplayName(feature);
@@ -266,8 +287,9 @@ export class HomeComponent implements OnInit, OnDestroy {
     const dropoffField = this.dropoff;
     
     if (!pickupField?.coordinates || !dropoffField?.coordinates) {
-      return; 
-    }
+    this.mapComponent?.clearRoute();
+    return;
+  }
     
     const waypointCoords = this.waypoints
       .filter(w => w.coordinates)

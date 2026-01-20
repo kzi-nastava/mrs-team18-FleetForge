@@ -28,6 +28,13 @@ export class MapComponent implements AfterViewInit {
   get vehicles(): VehicleLocationDTO[] {
     return this._vehicles;
   }
+
+  clearRoute(): void {
+    if (this.routeControl) {
+      this.map.removeControl(this.routeControl);
+      this.routeControl = undefined;
+    }
+  }
   
   public map!: L.Map;
   private vehicleMarkers: L.Marker[] = [];
