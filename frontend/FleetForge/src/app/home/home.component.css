@@ -235,6 +235,7 @@
 }
 
 .map-section {
+  position: relative;
   flex: 1;
   border-radius: 12px;
   overflow: hidden;
@@ -316,4 +317,25 @@
 
 .btn-remove-waypoint:hover {
   background-color: var(--color-dark-red);
+}
+
+.estimate-result {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 1000; 
+  
+  padding: 14px 16px;
+  border-radius: 8px;
+  background: var(--color-primary);
+  color: #1a1a1a;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(255, 153, 0, 0.35);
+  animation: fadeInUp 0.3s ease-out;
+  min-width: 160px;
+}
+
+.estimate-result p {
+  margin: 4px 0;
+  font-size: 14px;
 }

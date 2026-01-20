@@ -3,11 +3,14 @@ import * as L from 'leaflet';
 import 'leaflet-routing-machine';
 import { environment } from '../../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
+import { Subject } from 'rxjs';
+
 
 @Injectable({
   providedIn: 'root'
 })
-export class RoutingService {
+export class RoutingService {  
+  routeSummary$ = new Subject<{ distanceKm: number; durationMin: number; cost: number }>();
 
   constructor(private http: HttpClient) {}
 
@@ -44,18 +47,27 @@ export class RoutingService {
 
   routeControl.on('routesfound', (e: any) => {
     const route = e.routes[0];
-    const distanceKm = +(route.summary.totalDistance / 1000).toFixed(2);
 
-    this.http.post('http://localhost:8080/api/ride-estimates', { distanceKm })
+    const distanceKm = +(route.summary.totalDistance / 1000).toFixed(2);
+    const durationMin = +(route.summary.totalTime / 60).toFixed(1);
+
+    this.http.post<any>('http://localhost:8080/api/ride-estimates', { distanceKm })
       .subscribe({
-        next: res => console.log('Ride estimate:', res),
+        next: res => {
+          this.routeSummary$.next({
+            distanceKm,
+            durationMin,
+            cost: res.estimatedPrice   
+          });
+        },
         error: err => console.error('Estimate error:', err)
       });
   });
 
-  const panel = document.querySelector('.leaflet-routing-container');
-  if (panel) (panel as HTMLElement).style.display = 'none';
 
-  return routeControl;
-}
+    const panel = document.querySelector('.leaflet-routing-container');
+    if (panel) (panel as HTMLElement).style.display = 'none';
+
+    return routeControl;
+  }
 }

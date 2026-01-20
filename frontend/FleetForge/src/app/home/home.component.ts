@@ -8,6 +8,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { Router } from '@angular/router';
 
 interface LocationField {
   id: string;
@@ -42,11 +43,16 @@ export class HomeComponent implements OnInit, OnDestroy {
   private nextWaypointId = 0;
   private readonly STORAGE_KEY = 'location_fields';
 
+  estimatedDistance?: number;
+  estimatedDuration?: number;
+  estimatedCost?: number;
+
 
   constructor(
     private vehicleService: VehicleService,
     private photonService: PhotonService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -62,6 +68,30 @@ export class HomeComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.subscriptions.forEach(sub => sub.unsubscribe());
     this.locationFields.forEach(field => field.searchSubject.complete());
+  }
+
+  onRouteSummary(summary: { distanceKm: number; durationMin: number; cost: number }): void {
+    this.estimatedDistance = summary.distanceKm;
+    this.estimatedDuration = summary.durationMin;
+    this.estimatedCost = summary.cost;
+  }
+
+  estimateRide(): void {
+    if (this.estimatedCost == null) {
+      console.warn('Estimate not ready yet');
+      return;
+    }
+
+    console.log('Estimate:', {
+      distance: this.estimatedDistance,
+      duration: this.estimatedDuration,
+      cost: this.estimatedCost
+    });
+  }
+
+
+  orderRide(): void {
+    this.router.navigate(['/login']);
   }
 
   private persistState(): void {

@@ -17,6 +17,7 @@ export class MapComponent implements AfterViewInit {
   private routeControl?: L.Routing.Control;
   
   @Output() mapClick = new EventEmitter<{address:string, lat:number, lng:number}>();
+  @Output() routeSummary = new EventEmitter<{ distanceKm: number; durationMin: number; cost: number }>();
   @Input() set vehicles(value: VehicleLocationDTO[]) {
     this._vehicles = value;
     console.log('Vehicles input changed:', value);
@@ -99,6 +100,10 @@ export class MapComponent implements AfterViewInit {
     if (this.vehicles.length > 0) {
       this.displayVehicles();
     }
+
+    this.routingService.routeSummary$.subscribe(summary => {
+      this.routeSummary.emit(summary);
+    });
   }
 
   registerOnClick(): void {
