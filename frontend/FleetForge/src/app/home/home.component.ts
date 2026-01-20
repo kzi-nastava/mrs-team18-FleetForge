@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, OnDestroy, ViewChild } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { MapComponent } from '../shared/map/map';
 import { VehicleService } from '../shared/services/vehicle.service';
@@ -32,9 +32,10 @@ interface LocationField {
   styleUrl: './home.component.css'
 })
 export class HomeComponent implements OnInit, OnDestroy {
+  @ViewChild(MapComponent) mapComponent!: MapComponent;
+  
   vehicles: VehicleLocationDTO[] = [];
   
-  // Location fields array
   locationFields: LocationField[] = [];
   
   private subscriptions: Subscription[] = [];
@@ -52,13 +53,11 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // Clean up all subscriptions and subjects
     this.subscriptions.forEach(sub => sub.unsubscribe());
     this.locationFields.forEach(field => field.searchSubject.complete());
   }
 
   private initializeLocationFields(): void {
-    // Initialize with pickup and dropoff
     this.addLocationField('pickup');
     this.addLocationField('dropoff');
   }
@@ -79,7 +78,6 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     this.setupSearchStream(field);
     
-    // Insert waypoints before dropoff
     if (type === 'waypoint') {
       const dropoffIndex = this.locationFields.findIndex(f => f.type === 'dropoff');
       this.locationFields.splice(dropoffIndex, 0, field);
@@ -133,29 +131,33 @@ export class HomeComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Add a new waypoint
   addWaypoint(): void {
     this.addLocationField('waypoint');
     this.cdr.markForCheck();
   }
 
-  // Remove a waypoint by ID
   removeWaypoint(waypointId: string): void {
     const index = this.locationFields.findIndex(f => f.id === waypointId);
     if (index !== -1) {
       const field = this.locationFields[index];
       field.searchSubject.complete();
+      
+      if (field.coordinates && this.mapComponent) {
+        this.mapComponent.removeLocationMarker(field.id);
+      }
+      
       this.locationFields.splice(index, 1);
+      
+      this.updateRoute();
+      
       this.cdr.markForCheck();
     }
   }
 
-  // Handle input changes
   onLocationInput(field: LocationField): void {
     field.searchSubject.next(field.query);
   }
 
-  // Handle suggestion selection
   selectSuggestion(field: LocationField, feature: PhotonFeature): void {
     const displayName = this.getDisplayName(feature);
     field.query = displayName;
@@ -164,6 +166,12 @@ export class HomeComponent implements OnInit, OnDestroy {
     
     const [lon, lat] = feature.geometry.coordinates;
     field.coordinates = { lat, lon };
+    
+    if (this.mapComponent) {
+      this.mapComponent.setLocationMarker(field.id, field.type, displayName, lat, lon);
+      
+      this.updateRoute();
+    }
     
     this.cdr.markForCheck();
     
@@ -174,23 +182,40 @@ export class HomeComponent implements OnInit, OnDestroy {
       name: displayName 
     });
   }
+  
+  private updateRoute(): void {
+    const pickupField = this.pickup;
+    const dropoffField = this.dropoff;
+    
+    if (!pickupField?.coordinates || !dropoffField?.coordinates) {
+      return; 
+    }
+    
+    const waypointCoords = this.waypoints
+      .filter(w => w.coordinates)
+      .map(w => [w.coordinates!.lat, w.coordinates!.lon] as [number, number]);
+    
+    if (this.mapComponent) {
+      this.mapComponent.updateRoute(
+        [pickupField.coordinates.lat, pickupField.coordinates.lon],
+        [dropoffField.coordinates.lat, dropoffField.coordinates.lon],
+        waypointCoords
+      );
+    }
+  }
 
-  // Get pickup location
   get pickup(): LocationField | undefined {
     return this.locationFields.find(f => f.type === 'pickup');
   }
 
-  // Get all waypoints
   get waypoints(): LocationField[] {
     return this.locationFields.filter(f => f.type === 'waypoint');
   }
 
-  // Get dropoff location
   get dropoff(): LocationField | undefined {
     return this.locationFields.find(f => f.type === 'dropoff');
   }
 
-  // Get all locations with coordinates (for routing)
   getAllLocationsWithCoordinates(): Array<{ lat: number; lon: number; type: string }> {
     return this.locationFields
       .filter(f => f.coordinates)
