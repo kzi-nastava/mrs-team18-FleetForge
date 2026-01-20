@@ -13,10 +13,11 @@ import { RoutingService } from './service/routing.service';
 export class MapComponent implements AfterViewInit {
   private _vehicles: VehicleLocationDTO[] = [];
   private markers: L.Marker[] = [];
-  private startPoint = L.latLng(45.2454929618196, 19.836663741992545);
-  private endPoint = L.latLng(45.2462264156403, 19.852365232320707);
+  private locationMarkers: Map<string, L.Marker> = new Map();
+  private routeControl?: L.Routing.Control;
   
   @Output() mapClick = new EventEmitter<{address:string, lat:number, lng:number}>();
+  @Output() routeSummary = new EventEmitter<{ distanceKm: number; durationMin: number; cost: number }>();
   @Input() set vehicles(value: VehicleLocationDTO[]) {
     this._vehicles = value;
     console.log('Vehicles input changed:', value);
@@ -28,6 +29,13 @@ export class MapComponent implements AfterViewInit {
   get vehicles(): VehicleLocationDTO[] {
     return this._vehicles;
   }
+
+  clearRoute(): void {
+    if (this.routeControl) {
+      this.map.removeControl(this.routeControl);
+      this.routeControl = undefined;
+    }
+  }
   
   public map!: L.Map;
   private vehicleMarkers: L.Marker[] = [];
@@ -37,12 +45,13 @@ export class MapComponent implements AfterViewInit {
     private routingService: RoutingService
   ) {}
 
-
   private initMap(): void {
     this.map = L.map('map', {
       center: [45.2396, 19.8227],
       zoom: 13,
     });
+    
+    this.map.attributionControl.setPrefix(`Leaflet`);
 
     const tiles = L.tileLayer(
       'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -60,11 +69,6 @@ export class MapComponent implements AfterViewInit {
     });
 
     this.registerOnClick();
-
-    // todo remove later
-    this.routingService.addRoute(this.map, this.startPoint, this.endPoint);
-    this.setMarkerWithCoords("Start Point", this.startPoint.lat, this.startPoint.lng);
-    this.setMarkerWithCoords("Destination", this.endPoint.lat, this.endPoint.lng);
   }
 
   private updateMarkerSizes(): void {
@@ -81,22 +85,26 @@ export class MapComponent implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-  const DefaultIcon = L.icon({
-    iconUrl: 'https://unpkg.com/leaflet@1.6.0/dist/images/marker-icon.png',
-    shadowUrl: 'https://unpkg.com/leaflet@1.6.0/dist/images/marker-shadow.png',
-    iconSize: [25, 41],      
-    iconAnchor: [12, 41],    
-    popupAnchor: [1, -34],   
-    shadowSize: [41, 41]     
-  });
+    const DefaultIcon = L.icon({
+      iconUrl: 'https://unpkg.com/leaflet@1.6.0/dist/images/marker-icon.png',
+      shadowUrl: 'https://unpkg.com/leaflet@1.6.0/dist/images/marker-shadow.png',
+      iconSize: [25, 41],      
+      iconAnchor: [12, 41],    
+      popupAnchor: [1, -34],   
+      shadowSize: [41, 41]     
+    });
 
-  L.Marker.prototype.options.icon = DefaultIcon;
-  this.initMap();
-  
-  if (this.vehicles.length > 0) {
-    this.displayVehicles();
+    L.Marker.prototype.options.icon = DefaultIcon;
+    this.initMap();
+    
+    if (this.vehicles.length > 0) {
+      this.displayVehicles();
+    }
+
+    this.routingService.routeSummary$.subscribe(summary => {
+      this.routeSummary.emit(summary);
+    });
   }
-}
 
   registerOnClick(): void {
     this.map.on('click', (e: any) => {
@@ -124,7 +132,7 @@ export class MapComponent implements AfterViewInit {
         const lon = parseFloat(data[0].lon);
         const newMarker = L.marker([lat, lon]);
       
-      (newMarker as any).customAddress = address;
+        (newMarker as any).customAddress = address;
         newMarker.addTo(this.map);
         this.markers.push(newMarker);
         newMarker.bindPopup(address).openPopup();
@@ -148,6 +156,89 @@ export class MapComponent implements AfterViewInit {
     newMarker.addTo(this.map);
     this.markers.push(newMarker);
     newMarker.bindPopup(address).openPopup();
+  }
+
+  setLocationMarker(id: string, type: 'pickup' | 'waypoint' | 'dropoff', label: string, lat: number, lon: number): void {
+    if (this.locationMarkers.has(id)) {
+      const existingMarker = this.locationMarkers.get(id);
+      this.map.removeLayer(existingMarker!);
+      this.locationMarkers.delete(id);
+    }
+
+    const iconHtml = this.getLocationIconHtml(type);
+    
+    const locationIcon = L.divIcon({
+      html: iconHtml,
+      className: 'location-marker-icon',
+      iconSize: [32, 32],
+      iconAnchor: [16, 32],
+      popupAnchor: [0, -32],
+    });
+
+    const marker = L.marker([lat, lon], { icon: locationIcon })
+      .addTo(this.map)
+      .bindPopup(`<strong>${this.getTypeLabel(type)}</strong><br/>${label}`);
+
+    this.locationMarkers.set(id, marker);
+
+    this.map.panTo([lat, lon]);
+  }
+
+  removeLocationMarker(id: string): void {
+    if (this.locationMarkers.has(id)) {
+      const marker = this.locationMarkers.get(id);
+      this.map.removeLayer(marker!);
+      this.locationMarkers.delete(id);
+    }
+  }
+
+  updateRoute(
+    pickup: [number, number],
+    dropoff: [number, number],
+    waypoints: [number, number][] = []
+  ): void {
+    if (this.routeControl) {
+      this.map.removeControl(this.routeControl);
+      this.routeControl = undefined;
+    }
+
+    const waypointLatLngs = waypoints.map(wp => L.latLng(wp[0], wp[1]));
+    
+    this.routeControl = this.routingService.addRoute(
+      this.map,
+      L.latLng(pickup[0], pickup[1]),
+      L.latLng(dropoff[0], dropoff[1]),
+      waypointLatLngs
+    );
+  }
+
+  private getLocationIconHtml(type: 'pickup' | 'waypoint' | 'dropoff'): string {
+    const colors = {
+      pickup: '#ef4444',  // red
+      waypoint: '#3b82f6',  // blue
+      dropoff: '#22c55e'    // green
+    };
+
+    const color = colors[type];
+
+    return `
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" 
+              fill="${color}" 
+              stroke="white" 
+              stroke-width="1.5"/>
+        <circle cx="12" cy="9" r="2.5" fill="white"/>
+      </svg>
+    `;
+  }
+
+  private getTypeLabel(type: 'pickup' | 'waypoint' | 'dropoff'): string {
+    const labels = {
+      pickup: 'Pickup',
+      waypoint: 'Waypoint',
+      dropoff: 'Dropoff'
+    };
+    return labels[type];
   }
 
   private displayVehicles(): void {
@@ -189,7 +280,7 @@ export class MapComponent implements AfterViewInit {
       <div style="font-family: var(--font-primary);">
         <strong>${vehicle.model}</strong><br/>
         Type: ${vehicle.vehicleType}<br/>
-        Status: <span font-weight: bold;">${availabilityText}</span>
+        Status: <span style="font-weight: bold;">${availabilityText}</span>
       </div>
     `;
 
@@ -199,5 +290,4 @@ export class MapComponent implements AfterViewInit {
 
     return marker;
   }
-
 }

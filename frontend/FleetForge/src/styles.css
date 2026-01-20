@@ -5,12 +5,16 @@
   --color-primary: #FF9900;
   --color-primary-dark: #db8709;
   --color-secondary: #3E5855;
+  --color-secondary-dark: #2c3e50;
+  --color-white: #FFFFFF;
   --color-background-white: #FFFFFF;
   --color-background-gray: #F5F5F5;
   --color-text-gray: #999999;
   --color-border: #D2D2D2;
   --color-background-black: #1a1a1a;
   --color-error: #FF4C4C;
+  --color-red: #FF4C4C;
+  --color-dark-red: #d32f2f;
   
   /* Fonts */
   --font-primary: 'Poppins', sans-serif;

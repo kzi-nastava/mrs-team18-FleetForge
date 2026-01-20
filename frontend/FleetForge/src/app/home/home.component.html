@@ -16,30 +16,71 @@
     <div class="find-vehicle-container">
       <div class="form-section">
         <h2>Find Your Vehicle</h2>
-        <div class="form-group">
-          <label for="pickup">Pick Up Address</label>
-          <input type="text" id="pickup" placeholder="Pick Destination" />
-        </div>
-        <div class="form-group">
-          <label for="waypoint">Add New Waypoint</label>
-          <div class="waypoint-input-wrapper">
-            <button class="btn-add-waypoint" type="button">+</button>
-            <input type="text" id="waypoint" placeholder="New Waypoint" />
+
+        <!-- Dynamic Location Fields -->
+        <div *ngFor="let field of locationFields; let i = index" class="form-group">
+          
+          <!-- Label -->
+          <label [for]="field.id">
+            <span *ngIf="field.type === 'pickup'">Pick Up Address</span>
+            <span *ngIf="field.type === 'waypoint'">Waypoint {{ waypoints.indexOf(field) + 1 }}</span>
+            <span *ngIf="field.type === 'dropoff'">Drop Off Address</span>
+          </label>
+
+          <!-- Input with optional remove button for waypoints -->
+          <div class="input-wrapper" [class.has-remove-btn]="field.type === 'waypoint'">
+            <input
+              [id]="field.id"
+              type="text"
+              [placeholder]="field.type === 'pickup' ? 'Pick Destination' : 
+                            field.type === 'dropoff' ? 'Pick Destination' : 
+                            'New Waypoint'"
+              [(ngModel)]="field.query"
+              (input)="onLocationInput(field)"
+              autocomplete="off"
+            />
+            <button 
+              *ngIf="field.type === 'waypoint'" 
+              class="btn-remove-waypoint" 
+              type="button"
+              (click)="removeWaypoint(field.id)"
+              aria-label="Remove waypoint"
+            >
+              ✕
+            </button>
           </div>
+
+          <!-- Suggestions dropdown -->
+          <ul class="suggestions" *ngIf="field.showSuggestions && field.suggestions.length">
+            <li *ngFor="let suggestion of field.suggestions" (click)="selectSuggestion(field, suggestion)">
+              {{ formatSuggestion(suggestion) }}
+            </li>
+          </ul>
         </div>
+
+        <!-- Add Waypoint Button -->
         <div class="form-group">
-          <label for="dropoff">Drop Off Address</label>
-          <input type="text" id="dropoff" placeholder="Pick Destination" />
+          <button class="btn-add-waypoint" type="button" (click)="addWaypoint()">
+            + Add Waypoint
+          </button>
         </div>
-        
+
         <div class="button-group">
-          <button class="btn btn-estimate">Estimate</button>
-          <button class="btn btn-order">Order</button>
+          <button class="btn btn-estimate" (click)="estimateRide()">Estimate</button>
+          <button class="btn btn-order" (click)="orderRide()">Order</button>
         </div>
       </div>
       <div class="map-section">
-        <app-map [vehicles]="vehicles"></app-map>
+        <app-map
+          [vehicles]="vehicles"
+          (routeSummary)="onRouteSummary($event)">
+        </app-map>
+        <div *ngIf="estimatedDistance" class="estimate-result">
+        <p>Distance: {{ estimatedDistance }} km</p>
+        <p>Duration: {{ estimatedDuration }} min</p>
+        <p>Cost: {{ estimatedCost }} RSD</p>
       </div>
+      </div>      
     </div>
   </div>
 </div>
