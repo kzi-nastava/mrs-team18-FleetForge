@@ -155,7 +155,8 @@
   font-weight: 500;
 }
 
-.form-group input {
+.form-group input {  
+  width: 100%;
   padding: 12px 16px;
   border: 1px solid var(--color-border);
   border-radius: 6px;
@@ -174,40 +175,20 @@
   color: var(--color-text-gray);
 }
 
-.waypoint-input-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.waypoint-input-wrapper input {
-  width: 100%;
-  padding-left: 60px;
-}
-
 .btn-add-waypoint {
-  position: absolute;
-  left: 8px;
-  width: 40px;
-  height: 40px;
-  background-color: transparent;
-  border: 1px solid var(--color-border);
+  width: 100%;
+  background-color: var(--color-background-black);
+  border: none;
   border-radius: 6px;
-  color: var(--color-text-gray);
-  font-size: 24px;
-  font-weight: 300;
+  color: var(--color-primary);
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1;
 }
 
 .btn-add-waypoint:hover {
-  background-color: var(--color-background-gray);
-  border-color: var(--color-primary);
-  color: var(--color-primary);
+  color:  #ffffff;
 }
 
 .button-group {
@@ -305,4 +286,33 @@
 
 .suggestions li:hover {
   background: #f2f2f2;
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.input-wrapper.has-remove-btn input {
+  flex: 1;
+}
+
+.btn-remove-waypoint {
+  padding: 12px 16px;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  min-width: 44px;
+  line-height: 1;
+}
+
+.btn-remove-waypoint:hover {
+  background-color: #d32f2f;
 }

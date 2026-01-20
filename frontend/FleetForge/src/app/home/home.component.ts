@@ -6,8 +6,18 @@ import { VehicleLocationDTO } from '../shared/models/vehicle.model';
 import { PhotonFeature, PhotonService } from '../shared/services/photon.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+
+interface LocationField {
+  id: string;
+  type: 'pickup' | 'waypoint' | 'dropoff';
+  query: string;
+  suggestions: PhotonFeature[];
+  showSuggestions: boolean;
+  searchSubject: Subject<string>;
+  coordinates?: { lat: number; lon: number };
+}
 
 @Component({
   selector: 'app-home',
@@ -23,22 +33,12 @@ import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 })
 export class HomeComponent implements OnInit, OnDestroy {
   vehicles: VehicleLocationDTO[] = [];
-
-  pickupQuery = '';
-  pickupSuggestions: PhotonFeature[] = [];
-  showPickupSuggestions = false;
-
-  waypointQuery = '';
-  waypointSuggestions: PhotonFeature[] = [];
-  showWaypointSuggestions = false;
-
-  dropoffQuery = '';
-  dropoffSuggestions: PhotonFeature[] = [];
-  showDropoffSuggestions = false;
-
-  private pickupSearchSubject = new Subject<string>();
-  private waypointSearchSubject = new Subject<string>();
-  private dropoffSearchSubject = new Subject<string>();
+  
+  // Location fields array
+  locationFields: LocationField[] = [];
+  
+  private subscriptions: Subscription[] = [];
+  private nextWaypointId = 0;
 
   constructor(
     private vehicleService: VehicleService,
@@ -48,25 +48,56 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadVehicles();
-    this.setupPickupSearchStream();
-    this.setupWaypointSearchStream();
-    this.setupDropoffSearchStream();
+    this.initializeLocationFields();
   }
 
   ngOnDestroy(): void {
-    this.pickupSearchSubject.complete();
-    this.waypointSearchSubject.complete();
-    this.dropoffSearchSubject.complete();
+    // Clean up all subscriptions and subjects
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+    this.locationFields.forEach(field => field.searchSubject.complete());
   }
 
-  private setupPickupSearchStream(): void {
-    this.pickupSearchSubject.pipe(
+  private initializeLocationFields(): void {
+    // Initialize with pickup and dropoff
+    this.addLocationField('pickup');
+    this.addLocationField('dropoff');
+  }
+
+  private addLocationField(type: 'pickup' | 'waypoint' | 'dropoff'): LocationField {
+    const id = type === 'waypoint' 
+      ? `waypoint-${this.nextWaypointId++}` 
+      : type;
+
+    const field: LocationField = {
+      id,
+      type,
+      query: '',
+      suggestions: [],
+      showSuggestions: false,
+      searchSubject: new Subject<string>()
+    };
+
+    this.setupSearchStream(field);
+    
+    // Insert waypoints before dropoff
+    if (type === 'waypoint') {
+      const dropoffIndex = this.locationFields.findIndex(f => f.type === 'dropoff');
+      this.locationFields.splice(dropoffIndex, 0, field);
+    } else {
+      this.locationFields.push(field);
+    }
+
+    return field;
+  }
+
+  private setupSearchStream(field: LocationField): void {
+    const subscription = field.searchSubject.pipe(
       debounceTime(300),
       distinctUntilChanged(),
       switchMap((query: string) => {
         if (query.length < 2) {
-          this.pickupSuggestions = [];
-          this.showPickupSuggestions = false;
+          field.suggestions = [];
+          field.showSuggestions = false;
           this.cdr.markForCheck();
           return [];
         }
@@ -74,73 +105,19 @@ export class HomeComponent implements OnInit, OnDestroy {
       })
     ).subscribe({
       next: (features: PhotonFeature[]) => {
-        this.pickupSuggestions = features;
-        this.showPickupSuggestions = features.length > 0;
+        field.suggestions = features;
+        field.showSuggestions = features.length > 0;
         this.cdr.markForCheck();
       },
       error: (error: any) => {
-        console.error('Error fetching pickup suggestions:', error);
-        this.pickupSuggestions = [];
-        this.showPickupSuggestions = false;
+        console.error(`Error fetching ${field.type} suggestions:`, error);
+        field.suggestions = [];
+        field.showSuggestions = false;
         this.cdr.markForCheck();
       }
     });
-  }
 
-  private setupWaypointSearchStream(): void {
-    this.waypointSearchSubject.pipe(
-      debounceTime(300),
-      distinctUntilChanged(),
-      switchMap((query: string) => {
-        if (query.length < 2) {
-          this.waypointSuggestions = [];
-          this.showWaypointSuggestions = false;
-          this.cdr.markForCheck();
-          return [];
-        }
-        return this.photonService.searchSuggestions(query);
-      })
-    ).subscribe({
-      next: (features: PhotonFeature[]) => {
-        this.waypointSuggestions = features;
-        this.showWaypointSuggestions = features.length > 0;
-        this.cdr.markForCheck();
-      },
-      error: (error: any) => {
-        console.error('Error fetching waypoint suggestions:', error);
-        this.waypointSuggestions = [];
-        this.showWaypointSuggestions = false;
-        this.cdr.markForCheck();
-      }
-    });
-  }
-
-  private setupDropoffSearchStream(): void {
-    this.dropoffSearchSubject.pipe(
-      debounceTime(300),
-      distinctUntilChanged(),
-      switchMap((query: string) => {
-        if (query.length < 2) {
-          this.dropoffSuggestions = [];
-          this.showDropoffSuggestions = false;
-          this.cdr.markForCheck();
-          return [];
-        }
-        return this.photonService.searchSuggestions(query);
-      })
-    ).subscribe({
-      next: (features: PhotonFeature[]) => {
-        this.dropoffSuggestions = features;
-        this.showDropoffSuggestions = features.length > 0;
-        this.cdr.markForCheck();
-      },
-      error: (error: any) => {
-        console.error('Error fetching dropoff suggestions:', error);
-        this.dropoffSuggestions = [];
-        this.showDropoffSuggestions = false;
-        this.cdr.markForCheck();
-      }
-    });
+    this.subscriptions.push(subscription);
   }
 
   loadVehicles(): void {
@@ -149,7 +126,6 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.vehicles = [...vehicles]; 
         this.cdr.markForCheck();
         console.log('Loaded vehicles:', this.vehicles);
-        console.log('vehicles property after assignment:', this.vehicles);
       },
       error: (error) => {
         console.error('Error loading vehicles:', error);
@@ -157,49 +133,72 @@ export class HomeComponent implements OnInit, OnDestroy {
     });
   }
 
-  onPickupInput(): void {
-    this.pickupSearchSubject.next(this.pickupQuery);
-  }
-
-  onWaypointInput(): void {
-    this.waypointSearchSubject.next(this.waypointQuery);
-  }
-
-  onDropoffInput(): void {
-    this.dropoffSearchSubject.next(this.dropoffQuery);
-  }
-
-  selectPickup(feature: PhotonFeature): void {
-    const displayName = this.getDisplayName(feature);
-    this.pickupQuery = displayName;
-    this.pickupSuggestions = [];
-    this.showPickupSuggestions = false;
+  // Add a new waypoint
+  addWaypoint(): void {
+    this.addLocationField('waypoint');
     this.cdr.markForCheck();
-
-    const [lon, lat] = feature.geometry.coordinates;
-    console.log('Selected pickup location:', { lat, lon, name: displayName });
   }
 
-  selectWaypoint(feature: PhotonFeature): void {
-    const displayName = this.getDisplayName(feature);
-    this.waypointQuery = displayName;
-    this.waypointSuggestions = [];
-    this.showWaypointSuggestions = false;
-    this.cdr.markForCheck();
-
-    const [lon, lat] = feature.geometry.coordinates;
-    console.log('Selected waypoint location:', { lat, lon, name: displayName });
+  // Remove a waypoint by ID
+  removeWaypoint(waypointId: string): void {
+    const index = this.locationFields.findIndex(f => f.id === waypointId);
+    if (index !== -1) {
+      const field = this.locationFields[index];
+      field.searchSubject.complete();
+      this.locationFields.splice(index, 1);
+      this.cdr.markForCheck();
+    }
   }
 
-  selectDropoff(feature: PhotonFeature): void {
-    const displayName = this.getDisplayName(feature);
-    this.dropoffQuery = displayName;
-    this.dropoffSuggestions = [];
-    this.showDropoffSuggestions = false;
-    this.cdr.markForCheck();
+  // Handle input changes
+  onLocationInput(field: LocationField): void {
+    field.searchSubject.next(field.query);
+  }
 
+  // Handle suggestion selection
+  selectSuggestion(field: LocationField, feature: PhotonFeature): void {
+    const displayName = this.getDisplayName(feature);
+    field.query = displayName;
+    field.suggestions = [];
+    field.showSuggestions = false;
+    
     const [lon, lat] = feature.geometry.coordinates;
-    console.log('Selected dropoff location:', { lat, lon, name: displayName });
+    field.coordinates = { lat, lon };
+    
+    this.cdr.markForCheck();
+    
+    console.log(`Selected ${field.type} location:`, { 
+      id: field.id,
+      lat, 
+      lon, 
+      name: displayName 
+    });
+  }
+
+  // Get pickup location
+  get pickup(): LocationField | undefined {
+    return this.locationFields.find(f => f.type === 'pickup');
+  }
+
+  // Get all waypoints
+  get waypoints(): LocationField[] {
+    return this.locationFields.filter(f => f.type === 'waypoint');
+  }
+
+  // Get dropoff location
+  get dropoff(): LocationField | undefined {
+    return this.locationFields.find(f => f.type === 'dropoff');
+  }
+
+  // Get all locations with coordinates (for routing)
+  getAllLocationsWithCoordinates(): Array<{ lat: number; lon: number; type: string }> {
+    return this.locationFields
+      .filter(f => f.coordinates)
+      .map(f => ({ 
+        lat: f.coordinates!.lat, 
+        lon: f.coordinates!.lon,
+        type: f.type 
+      }));
   }
 
   private getDisplayName(feature: PhotonFeature): string {
