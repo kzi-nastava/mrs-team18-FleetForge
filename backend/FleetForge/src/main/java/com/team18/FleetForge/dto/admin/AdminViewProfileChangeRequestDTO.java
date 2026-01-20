@@ -21,17 +21,13 @@ public class AdminViewProfileChangeRequestDTO {
     private String email;
     private String phoneNumber;
     private String address;
-    private String profilePicture;
 
     private String newFirstName;
     private String newLastName;
     private String newEmail;
     private String newPhoneNumber;
     private String newAddress;
-    private String newProfilePicture;
 
-    private InformationChangeRequestStatus status;
-    private LocalDateTime createdAt;
 
     public AdminViewProfileChangeRequestDTO(DriverProfileChangeRequest request, Driver driver) {
         this.requestId=request.getId();
@@ -41,16 +37,12 @@ public class AdminViewProfileChangeRequestDTO {
         this.email=driver.getEmail();
         this.phoneNumber=driver.getPhoneNumber();
         this.address=driver.getAddress();
-        this.profilePicture=driver.getProfilePicture();
 
         this.newFirstName=request.getNewFirstName();
         this.newLastName=request.getNewLastName();
         this.newEmail=request.getNewEmail();
         this.newPhoneNumber=request.getNewPhoneNumber();
         this.newAddress=request.getNewAddress();
-        this.newProfilePicture=request.getNewProfilePicture();
-        this.status=InformationChangeRequestStatus.PENDING;
-        this.createdAt=LocalDateTime.now();
 
     }
 }

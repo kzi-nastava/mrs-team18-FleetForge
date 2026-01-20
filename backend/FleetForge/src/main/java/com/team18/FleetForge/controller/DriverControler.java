@@ -121,7 +121,6 @@ public class DriverControler {
         changeRequest.setNewLastName(request.getNewLastName());
         changeRequest.setNewAddress(request.getNewAddress());
         changeRequest.setNewEmail(request.getNewEmail());
-        changeRequest.setNewProfilePicture(request.getNewProfilePicture());
         changeRequest.setNewPhoneNumber(request.getNewPhoneNumber());
 
         driverChangeRequestService.save(changeRequest);

@@ -14,5 +14,4 @@ public class DriverProfileChangeRequestDTO {
     private String newEmail;
     private String newPhoneNumber;
     private String newAddress;
-    private String newProfilePicture;
 }

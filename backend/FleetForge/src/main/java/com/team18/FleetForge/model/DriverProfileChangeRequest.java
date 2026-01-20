@@ -38,6 +38,4 @@ public class DriverProfileChangeRequest {
     private String newPhoneNumber;
     @Column(name = "new_address", nullable = false)
     private String newAddress;
-    @Column(name = "new_profile_picture")
-    private String newProfilePicture;
 }

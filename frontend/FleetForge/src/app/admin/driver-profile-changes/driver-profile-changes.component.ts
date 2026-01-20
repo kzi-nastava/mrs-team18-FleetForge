@@ -20,6 +20,7 @@ protected vehicleChanges: WritableSignal<VehicleProfileChangePendingRequestsDTO[
   }
   ngOnInit(): void {
     this.service.findAllPendingRequests().subscribe(data => {
+      console.log(data);
       this.changes.set(data);
       
     });

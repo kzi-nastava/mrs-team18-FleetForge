@@ -17,13 +17,11 @@ export interface DriverInformationDTO extends UserInformationDTO{
 }
 
 export interface DriverChangeRequestDTO{
-    id:number;
     newFirstName?:string;
     newLastName?:string;
     newEmail?:string;
     newPhoneNumber?:string;
     newAddress?:string;
-    newProfilePicture?:string;
 }
 export interface DriverChangeResponseDTO{
     status:InformationChangeRequestStatus;

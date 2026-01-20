@@ -9,6 +9,7 @@ import { Vehicle } from '../model/vehicle.model';
 import { RouterLink } from '@angular/router';
 import { DriverService } from '../service/driver-service';
 import { VehicleType } from '../../shared/models/vehicle.model';
+import { form } from '@angular/forms/signals';
 
 @Component({
   selector: 'app-driver-profile',
@@ -23,25 +24,26 @@ import { VehicleType } from '../../shared/models/vehicle.model';
   encapsulation: ViewEncapsulation.None
 })
 export class DriverProfileComponent {
-
+  formData = new FormData();
+  driverEmail: string = '';
   constructor(private driverService: DriverService) { }
 
 editDriver(): void {
+  const file = this.formData.get('file') as File | null;
+  const fileExtension = file ? file.name.substring(file.name.lastIndexOf('.')) : '';
+  console.log("img: " + this.driverEmail + fileExtension);
   this.driverService.createChangeRequest({
-    id:1,//treba mi id iz ulogovanog korisnika
     newFirstName: this.editDriverInfo.value.firstName ?? '',
     newLastName: this.editDriverInfo.value.lastName ?? '',
     newEmail: this.editDriverInfo.value.email ?? '',
     newPhoneNumber: this.editDriverInfo.value.phoneNumber ?? '',
-    newAddress: this.editDriverInfo.value.address ?? '',
-    newProfilePicture: this.editDriverInfo.value.profilePicture ?? 'blank_profile.webp'
+    newAddress: this.editDriverInfo.value.address ?? ''
   }).subscribe((response) =>  {
-  alert('Profile change request submitted for approval.');}
-  );
+    alert('Profile change request submitted for approval.');
+  });
 }
 editVehicle(): void {
   this.driverService.createVehicleChangeRequest({
-    vehicleId:1,//treba mi id iz ulogovanog korisnika
     newModel: this.editVehicleInfo.value.model ?? '',
     newType: (this.editVehicleInfo.value.type ?? '') as VehicleType,
     newRegistrationNumber: this.editVehicleInfo.value.registrationNumber ?? '',
@@ -59,17 +61,19 @@ editVehicle(): void {
     this.fileInput.nativeElement.click();
   }
   onFileSelected(event: Event): void {
+    if(this.formData.has('file')){
+      this.formData.delete('file');
+    }
     const input = event.target as HTMLInputElement;
     if (!input.files || input.files.length === 0) return;
 
     const file = input.files[0];
-    // ovde treba sacuvati sliku na server ili u bazu podataka
-    // za sada samo prikazujemo izabranu sliku
-    // pozivom servisa this.userService.uploadProfilePicture(file);
+    this.formData.set('file', file);
     this.imageUrl = URL.createObjectURL(file);
     this.editDriverInfo.patchValue({
     profilePicture: file.name 
   } );
+  this.driverService.uploadProfilePicture(this.formData).subscribe();
   }
 
   editDriverInfo=new FormGroup({
@@ -90,6 +94,7 @@ editVehicle(): void {
   });
 ngOnInit(): void {
     this.driverService.getCurrentDriver().subscribe((driverData) => {
+      this.driverEmail=driverData.email ?? '';
        this.editDriverInfo.setValue({
       firstName: driverData.firstName ?? '',
       lastName: driverData.lastName ?? '',
@@ -97,6 +102,7 @@ ngOnInit(): void {
       phoneNumber: driverData.phoneNumber ?? '', 
       address: driverData.address ?? '',
       profilePicture: "http://localhost:8080" + (driverData.profilePicture ?? 'blank_profile.webp')
+  
       
     });
 
