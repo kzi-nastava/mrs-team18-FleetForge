@@ -30,14 +30,13 @@ export class RoutingService {
       profile: 'mapbox/driving'
     }),
     collapsible: false,
-    // --- KEY CHANGES HERE ---
     plan: L.Routing.plan(allWaypoints, {
-      addWaypoints: false,      // Prevents users from clicking the line to add points
-      draggableWaypoints: false, // Prevents existing points from being moved
-      createMarker: () => false  // Returns false so no default markers are rendered
+      addWaypoints: false,      
+      draggableWaypoints: false, 
+      createMarker: () => false 
     }),
     lineOptions: {
-      addWaypoints: false,      // Ensure the line itself is not interactive
+      addWaypoints: false,      
       extendToWaypoints: true,
       missingRouteTolerance: 0
     }
@@ -54,7 +53,6 @@ export class RoutingService {
       });
   });
 
-  // Optional: Remove the itinerary UI if you don't want the text directions
   const panel = document.querySelector('.leaflet-routing-container');
   if (panel) (panel as HTMLElement).style.display = 'none';
 

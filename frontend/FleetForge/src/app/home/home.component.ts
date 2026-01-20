@@ -40,6 +40,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   
   private subscriptions: Subscription[] = [];
   private nextWaypointId = 0;
+  private readonly STORAGE_KEY = 'location_fields';
+
 
   constructor(
     private vehicleService: VehicleService,
@@ -49,13 +51,86 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadVehicles();
-    this.initializeLocationFields();
+    this.restoreState();
+  }
+
+  clearSavedLocations(): void {
+    localStorage.removeItem(this.STORAGE_KEY);
+    location.reload();
   }
 
   ngOnDestroy(): void {
     this.subscriptions.forEach(sub => sub.unsubscribe());
     this.locationFields.forEach(field => field.searchSubject.complete());
   }
+
+  private persistState(): void {
+    const serializable = this.locationFields.map(f => ({
+      id: f.id,
+      type: f.type,
+      query: f.query,
+      coordinates: f.coordinates
+    }));
+
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(serializable));
+  }
+
+
+  private restoreState(): void {
+    const raw = localStorage.getItem(this.STORAGE_KEY);
+
+    if (!raw) {
+      this.initializeLocationFields();
+      return;
+    }
+
+    const saved = JSON.parse(raw);
+
+    this.locationFields = [];
+    this.nextWaypointId = 0;
+
+    saved.forEach((s: any) => {
+      const field: LocationField = {
+        id: s.id,
+        type: s.type,
+        query: s.query,
+        suggestions: [],
+        showSuggestions: false,
+        searchSubject: new Subject<string>(),
+        coordinates: s.coordinates
+      };
+
+      this.setupSearchStream(field);
+
+      if (s.type === 'waypoint') {
+        const num = parseInt(s.id.split('-')[1] || '0', 10);
+        this.nextWaypointId = Math.max(this.nextWaypointId, num + 1);
+      }
+
+      this.locationFields.push(field);
+    });
+
+    this.cdr.markForCheck();
+
+    // restore markers + route
+    setTimeout(() => {
+      this.locationFields.forEach(f => {
+        if (f.coordinates && this.mapComponent) {
+          this.mapComponent.setLocationMarker(
+            f.id,
+            f.type,
+            f.query,
+            f.coordinates.lat,
+            f.coordinates.lon
+          );
+        }
+      });
+
+      this.updateRoute();
+      this.persistState();
+    });
+  }
+
 
   private initializeLocationFields(): void {
     this.addLocationField('pickup');
@@ -134,6 +209,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   addWaypoint(): void {
     this.addLocationField('waypoint');
     this.cdr.markForCheck();
+    this.persistState();
   }
 
   removeWaypoint(waypointId: string): void {
@@ -149,13 +225,14 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.locationFields.splice(index, 1);
       
       this.updateRoute();
-      
+      this.persistState();
       this.cdr.markForCheck();
     }
   }
 
   onLocationInput(field: LocationField): void {
     field.searchSubject.next(field.query);
+    this.persistState();
   }
 
   selectSuggestion(field: LocationField, feature: PhotonFeature): void {
@@ -181,6 +258,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       lon, 
       name: displayName 
     });
+    this.persistState();
   }
   
   private updateRoute(): void {
