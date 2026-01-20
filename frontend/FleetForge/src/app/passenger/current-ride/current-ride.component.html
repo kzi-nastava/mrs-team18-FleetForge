@@ -18,7 +18,6 @@
           </div>
           <div class="driver-phone">{{ rideData.driver.phoneNumber }}</div>
         </div>
-        <!-- <button class="contact-btn" (click)="onContactDriver()">Contact</button> -->
       </div>
 
       <!-- Route Information -->
@@ -66,7 +65,7 @@
         <div class="arrival-meta">
           <div class="meta-block">
             <span class="meta-label">Distance</span>
-            <span class="meta-value">{{ rideData.route.totalDistanceKm | number:'1.0-1' }} km</span>
+            <span class="meta-value">{{ rideData.route.totalDistanceKm | number:'1.1-1' }} km</span>
           </div>
           <div class="meta-block">
             <span class="meta-label">Time</span>
@@ -84,7 +83,10 @@
 
     <!-- Right Section: Map -->
     <div class="map-section">
-      <app-map></app-map>
+      <app-map 
+        [currentRide]="rideData"
+        (routeCalculated)="onRouteCalculated($event)">
+      </app-map>
     </div>
   </div>
 </div>

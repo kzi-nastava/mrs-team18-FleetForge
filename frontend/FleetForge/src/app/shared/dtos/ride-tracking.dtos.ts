@@ -4,6 +4,7 @@ export interface WaypointDTO {
   location: GeoPoint;
   address: string;
   order: number;
+  isCompleted: boolean;
 }
 
 export interface RouteInfoDTO {
