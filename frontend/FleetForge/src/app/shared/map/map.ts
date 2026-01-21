@@ -1,8 +1,10 @@
-import { Component, AfterViewInit, Input, EventEmitter, Output } from '@angular/core';
+import { Component, AfterViewInit, Input, EventEmitter, Output, OnDestroy } from '@angular/core';
 import * as L from 'leaflet';
+import 'leaflet-routing-machine';
 import { VehicleLocationDTO } from '../models/vehicle.model';
 import { NominatimService } from '../services/nominatim';
-import { RoutingService } from './service/routing.service';
+import { RideTrackingDTO } from '../dtos/ride-tracking.dtos';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-map',
@@ -10,19 +12,32 @@ import { RoutingService } from './service/routing.service';
   styleUrls: ['./map.css'],
   standalone: true
 })
-export class MapComponent implements AfterViewInit {
+export class MapComponent implements AfterViewInit, OnDestroy {
   private _vehicles: VehicleLocationDTO[] = [];
+  private _currentRide: RideTrackingDTO | null = null;
   private markers: L.Marker[] = [];
+
+  private routeControl: L.Routing.Control | null = null;
   private locationMarkers: Map<string, L.Marker> = new Map();
-  private routeControl?: L.Routing.Control;
+  private currentLocationMarker: L.Marker | null = null;
+  private trackingInterval: any;
   
   @Output() mapClick = new EventEmitter<{address:string, lat:number, lng:number}>();
+  @Output() routeCalculated = new EventEmitter<{distanceKm: number, estimatedMinutes: number}>();
+  @Output() routeCoordinatesAvailable = new EventEmitter<Array<{latitude: number, longitude: number}>>();  
   @Output() routeSummary = new EventEmitter<{ distanceKm: number; durationMin: number; cost: number }>();
   @Input() set vehicles(value: VehicleLocationDTO[]) {
     this._vehicles = value;
-    console.log('Vehicles input changed:', value);
     if (this.map) {
       this.displayVehicles();
+    }
+  }
+  
+  @Input() set currentRide(value: RideTrackingDTO | null) {
+    this._currentRide = value;
+    if (this.map && value) {
+      this.displayCurrentRide();
+    } else {
     }
   }
   
@@ -69,11 +84,14 @@ export class MapComponent implements AfterViewInit {
     });
 
     this.registerOnClick();
+  
+    if (this._currentRide) {
+      this.displayCurrentRide();
+    }
   }
 
   private updateMarkerSizes(): void {
     const zoom = this.map.getZoom();
-    
     const iconSize = 30 + (zoom - 10) * 3; 
     
     this.vehicleMarkers.forEach(marker => {
@@ -104,6 +122,13 @@ export class MapComponent implements AfterViewInit {
     this.routingService.routeSummary$.subscribe(summary => {
       this.routeSummary.emit(summary);
     });
+
+  }
+
+  ngOnDestroy(): void {
+    if (this.trackingInterval) {
+      clearInterval(this.trackingInterval);
+    }
   }
 
   registerOnClick(): void {
@@ -111,9 +136,6 @@ export class MapComponent implements AfterViewInit {
       const coord = e.latlng;
       const lat = coord.lat;
       const lng = coord.lng;
-      console.log(
-        'You clicked the map at latitude: ' + lat + ' and longitude: ' + lng
-      );
       this.nominatimService.reverseSearch(lat, lng).subscribe((data) => {
         if(data.address.house_number==undefined){
           this.mapClick.emit({address: data.address.road, lat: lat, lng: lng});
@@ -124,9 +146,133 @@ export class MapComponent implements AfterViewInit {
     });
   }
 
+  private displayCurrentRide(): void {
+    if (!this._currentRide || !this.map) {
+      return;
+    }
+
+    // Remove previous route if exists
+    if (this.routeControl) {
+      this.map.removeControl(this.routeControl);
+      this.routeControl = null;
+    }
+
+    this.markers.forEach(marker => this.map.removeLayer(marker));
+    this.markers = [];
+
+    const route = this._currentRide.route;
+    
+    const remainingWaypoints = route.waypoints
+    .filter(wp => !wp.isCompleted)
+    .sort((a, b) => a.order - b.order)
+    .map(wp => L.latLng(wp.location.latitude, wp.location.longitude));
+
+    const waypoints: L.LatLng[] = [
+      L.latLng(this._currentRide.currentLocation.latitude, this._currentRide.currentLocation.longitude),
+      ...remainingWaypoints,
+      L.latLng(route.endLocation.latitude, route.endLocation.longitude)
+    ];
+
+    this.routeControl = L.Routing.control({
+      waypoints: waypoints,
+      router: L.Routing.mapbox(environment.MAPBOX_API_KEY, { 
+        profile: 'mapbox/driving' 
+      }),
+      routeWhileDragging: false,
+      addWaypoints: false,
+      lineOptions: {
+        styles: [{ color: '#FF9900', weight: 4, opacity: 0.8 }],
+        extendToWaypoints: true,
+        missingRouteTolerance: 0
+      },
+      show: false,
+      createMarker: function() { return null; }
+    } as any).addTo(this.map);
+
+    // Listen for route calculation
+    this.routeControl.on('routesfound', (e: any) => {
+      const routes = e.routes;
+      const summary = routes[0].summary;
+      const distanceKm = summary.totalDistance / 1000;
+      const estimatedMinutes = Math.round(summary.totalTime / 60);
+
+      const coordinates = routes[0].coordinates.map((coord: any) => ({
+        latitude: coord.lat,
+        longitude: coord.lng
+      }));
+      
+      this.routeCalculated.emit({ distanceKm, estimatedMinutes });
+      this.routeCoordinatesAvailable.emit(coordinates);
+    });
+
+    this.addRouteMarkers(route.startLocation, route.startAddress, 'start');
+    
+    route.waypoints.forEach((wp, index) => {
+      this.addRouteMarkers(wp.location, wp.address, 'waypoint', index + 1);
+    });
+    
+    this.addRouteMarkers(route.endLocation, route.endAddress, 'end');
+    this.updateCurrentLocationMarker(this._currentRide.currentLocation);
+
+    const bounds = L.latLngBounds(waypoints);
+    this.map.fitBounds(bounds, { padding: [50, 50] });
+    
+  }
+
+  private addRouteMarkers(location: {latitude: number, longitude: number}, address: string, type: 'start' | 'waypoint' | 'end', order?: number): void {
+    let iconHtml = '';
+    
+    if (type === 'start') {
+      iconHtml = '<img src="/map-pointer.svg" style="width: 28px; height: 28px; filter: invert(65%) sepia(74%) saturate(1200%) hue-rotate(65deg);" />';
+    } else if (type === 'end') {
+      iconHtml = '<img src="/map-pointer.svg" style="width: 28px; height: 28px; filter: invert(35%) sepia(74%) saturate(1200%) hue-rotate(340deg);" />';
+    } else {
+      iconHtml = '<img src="/waypoint-circle.svg" style="width: 28px; height: 28px;" />';
+    }
+
+    const icon = L.divIcon({
+      html: iconHtml,
+      className: 'custom-marker-icon',
+      iconSize: [28, 28],
+      iconAnchor: [14, 28]
+    });
+
+    const marker = L.marker([location.latitude, location.longitude], { icon })
+      .addTo(this.map)
+      .bindPopup(address);
+    
+    this.markers.push(marker);
+  }
+
+  private updateCurrentLocationMarker(location: {latitude: number, longitude: number}): void {
+    if (this.currentLocationMarker) {
+      this.currentLocationMarker.setLatLng([location.latitude, location.longitude]);
+    } else {
+      const carIconHtml = `
+        <div style="background: #FF9900; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.85 7h10.29l1.08 3.11H5.77L6.85 7zM19 17H5v-5h14v5z"/>
+            <circle cx="7.5" cy="14.5" r="1.5"/>
+            <circle cx="16.5" cy="14.5" r="1.5"/>
+          </svg>
+        </div>
+      `;
+
+      const carIcon = L.divIcon({
+        html: carIconHtml,
+        className: 'current-location-marker',
+        iconSize: [40, 40],
+        iconAnchor: [20, 20]
+      });
+
+      this.currentLocationMarker = L.marker([location.latitude, location.longitude], { icon: carIcon })
+        .addTo(this.map)
+        .bindPopup('Current Location');
+    }
+  }
+
   setMarker(address: string): void {
     this.nominatimService.search(address+" Novi Sad").subscribe((data) => {
-      console.log('Geocoding data:', data);
       if (data && data.length > 0) {
         const lat = parseFloat(data[0].lat);
         const lon = parseFloat(data[0].lon);
@@ -148,6 +294,30 @@ export class MapComponent implements AfterViewInit {
       }
       return true; 
     });
+  }
+
+  updateCurrentLocation(location: {latitude: number, longitude: number}): void {
+    if (!this._currentRide || !this.map) {
+      return;
+    }
+
+    this.updateCurrentLocationMarker(location);
+    if (this.routeControl) {
+      const route = this._currentRide.route;
+      
+      const remainingWaypoints = route.waypoints
+        .filter(wp => !wp.isCompleted)
+        .sort((a, b) => a.order - b.order)
+        .map(wp => L.latLng(wp.location.latitude, wp.location.longitude));
+
+      const waypoints: L.LatLng[] = [
+        L.latLng(location.latitude, location.longitude),
+        ...remainingWaypoints,
+        L.latLng(route.endLocation.latitude, route.endLocation.longitude)
+      ];
+
+      this.routeControl.setWaypoints(waypoints);
+    }
   }
 
   setMarkerWithCoords(address: string, lat: number, lng: number): void {
@@ -242,14 +412,12 @@ export class MapComponent implements AfterViewInit {
   }
 
   private displayVehicles(): void {
-    console.log('displayVehicles called. Map exists:', !!this.map, 'Vehicles count:', this.vehicles.length);
     if (!this.map) return;
 
     this.vehicleMarkers.forEach(marker => marker.remove());
     this.vehicleMarkers = [];
 
     this.vehicles.forEach(vehicle => {
-      console.log('Processing vehicle:', vehicle);
       if (vehicle.isActive) {
         const marker = this.createVehicleMarker(vehicle);
         this.vehicleMarkers.push(marker);

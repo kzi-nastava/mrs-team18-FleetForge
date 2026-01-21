@@ -18,6 +18,7 @@ import { PasswordSetComponent } from './driver/password-set/password-set.compone
 import { RegisterDriverComponent } from './admin/register-driver/register-driver.component';
 import { ActivateAccountComponent } from './auth/activate-account/activate-account.component';
 import { PassengerHomeComponent } from './passenger/passenger-home/passenger-home.component';
+import { CurrentRideComponent } from './passenger/current-ride/current-ride.component';
 
 import { authGuard, guestGuard, roleGuard } from './auth/guard/auth-guard';
 import { homeRedirectGuard } from './auth/guard/home-redirect-guard';
@@ -45,6 +46,11 @@ export const routes: Routes = [
       { 
         path: 'passenger/passenger-home', 
         component: PassengerHomeComponent,
+        canActivate: [authGuard, roleGuard(['PASSENGER'])]
+      },
+      { 
+        path: 'passenger/current-ride', 
+        component: CurrentRideComponent,
         canActivate: [authGuard, roleGuard(['PASSENGER'])]
       },
       
