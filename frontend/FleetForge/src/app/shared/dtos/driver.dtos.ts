@@ -22,3 +22,7 @@ export interface PasswordSetDTO{
 export interface PasswordSetResponseDTO{
     success:boolean;
 }
+
+export interface DriverSessionResponseDTO{
+    sessionId:number;
+}

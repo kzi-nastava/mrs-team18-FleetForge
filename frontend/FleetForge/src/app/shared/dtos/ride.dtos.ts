@@ -1,0 +1,31 @@
+import { VehicleType } from "./vehicle.dtos";
+
+export interface RideCreateRequestDTO{
+    coordinates: WayPointDTO[];
+    passengerNumber: number;
+    rideTime:string;
+    rideNow: boolean;
+    passengerEmails: string[];
+    vehicleType:VehicleType;
+    babySeat: boolean;
+    petFriendly: boolean;
+    startAddress: string;
+    endAddress: string;
+    totalDistance: number;
+    estimatedDuration:number;
+}
+
+export interface WayPointDTO{
+    location: GeoPoint;
+    address: string;
+    orderIndex: number;
+}
+
+export interface GeoPoint{
+    latitude: number;
+    longitude: number;
+}
+
+export interface RideCreateResponseDTO{
+    created:boolean;
+}
