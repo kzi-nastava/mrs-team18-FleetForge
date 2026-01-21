@@ -10,6 +10,7 @@ import { VehicleChangeRequestDTO, VehicleChangeResponseDTO } from '../../shared/
 })
 export class DriverService {
   private apiUrl = 'http://localhost:8080/api/drivers';
+  private apiUsersUrl='http://localhost:8080/api/users';
 
   constructor(private http: HttpClient) {}
 
@@ -29,5 +30,8 @@ export class DriverService {
       password: newPassword
     };
     return this.http.put<void>(`${this.apiUrl}/password`, passwordChangeDTO);
+  }
+  uploadProfilePicture(formData: FormData): Observable<any> {
+    return this.http.post<any>(`${this.apiUsersUrl}/upload-profile-picture`, formData);
   }
 }

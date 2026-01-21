@@ -16,14 +16,16 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   private _vehicles: VehicleLocationDTO[] = [];
   private _currentRide: RideTrackingDTO | null = null;
   private markers: L.Marker[] = [];
+
   private routeControl: L.Routing.Control | null = null;
+  private locationMarkers: Map<string, L.Marker> = new Map();
   private currentLocationMarker: L.Marker | null = null;
   private trackingInterval: any;
   
   @Output() mapClick = new EventEmitter<{address:string, lat:number, lng:number}>();
   @Output() routeCalculated = new EventEmitter<{distanceKm: number, estimatedMinutes: number}>();
-  @Output() routeCoordinatesAvailable = new EventEmitter<Array<{latitude: number, longitude: number}>>();
-  
+  @Output() routeCoordinatesAvailable = new EventEmitter<Array<{latitude: number, longitude: number}>>();  
+  @Output() routeSummary = new EventEmitter<{ distanceKm: number; durationMin: number; cost: number }>();
   @Input() set vehicles(value: VehicleLocationDTO[]) {
     this._vehicles = value;
     if (this.map) {
@@ -42,17 +44,29 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   get vehicles(): VehicleLocationDTO[] {
     return this._vehicles;
   }
+
+  clearRoute(): void {
+    if (this.routeControl) {
+      this.map.removeControl(this.routeControl);
+      this.routeControl = undefined;
+    }
+  }
   
   public map!: L.Map;
   private vehicleMarkers: L.Marker[] = [];
 
-  constructor(private nominatimService: NominatimService) {}
+  constructor(
+    private nominatimService: NominatimService,
+    private routingService: RoutingService
+  ) {}
 
   private initMap(): void {
     this.map = L.map('map', {
       center: [45.2396, 19.8227],
       zoom: 13,
     });
+    
+    this.map.attributionControl.setPrefix(`Leaflet`);
 
     const tiles = L.tileLayer(
       'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -104,6 +118,11 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     if (this.vehicles.length > 0) {
       this.displayVehicles();
     }
+
+    this.routingService.routeSummary$.subscribe(summary => {
+      this.routeSummary.emit(summary);
+    });
+
   }
 
   ngOnDestroy(): void {
@@ -309,6 +328,89 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     newMarker.bindPopup(address).openPopup();
   }
 
+  setLocationMarker(id: string, type: 'pickup' | 'waypoint' | 'dropoff', label: string, lat: number, lon: number): void {
+    if (this.locationMarkers.has(id)) {
+      const existingMarker = this.locationMarkers.get(id);
+      this.map.removeLayer(existingMarker!);
+      this.locationMarkers.delete(id);
+    }
+
+    const iconHtml = this.getLocationIconHtml(type);
+    
+    const locationIcon = L.divIcon({
+      html: iconHtml,
+      className: 'location-marker-icon',
+      iconSize: [32, 32],
+      iconAnchor: [16, 32],
+      popupAnchor: [0, -32],
+    });
+
+    const marker = L.marker([lat, lon], { icon: locationIcon })
+      .addTo(this.map)
+      .bindPopup(`<strong>${this.getTypeLabel(type)}</strong><br/>${label}`);
+
+    this.locationMarkers.set(id, marker);
+
+    this.map.panTo([lat, lon]);
+  }
+
+  removeLocationMarker(id: string): void {
+    if (this.locationMarkers.has(id)) {
+      const marker = this.locationMarkers.get(id);
+      this.map.removeLayer(marker!);
+      this.locationMarkers.delete(id);
+    }
+  }
+
+  updateRoute(
+    pickup: [number, number],
+    dropoff: [number, number],
+    waypoints: [number, number][] = []
+  ): void {
+    if (this.routeControl) {
+      this.map.removeControl(this.routeControl);
+      this.routeControl = undefined;
+    }
+
+    const waypointLatLngs = waypoints.map(wp => L.latLng(wp[0], wp[1]));
+    
+    this.routeControl = this.routingService.addRoute(
+      this.map,
+      L.latLng(pickup[0], pickup[1]),
+      L.latLng(dropoff[0], dropoff[1]),
+      waypointLatLngs
+    );
+  }
+
+  private getLocationIconHtml(type: 'pickup' | 'waypoint' | 'dropoff'): string {
+    const colors = {
+      pickup: '#ef4444',  // red
+      waypoint: '#3b82f6',  // blue
+      dropoff: '#22c55e'    // green
+    };
+
+    const color = colors[type];
+
+    return `
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" 
+              fill="${color}" 
+              stroke="white" 
+              stroke-width="1.5"/>
+        <circle cx="12" cy="9" r="2.5" fill="white"/>
+      </svg>
+    `;
+  }
+
+  private getTypeLabel(type: 'pickup' | 'waypoint' | 'dropoff'): string {
+    const labels = {
+      pickup: 'Pickup',
+      waypoint: 'Waypoint',
+      dropoff: 'Dropoff'
+    };
+    return labels[type];
+  }
+
   private displayVehicles(): void {
     if (!this.map) return;
 
@@ -346,7 +448,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       <div style="font-family: var(--font-primary);">
         <strong>${vehicle.model}</strong><br/>
         Type: ${vehicle.vehicleType}<br/>
-        Status: <span font-weight: bold;">${availabilityText}</span>
+        Status: <span style="font-weight: bold;">${availabilityText}</span>
       </div>
     `;
 

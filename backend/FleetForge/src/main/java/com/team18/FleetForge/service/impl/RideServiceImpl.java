@@ -2,22 +2,34 @@ package com.team18.FleetForge.service.impl;
 
 import com.team18.FleetForge.dto.RouteDTO;
 import com.team18.FleetForge.dto.driver.DriverRideHistoryDTO;
+import com.team18.FleetForge.dto.ride.lifecycle.RideCreateRequestDTO;
+import com.team18.FleetForge.dto.ride.routes.WayPointDTO;
 import com.team18.FleetForge.dto.ride.view.RideDetailsDTO;
+import com.team18.FleetForge.model.enums.VehicleType;
 import com.team18.FleetForge.model.ride.Ride;
 import com.team18.FleetForge.model.ride.WayPoint;
 import com.team18.FleetForge.model.users.Passenger;
 import com.team18.FleetForge.model.enums.RideStatus;
+import com.team18.FleetForge.model.users.User;
 import com.team18.FleetForge.repository.RideRepository;
+import com.team18.FleetForge.repository.UserRepository;
+import com.team18.FleetForge.service.DriverService;
+import com.team18.FleetForge.service.PriceCalculationService;
 import com.team18.FleetForge.service.RideService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.naming.AuthenticationException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,6 +39,9 @@ import java.util.stream.Collectors;
 public class RideServiceImpl implements RideService {
 
     private final RideRepository rideRepository;
+    private final UserRepository userRepository;
+    private final DriverService driverService;
+    private final PriceCalculationService priceCalculationService;
 
     @Override
     public List<DriverRideHistoryDTO> getDriverRideHistory(Long driverId, LocalDate startDate) {
@@ -159,6 +174,65 @@ public class RideServiceImpl implements RideService {
                 .price(ride.getTotalCost())
                 .panicTriggered(ride.getPanicActivated() != null ? ride.getPanicActivated() : false)
                 .build();
+    }
+
+    @Transactional
+    @Override
+    public Ride createRide(RideCreateRequestDTO rideCreateRequestDTO) {
+        Ride ride = new Ride();
+        List<WayPointDTO> wayPoints = new ArrayList<>(rideCreateRequestDTO.getCoordinates());
+        ride.setStartLocation(wayPoints.get(0).getLocation());
+        ride.setEndLocation(wayPoints.get(wayPoints.size()-1).getLocation());
+
+        wayPoints.remove(wayPoints.size()-1);
+        wayPoints.remove(0);
+
+        if(!wayPoints.isEmpty()) {
+            List<WayPoint> wayPoints1 = new ArrayList<>();
+            for(WayPointDTO wayPoint : wayPoints) {
+                WayPoint wayPoint1 = new WayPoint();
+                wayPoint1.setLocation(wayPoint.getLocation());
+                wayPoint1.setAddress(wayPoint.getAddress());
+                wayPoint1.setOrderIndex(wayPoint.getOrderIndex());
+                wayPoints1.add(wayPoint1);
+            }
+            ride.setWayPoints(wayPoints1);
+        }
+
+        ride.setPassengerNumber(rideCreateRequestDTO.getPassengerNumber());
+        if(rideCreateRequestDTO.isRideNow()){
+            ride.setStartTime(LocalDateTime.now());
+        }else{
+            ride.setStartTime(rideCreateRequestDTO.getRideTime());
+        }
+        List<Passenger>  passengers = new ArrayList<>();
+        for(String email:rideCreateRequestDTO.getPassengerEmails()){
+            Optional<User> user=userRepository.findByEmail(email);
+            if(user.isPresent()) {
+                Passenger passenger = (Passenger) user.get();
+                passengers.add(passenger);
+            }
+        }
+        ride.setLinkedPassengers(passengers);
+        ride.setVehicleType(rideCreateRequestDTO.getVehicleType());
+        ride.setBabySeat(rideCreateRequestDTO.isBabySeat());
+        ride.setPetFriendly(rideCreateRequestDTO.isPetFriendly());
+        ride.setStartAddress(rideCreateRequestDTO.getStartAddress());
+        ride.setEndAddress(rideCreateRequestDTO.getEndAddress());
+        ride.setTotalDistance(rideCreateRequestDTO.getTotalDistance());
+        ride.setEstimatedDuration(rideCreateRequestDTO.getEstimatedDuration());
+        ride.setTotalCost(priceCalculationService.calculatePrice(
+                rideCreateRequestDTO.getTotalDistance(),
+                rideCreateRequestDTO.getVehicleType()
+        ));
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Passenger passenger = (Passenger) authentication.getPrincipal();
+        ride.setPassenger(passenger);
+        ride.setStatus(RideStatus.PENDING);
+        ride.setDriver(driverService.findAvailableDriver(ride));
+        rideRepository.save(ride);
+        return ride;
     }
 
 }

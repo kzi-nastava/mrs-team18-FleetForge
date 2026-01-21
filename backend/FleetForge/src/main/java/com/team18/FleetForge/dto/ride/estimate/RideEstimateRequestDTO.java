@@ -7,10 +7,5 @@ import java.util.List;
 
 @Data
 public class RideEstimateRequestDTO {
-
-    private GeoPoint startLocation;
-    private GeoPoint destinationLocation;
-
-    // Optional waypoints
-    private List<GeoPoint> waypoints;
+    private Double distanceKm;
 }

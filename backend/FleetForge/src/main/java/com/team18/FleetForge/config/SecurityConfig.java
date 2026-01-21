@@ -51,7 +51,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/h2-console/**").permitAll()
 
-
                         // Public images
                         .requestMatchers("/uploads/**").permitAll()
 
@@ -60,9 +59,12 @@ public class SecurityConfig {
                         .requestMatchers("/api/unregistered-users/**").permitAll()
                         .requestMatchers("/error").permitAll()
                           
-                          
-                        .requestMatchers("/api/drivers/set-password").permitAll()//todo remove later
+                        // Public driver endpoints
+                        .requestMatchers("/api/drivers/set-password").permitAll()
                         .requestMatchers("/api/drivers/validate-token").permitAll()
+
+                        // Guest endpoints
+                        .requestMatchers("/api/ride-estimates").permitAll()
 
                         .anyRequest().authenticated()
                 )

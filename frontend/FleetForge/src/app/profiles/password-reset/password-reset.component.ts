@@ -6,6 +6,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { Router, RouterLink } from '@angular/router';
 import { Location } from '@angular/common';
+import { PasswordReset } from '../service/password-reset';
 
 @Component({
   selector: 'app-password-reset',
@@ -19,13 +20,12 @@ import { Location } from '@angular/common';
   encapsulation: ViewEncapsulation.None
 })
 export class PasswordResetComponent {
-  constructor(protected router: Router, protected location: Location) {}
+  constructor(protected router: Router, protected location: Location, private passwordService: PasswordReset) {}
 
   editUsersPassword=new FormGroup({
     newPassword: new FormControl('', Validators.required),
     repeatPassword: new FormControl('', Validators.required)
   });
-
   resetPassword(): void {
     if (this.editUsersPassword.invalid) return;
 
@@ -35,8 +35,16 @@ export class PasswordResetComponent {
       alert('Passwords do not match!');
       return;
     }
-    alert('Password successfully changed!');
-    this.location.back();
+    this.passwordService.resetPassword({ newPassword }).subscribe({
+      next: (response) => {
+        alert('Password successfully changed!');
+        this.location.back();
+      },
+      error: (error) => {
+        alert('An error occurred while changing the password.');
+        console.error(error);
+      }
+    });
   }
 
 }

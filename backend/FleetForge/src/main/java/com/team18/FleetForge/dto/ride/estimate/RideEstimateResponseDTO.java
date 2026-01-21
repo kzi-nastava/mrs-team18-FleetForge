@@ -5,8 +5,5 @@ import lombok.Data;
 
 @Data
 public class RideEstimateResponseDTO {
-
-    private RouteDTO route;
-
-    private double estimatedCost;
+    private double estimatedPrice;
 }

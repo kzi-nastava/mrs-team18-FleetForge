@@ -52,7 +52,7 @@ public class DataLoader implements CommandLineRunner {
         driver1.setProfilePicture("driver1.jpg");
         driver1.setVehicle(vehicle1);
         driver1.setActive(true);
-        driver1.setAvailable(true);
+        driver1.setAvailable(false);
         driver1.setCurrentLocation(new GeoPoint(45.2671, 19.8335));
         driver1.setRole(Role.ROLE_DRIVER);
         driver1.setActivated(true);
@@ -199,12 +199,12 @@ public class DataLoader implements CommandLineRunner {
                 LocalDateTime.now().minusDays(1).withHour(9).withMinute(0),
                 LocalDateTime.now().minusDays(1).withHour(9).withMinute(20),
                 4.5, 20.0, 780.0,
-                RideStatus.COMPLETED, false, null, null
+                RideStatus.IN_PROGRESS, false, null, null
         );
         rideRepository.save(ride5);
 
         Ride ride6 = createRide(
-                driver1, passenger3,
+                driver2, passenger3,
                 new GeoPoint(45.2600, 19.8400), "Novi Sad Centar",
                 new GeoPoint(45.2500, 19.8600), "Petrovaradin",
                 LocalDateTime.now().minusDays(3).withHour(20).withMinute(0),

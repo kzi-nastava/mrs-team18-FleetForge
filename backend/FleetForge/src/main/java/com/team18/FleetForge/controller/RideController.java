@@ -14,7 +14,9 @@ import com.team18.FleetForge.model.GeoPoint;
 import com.team18.FleetForge.model.Route;
 import com.team18.FleetForge.model.enums.RideCancellationRole;
 import com.team18.FleetForge.model.enums.RideStatus;
+import com.team18.FleetForge.service.RideService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -25,10 +27,13 @@ import java.security.Principal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/rides")
 public class RideController {
+
+    private final RideService rideService;
+
 
     /**
      * POST /api/rides/{rideId}/cancellations
@@ -159,32 +164,11 @@ public class RideController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<RideCreateResponseDTO> createRide(@RequestBody RideCreateRequestDTO request) {
-        Route route = new Route();
-        route.setGeometry(new ArrayList<>(request.getCoordinates()));
-
-    double price=calculatePrice(route,request);
-
-        RideCreateResponseDTO response = RideCreateResponseDTO.builder()
-                .rideId(1L)
-                .status(RideStatus.PENDING)
-                .estimatedPrice(price)
-                .message("Ride created successfully")
-                .build();
-
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    public ResponseEntity<?> createRide(@RequestBody RideCreateRequestDTO request) {
+        rideService.createRide(request);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    private double calculatePrice(Route route,RideCreateRequestDTO request) {
-        double km=20;
-        double price=120*km;
-        switch (request.getVehicleType()){
-            case VAN -> price+=250;
-            default -> price+=500;
-        }
-        return price;
-
-    }
 //    Authentication authentication = authenticationManager.authenticate(
 //            new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword())
 //    );

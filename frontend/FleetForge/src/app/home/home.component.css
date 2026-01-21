@@ -1,16 +1,18 @@
 .home-container {
   width: 100%;
-  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  background: var(--color-background-white);
 }
 
 .hero-section {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 80px 60px;
+  padding: 0px 60px;
+  padding-bottom: 90px;
   max-width: 1400px;
   margin: 0 auto;
   gap: 60px;
+  min-height: 90vh;
 }
 
 .hero-content {
@@ -21,7 +23,7 @@
 .hero-content h1 {
   font-size: 56px;
   font-weight: 700;
-  color: #2c3e50;
+  color: var(--color-secondary-dark);
   margin: 0 0 40px 0;
   line-height: 1.2;
 }
@@ -46,7 +48,7 @@
 
 .btn-primary {
   background-color: var(--color-primary);
-  color: white;
+  color: var(--color-background-white);
 }
 
 .btn-primary:hover {
@@ -57,7 +59,7 @@
 
 .btn-secondary {
   background-color: var(--color-secondary);
-  color: white;
+  color: var(--color-background-white);
 }
 
 .btn-secondary:hover {
@@ -143,24 +145,25 @@
 }
 
 .form-group {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
 .form-group label {
-  color: #ffffff;
+  color: var(--color-white);
   font-size: 14px;
   font-weight: 500;
 }
 
-.form-group input {
+.form-group input {  
+  width: 100%;
   padding: 12px 16px;
   border: 1px solid var(--color-border);
   border-radius: 6px;
   background-color: var(--color-background-white);
   font-size: 14px;
-  color: #333;
   outline: none;
   transition: border-color 0.3s ease;
 }
@@ -173,40 +176,20 @@
   color: var(--color-text-gray);
 }
 
-.waypoint-input-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.waypoint-input-wrapper input {
-  width: 100%;
-  padding-left: 60px;
-}
-
 .btn-add-waypoint {
-  position: absolute;
-  left: 8px;
-  width: 40px;
-  height: 40px;
-  background-color: transparent;
-  border: 1px solid var(--color-border);
+  width: 100%;
+  background-color: var(--color-background-black);
+  border: none;
   border-radius: 6px;
-  color: var(--color-text-gray);
-  font-size: 24px;
-  font-weight: 300;
+  color: var(--color-primary);
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1;
 }
 
 .btn-add-waypoint:hover {
-  background-color: var(--color-background-gray);
-  border-color: var(--color-primary);
-  color: var(--color-primary);
+  color:  var(--color-white);
 }
 
 .button-group {
@@ -230,7 +213,7 @@
 
 .btn-estimate:hover {
   background-color: var(--color-primary);
-  color: #ffffff;
+  color: var(--color-white);
 }
 
 .btn-order {
@@ -238,7 +221,7 @@
   padding: 12px;
   background-color: var(--color-primary);
   border: 2px solid var(--color-primary);
-  color: #ffffff;
+  color: var(--color-white);
   border-radius: 6px;
   font-size: 14px;
   font-weight: 600;
@@ -252,6 +235,7 @@
 }
 
 .map-section {
+  position: relative;
   flex: 1;
   border-radius: 12px;
   overflow: hidden;
@@ -279,4 +263,79 @@
     width: 100%;
     min-height: 400px;
   }
+}
+
+.suggestions {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 0 0;
+  border: 1px solid #ccc;
+  max-height: 160px;
+  overflow-y: auto;
+  position: absolute;
+  background: var(--color-background-white);
+  width: 100%;
+  z-index: 1000;
+  top: 100%;
+  left: 0;
+}
+
+
+.suggestions li {
+  padding: 8px;
+  cursor: pointer;
+}
+
+.suggestions li:hover {
+  background: var(--color-border);
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.input-wrapper.has-remove-btn input {
+  flex: 1;
+}
+
+.btn-remove-waypoint {
+  padding: 12px 16px;
+  background-color: var(--color-error);
+  color: var(--color-background-white);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  min-width: 44px;
+  line-height: 1;
+}
+
+.btn-remove-waypoint:hover {
+  background-color: var(--color-dark-red);
+}
+
+.estimate-result {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 1000; 
+  
+  padding: 14px 16px;
+  border-radius: 8px;
+  background: var(--color-primary);
+  color: #1a1a1a;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(255, 153, 0, 0.35);
+  animation: fadeInUp 0.3s ease-out;
+  min-width: 160px;
+}
+
+.estimate-result p {
+  margin: 4px 0;
+  font-size: 14px;
 }

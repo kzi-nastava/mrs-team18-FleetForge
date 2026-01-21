@@ -8,14 +8,12 @@ export interface DriverProfileChangePendingRequestsDTO{
     email:string;
     phoneNumber:string;
     address:string;
-    profilePicture?:string;
 
     newFirstName?:string;
     newLastName?:string;
     newEmail?:string;
     newPhoneNumber?:string;
     newAddress?:string;
-    newProfilePicture?:string;
 }
 
 export interface VehicleProfileChangePendingRequestsDTO{

@@ -1,6 +1,7 @@
 package com.team18.FleetForge.model.ride;
 
 import com.team18.FleetForge.model.GeoPoint;
+import com.team18.FleetForge.model.enums.VehicleType;
 import com.team18.FleetForge.model.users.Driver;
 import com.team18.FleetForge.model.users.Passenger;
 import com.team18.FleetForge.model.enums.PanicInitiator;
@@ -104,4 +105,15 @@ public class Ride {
     @Enumerated(EnumType.STRING)
     @Column(name = "panic_initiator")
     private PanicInitiator panicInitiator;
+
+    @Column(name = "passenger_number")
+    private int passengerNumber;
+
+    @Column(name = "vehicle_type")
+    private VehicleType vehicleType;
+
+    @Column(name = "pet_friendly")
+    private boolean isPetFriendly;
+    @Column(name = "baby_seat")
+    private boolean isBabySeat;
 }

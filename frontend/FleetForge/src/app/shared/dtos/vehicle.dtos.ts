@@ -10,7 +10,6 @@ export interface VehicleInformationDTO{
 }
 
 export interface VehicleChangeRequestDTO{
-    vehicleId:number;
     newModel?:string;
     newType?:VehicleType;
     newRegistrationNumber?:string;
