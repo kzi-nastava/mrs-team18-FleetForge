@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import * as L from 'leaflet';
 import 'leaflet-routing-machine';
-import { environment } from '../../../../environments/enviroment';
+import { environment } from '../../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Subject } from 'rxjs';
 
