@@ -1,15 +1,12 @@
 package com.team18.FleetForge.controller;
 
 import com.team18.FleetForge.dto.ride.lifecycle.*;
-import com.team18.FleetForge.dto.ride.reports.InconsistencyReportDTO;
-import com.team18.FleetForge.dto.ride.reports.InconsistencyReportResponseDTO;
+
 import com.team18.FleetForge.dto.ride.routes.FavoriteRouteGetResponseDTO;
 import com.team18.FleetForge.dto.ride.routes.FavoriteRoutePostDeleteRequestDTO;
 import com.team18.FleetForge.dto.ride.routes.FavoriteRoutePostDeleteResponseDTO;
 import com.team18.FleetForge.dto.ride.review.RideReviewRequestDTO;
 import com.team18.FleetForge.dto.ride.review.RideReviewResponseDTO;
-import com.team18.FleetForge.dto.ride.view.RideTrackingDTO;
-import com.team18.FleetForge.dto.driver.DriverInfoDTO;
 import com.team18.FleetForge.model.GeoPoint;
 import com.team18.FleetForge.model.Route;
 import com.team18.FleetForge.model.enums.RideCancellationRole;
@@ -121,48 +118,6 @@ public class RideController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    /**
-     * GET /api/rides/{rideId}/tracking
-     * Response:
-     *  - rideId (Long)
-     *  - status (String)
-     *  - currentLocation (GeoPoint)
-     *  - estimatedArrivalMinutes (Integer)
-     *  - route (RouteInfoDTO)
-     *  - driver (DriverInfoDTO)
-     *  - vehicle (VehicleInfoDTO)
-     *  - panicActivated (Boolean)
-     */
-    @GetMapping(
-            value = "/{rideId}/tracking",
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    public ResponseEntity<RideTrackingDTO> getLiveRideTracking(@PathVariable Long rideId) {
-
-        RideTrackingDTO response = RideTrackingDTO.builder()
-                .rideId(rideId)
-                .status("IN PROGRESS")
-                .currentLocation(new GeoPoint(45.2671, 19.8335))
-                .estimatedArrivalMinutes(12)
-                .route(RideTrackingDTO.RouteInfoDTO.builder()
-                        .startLocation(new GeoPoint(45.2550, 19.8450))
-                        .startAddress("Bulevar oslobođenja 46, Novi Sad")
-                        .endLocation(new GeoPoint(45.2671, 19.8335))
-                        .endAddress("Trg slobode 1, Novi Sad")
-                        .totalDistanceKm(5.2)
-                        .build())
-                .driver(DriverInfoDTO.builder()
-                        .id(10L)
-                        .firstName("Marko")
-                        .lastName("Marković")
-                        .phoneNumber("+381641234567")
-                        .profileImage("driver10.jpg")
-                        .build())
-                .panicActivated(false)
-                .build();
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
 
     @PostMapping("/create")
     public ResponseEntity<RideCreateResponseDTO> createRide(@RequestBody RideCreateRequestDTO request) {
