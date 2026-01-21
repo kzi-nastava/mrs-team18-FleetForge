@@ -5,6 +5,8 @@ import { VehicleLocationDTO } from '../models/vehicle.model';
 import { NominatimService } from '../services/nominatim';
 import { RideTrackingDTO } from '../dtos/ride-tracking.dtos';
 import { environment } from '../../../environments/environment';
+import { RoutingService } from './service/routing.service';
+
 
 @Component({
   selector: 'app-map',
@@ -48,7 +50,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   clearRoute(): void {
     if (this.routeControl) {
       this.map.removeControl(this.routeControl);
-      this.routeControl = undefined;
+      this.routeControl = null;
     }
   }
   
@@ -369,7 +371,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   ): void {
     if (this.routeControl) {
       this.map.removeControl(this.routeControl);
-      this.routeControl = undefined;
+      this.routeControl = null;
     }
 
     const waypointLatLngs = waypoints.map(wp => L.latLng(wp[0], wp[1]));
