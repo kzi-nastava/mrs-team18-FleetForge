@@ -58,9 +58,9 @@
         <div class="form-group">
           <label for="datetime">Date & time</label>
           <div class="datetimeNow">
-            <input type="datetime-local" id="datetime" formControlName="datetime" />
+            <input type="datetime-local" id="datetime" formControlName="datetime" [min]="minDateTime" />
             <div class="now-toggle">
-              <input type="checkbox" id="now" formControlName="now" />
+              <input type="checkbox" id="now" formControlName="now" (change)="onNowToggle()" />
               <label for="now">Now</label>
             </div>
           </div>

@@ -188,7 +188,7 @@ private Driver scoring(List<Driver>drivers,Ride ride){
         List<Ride> upcominPendingRides=new ArrayList<>();
         for(Ride ride:pendingRides){
            Duration dur= Duration.between(LocalDateTime.now(),ride.getStartTime());
-           if(dur.toMinutes()<=30){
+           if(dur.toMinutes()<=60){
                upcominPendingRides.add(ride);
            }
         }

@@ -43,14 +43,16 @@ export class NavbarComponent {
   }
 
   onLogout(): void {
+    if(localStorage.getItem('role') === 'DRIVER' && this.status){
+      this.navbarService.goOffline({sessionId: Number(localStorage.getItem('sessionId'))}).subscribe();
+    }
+    this.status = false;
     this.sidebarService.setAuthenticated(false);
     this.sidebarService.setUserRole(null);
     this.showProfileMenu = false;
     localStorage.removeItem('token');
     localStorage.removeItem('role');
     this.router.navigate(['/']);
-    this.status = false;
-    this.navbarService.goOffline({sessionId: Number(localStorage.getItem('sessionId'))}).subscribe();
   }
 
   viewProfile(): void {

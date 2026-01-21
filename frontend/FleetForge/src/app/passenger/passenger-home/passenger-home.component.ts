@@ -4,7 +4,16 @@ import { VehicleService } from '../../shared/services/vehicle.service';
 import { MapComponent } from '../../shared/map/map';
 import { RouterModule } from '@angular/router';
 import { last, map } from 'rxjs';
-import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  FormArray,
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  ValidationErrors,
+  ValidatorFn,
+  Validators,
+} from '@angular/forms';
 import { PassengerHome } from '../service/passenger-home/passenger-home';
 import { CommonModule } from '@angular/common';
 import { WayPointDTO } from '../../shared/dtos/ride.dtos';
@@ -24,12 +33,55 @@ export class PassengerHomeComponent {
   waypointsNumber: number = 0;
 vehicles: VehicleLocationDTO[] = [];
 
+  minDateTime: string = '';
+
   constructor(private vehicleService: VehicleService, private cdr: ChangeDetectorRef,private passengerHomeService:PassengerHome) {}
   @ViewChild(MapComponent) mapComponent!: MapComponent;
   markers: string[] = [];
 
+  private minDateTimeValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      if (!control.value) {
+        return null; // Ako nema vrednosti, required validator će to uhvatiti
+      }
+
+      const selectedDate = new Date(control.value);
+      const minDate = new Date();
+      minDate.setMinutes(minDate.getMinutes() + 60);
+      minDate.setSeconds(0, 0);
+
+      if (selectedDate < minDate) {
+        return { 
+          minDateTime: { 
+            requiredMin: this.minDateTime, 
+            actual: control.value 
+          } 
+        };
+      }
+
+      return null;
+    };
+  }
+
   ngOnInit(): void {
-   // this.loadVehicles();
+     // this.loadVehicles();
+     this.updateMinDateTime();
+    setInterval(() => this.updateMinDateTime(), 60000);
+  }
+
+  private updateMinDateTime(): void {
+   const now = new Date();
+  now.setMinutes(now.getMinutes() + 60); 
+  now.setSeconds(0, 0);
+
+  const pad = (n: number) => n.toString().padStart(2, '0');
+
+  this.minDateTime =
+    now.getFullYear() + '-' +
+    pad(now.getMonth() + 1) + '-' +
+    pad(now.getDate()) + 'T' +
+    pad(now.getHours()) + ':' +
+    pad(now.getMinutes());
   }
 
   scrollToBookRide(): void {
@@ -164,7 +216,10 @@ this.waypointArray.controls.forEach(control => {
 rideForm = new FormGroup({
     pickup: new FormControl('', Validators.required),
     dropoff: new FormControl('', Validators.required),
-    datetime: new FormControl('', Validators.required),
+  datetime: new FormControl('', [
+      Validators.required,
+      this.minDateTimeValidator() 
+    ]),
     passengers: new FormControl(0, [Validators.required, Validators.min(1)]),
     now: new FormControl(false),
     waypoint: new FormArray<FormControl<string>>([]),
@@ -218,7 +273,7 @@ if(dropoffLatLng){
       const rideRequest = {
         coordinates: wayPointsDto,
         passengerNumber: this.rideForm.value.passengers || 0,
-        rideTime: new Date(this.rideForm.value.datetime!).toISOString().slice(0, -1),// Skidanje Z sa kraja stringa za pravilni format
+        rideTime:this.rideForm.value.now ? new Date().toISOString().slice(0, -1) :new Date(this.rideForm.value.datetime!).toISOString().slice(0, -1),// Skidanje Z sa kraja stringa za pravilni format
         rideNow: this.rideForm.value.now || false,
         passengerEmails: this.passengerArray.value || [],
         vehicleType: this.rideForm.value.type as VehicleType || VehicleType.STANDARD,
@@ -241,6 +296,7 @@ if(dropoffLatLng){
           this.markers.forEach(marker => this.mapComponent.removeMarker(marker));
           this.mapComponent.clearRoute();
           this.markers = [];
+          this.rideForm.get('datetime')?.enable();
           }else{
             alert('Failed to create ride. There is no free drivers.');
               this.rideForm.reset();
@@ -249,6 +305,7 @@ if(dropoffLatLng){
           this.markers.forEach(marker => this.mapComponent.removeMarker(marker));
           this.mapComponent.clearRoute();
           this.markers = [];
+          this.rideForm.get('datetime')?.enable();
           }
         },
         error: (error) => {
@@ -275,5 +332,13 @@ removeWaypoint(index: number): void {
   removePassenger(index: number): void {
     this.passengerArray.removeAt(index);
     this.passengersNumber--;
+  }
+
+  onNowToggle(): void {
+    if (this.rideForm.value.now) {
+      this.rideForm.get('datetime')?.disable();
+    } else {
+      this.rideForm.get('datetime')?.enable();
+    }
   }
 }
