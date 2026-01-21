@@ -20,7 +20,7 @@ import java.util.ArrayList;
 public class RideCreateRequestDTO {
     private ArrayList<WayPointDTO> coordinates;
     private int passengerNumber;
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     private LocalDateTime rideTime;
     private boolean rideNow;
     private ArrayList<String> passengerEmails;
