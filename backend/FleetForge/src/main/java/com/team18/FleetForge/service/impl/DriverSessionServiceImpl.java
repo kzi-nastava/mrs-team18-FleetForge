@@ -17,4 +17,14 @@ public class DriverSessionServiceImpl implements DriverSessionService {
     public List<DriverSession> findAllDriverSessions(Driver driver) {
         return driverSessionRepo.findByDriver(driver);
     }
+
+    @Override
+    public void save(DriverSession driverSession) {
+        driverSessionRepo.save(driverSession);
+    }
+
+    @Override
+    public DriverSession findBySessionById(Long sessionId) {
+        return  driverSessionRepo.findById(sessionId).orElse(null);
+    }
 }

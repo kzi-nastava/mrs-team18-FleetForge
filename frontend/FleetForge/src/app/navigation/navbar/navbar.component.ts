@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { AsyncPipe, LowerCasePipe } from '@angular/common';
 import { SidebarService } from '../sidebar/sidebar.service';
+import { Navbar } from './service/navbar';
 
 export interface NavItem {
   label: string;
@@ -26,8 +27,9 @@ export class NavbarComponent {
   isAuthenticated$!: SidebarService['isAuthenticated$'];
   userRole$!: SidebarService['userRole$'];
   showProfileMenu = false;
+  status: boolean = false;
 
-  constructor(private sidebarService: SidebarService, private router: Router) {
+  constructor(private sidebarService: SidebarService, private router: Router, private navbarService: Navbar) {
     this.isAuthenticated$ = this.sidebarService.isAuthenticated$;
     this.userRole$ = this.sidebarService.userRole$;
   }
@@ -41,6 +43,10 @@ export class NavbarComponent {
   }
 
   onLogout(): void {
+    if(localStorage.getItem('role') === 'DRIVER' && this.status){
+      this.navbarService.goOffline({sessionId: Number(localStorage.getItem('sessionId'))}).subscribe();
+    }
+    this.status = false;
     this.sidebarService.setAuthenticated(false);
     this.sidebarService.setUserRole(null);
     this.showProfileMenu = false;
@@ -61,5 +67,17 @@ export class NavbarComponent {
         this.router.navigate(['profile-driver']);
       }
     });
+  }
+  changeStatus(): void {
+    if(!this.status){
+      this.navbarService.goOnline().subscribe((response)=>{
+        localStorage.setItem('sessionId', response.sessionId.toString());
+        this.status = true;
+      });
+    } else {
+      this.navbarService.goOffline({sessionId: Number(localStorage.getItem('sessionId'))}).subscribe(()=>{
+        this.status = false;
+      });
+    }
   }
 }

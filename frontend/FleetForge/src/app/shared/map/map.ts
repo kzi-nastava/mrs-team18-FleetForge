@@ -6,6 +6,7 @@ import { NominatimService } from '../services/nominatim';
 import { RideTrackingDTO } from '../dtos/ride-tracking.dtos';
 import { environment } from '../../../environments/environment';
 import { RoutingService } from './service/routing.service';
+import { Observable } from 'rxjs';
 
 
 @Component({
@@ -148,6 +149,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     });
   }
 
+
   private displayCurrentRide(): void {
     if (!this._currentRide || !this.map) {
       return;
@@ -273,30 +275,41 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  setMarker(address: string): void {
-    this.nominatimService.search(address+" Novi Sad").subscribe((data) => {
+  setMarker(address: string): Observable<void> {
+  return new Observable(observer => {
+    this.nominatimService.search(address + " Novi Sad").subscribe((data) => {
+      console.log('Geocoding data:', data);
       if (data && data.length > 0) {
         const lat = parseFloat(data[0].lat);
         const lon = parseFloat(data[0].lon);
         const newMarker = L.marker([lat, lon]);
+        this.locationMarkers.set(address, newMarker);
       
         (newMarker as any).customAddress = address;
         newMarker.addTo(this.map);
         this.markers.push(newMarker);
         newMarker.bindPopup(address).openPopup();
+        
+        observer.next();
+        observer.complete();
+      } else {
+        observer.error('No results found');
       }
     });
-  }
+  });
+}
   
   removeMarker(address: string): void {
     this.markers = this.markers.filter(marker => {
       if ((marker as any).customAddress === address) {
         this.map.removeLayer(marker); 
+        this.locationMarkers.delete(address);
         return false; 
       }
       return true; 
     });
   }
+
 
   updateCurrentLocation(location: {latitude: number, longitude: number}): void {
     if (!this._currentRide || !this.map) {
@@ -327,6 +340,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     (newMarker as any).customAddress = address;
     newMarker.addTo(this.map);
     this.markers.push(newMarker);
+    this.locationMarkers.set(address, newMarker);
     newMarker.bindPopup(address).openPopup();
   }
 

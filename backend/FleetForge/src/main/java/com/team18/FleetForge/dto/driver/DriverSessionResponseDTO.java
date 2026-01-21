@@ -11,9 +11,4 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class DriverSessionResponseDTO {
     private Long sessionId;
-    private Long driverId;
-    private LocalDateTime startedAt;
-    private LocalDateTime endedAt;
-    private boolean active;
-
 }

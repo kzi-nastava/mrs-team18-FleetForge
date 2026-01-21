@@ -2,6 +2,7 @@ package com.team18.FleetForge.service.impl;
 
 import com.team18.FleetForge.model.DriverSession;
 import com.team18.FleetForge.model.enums.RideStatus;
+import com.team18.FleetForge.model.enums.VehicleType;
 import com.team18.FleetForge.model.ride.Ride;
 import com.team18.FleetForge.model.users.Driver;
 import com.team18.FleetForge.repository.DriverRepository;
@@ -31,14 +32,19 @@ public class DriverServiceImpl implements DriverService {
         if(activeDrivers.isEmpty())
             return null;
         List<Driver> availableDrivers = driverRepository.findByIsAvailableTrue();
-        if(availableDrivers.isEmpty()){
+        List<Driver> activeDriversWithNeedeVehicle=filterByVehicleType(activeDrivers,ride.getVehicleType());
+        List<Driver> availableDriversWithNeedeVehicle=filterByVehicleType(availableDrivers,ride.getVehicleType());
+
+
+        if(availableDriversWithNeedeVehicle.isEmpty()){
             List<Driver> canDriveNext=new ArrayList<>();
-            for(Driver driver:activeDrivers){
+            for(Driver driver:activeDriversWithNeedeVehicle){
                 if(canDriverRideNextRide(driver,ride) &&
                         checkDriverActivity(driverSessionRepo.findByDriver(driver),false)) {
                     canDriveNext.add(driver);
                 }
             }
+
             if(canDriveNext.isEmpty()) {
                 return null;
             }
@@ -46,7 +52,7 @@ public class DriverServiceImpl implements DriverService {
             return driver;
         }else{
             List<Driver> validAvailableDrivers = new ArrayList<>();
-            for(Driver driver : availableDrivers) {
+            for(Driver driver : availableDriversWithNeedeVehicle) {
                 if(checkDriverActivity(driverSessionRepo.findByDriver(driver),false)) {
                     validAvailableDrivers.add(driver);
                 }
@@ -57,7 +63,15 @@ public class DriverServiceImpl implements DriverService {
             return availableDriverNearest(validAvailableDrivers, ride);
         }
     }
-
+private List<Driver> filterByVehicleType(List<Driver> drivers, VehicleType vehicleType) {
+        List<Driver> driversWithNeedeVehicle=new ArrayList<>();
+    for(Driver driver:drivers){
+        if(driver.getVehicle().getType()==vehicleType){
+            driversWithNeedeVehicle.add(driver);
+        }
+    }
+    return driversWithNeedeVehicle;
+}
     private boolean canDriverRideNextRide(Driver driver, Ride ride) {// ako je voznja pending i ima vozaca tog znaci da ne moze da vozi
         // jer voznje koje imaju vozaca su samo one u bliskoj buducnosti nece imati vozaca voznja koja je za npr sat vremena ili vise od sad
         List<Ride> pendingRides = rideRepository.findAllByDriverAndStatus(driver, RideStatus.PENDING);
@@ -181,7 +195,7 @@ private Driver scoring(List<Driver>drivers,Ride ride){
         List<Ride> upcominPendingRides=new ArrayList<>();
         for(Ride ride:pendingRides){
            Duration dur= Duration.between(LocalDateTime.now(),ride.getStartTime());
-           if(dur.toMinutes()<=30){
+           if(dur.toMinutes()<=60){
                upcominPendingRides.add(ride);
            }
         }
@@ -193,7 +207,11 @@ private Driver scoring(List<Driver>drivers,Ride ride){
             }
         }
         for(Ride ride:upcominPendingRides) {
-            Driver driver=availableDriverNearest(validActiveDrivers,ride);
+            List<Driver> validActiveWithNeededVehicle=filterByVehicleType(validActiveDrivers,ride.getVehicleType());
+            if(validActiveWithNeededVehicle.isEmpty()) {
+                return;
+            }
+            Driver driver=availableDriverNearest(validActiveWithNeededVehicle,ride);
             ride.setDriver(driver);
             driver.setAvailable(false);
             driverRepository.save(driver);

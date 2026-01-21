@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 public class DriverSession {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "driver_id", nullable = false, foreignKey = @ForeignKey(name = "fk_driver_session"))

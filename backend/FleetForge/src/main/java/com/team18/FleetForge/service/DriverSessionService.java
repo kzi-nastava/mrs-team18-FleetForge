@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface DriverSessionService {
     List<DriverSession> findAllDriverSessions(Driver driver);
+    void save(DriverSession driverSession);
+    DriverSession findBySessionById(Long sessionId);
 }

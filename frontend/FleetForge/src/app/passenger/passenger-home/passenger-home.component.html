@@ -14,16 +14,30 @@
 
   <div class="find-vehicle-section">
     <div class="find-vehicle-container">
-      <form class="form-section">
+      <form class="form-section" [formGroup]="rideForm" (ngSubmit)="onSubmit()">
         <h2 id="bookRide">Find Your Vehicle</h2>
         <div class="form-group">
           <label for="pickup">Pick Up Address</label>
-          <input type="text" id="pickup" formControlName="pickup" placeholder="Pick Destination" (change)="onWaypointChange($event)" />
+          <input type="text" id="pickup" formControlName="pickup" placeholder="Pick Destination" (change)="onWaypointChange($event, -2)" />
         </div>
 
         <div class="form-group">
-            <div class="newWaypoints">
-          <label for="waypoint" id="waypointAdd">Add New Waypoint</label>
+            <div class="newWaypoints" formArrayName="waypoint">
+         
+          <div *ngFor="let point of waypointArray.controls; let i = index">
+      
+        <label for="waypoint{{i}}" id="waypoint{{i}}">Waypoint {{ i + 1 }}:</label>
+        <div class="waypoint-input-wrapper">
+        <input 
+          [formControlName]="i" 
+          type="text" 
+          placeholder="New Waypoint"
+          (change)="onWaypointChange($event, i)">
+        
+        <button type="button" class="btn-add-waypoint"(click)="removeWaypoint(i)">-</button>
+      </div>
+    </div>
+   <label for="waypoint" id="waypointAdd">Add New Waypoint</label>
           <div class="waypoint-input-wrapper">
             <button class="btn-add-waypoint" id="addWaypoint" type="button" (click)="addWaypointInput()">+</button>
             <input type="text" id="waypoint" placeholder="New Waypoint" disabled/>
@@ -33,7 +47,7 @@
 
         <div class="form-group">
           <label for="dropoff">Drop Off Address</label>
-          <input type="text" id="dropoff" formControlName="dropoff" placeholder="Pick Destination" (change)="onWaypointChange($event)" />
+          <input type="text" id="dropoff" formControlName="dropoff" placeholder="Pick Destination" (change)="onWaypointChange($event,-1)" />
         </div>
 
         <div class="form-group">
@@ -44,16 +58,26 @@
         <div class="form-group">
           <label for="datetime">Date & time</label>
           <div class="datetimeNow">
-            <input type="datetime-local" id="datetime" formControlName="datetime" />
+            <input type="datetime-local" id="datetime" formControlName="datetime" [min]="minDateTime" />
             <div class="now-toggle">
-              <input type="checkbox" id="now" />
+              <input type="checkbox" id="now" formControlName="now" (change)="onNowToggle()" />
               <label for="now">Now</label>
             </div>
           </div>
         </div>
 
          <div class="form-group">
-            <div class="newPassengers">
+            <div class="newPassengers" formArrayName="passenger">
+              <div *ngFor="let passenger of passengerArray.controls; let j = index">
+        <label for="passenger{{j}}" id="passenger{{j}}">Passenger {{ j + 1 }}:</label>
+        <div class="passenger-input-wrapper">
+        <input 
+          [formControlName]="j"
+          type="text" 
+          placeholder="New Passenger">
+        <button type="button" class="btn-add-passenger"(click)="removePassenger(j)">-</button>
+      </div>
+    </div>
 
     
               <label for="newPassengerAdd" id="newPassengerAdd">Add New Passenger</label>
@@ -73,14 +97,14 @@
       <option value="" disabled selected>Select vehicle type</option>
       <option value="STANDARD">Standard</option>
       <option value="LUXURY">Luxury</option>
-      <option value="SUV">SUV</option>
+      <option value="VAN">Van</option>
     </select>
     <div class="now-toggle">
-              <input type="checkbox" id="now" />
+              <input type="checkbox" id="now" formControlName="babySeat" />
               <label for="now">Is baby seat available</label>
             </div>
             <div class="now-toggle">
-              <input type="checkbox" id="now" />
+              <input type="checkbox" id="now" formControlName="petFriendly" />
               <label for="now">Is pet friendly</label>
             </div>
         </div>
@@ -88,7 +112,7 @@
         <button class="btn btn-order" type="submit">Order</button>
       </form>
       <div class="map-section">
-        <app-map [vehicles]="vehicles" (mapClick)="handleMapClick($event)"></app-map>
+        <app-map [vehicles]="vehicles" (mapClick)="handleMapClick($event)" (routeSummary)="onRouteSummary($event)"></app-map>
       </div>
     </div>
   </div>

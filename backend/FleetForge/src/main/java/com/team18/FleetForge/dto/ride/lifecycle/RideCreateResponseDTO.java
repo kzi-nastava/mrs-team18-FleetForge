@@ -11,8 +11,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class RideCreateResponseDTO {
-    private Long rideId;
-    private RideStatus status;
-    private double estimatedPrice;
-    private String message;
+    private boolean created;
 }
