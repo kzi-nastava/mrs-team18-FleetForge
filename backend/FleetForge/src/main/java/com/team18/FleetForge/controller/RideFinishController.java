@@ -3,7 +3,6 @@ package com.team18.FleetForge.controller;
 import com.team18.FleetForge.dto.ride.lifecycle.FinishRideRequestDTO;
 import com.team18.FleetForge.dto.ride.lifecycle.FinishRideResponseDTO;
 import com.team18.FleetForge.service.RideFinishService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,14 +19,18 @@ public class RideFinishController {
 
     /**
      * Endpoint for drivers to mark a ride as completed
-     * POST /api/rides/finish
+     * PUT /api/rides/{rideId}/finish
      */
-    @PostMapping("/finish")
+    @PutMapping("/{rideId}/finish")
     @PreAuthorize("hasRole('DRIVER')")
     public ResponseEntity<FinishRideResponseDTO> finishRide(
-            @Valid @RequestBody FinishRideRequestDTO request) {
+            @PathVariable Long rideId) {
 
         try {
+            FinishRideRequestDTO request = FinishRideRequestDTO.builder()
+                    .rideId(rideId)
+                    .build();
+
             FinishRideResponseDTO response = rideFinishService.finishRide(request);
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
