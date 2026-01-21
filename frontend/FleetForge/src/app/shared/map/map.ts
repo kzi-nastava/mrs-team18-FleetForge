@@ -22,6 +22,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   
   @Output() mapClick = new EventEmitter<{address:string, lat:number, lng:number}>();
   @Output() routeCalculated = new EventEmitter<{distanceKm: number, estimatedMinutes: number}>();
+  @Output() routeCoordinatesAvailable = new EventEmitter<Array<{latitude: number, longitude: number}>>();
   
   @Input() set vehicles(value: VehicleLocationDTO[]) {
     this._vehicles = value;
@@ -131,6 +132,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       return;
     }
 
+    // Remove previous route if exists
     if (this.routeControl) {
       this.map.removeControl(this.routeControl);
       this.routeControl = null;
@@ -142,15 +144,15 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     const route = this._currentRide.route;
     
     const remainingWaypoints = route.waypoints
-  .filter(wp => !wp.isCompleted)
-  .sort((a, b) => a.order - b.order)
-  .map(wp => L.latLng(wp.location.latitude, wp.location.longitude));
+    .filter(wp => !wp.isCompleted)
+    .sort((a, b) => a.order - b.order)
+    .map(wp => L.latLng(wp.location.latitude, wp.location.longitude));
 
-const waypoints: L.LatLng[] = [
-  L.latLng(this._currentRide.currentLocation.latitude, this._currentRide.currentLocation.longitude),
-  ...remainingWaypoints,
-  L.latLng(route.endLocation.latitude, route.endLocation.longitude)
-];
+    const waypoints: L.LatLng[] = [
+      L.latLng(this._currentRide.currentLocation.latitude, this._currentRide.currentLocation.longitude),
+      ...remainingWaypoints,
+      L.latLng(route.endLocation.latitude, route.endLocation.longitude)
+    ];
 
     this.routeControl = L.Routing.control({
       waypoints: waypoints,
@@ -174,8 +176,14 @@ const waypoints: L.LatLng[] = [
       const summary = routes[0].summary;
       const distanceKm = summary.totalDistance / 1000;
       const estimatedMinutes = Math.round(summary.totalTime / 60);
+
+      const coordinates = routes[0].coordinates.map((coord: any) => ({
+        latitude: coord.lat,
+        longitude: coord.lng
+      }));
       
       this.routeCalculated.emit({ distanceKm, estimatedMinutes });
+      this.routeCoordinatesAvailable.emit(coordinates);
     });
 
     this.addRouteMarkers(route.startLocation, route.startAddress, 'start');
@@ -267,6 +275,30 @@ const waypoints: L.LatLng[] = [
       }
       return true; 
     });
+  }
+
+  updateCurrentLocation(location: {latitude: number, longitude: number}): void {
+    if (!this._currentRide || !this.map) {
+      return;
+    }
+
+    this.updateCurrentLocationMarker(location);
+    if (this.routeControl) {
+      const route = this._currentRide.route;
+      
+      const remainingWaypoints = route.waypoints
+        .filter(wp => !wp.isCompleted)
+        .sort((a, b) => a.order - b.order)
+        .map(wp => L.latLng(wp.location.latitude, wp.location.longitude));
+
+      const waypoints: L.LatLng[] = [
+        L.latLng(location.latitude, location.longitude),
+        ...remainingWaypoints,
+        L.latLng(route.endLocation.latitude, route.endLocation.longitude)
+      ];
+
+      this.routeControl.setWaypoints(waypoints);
+    }
   }
 
   setMarkerWithCoords(address: string, lat: number, lng: number): void {
