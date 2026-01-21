@@ -1,20 +1,29 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { MapComponent } from '../../shared/map/map';
-import { RideTrackingDTO, DriverInfoDTO, RouteInfoDTO } from '../../shared/dtos/ride-tracking.dtos';
+import { RideTrackingDTO } from '../../shared/dtos/ride-tracking.dtos';
 
 @Component({
   selector: 'app-current-ride',
   standalone: true,
-  imports: [CommonModule, MapComponent],
+  imports: [CommonModule, MapComponent, FormsModule],
   templateUrl: './current-ride.component.html',
   styleUrls: ['./current-ride.component.css']
 })
 export class CurrentRideComponent implements OnInit, OnDestroy {
+  @ViewChild(MapComponent) mapComponent!: MapComponent;
+  
   rideData: RideTrackingDTO | null = null;
   calculatedDistance: number = 0;
   calculatedTime: number = 0;
   private locationUpdateInterval: any;
+  private routeCoordinates: Array<{latitude: number, longitude: number}> = [];
+  private currentCoordinateIndex: number = 0;
+  showWrongWayModal: boolean = false;
+  wrongWayReport: string = '';
+  
+  constructor() {}
   
   ngOnInit(): void {
     this.loadMockData();
@@ -75,27 +84,93 @@ export class CurrentRideComponent implements OnInit, OnDestroy {
     this.calculatedDistance = routeInfo.distanceKm;
     this.calculatedTime = routeInfo.estimatedMinutes;
     
-
     if (this.rideData) {
       this.rideData.route.totalDistanceKm = routeInfo.distanceKm;
       this.rideData.estimatedArrivalMinutes = routeInfo.estimatedMinutes;
     }
   }
 
+  onRouteCoordinatesReceived(coordinates: Array<{latitude: number, longitude: number}>): void {
+    this.routeCoordinates = coordinates;
+    this.currentCoordinateIndex = 0;
+  }
+
   private startLocationTracking(): void {
-    // Simulate current location updates (in real app, this would come from API)
-    // For now, just keeping the initial position
-    // You can add mock position changes here to test the tracking
+    const waypointThreshold = 0.0005;
+    
+    this.locationUpdateInterval = setInterval(() => {
+      if (!this.rideData || this.routeCoordinates.length === 0) {
+        return;
+      }
+
+      const coordinatesPerUpdate = 5;
+      const targetIndex = Math.min(
+        this.currentCoordinateIndex + coordinatesPerUpdate,
+        this.routeCoordinates.length - 1
+      );
+
+      if (this.currentCoordinateIndex < this.routeCoordinates.length - 1) {
+        const coord = this.routeCoordinates[targetIndex];
+        
+        this.rideData.currentLocation.latitude = coord.latitude;
+        this.rideData.currentLocation.longitude = coord.longitude;
+
+        this.rideData.route.waypoints.forEach(waypoint => {
+          if (!waypoint.isCompleted) {
+            const latDiff = Math.abs(coord.latitude - waypoint.location.latitude);
+            const lngDiff = Math.abs(coord.longitude - waypoint.location.longitude);
+            
+            if (latDiff < waypointThreshold && lngDiff < waypointThreshold) {
+              waypoint.isCompleted = true;
+              console.log(`Waypoint reached: ${waypoint.address}`);
+            }
+          }
+        });
+
+        if (this.mapComponent) {
+          this.mapComponent.updateCurrentLocation(this.rideData.currentLocation);
+        }
+
+        this.currentCoordinateIndex = targetIndex;
+      } else {
+        if (this.locationUpdateInterval) {
+          clearInterval(this.locationUpdateInterval);
+        }
+        console.log('Ride completed!');
+      }
+    }, 2000);
   }
 
   getDriverRating(): number {
-    // Will be replaced with actual rating from API
+    // TODO: Fetch real driver rating from API
     return 3.0;
   }
 
   onWrongWay(): void {
-    // TODO: Implement wrong way functionality
-    console.log('Wrong way clicked');
+    this.showWrongWayModal = true;
+    this.wrongWayReport = '';
+  }
+
+  onCloseWrongWayModal(): void {
+    this.showWrongWayModal = false;
+    this.wrongWayReport = '';
+  }
+
+  onSubmitWrongWayReport(): void {
+    if (!this.wrongWayReport.trim()) {
+      alert('Please enter a report before submitting.');
+      return;
+    }
+
+    const reportData = {
+      rideId: this.rideData?.rideId,
+      report: this.wrongWayReport,
+      currentLocation: this.rideData?.currentLocation
+    };
+
+    console.log('Wrong way report submitted:', reportData);
+    alert('Report submitted successfully!');
+    this.onCloseWrongWayModal();
   }
 
   onSOS(): void {

@@ -85,8 +85,40 @@
     <div class="map-section">
       <app-map 
         [currentRide]="rideData"
-        (routeCalculated)="onRouteCalculated($event)">
+        (routeCalculated)="onRouteCalculated($event)"
+        (routeCoordinatesAvailable)="onRouteCoordinatesReceived($event)">
       </app-map>
+    </div>
+  </div>
+</div>
+
+<!-- Wrong Way Report Modal -->
+<div class="modal-overlay" *ngIf="showWrongWayModal" (click)="onCloseWrongWayModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2 class="modal-title">Report Issue</h2>
+      <button class="modal-close-btn" (click)="onCloseWrongWayModal()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <label class="form-label">Describe the driver inconsistency:</label>
+      <textarea 
+        class="form-textarea"
+        [(ngModel)]="wrongWayReport"
+        placeholder="Please provide details about the issue (e.g., wrong route, unsafe driving, etc.)"
+        rows="6"
+        maxlength="500"
+      ></textarea>
+      <div class="char-counter">{{ wrongWayReport.length }}/500</div>
+    </div>
+    
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="onCloseWrongWayModal()">Close</button>
+      <button class="btn-primary" (click)="onSubmitWrongWayReport()">Submit Report</button>
     </div>
   </div>
 </div>
