@@ -14,6 +14,7 @@ import com.team18.FleetForge.model.GeoPoint;
 import com.team18.FleetForge.model.Route;
 import com.team18.FleetForge.model.enums.RideCancellationRole;
 import com.team18.FleetForge.model.enums.RideStatus;
+import com.team18.FleetForge.model.ride.Ride;
 import com.team18.FleetForge.service.RideService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -164,9 +165,15 @@ public class RideController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> createRide(@RequestBody RideCreateRequestDTO request) {
-        rideService.createRide(request);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+    public ResponseEntity<RideCreateResponseDTO> createRide(@RequestBody RideCreateRequestDTO request) {
+        Ride ride=rideService.createRide(request);
+        RideCreateResponseDTO response= new RideCreateResponseDTO();
+        if(ride==null){
+            response.setCreated(false);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+        response.setCreated(true);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 //    Authentication authentication = authenticationManager.authenticate(

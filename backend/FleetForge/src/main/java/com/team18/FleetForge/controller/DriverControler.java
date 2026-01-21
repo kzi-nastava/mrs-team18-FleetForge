@@ -46,6 +46,8 @@ public class DriverControler {
     private final ActivationTokenService activationTokenService;
     private final ProfilePictureService profilePictureService;
     private final PasswordEncoder passwordEncoder;
+    private final DriverSessionService driverSessionService;
+    private final DriverService driverService;
 
     @GetMapping
     public ResponseEntity<DriverGetResponseDTO> getCurrentDriver(){
@@ -133,39 +135,31 @@ public class DriverControler {
     public ResponseEntity<DriverSessionResponseDTO> startSession() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Driver driver = (Driver) authentication.getPrincipal();
+        driver.setAvailable(true);
+        driver.setActive(true);
+        userService.save(driver);
         DriverSession newSession = new DriverSession();
         newSession.setDriver(driver);
         newSession.setStartedAt(LocalDateTime.now());
-        //sacuvaj
+        driverSessionService.save(newSession);
 
-        DriverSessionResponseDTO driverSessionResponseDTO = new DriverSessionResponseDTO();
-        // driverSessionResponseDTO.setSessionId(newSession.getId()); //moze posle sa bazom kad se kljuc generise
-        driverSessionResponseDTO.setDriverId(driver.getId());
-        driverSessionResponseDTO.setStartedAt(newSession.getStartedAt());
-        driverSessionResponseDTO.setActive(true);
-        return new ResponseEntity<>(driverSessionResponseDTO, HttpStatus.OK);
-
-
+        DriverSessionResponseDTO response= new DriverSessionResponseDTO();
+        response.setSessionId(newSession.getId());
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PutMapping("/offline")
-    public ResponseEntity<DriverSessionResponseDTO> stopSession(@RequestBody DriverSessionEndRequestDTO request) {
-        //preko session id iz request.getId() nadjem session
+    public ResponseEntity<?> stopSession(@RequestBody DriverSessionEndRequestDTO request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Driver driver = (Driver) authentication.getPrincipal();
-        DriverSession newSession = new DriverSession();
+        driver.setAvailable(false);
+        driver.setActive(false);
         Long sessionId = request.getSessionId();
-        DriverSession foundSession = new DriverSession();
-        foundSession.setDriver(driver);
-        foundSession.setStartedAt(LocalDateTime.now()); //samo za prikaz je .now inace se uzima iz ucitane sesije
+        DriverSession foundSession = driverSessionService.findBySessionById(sessionId);
         foundSession.setEndedAt(LocalDateTime.now());
-        //sacuvam
-        DriverSessionResponseDTO driverSessionResponseDTO = new DriverSessionResponseDTO();
-        driverSessionResponseDTO.setDriverId(driver.getId());
-        driverSessionResponseDTO.setStartedAt(foundSession.getStartedAt());
-        driverSessionResponseDTO.setEndedAt(foundSession.getEndedAt());
-        driverSessionResponseDTO.setActive(false);
-        return new ResponseEntity<>(driverSessionResponseDTO, HttpStatus.OK);
+        driverSessionService.save(foundSession);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/{id}/active-hours")
