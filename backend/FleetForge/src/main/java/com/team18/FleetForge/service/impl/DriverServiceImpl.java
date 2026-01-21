@@ -2,6 +2,7 @@ package com.team18.FleetForge.service.impl;
 
 import com.team18.FleetForge.model.DriverSession;
 import com.team18.FleetForge.model.enums.RideStatus;
+import com.team18.FleetForge.model.enums.VehicleType;
 import com.team18.FleetForge.model.ride.Ride;
 import com.team18.FleetForge.model.users.Driver;
 import com.team18.FleetForge.repository.DriverRepository;
@@ -39,10 +40,16 @@ public class DriverServiceImpl implements DriverService {
                     canDriveNext.add(driver);
                 }
             }
-            if(canDriveNext.isEmpty()) {
+            List<Driver> filteredByVehicleType=new ArrayList<>();
+            for(Driver driver:canDriveNext){
+                if(driver.getVehicle().getType()==ride.getVehicleType()){
+                    filteredByVehicleType.add(driver);
+                }
+            }
+            if(filteredByVehicleType.isEmpty()) {
                 return null;
             }
-            Driver driver = scoring(canDriveNext, ride);
+            Driver driver = scoring(filteredByVehicleType, ride);
             return driver;
         }else{
             List<Driver> validAvailableDrivers = new ArrayList<>();

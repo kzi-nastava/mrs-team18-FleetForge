@@ -8,6 +8,7 @@ import com.team18.FleetForge.dto.ride.view.RideDetailsDTO;
 import com.team18.FleetForge.model.enums.VehicleType;
 import com.team18.FleetForge.model.ride.Ride;
 import com.team18.FleetForge.model.ride.WayPoint;
+import com.team18.FleetForge.model.users.Driver;
 import com.team18.FleetForge.model.users.Passenger;
 import com.team18.FleetForge.model.enums.RideStatus;
 import com.team18.FleetForge.model.users.User;
@@ -230,7 +231,11 @@ public class RideServiceImpl implements RideService {
         Passenger passenger = (Passenger) authentication.getPrincipal();
         ride.setPassenger(passenger);
         ride.setStatus(RideStatus.PENDING);
-        ride.setDriver(driverService.findAvailableDriver(ride));
+        Driver driver=driverService.findAvailableDriver(ride);
+        if(driver==null&&rideCreateRequestDTO.isRideNow()){
+            return null;
+        }
+        ride.setDriver(driver);
         rideRepository.save(ride);
         return ride;
     }
