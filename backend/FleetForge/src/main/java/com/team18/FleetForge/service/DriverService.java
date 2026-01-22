@@ -6,4 +6,5 @@ import com.team18.FleetForge.model.users.Driver;
 public interface DriverService {
     Driver findAvailableDriver(Ride ride);
     void setDriversScheduledRides();
+    boolean checkAlreadyBookedDateTime(Ride ride);
 }

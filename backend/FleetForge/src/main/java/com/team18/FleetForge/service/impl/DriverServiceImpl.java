@@ -219,4 +219,21 @@ private Driver scoring(List<Driver>drivers,Ride ride){
             validActiveDrivers.remove(driver);
         }
     }
+
+    public boolean checkAlreadyBookedDateTime(Ride ride){
+        List<Ride> allPending=rideRepository.findAllByDriverAndStatus(null,RideStatus.PENDING);
+        for(Ride ride2:allPending){
+            if(ride2.getVehicleType()==ride.getVehicleType()) {
+                LocalDateTime start = ride2.getStartTime();
+                LocalDateTime end = ride2.getStartTime().plusMinutes(Math.round(ride2.getEstimatedDuration()));
+                LocalDateTime startRide = ride.getStartTime();
+                LocalDateTime endRide = ride.getStartTime().plusMinutes(Math.round(ride.getEstimatedDuration()));
+                if (startRide.isBefore(end) &&
+                        endRide.isAfter(start)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 }
