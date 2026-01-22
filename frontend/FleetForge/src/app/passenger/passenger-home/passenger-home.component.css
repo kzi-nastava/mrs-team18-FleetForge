@@ -1,18 +1,3 @@
-:root {
-  --color-primary: #f9a825;
-  --color-primary-dark: #f57f17;
-  --color-secondary: #2c3e50;
-  --color-secondary-dark: #1a252f;
-  --color-background-black: #222222;
-  --color-background-white: #ffffff;
-  --color-background-gray: #f5f5f5;
-  --color-text-white: #ffffff;
-  --color-text-gray: #999999;
-  --color-border: #cccccc;
-  --color-error: #e74c3c;
-  --color-error-dark: #c0392b;
-}
-
 .home-container {
   width: 100%;
   background: var(--color-background-white);
@@ -135,7 +120,7 @@
 }
 
 .form-group label {
-  color: var(--color-text-white);
+  color: var(--color-white);
   font-size: 14px;
   font-weight: 500;
 }
@@ -227,7 +212,7 @@ hr {
   align-items: center;
   gap: 8px;
   white-space: nowrap;
-  color: var(--color-text-white);
+  color: var(--color-white);
 }
 
 .now-toggle input[type="checkbox"] {
