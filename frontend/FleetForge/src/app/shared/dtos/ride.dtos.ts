@@ -29,3 +29,10 @@ export interface GeoPoint{
 export interface RideCreateResponseDTO{
     created:boolean;
 }
+
+export interface RideFavoriteRoutesDTO{
+    id:number;
+    startAddress:string;
+    endAddress:string;
+    waypoints:WayPointDTO[];
+}

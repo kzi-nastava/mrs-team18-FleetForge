@@ -1,6 +1,7 @@
 package com.team18.FleetForge.model.users;
 
 import com.team18.FleetForge.model.Route;
+import com.team18.FleetForge.model.ride.Ride;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
@@ -19,5 +20,5 @@ import java.util.List;
 public class Passenger extends User {
     //todo remove later
     @Transient
-    private List<Route> favoriteRoutes;
+    private List<Ride> favoriteRoutes;
 }

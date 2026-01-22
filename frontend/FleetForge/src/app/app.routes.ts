@@ -22,6 +22,8 @@ import { CurrentRideComponent } from './passenger/current-ride/current-ride.comp
 
 import { authGuard, guestGuard, roleGuard } from './auth/guard/auth-guard';
 import { homeRedirectGuard } from './auth/guard/home-redirect-guard';
+import { PassengerHistoryComponent } from './passenger/passenger-history/passenger-history.component';
+import { PassengerFavoriteRoutesComponent } from './passenger/passenger-favorite-routes/passenger-favorite-routes.component';
 
 export const routes: Routes = [
   /** ROUTES WITH NAVBAR */
@@ -51,6 +53,16 @@ export const routes: Routes = [
       { 
         path: 'passenger/current-ride', 
         component: CurrentRideComponent,
+        canActivate: [authGuard, roleGuard(['PASSENGER'])]
+      },
+      {
+        path: 'passenger/ride-history', 
+        component: PassengerHistoryComponent,
+        canActivate: [authGuard, roleGuard(['PASSENGER'])]
+      },
+      {
+        path: 'passenger/favourite-rides', 
+        component: PassengerFavoriteRoutesComponent,
         canActivate: [authGuard, roleGuard(['PASSENGER'])]
       },
       
