@@ -231,11 +231,17 @@ public class RideServiceImpl implements RideService {
         Passenger passenger = (Passenger) authentication.getPrincipal();
         ride.setPassenger(passenger);
         ride.setStatus(RideStatus.PENDING);
-        Driver driver=driverService.findAvailableDriver(ride);
-        if(driver==null&&rideCreateRequestDTO.isRideNow()){
-            return null;
+        if(rideCreateRequestDTO.isRideNow()) {
+            Driver driver = driverService.findAvailableDriver(ride);
+            if (driver == null) {
+                return null;
+            }
+            ride.setDriver(driver);
+        }else{
+            if(!driverService.checkAlreadyBookedDateTime(ride)){
+                return null;
+            }
         }
-        ride.setDriver(driver);
         rideRepository.save(ride);
         return ride;
     }
