@@ -18,5 +18,4 @@ public class RideReviewResponseDTO {
     private Integer driverRating;
     private String comment;
     private LocalDateTime reviewedAt;
-    private String message;
 }
