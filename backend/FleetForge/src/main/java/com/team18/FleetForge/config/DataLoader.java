@@ -10,10 +10,7 @@ import com.team18.FleetForge.model.ride.Ride;
 import com.team18.FleetForge.model.users.Admin;
 import com.team18.FleetForge.model.users.Driver;
 import com.team18.FleetForge.model.users.Passenger;
-import com.team18.FleetForge.repository.DriverRepository;
-import com.team18.FleetForge.repository.PassengerRepository;
-import com.team18.FleetForge.repository.RideRepository;
-import com.team18.FleetForge.repository.UserRepository;
+import com.team18.FleetForge.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -149,8 +146,8 @@ public class DataLoader implements CommandLineRunner {
                 driver1, passenger1,
                 new GeoPoint(45.2550, 19.8450), "Bulevar oslobođenja 46, Novi Sad",
                 new GeoPoint(45.2671, 19.8335), "Trg slobode 1, Novi Sad",
-                LocalDateTime.now().minusDays(30).withHour(14).withMinute(30),
-                LocalDateTime.now().minusDays(30).withHour(14).withMinute(50),
+                LocalDateTime.now().minusDays(1).withHour(12).withMinute(30),
+                LocalDateTime.now().minusDays(1).withHour(12).withMinute(50),
                 5.2, 20.0, 850.0,
                 RideStatus.COMPLETED, false, null, null
         );
