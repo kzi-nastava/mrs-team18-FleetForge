@@ -9,5 +9,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FavoriteRoutePostDeleteRequestDTO {
-    Route route;
+    private Long rideId;
 }

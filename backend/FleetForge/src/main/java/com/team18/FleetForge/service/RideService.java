@@ -21,4 +21,6 @@ public interface RideService {
     DriverRideHistoryDTO getCurrentActiveRide(Long driverId);
 
     Ride createRide(RideCreateRequestDTO rideCreateRequestDTO);
+
+    Ride getRideById(Long rideId);
 }
