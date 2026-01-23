@@ -2,9 +2,6 @@ package com.team18.FleetForge.controller;
 
 import com.team18.FleetForge.dto.ride.lifecycle.*;
 
-import com.team18.FleetForge.dto.ride.routes.FavoriteRouteGetResponseDTO;
-import com.team18.FleetForge.dto.ride.routes.FavoriteRoutePostDeleteRequestDTO;
-import com.team18.FleetForge.dto.ride.routes.FavoriteRoutePostDeleteResponseDTO;
 import com.team18.FleetForge.dto.ride.review.RideReviewRequestDTO;
 import com.team18.FleetForge.dto.ride.review.RideReviewResponseDTO;
 import com.team18.FleetForge.model.GeoPoint;
@@ -137,61 +134,7 @@ public class RideController {
 //
 //SecurityContextHolder.getContext().setAuthentication(authentication);
 
-    @GetMapping("/favorites")
-    public ResponseEntity<FavoriteRouteGetResponseDTO> getFavouriteRoutes(Principal principal) {
-        //trazim rute iz passengera a njega iz principal/authentication-a
-//principal.getId ili slicno
 
-        ArrayList<Route> routes = new ArrayList<>();
-        Route route = new Route();
-        Route route2 = new Route();
-        GeoPoint g1=new GeoPoint(45.2671, 19.8335);
-        GeoPoint g2=new GeoPoint(45.2671, 19.8335);
-        route.setGeometry(new ArrayList<GeoPoint>());
-        route.getGeometry().add(g1);
-        route.getGeometry().add(g2);
-        route.setDistanceMeters(2500);
-        route.setDurationSeconds(25000);
-        route.setId(1L);
-
-        GeoPoint g3=new GeoPoint(45.2671, 19.8335);
-        GeoPoint g4=new GeoPoint(45.2671, 19.8335);
-        route2.setGeometry(new ArrayList<>());
-        route2.getGeometry().add(g3);
-        route2.getGeometry().add(g4);
-        route2.setDistanceMeters(3000);
-        route2.setDurationSeconds(30000);
-        route2.setId(2L);
-        routes.add(route);
-        routes.add(route2);
-
-
-
-        FavoriteRouteGetResponseDTO responseDTO=new FavoriteRouteGetResponseDTO();
-        responseDTO.setRoutes(routes);
-
-        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
-    }
-
-    @PostMapping("/favorites")
-    public ResponseEntity<FavoriteRoutePostDeleteRequestDTO> addFavoriteRoute(@RequestBody FavoriteRoutePostDeleteRequestDTO request) {
-
-        //naci putnika preko principal/authenticationa i dodati mu rutu iz request u listu omiljenih
-        FavoriteRoutePostDeleteRequestDTO responseDTO = new FavoriteRoutePostDeleteRequestDTO();
-        responseDTO.setRoute(new Route());
-        responseDTO.setRoute(request.getRoute());
-        return  new ResponseEntity<>(responseDTO, HttpStatus.OK);
-    }
-
-    @DeleteMapping("/favorites/{routeId}")
-    public ResponseEntity<FavoriteRoutePostDeleteResponseDTO> deleteFavoriteRoute(@PathVariable Long routeId) {
-        //naci rutu preko id-a iz passengera ciji su podaci sacuvani jer je ulogovan
-        Route route = new Route();
-        route.setId(routeId);
-        FavoriteRoutePostDeleteResponseDTO responseDTO = new FavoriteRoutePostDeleteResponseDTO();
-        responseDTO.setRoute(route);
-        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
-    }
     /**
      * PUT /api/rides/{rideId}/complete
      * Response:

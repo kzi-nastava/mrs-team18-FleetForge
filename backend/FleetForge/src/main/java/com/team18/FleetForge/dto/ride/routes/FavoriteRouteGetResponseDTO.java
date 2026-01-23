@@ -1,15 +1,20 @@
 package com.team18.FleetForge.dto.ride.routes;
 
 import com.team18.FleetForge.model.Route;
+import com.team18.FleetForge.model.ride.WayPoint;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class FavoriteRouteGetResponseDTO {
-    ArrayList<Route> routes;
+    private Long id;
+    private String startAddress;
+    private String endAddress;
+    private List<WayPoint> waypoints;
 }

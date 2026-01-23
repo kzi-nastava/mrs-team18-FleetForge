@@ -246,4 +246,9 @@ public class RideServiceImpl implements RideService {
         return ride;
     }
 
+    @Override
+    public Ride getRideById(Long rideId) {
+        return rideRepository.getRideById(rideId);
+    }
+
 }
