@@ -31,7 +31,7 @@ export const SIDEBAR_MENU_CONFIG: Record<UserRole, SidebarMenuItem[]> = {
     },
     {
       label: 'Favourite Rides',
-      icon: '★', // star icon
+      icon: '❤️', // heart icon
       path: '/passenger/favourite-rides'
     },
     {

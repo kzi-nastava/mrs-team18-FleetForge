@@ -1,0 +1,57 @@
+<div class="passenger-dashboard">
+    <div class="header-section">
+        <h2 class="dashboard-title">Favorite routes</h2>
+    </div>
+
+    <div class="rides-section">
+
+        <div class="table-container">
+            <table class="rides-table">
+                <thead>
+                    <tr>
+                        <th class="col-fixed ">Start address</th>
+                        <th class="col-fluid ">Waypoints</th>
+                        <th class="col-fixed ">End address</th>
+                        <th class="col-action ">Ride again</th>
+                        <th class="col-action ">Remove</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let route of routes()">
+                        <td class="col-fixed">
+                            <div class="address-box first-address">{{ route.startAddress }}</div>
+                        </td>
+
+                        <td class="col-fluid">
+                            <div class="waypoints-scroll-container">
+                                @for(point of route.waypoints; track $index) {
+                                    <div class="waypoint-chip">
+                                        <span class="dot">📍</span>
+                                        {{ point.address }}
+                                    </div>
+                                }
+                                @if(route.waypoints.length === 0) {
+                                    <span class="no-waypoints">Direct ride</span>
+                                }
+                            </div>
+                        </td>
+
+                        <td class="col-fixed">
+                            <div class="address-box last-address">{{ route.endAddress }}</div>
+                        </td>
+                        <td class="col-action">
+                            <button type="button" class="action-btn btnRideAgain" (click)="rideAgain(route)">
+                                Ride again
+                            </button>
+                        </td>
+                        <td class="col-action">
+                            <button type="button" class="action-btn btnRemove" (click)="remove(route)">
+                                Remove
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

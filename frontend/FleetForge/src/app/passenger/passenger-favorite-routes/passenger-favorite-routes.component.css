@@ -1,0 +1,161 @@
+.passenger-dashboard {
+	padding: 24px;
+	background-color: var(--color-background-gray);
+	min-height: 100vh;
+	font-family: var(--font-primary);
+}
+
+.header-section {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 32px;
+}
+
+.dashboard-title {
+	font-size: 32px;
+	font-weight: 700;
+	color: var(--color-primary);
+	margin: 0;
+}
+
+
+
+.rides-section {
+	background: var(--color-background-white);
+	border-radius: 12px;
+	padding: 24px;
+}
+
+
+
+.table-container {
+	overflow-x: auto;
+	background: var(--color-background-white);
+	border-radius: 8px;
+	border: 1px solid var(--color-border);
+}
+
+.rides-table {
+	width: 100%;
+	border-collapse: collapse;
+	table-layout: fixed;
+}
+
+.rides-table thead {
+	background-color: var(--color-background-gray);
+}
+
+.rides-table th {
+	padding: 16px;
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--color-secondary);
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	border-bottom: 2px solid var(--color-border);
+}
+
+.rides-table td {
+	padding: 12px 16px;
+	vertical-align: middle;
+	border-bottom: 1px solid var(--color-border);
+	font-size: 14px;
+	color: var(--color-secondary-dark);
+}
+
+.rides-table tbody tr:hover {
+	background-color: var(--color-background-gray);
+}
+
+.col-fixed {
+	width: 20%;
+    text-align: center;
+}
+
+.col-action {
+	width: 10%;
+    text-align: center;
+}
+
+.col-fluid {
+	width: auto;
+	overflow: hidden;
+    text-align: center;
+}
+
+
+
+.address-box {
+	font-weight: 500;
+	color: var(--color-secondary-dark);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.waypoints-scroll-container {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+    width: fit-content;
+    max-width: 100%;
+    margin: 0 auto;
+	overflow-x: auto;
+	padding: 2px 0;
+	scrollbar-width: thin;
+}
+
+.waypoints-scroll-container::-webkit-scrollbar {
+	display: none;
+}
+
+.waypoint-chip {
+	flex: 0 0 auto;
+	background: var(--color-background-white);
+	color: var(--color-secondary);
+	padding: 6px 12px;
+	border-radius: 16px;
+	font-size: 13px;
+	white-space: nowrap;
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	border: 1px solid var(--color-border);
+}
+
+.dot {
+	font-size: 10px;
+}
+
+
+
+.no-waypoints {
+	color: var(--color-text-gray);
+	font-style: italic;
+	font-size: 13px;
+}
+
+.action-btn {
+	border: 1px solid var(--color-primary);
+	border-radius: 6px;
+	background: var(--color-background-white);
+	padding: 6px 12px;
+	font-size: 13px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.action-btn:hover {
+	background-color: var(--color-background-gray);
+}
+
+.btnRemove {
+    color: var(--color-red);
+    border-color: var(--color-red);
+}
+.btnRideAgain {
+    color: var(--color-primary);
+}
