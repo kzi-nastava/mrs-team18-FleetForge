@@ -235,41 +235,6 @@ public class RideController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    /**
-     * POST /api/rides/{rideId}/review
-     * Request Body:
-     *  - vehicleRating (Integer, 1-5, required)
-     *  - driverRating (Integer, 1-5, required)
-     *  - comment (String, optional, max 500 chars)
-     * Response:
-     *  - rideId (Long)
-     *  - vehicleRating (Integer)
-     *  - driverRating (Integer)
-     *  - comment (String)
-     *  - reviewedAt (LocalDateTime)
-     *  - message (String)
-     */
-    @PostMapping(
-            value = "/{rideId}/review",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    public ResponseEntity<RideReviewResponseDTO> submitReview(
-            @PathVariable Long rideId,
-            @Valid @RequestBody RideReviewRequestDTO request) {
-
-        // Dummy review response
-        RideReviewResponseDTO response = RideReviewResponseDTO.builder()
-                .rideId(rideId)
-                .vehicleRating(request.getVehicleRating())
-                .driverRating(request.getDriverRating())
-                .comment(request.getComment())
-                .reviewedAt(LocalDateTime.now())
-                .message("Review submitted successfully. Thank you for your feedback!")
-                .build();
-
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
-    }
     @PutMapping("/{id}/start")
     public ResponseEntity<RideStartResponseDTO> startRide(@PathVariable Long id) {
         RideStartResponseDTO responseDTO = new RideStartResponseDTO();
