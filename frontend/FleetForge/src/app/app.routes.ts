@@ -18,13 +18,14 @@ import { PasswordSetComponent } from './driver/password-set/password-set.compone
 import { RegisterDriverComponent } from './admin/register-driver/register-driver.component';
 import { ActivateAccountComponent } from './auth/activate-account/activate-account.component';
 import { PassengerHomeComponent } from './passenger/passenger-home/passenger-home.component';
-import { CurrentRideComponent } from './passenger/current-ride/current-ride.component';
+import { CurrentRidePassengerComponent } from './passenger/current-ride-passenger/current-ride-passenger.component';
 
 import { authGuard, guestGuard, roleGuard } from './auth/guard/auth-guard';
 import { homeRedirectGuard } from './auth/guard/home-redirect-guard';
 import { PassengerHistoryComponent } from './passenger/passenger-history/passenger-history.component';
 import { PassengerFavoriteRoutesComponent } from './passenger/passenger-favorite-routes/passenger-favorite-routes.component';
 import { PassengerDashboardComponent } from './passenger/dashboard/dashboard.component';
+import { CurrentRideDriverComponent } from './driver/current-ride-driver/current-ride-driver.component';
 
 export const routes: Routes = [
   /** ROUTES WITH NAVBAR */
@@ -32,83 +33,88 @@ export const routes: Routes = [
     path: '',
     component: MainLayoutComponent,
     children: [
-      // Home page - accessible by everyone (no guard)            
+      // Home page - accessible by everyone (no guard)
       {
         path: '',
         component: HomeComponent,
         canActivate: [homeRedirectGuard]
       },
 
-      
+
       // Passenger routes - require authentication and PASSENGER role
-      { 
-        path: 'profile-passenger', 
+      {
+        path: 'profile-passenger',
         component: PassengerProfileComponent,
         canActivate: [authGuard, roleGuard(['PASSENGER'])]
       },
-      { 
-        path: 'passenger/passenger-home', 
+      {
+        path: 'passenger/passenger-home',
         component: PassengerHomeComponent,
         canActivate: [authGuard, roleGuard(['PASSENGER'])]
       },
-      { 
-        path: 'passenger/current-ride', 
-        component: CurrentRideComponent,
+      {
+        path: 'passenger/current-ride',
+        component: CurrentRidePassengerComponent,
         canActivate: [authGuard, roleGuard(['PASSENGER'])]
       },
       {
-        path: 'passenger/ride-history', 
+        path: 'passenger/ride-history',
         component: PassengerHistoryComponent,
         canActivate: [authGuard, roleGuard(['PASSENGER'])]
       },
       {
-        path: 'passenger/favourite-rides', 
+        path: 'passenger/favourite-rides',
         component: PassengerFavoriteRoutesComponent,
         canActivate: [authGuard, roleGuard(['PASSENGER'])]
       },
       {
-        path: 'passenger/dashboard', 
+        path: 'passenger/dashboard',
         component: PassengerDashboardComponent,
         canActivate: [authGuard, roleGuard(['PASSENGER'])]
       },
-      
+
       // Admin routes - require authentication and ADMIN role
-      { 
-        path: 'profile-admin', 
+      {
+        path: 'profile-admin',
         component: AdminProfileComponent,
         canActivate: [authGuard, roleGuard(['ADMIN'])]
       },
-      { 
-        path: 'admin/driver-changes', 
+      {
+        path: 'admin/driver-changes',
         component: DriverProfileChangesComponent,
         canActivate: [authGuard, roleGuard(['ADMIN'])]
       },
-      { 
-        path: 'admin/register-new-driver', 
+      {
+        path: 'admin/register-new-driver',
         component: RegisterDriverComponent,
         canActivate: [authGuard, roleGuard(['ADMIN'])]
       },
-      
+
       // Driver routes - require authentication and DRIVER role
-      { 
-        path: 'profile-driver', 
+      {
+        path: 'profile-driver',
         component: DriverProfileComponent,
         canActivate: [authGuard, roleGuard(['DRIVER'])]
       },
-      { 
-        path: 'driver/ride-history', 
+      {
+        path : 'driver/current-ride',
+        component: CurrentRideDriverComponent,
+        canActivate: [authGuard, roleGuard(['DRIVER'])]
+      },
+      {
+        path: 'driver/ride-history',
         component: DriverHistoryComponent,
         canActivate: [authGuard, roleGuard(['DRIVER'])]
       },
-      { 
-        path: 'set-password', 
+      {
+        path: 'set-password',
         component: PasswordSetComponent,
         canActivate: [authGuard, roleGuard(['DRIVER'])]
       },
-      
+
       // Password reset - accessible by all authenticated users
-      { 
-        path: 'profile-password-reset', 
+      {
+        path: 'profile-password-reset',
         component: PasswordResetComponent,
         canActivate: [authGuard]
       }
@@ -120,28 +126,28 @@ export const routes: Routes = [
     path: '',
     component: AuthLayoutComponent,
     children: [
-      { 
-        path: 'login', 
+      {
+        path: 'login',
         component: LoginComponent,
         canActivate: [guestGuard]
       },
-      { 
-        path: 'register', 
+      {
+        path: 'register',
         component: RegisterComponent,
         canActivate: [guestGuard]
       },
-      { 
-        path: 'forgot-password', 
+      {
+        path: 'forgot-password',
         component: ForgotPasswordComponent,
         canActivate: [guestGuard]
       },
-      { 
-        path: 'reset-password', 
+      {
+        path: 'reset-password',
         component: ResetPasswordComponent
         // No guard - token-based access
       },
-      { 
-        path: 'activate-account', 
+      {
+        path: 'activate-account',
         component: ActivateAccountComponent
         // No guard - token-based access
       }
