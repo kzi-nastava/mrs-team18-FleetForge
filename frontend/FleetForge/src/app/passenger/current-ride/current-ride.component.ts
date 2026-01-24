@@ -27,22 +27,191 @@ export class CurrentRideComponent implements OnInit, OnDestroy {
   
   ngOnInit(): void {
     this.loadMockData();
-    this.startLocationTracking();
+    this.resolveSimulationFlow();
   }
 
   ngOnDestroy(): void {
-    if (this.locationUpdateInterval) {
-      clearInterval(this.locationUpdateInterval);
+    clearInterval(this.locationUpdateInterval);
+  }
+
+  /* ------------------------------------------------------------------
+   *  STATE HELPERS 
+   * ------------------------------------------------------------------ */
+
+  hasDriver(): boolean {
+    return !!this.rideData?.driver;
+  }
+
+  isAccepted(): boolean {
+    return this.rideData?.status === 'ACCEPTED';
+  }
+
+  isInProgress(): boolean {
+    return this.rideData?.status === 'IN_PROGRESS';
+  }
+
+  isCompleted(): boolean {
+    return this.rideData?.status === 'COMPLETED';
+  }
+
+  getRideSubtitle(): string {
+    if (!this.rideData) return '';
+
+    if (this.isAccepted() && !this.hasDriver()) {
+      return 'We will assign you a driver in a moment';
+    }
+
+    if (this.isAccepted() && this.hasDriver()) {
+      return 'Driver is coming to your pickup location';
+    }
+
+    if (this.isInProgress()) {
+      return 'Enjoy your ride — live tracking enabled';
+    }
+
+    if (this.isCompleted()) {
+      return 'Ride completed';
+    }
+
+    return '';
+  }
+
+  /* ------------------------------------------------------------------
+   *  SIMULATION ORCHESTRATION
+   * ------------------------------------------------------------------ */
+
+  private resolveSimulationFlow(): void {
+    if (!this.rideData) return;
+
+    if (this.isAccepted() && this.hasDriver()) {
+      this.startDriverToPickupSimulation();
+    }
+
+    if (this.isInProgress()) {
+      this.startRideSimulation();
     }
   }
+
+  /* ------------------------------------------------------------------
+   *  PHASE 1: DRIVER → PICKUP
+   * ------------------------------------------------------------------ */
+ 
+
+  private startDriverToPickupSimulation(): void {
+    this.currentCoordinateIndex = 0;
+
+    this.locationUpdateInterval = setInterval(() => {
+      if (!this.rideData || this.routeCoordinates.length === 0) return;
+
+      const targetIndex = Math.min(
+        this.currentCoordinateIndex + 5, 
+        this.routeCoordinates.length - 1
+      );
+
+      const coord = this.routeCoordinates[targetIndex];
+      this.rideData.currentLocation.latitude = coord.latitude;
+      this.rideData.currentLocation.longitude = coord.longitude;
+      
+      this.mapComponent?.updateCurrentLocation(this.rideData.currentLocation);
+      this.currentCoordinateIndex = targetIndex;
+
+      if (this.currentCoordinateIndex >= this.routeCoordinates.length - 1) {
+        clearInterval(this.locationUpdateInterval);
+
+        // 3 seconds for passengers to enter the vechile 
+        setTimeout(() => {
+          if (!this.rideData) return;
+
+          this.rideData.status = 'IN_PROGRESS';
+          this.currentCoordinateIndex = 0;
+          this.startRideSimulation();
+        }, 3000);
+      }
+    }, 1000); 
+  }
+
+  /* ------------------------------------------------------------------
+   *  PHASE 2: RIDE IN PROGRESS
+   * ------------------------------------------------------------------ */
+
+  private startRideSimulation(): void {
+    this.startLocationTracking();
+  }
+
+  private startLocationTracking(): void {
+    const waypointThreshold = 0.0005;
+
+    this.locationUpdateInterval = setInterval(() => {
+      if (!this.rideData || this.routeCoordinates.length === 0) return;
+
+      const targetIndex = Math.min(
+        this.currentCoordinateIndex + 5,
+        this.routeCoordinates.length - 1
+      );
+
+      if (this.currentCoordinateIndex < this.routeCoordinates.length - 1) {
+        const coord = this.routeCoordinates[targetIndex];
+
+        this.rideData.currentLocation.latitude = coord.latitude;
+        this.rideData.currentLocation.longitude = coord.longitude;
+
+        this.rideData.route.waypoints.forEach(wp => {
+          if (!wp.isCompleted) {
+            const latDiff = Math.abs(coord.latitude - wp.location.latitude);
+            const lngDiff = Math.abs(coord.longitude - wp.location.longitude);
+
+            if (latDiff < waypointThreshold && lngDiff < waypointThreshold) {
+              wp.isCompleted = true;
+            }
+          }
+        });
+
+        this.mapComponent?.updateCurrentLocation(this.rideData.currentLocation);
+        this.currentCoordinateIndex = targetIndex;
+      } else {
+        clearInterval(this.locationUpdateInterval);
+
+        // 3 seconds for driver to click end button 
+        setTimeout(() => {
+          if (!this.rideData) return;
+          this.rideData.status = 'COMPLETED';
+        }, 3000);
+      }
+    }, 2000);
+  }
+
+  /* ------------------------------------------------------------------
+   *  MAP CALLBACKS
+   * ------------------------------------------------------------------ */
+
+  onRouteCalculated(routeInfo: { distanceKm: number; estimatedMinutes: number }): void {
+    this.calculatedDistance = routeInfo.distanceKm;
+    this.calculatedTime = routeInfo.estimatedMinutes;
+
+    if (this.rideData) {
+      this.rideData.route.totalDistanceKm = routeInfo.distanceKm;
+      this.rideData.estimatedArrivalMinutes = routeInfo.estimatedMinutes;
+    }
+  }
+
+  onRouteCoordinatesReceived(
+    coordinates: Array<{ latitude: number; longitude: number }>
+  ): void {
+    this.routeCoordinates = coordinates;
+    this.currentCoordinateIndex = 0;
+  }
+
+  /* ------------------------------------------------------------------
+   *  MOCK DATA
+   * ------------------------------------------------------------------ */
 
   loadMockData(): void {
     this.rideData = {
       rideId: 1,
-      status: 'IN_PROGRESS',
+      status: 'ACCEPTED',
       currentLocation: {
-        latitude: 45.2454,
-        longitude: 19.8367
+        latitude: 45.26,
+        longitude: 19.84
       },
       estimatedArrivalMinutes: 8,
       route: {
@@ -74,73 +243,15 @@ export class CurrentRideComponent implements OnInit, OnDestroy {
         firstName: 'John',
         lastName: 'Doe',
         phoneNumber: '+381 69 123 4567',
-        profileImage: '../../../../public/profile.svg'
+        profileImage: 'default.png',
       },
       panicActivated: false
     };
   }
 
-  onRouteCalculated(routeInfo: {distanceKm: number, estimatedMinutes: number}): void {
-    this.calculatedDistance = routeInfo.distanceKm;
-    this.calculatedTime = routeInfo.estimatedMinutes;
-    
-    if (this.rideData) {
-      this.rideData.route.totalDistanceKm = routeInfo.distanceKm;
-      this.rideData.estimatedArrivalMinutes = routeInfo.estimatedMinutes;
-    }
-  }
-
-  onRouteCoordinatesReceived(coordinates: Array<{latitude: number, longitude: number}>): void {
-    this.routeCoordinates = coordinates;
-    this.currentCoordinateIndex = 0;
-  }
-
-  private startLocationTracking(): void {
-    const waypointThreshold = 0.0005;
-    
-    this.locationUpdateInterval = setInterval(() => {
-      if (!this.rideData || this.routeCoordinates.length === 0) {
-        return;
-      }
-
-      const coordinatesPerUpdate = 5;
-      const targetIndex = Math.min(
-        this.currentCoordinateIndex + coordinatesPerUpdate,
-        this.routeCoordinates.length - 1
-      );
-
-      if (this.currentCoordinateIndex < this.routeCoordinates.length - 1) {
-        const coord = this.routeCoordinates[targetIndex];
-        
-        this.rideData.currentLocation.latitude = coord.latitude;
-        this.rideData.currentLocation.longitude = coord.longitude;
-
-        this.rideData.route.waypoints.forEach(waypoint => {
-          if (!waypoint.isCompleted) {
-            const latDiff = Math.abs(coord.latitude - waypoint.location.latitude);
-            const lngDiff = Math.abs(coord.longitude - waypoint.location.longitude);
-            
-            if (latDiff < waypointThreshold && lngDiff < waypointThreshold) {
-              waypoint.isCompleted = true;
-              console.log(`Waypoint reached: ${waypoint.address}`);
-            }
-          }
-        });
-
-        if (this.mapComponent) {
-          this.mapComponent.updateCurrentLocation(this.rideData.currentLocation);
-        }
-
-        this.currentCoordinateIndex = targetIndex;
-      } else {
-        if (this.locationUpdateInterval) {
-          clearInterval(this.locationUpdateInterval);
-        }
-        console.log('Ride completed!');
-      }
-    }, 2000);
-  }
-
+  /* ------------------------------------------------------------------
+   *  ACTIONS
+   * ------------------------------------------------------------------ */
   getDriverRating(): number {
     // TODO: Fetch real driver rating from API
     return 3.0;
@@ -157,19 +268,7 @@ export class CurrentRideComponent implements OnInit, OnDestroy {
   }
 
   onSubmitWrongWayReport(): void {
-    if (!this.wrongWayReport.trim()) {
-      alert('Please enter a report before submitting.');
-      return;
-    }
-
-    const reportData = {
-      rideId: this.rideData?.rideId,
-      report: this.wrongWayReport,
-      currentLocation: this.rideData?.currentLocation
-    };
-
-    console.log('Wrong way report submitted:', reportData);
-    alert('Report submitted successfully!');
+    if (!this.wrongWayReport.trim()) return;
     this.onCloseWrongWayModal();
   }
 

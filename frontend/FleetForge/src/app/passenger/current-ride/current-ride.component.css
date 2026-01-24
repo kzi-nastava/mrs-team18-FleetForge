@@ -28,6 +28,12 @@
   margin: 0 0 0.5rem 0;
 }
 
+.ride-subtitle {
+  margin-top: 0.25rem;
+  font-size: 0.95rem;
+  color: var(--color-text-gray);
+}
+
 /* Driver Card */
 .driver-card {
   background: var(--color-background-white);

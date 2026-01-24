@@ -2,7 +2,10 @@
   <div class="content-wrapper">
     <!-- Left Section: Ride Details -->
     <div class="ride-details-section">
-      <h1 class="page-title">Current Ride</h1>
+      <div>
+        <h1 class="page-title">Current Ride</h1>
+        <p class="ride-subtitle">{{ getRideSubtitle() }}</p>
+      </div>
 
       <!-- Driver Card -->
       <div class="driver-card">
@@ -13,7 +16,6 @@
           <span class="driver-label">Driver</span>
           <h3 class="driver-name">{{ rideData.driver.firstName }} {{ rideData.driver.lastName }}</h3>
           <div class="driver-rating">
-            <span class="rating-value">{{ getDriverRating() }}</span>
             <span class="rating-star">★</span>
           </div>
           <div class="driver-phone">{{ rideData.driver.phoneNumber }}</div>
@@ -57,9 +59,10 @@
       <div class="arrival-info">
         <div class="car-icon">
           <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-            <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.85 7h10.29l1.08 3.11H5.77L6.85 7zM19 17H5v-5h14v5z"/>
-            <circle cx="7.5" cy="14.5" r="1.5"/>
-            <circle cx="16.5" cy="14.5" r="1.5"/>
+            <path
+              d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.85 7h10.29l1.08 3.11H5.77L6.85 7zM19 17H5v-5h14v5z" />
+            <circle cx="7.5" cy="14.5" r="1.5" />
+            <circle cx="16.5" cy="14.5" r="1.5" />
           </svg>
         </div>
         <div class="arrival-meta">
@@ -75,7 +78,7 @@
       </div>
 
       <!-- Action Buttons -->
-      <div class="action-buttons">
+      <div class="action-buttons" *ngIf="isInProgress()">
         <button class="btn wrong-way-btn" (click)="onWrongWay()">Wrong way</button>
         <button class="btn sos-btn" (click)="onSOS()">SOS</button>
       </div>
@@ -83,9 +86,7 @@
 
     <!-- Right Section: Map -->
     <div class="map-section">
-      <app-map 
-        [currentRide]="rideData"
-        (routeCalculated)="onRouteCalculated($event)"
+      <app-map [currentRide]="rideData" (routeCalculated)="onRouteCalculated($event)"
         (routeCoordinatesAvailable)="onRouteCoordinatesReceived($event)">
       </app-map>
     </div>
@@ -99,23 +100,20 @@
       <h2 class="modal-title">Report Issue</h2>
       <button class="modal-close-btn" (click)="onCloseWrongWayModal()">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" />
         </svg>
       </button>
     </div>
-    
+
     <div class="modal-body">
       <label class="form-label">Describe the driver inconsistency:</label>
-      <textarea 
-        class="form-textarea"
-        [(ngModel)]="wrongWayReport"
-        placeholder="Please provide details about the issue (e.g., wrong route, unsafe driving, etc.)"
-        rows="6"
-        maxlength="500"
-      ></textarea>
+      <textarea class="form-textarea" [(ngModel)]="wrongWayReport"
+        placeholder="Please provide details about the issue (e.g., wrong route, unsafe driving, etc.)" rows="6"
+        maxlength="500"></textarea>
       <div class="char-counter">{{ wrongWayReport.length }}/500</div>
     </div>
-    
+
     <div class="modal-footer">
       <button class="btn-secondary" (click)="onCloseWrongWayModal()">Close</button>
       <button class="btn-primary" (click)="onSubmitWrongWayReport()">Submit Report</button>
