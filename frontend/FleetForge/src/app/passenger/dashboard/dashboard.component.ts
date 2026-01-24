@@ -35,7 +35,7 @@ export class PassengerDashboardComponent implements OnInit {
 
   favoriteRoutes = [
     {
-      name: 'Home → Work',
+      name: 'Home to Work',
       vehicleType: 'Standard Vehicle'
     },
     {

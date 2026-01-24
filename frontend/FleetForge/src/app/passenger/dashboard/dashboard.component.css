@@ -92,15 +92,6 @@
   color: var(--color-text-gray);
 }
 
-.ride-status {
-  font-size: 10px;
-  font-weight: 700;
-  background: #eff6ff;
-  color: #1d4ed8;
-  padding: 2px 6px;
-  border-radius: 4px;
-}
-
 .ride-route {
   font-size: 14px;
   font-weight: 500;
@@ -112,24 +103,6 @@
   margin: 0 6px;
 }
 
-.favorite-route {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: var(--color-background-gray);
-  border: 1px solid var(--color-border);
-  padding: 12px;
-  border-radius: 8px;
-  cursor: pointer;
-  margin-bottom: 8px;
-  transition: background 0.2s;
-}
-
-.favorite-route:hover {
-  background: var(--color-background-white);
-}
-
 .route-name {
   font-size: 14px;
   font-weight: 600;
@@ -138,13 +111,6 @@
 .route-type {
   font-size: 12px;
   color: var(--color-text-gray);
-}
-
-.hint-text {
-  font-size: 12px;
-  color: var(--color-text-gray);
-  text-align: center;
-  margin-top: 12px;
 }
 
 .passenger-dashboard {
@@ -170,4 +136,75 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
+}
+
+.card-subtitle {
+  font-size: 12px;
+  color: var(--color-text-gray);
+}
+
+.hint-link {
+  display: block;
+  font-size: 12px;
+  color: var(--color-primary);
+  text-align: center;
+  margin-top: 12px;
+  text-decoration: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.hint-link:hover {
+  text-decoration: underline;
+}
+
+.scheduled-ride {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
+
+.favorite-route-container {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--color-background-white);
+  border: 1px solid var(--color-border);
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.btn-action-small {
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.2s;
+}
+
+.btn-cancel {
+  background-color: var(--color-red);
+  color: var(--color-white);
+}
+
+.btn-order-small {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+}
+
+.btn-action-small:hover {
+  opacity: 0.8;
+}
+
+.favorite-route-info .route-name {
+  font-size: 14px;
+  font-weight: 600;
 }
