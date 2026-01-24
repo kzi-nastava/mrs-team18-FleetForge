@@ -1,25 +1,30 @@
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MapComponent } from '../../shared/map/map';
+import { CurrentRideComponent, ActionButton, CardInfo } from '../../shared/current-ride/current-ride.component';
 import { RideTrackingDTO } from '../../shared/dtos/ride-tracking.dtos';
 
 @Component({
-  selector: 'app-current-ride',
+  selector: 'app-current-ride-passenger',
   standalone: true,
-  imports: [CommonModule, MapComponent, FormsModule],
-  templateUrl: './current-ride.component.html',
-  styleUrls: ['./current-ride.component.css']
+  imports: [CommonModule, CurrentRideComponent, FormsModule],
+  templateUrl: './current-ride-passenger.component.html',
+  styleUrls: ['./current-ride-passenger.component.css']
 })
-export class CurrentRideComponent implements OnInit, OnDestroy {
-  @ViewChild(MapComponent) mapComponent!: MapComponent;
+export class CurrentRidePassengerComponent implements OnInit, OnDestroy {
+  @ViewChild(CurrentRideComponent) currentRideComponent!: CurrentRideComponent;
   
   rideData: RideTrackingDTO | null = null;
-  calculatedDistance: number = 0;
-  calculatedTime: number = 0;
+  cardInfo: CardInfo | null = null;
+  actionButtons: ActionButton[] = [
+    { label: 'Wrong way', color: 'primary', action: 'wrong-way' },
+    { label: 'SOS', color: 'warn', action: 'sos' }
+  ];
+  
   private locationUpdateInterval: any;
   private routeCoordinates: Array<{latitude: number, longitude: number}> = [];
   private currentCoordinateIndex: number = 0;
+  
   showWrongWayModal: boolean = false;
   wrongWayReport: string = '';
   
@@ -76,17 +81,25 @@ export class CurrentRideComponent implements OnInit, OnDestroy {
         phoneNumber: '+381 69 123 4567',
         profileImage: '../../../../public/profile.svg'
       },
-      panicActivated: false
+      panicActivated: false,
+      passenger: {
+        id: 2,
+        firstName: 'Alice',
+        lastName: 'Johnson',
+        phoneNumber: '+381 69 765 4321',
+        profileImage: '../../../../public/profile.svg'
+      }
     };
-  }
 
-  onRouteCalculated(routeInfo: {distanceKm: number, estimatedMinutes: number}): void {
-    this.calculatedDistance = routeInfo.distanceKm;
-    this.calculatedTime = routeInfo.estimatedMinutes;
-    
-    if (this.rideData) {
-      this.rideData.route.totalDistanceKm = routeInfo.distanceKm;
-      this.rideData.estimatedArrivalMinutes = routeInfo.estimatedMinutes;
+    // Set card info from driver data
+    if (this.rideData.driver) {
+      this.cardInfo = {
+        label: 'Driver',
+        name: `${this.rideData.driver.firstName} ${this.rideData.driver.lastName}`,
+        rating: this.getDriverRating(),
+        phoneNumber: this.rideData.driver.phoneNumber,
+        profileImage: this.rideData.driver.profileImage
+      };
     }
   }
 
@@ -127,8 +140,8 @@ export class CurrentRideComponent implements OnInit, OnDestroy {
           }
         });
 
-        if (this.mapComponent) {
-          this.mapComponent.updateCurrentLocation(this.rideData.currentLocation);
+        if (this.currentRideComponent && this.currentRideComponent.mapComponent) {
+          this.currentRideComponent.mapComponent.updateCurrentLocation(this.rideData.currentLocation);
         }
 
         this.currentCoordinateIndex = targetIndex;
@@ -146,7 +159,15 @@ export class CurrentRideComponent implements OnInit, OnDestroy {
     return 3.0;
   }
 
-  onWrongWay(): void {
+  onActionButton(action: string): void {
+    if (action === 'wrong-way') {
+      this.onWrongWay();
+    } else if (action === 'sos') {
+      this.onSOS();
+    }
+  }
+
+  private onWrongWay(): void {
     this.showWrongWayModal = true;
     this.wrongWayReport = '';
   }
@@ -173,7 +194,7 @@ export class CurrentRideComponent implements OnInit, OnDestroy {
     this.onCloseWrongWayModal();
   }
 
-  onSOS(): void {
+  private onSOS(): void {
     // TODO: Implement SOS/panic functionality
     console.log('SOS clicked');
   }
