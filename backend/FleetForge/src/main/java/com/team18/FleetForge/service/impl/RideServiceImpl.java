@@ -5,7 +5,6 @@ import com.team18.FleetForge.dto.driver.DriverRideHistoryDTO;
 import com.team18.FleetForge.dto.ride.lifecycle.RideCreateRequestDTO;
 import com.team18.FleetForge.dto.ride.routes.WayPointDTO;
 import com.team18.FleetForge.dto.ride.view.RideDetailsDTO;
-import com.team18.FleetForge.model.enums.VehicleType;
 import com.team18.FleetForge.model.ride.Ride;
 import com.team18.FleetForge.model.ride.WayPoint;
 import com.team18.FleetForge.model.users.Driver;
@@ -19,13 +18,11 @@ import com.team18.FleetForge.service.PriceCalculationService;
 import com.team18.FleetForge.service.RideService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.naming.AuthenticationException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -230,7 +227,7 @@ public class RideServiceImpl implements RideService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Passenger passenger = (Passenger) authentication.getPrincipal();
         ride.setPassenger(passenger);
-        ride.setStatus(RideStatus.PENDING);
+        ride.setStatus(RideStatus.ACCEPTED);
         if(rideCreateRequestDTO.isRideNow()) {
             Driver driver = driverService.findAvailableDriver(ride);
             if (driver == null) {
