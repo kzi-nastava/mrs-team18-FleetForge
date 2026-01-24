@@ -1,33 +1,34 @@
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MapComponent } from '../../shared/map/map';
+import { CurrentRideComponent, ActionButton, CardInfo } from '../../shared/current-ride/current-ride.component';
 import { RideTrackingDTO } from '../../shared/dtos/ride-tracking.dtos';
 
 @Component({
-  selector: 'app-current-ride',
+  selector: 'app-current-ride-driver',
   standalone: true,
-  imports: [CommonModule, MapComponent, FormsModule],
-  templateUrl: './current-ride.component.html',
-  styleUrls: ['./current-ride.component.css']
+  imports: [CommonModule, CurrentRideComponent, FormsModule],
+  templateUrl: './current-ride-driver.component.html',
+  styleUrls: ['./current-ride-driver.component.css']
 })
-export class CurrentRideComponent implements OnInit, OnDestroy {
-  @ViewChild(MapComponent) mapComponent!: MapComponent;
+export class CurrentRideDriverComponent implements OnInit, OnDestroy {
+  @ViewChild(CurrentRideComponent) currentRideComponent!: CurrentRideComponent;
   
   rideData: RideTrackingDTO | null = null;
-  calculatedDistance: number = 0;
-  calculatedTime: number = 0;
+  cardInfo: CardInfo | null = null;
+  actionButtons: ActionButton[] = [];
+  
   private locationUpdateInterval: any;
   private routeCoordinates: Array<{latitude: number, longitude: number}> = [];
   private currentCoordinateIndex: number = 0;
-  showWrongWayModal: boolean = false;
-  wrongWayReport: string = '';
+  private rideStarted: boolean = false;
+
   
   constructor() {}
   
   ngOnInit(): void {
     this.loadMockData();
-    this.startLocationTracking();
+    this.updateActionButtons();
   }
 
   ngOnDestroy(): void {
@@ -39,7 +40,7 @@ export class CurrentRideComponent implements OnInit, OnDestroy {
   loadMockData(): void {
     this.rideData = {
       rideId: 1,
-      status: 'IN_PROGRESS',
+      status: 'ACCEPTED',
       currentLocation: {
         latitude: 45.2454,
         longitude: 19.8367
@@ -69,30 +70,51 @@ export class CurrentRideComponent implements OnInit, OnDestroy {
         ],
         totalDistanceKm: 2.5
       },
-      driver: {
+      passenger: {
         id: 1,
-        firstName: 'John',
-        lastName: 'Doe',
-        phoneNumber: '+381 69 123 4567',
+        firstName: 'Jane',
+        lastName: 'Smith',
+        phoneNumber: '+381 69 987 6543',
         profileImage: '../../../../public/profile.svg'
       },
+      driver: {
+        id: 2,
+        firstName: 'Bob',
+        lastName: 'Brown',
+        phoneNumber: '+381 69 123 4567',
+        profileImage: '../../../../public/profile.svg'
+        },
       panicActivated: false
     };
-  }
 
-  onRouteCalculated(routeInfo: {distanceKm: number, estimatedMinutes: number}): void {
-    this.calculatedDistance = routeInfo.distanceKm;
-    this.calculatedTime = routeInfo.estimatedMinutes;
-    
-    if (this.rideData) {
-      this.rideData.route.totalDistanceKm = routeInfo.distanceKm;
-      this.rideData.estimatedArrivalMinutes = routeInfo.estimatedMinutes;
+    // Set card info from passenger data
+    if (this.rideData.passenger) {
+      this.cardInfo = {
+        label: 'Passenger',
+        name: `${this.rideData.passenger.firstName} ${this.rideData.passenger.lastName}`,
+        phoneNumber: this.rideData.passenger.phoneNumber,
+        profileImage: this.rideData.passenger.profileImage
+      };
     }
   }
 
   onRouteCoordinatesReceived(coordinates: Array<{latitude: number, longitude: number}>): void {
     this.routeCoordinates = coordinates;
     this.currentCoordinateIndex = 0;
+  }
+
+  private updateActionButtons(): void {
+    if (!this.rideStarted) {
+      this.actionButtons = [
+        { label: 'Start Ride', color: 'success', action: 'start-ride' },
+        { label: 'SOS', color: 'warn', action: 'sos' }
+      ];
+    } else {
+      this.actionButtons = [
+        { label: 'Finish Ride', color: 'primary', action: 'finish-ride' },
+        { label: 'SOS', color: 'warn', action: 'sos' }
+      ];
+    }
   }
 
   private startLocationTracking(): void {
@@ -127,8 +149,8 @@ export class CurrentRideComponent implements OnInit, OnDestroy {
           }
         });
 
-        if (this.mapComponent) {
-          this.mapComponent.updateCurrentLocation(this.rideData.currentLocation);
+        if (this.currentRideComponent && this.currentRideComponent.mapComponent) {
+          this.currentRideComponent.mapComponent.updateCurrentLocation(this.rideData.currentLocation);
         }
 
         this.currentCoordinateIndex = targetIndex;
@@ -136,45 +158,49 @@ export class CurrentRideComponent implements OnInit, OnDestroy {
         if (this.locationUpdateInterval) {
           clearInterval(this.locationUpdateInterval);
         }
-        console.log('Ride completed!');
+        console.log('Destination reached!');
       }
     }, 2000);
   }
 
-  getDriverRating(): number {
-    // TODO: Fetch real driver rating from API
-    return 3.0;
-  }
-
-  onWrongWay(): void {
-    this.showWrongWayModal = true;
-    this.wrongWayReport = '';
-  }
-
-  onCloseWrongWayModal(): void {
-    this.showWrongWayModal = false;
-    this.wrongWayReport = '';
-  }
-
-  onSubmitWrongWayReport(): void {
-    if (!this.wrongWayReport.trim()) {
-      alert('Please enter a report before submitting.');
-      return;
+  onActionButton(action: string): void {
+    if (action === 'start-ride') {
+      this.onStartRide();
+    } else if (action === 'finish-ride') {
+      this.onFinishRide();
+    } else if (action === 'sos') {
+      this.onSOS();
     }
-
-    const reportData = {
-      rideId: this.rideData?.rideId,
-      report: this.wrongWayReport,
-      currentLocation: this.rideData?.currentLocation
-    };
-
-    console.log('Wrong way report submitted:', reportData);
-    alert('Report submitted successfully!');
-    this.onCloseWrongWayModal();
   }
 
-  onSOS(): void {
+  private onStartRide(): void {
+    if (!this.rideStarted && this.routeCoordinates.length > 0) {
+      this.rideStarted = true;
+      if (this.rideData) {
+        this.rideData.status = 'IN_PROGRESS';
+      }
+      this.updateActionButtons();
+      this.startLocationTracking();
+      alert('Ride started - passengers picked up');
+    }
+  }
+
+  private onFinishRide(): void {
+    if (this.rideStarted) {
+      if (this.locationUpdateInterval) {
+        clearInterval(this.locationUpdateInterval);
+      }
+      if (this.rideData) {
+        this.rideData.status = 'COMPLETED';
+      }
+      console.log('Ride finished - destination reached');
+      alert('Ride completed successfully!');
+    }
+  }
+
+  private onSOS(): void {
     // TODO: Implement SOS/panic functionality
     console.log('SOS clicked');
   }
+
 }

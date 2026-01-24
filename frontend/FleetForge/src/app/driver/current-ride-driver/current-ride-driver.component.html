@@ -1,0 +1,12 @@
+<ng-container *ngIf="rideData && cardInfo">
+  <app-current-ride
+    [rideData]="rideData"
+    [cardInfo]="cardInfo"
+    [actionButtons]="actionButtons"
+    [showRating]="false"
+    (routeCoordinatesReceived)="onRouteCoordinatesReceived($event)"
+    (actionButtonClicked)="onActionButton($event)">
+  </app-current-ride>
+
+
+</ng-container>

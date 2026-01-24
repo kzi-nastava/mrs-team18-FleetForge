@@ -24,6 +24,15 @@ export interface DriverInfoDTO {
   profileImage: string;
 }
 
+export interface PassengerInfoDTO {
+  id: number;
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
+  profileImage: string;
+}
+
+
 export interface RideTrackingDTO {
   rideId: number;
   status: string;
@@ -32,4 +41,5 @@ export interface RideTrackingDTO {
   route: RouteInfoDTO;
   driver: DriverInfoDTO;
   panicActivated: boolean;
+  passenger: PassengerInfoDTO;
 }

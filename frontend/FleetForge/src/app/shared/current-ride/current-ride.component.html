@@ -1,22 +1,22 @@
-<div class="current-ride-container" *ngIf="rideData">
+<div class="current-ride-container" *ngIf="rideData && cardInfo">
   <div class="content-wrapper">
     <!-- Left Section: Ride Details -->
     <div class="ride-details-section">
       <h1 class="page-title">Current Ride</h1>
 
-      <!-- Driver Card -->
-      <div class="driver-card">
-        <div class="driver-avatar-block">
-          <img [src]="rideData.driver.profileImage" alt="Driver" class="driver-avatar" />
+      <!-- Card (Driver/Passenger Info) -->
+      <div class="info-card">
+        <div class="card-avatar-block">
+          <img [src]="cardInfo.profileImage" alt="Profile" class="card-avatar" />
         </div>
-        <div class="driver-details">
-          <span class="driver-label">Driver</span>
-          <h3 class="driver-name">{{ rideData.driver.firstName }} {{ rideData.driver.lastName }}</h3>
-          <div class="driver-rating">
-            <span class="rating-value">{{ getDriverRating() }}</span>
+        <div class="card-details">
+          <span class="card-label">{{ cardInfo.label }}</span>
+          <h3 class="card-name">{{ cardInfo.name }}</h3>
+          <div class="card-rating" *ngIf="showRating && cardInfo.rating !== undefined">
+            <span class="rating-value">{{ cardInfo.rating }}</span>
             <span class="rating-star">★</span>
           </div>
-          <div class="driver-phone">{{ rideData.driver.phoneNumber }}</div>
+          <div class="card-phone" *ngIf="cardInfo.phoneNumber">{{ cardInfo.phoneNumber }}</div>
         </div>
       </div>
 
@@ -76,8 +76,13 @@
 
       <!-- Action Buttons -->
       <div class="action-buttons">
-        <button class="btn wrong-way-btn" (click)="onWrongWay()">Wrong way</button>
-        <button class="btn sos-btn" (click)="onSOS()">SOS</button>
+        <button 
+          *ngFor="let button of actionButtons"
+          [ngClass]="getButtonClass(button)"
+          [disabled]="button.disabled"
+          (click)="onActionButtonClicked(button.action)">
+          {{ button.label }}
+        </button>
       </div>
     </div>
 
@@ -88,37 +93,6 @@
         (routeCalculated)="onRouteCalculated($event)"
         (routeCoordinatesAvailable)="onRouteCoordinatesReceived($event)">
       </app-map>
-    </div>
-  </div>
-</div>
-
-<!-- Wrong Way Report Modal -->
-<div class="modal-overlay" *ngIf="showWrongWayModal" (click)="onCloseWrongWayModal()">
-  <div class="modal-content" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h2 class="modal-title">Report Issue</h2>
-      <button class="modal-close-btn" (click)="onCloseWrongWayModal()">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
-    </div>
-    
-    <div class="modal-body">
-      <label class="form-label">Describe the driver inconsistency:</label>
-      <textarea 
-        class="form-textarea"
-        [(ngModel)]="wrongWayReport"
-        placeholder="Please provide details about the issue (e.g., wrong route, unsafe driving, etc.)"
-        rows="6"
-        maxlength="500"
-      ></textarea>
-      <div class="char-counter">{{ wrongWayReport.length }}/500</div>
-    </div>
-    
-    <div class="modal-footer">
-      <button class="btn-secondary" (click)="onCloseWrongWayModal()">Close</button>
-      <button class="btn-primary" (click)="onSubmitWrongWayReport()">Submit Report</button>
     </div>
   </div>
 </div>

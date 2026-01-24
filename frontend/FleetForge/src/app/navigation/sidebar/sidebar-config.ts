@@ -60,6 +60,11 @@ export const SIDEBAR_MENU_CONFIG: Record<UserRole, SidebarMenuItem[]> = {
       path: '/driver/dashboard'
     },
     {
+      label: 'Current Ride',
+      icon: '◆', // diamond/location icon
+      path: '/driver/current-ride'
+    },
+    {
       label: 'Ride History',
       icon: '⏱',
       path: '/driver/ride-history'

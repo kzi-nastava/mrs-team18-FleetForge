@@ -1,15 +1,15 @@
 import { TestBed } from '@angular/core/testing';
-import { CurrentRideComponent } from './current-ride.component';
+import { CurrentRidePassengerComponent } from './current-ride-passenger.component';
 
-describe('CurrentRideComponent', () => {
+describe('CurrentRidePassengerComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CurrentRideComponent]
+      imports: [CurrentRidePassengerComponent]
     }).compileComponents();
   });
 
   it('should create', () => {
-    const fixture = TestBed.createComponent(CurrentRideComponent);
+    const fixture = TestBed.createComponent(CurrentRidePassengerComponent);
     const component = fixture.componentInstance;
     expect(component).toBeTruthy();
   });
