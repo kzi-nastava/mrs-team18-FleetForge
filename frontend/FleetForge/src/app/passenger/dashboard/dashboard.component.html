@@ -1,0 +1,54 @@
+<div class="passenger-dashboard">
+    <div class="dashboard-header">
+        <h1>Passenger Dashboard</h1>
+        <button class="btn-order" routerLink="/book">
+            Order New Ride
+        </button>
+    </div>
+
+    <div class="dashboard-grid">
+        <div class="map-card">
+            <div class="map-wrapper">
+                <app-map [vehicles]="vehicles"></app-map>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <div class="card">
+                <h3 class="card-title">Scheduled Rides</h3>
+
+                <div class="scheduled-ride" *ngFor="let ride of scheduledRides">
+                    <div class="ride-meta">
+                        <span class="ride-date">{{ ride.date }}</span>
+                    </div>
+
+                    <div class="ride-route">
+                        <strong>{{ ride.from }}</strong>
+                        <div class="arrow">→</div>
+                        <span>{{ ride.to }}</span>
+                    </div>
+                </div>
+
+                <p class="hint-text">
+                    Click to see all scheduled routes
+                </p>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">Favorite Routes</h3>
+
+                <button class="favorite-route" *ngFor="let route of favoriteRoutes">
+                    <div class="route-info">
+                        <div class="route-name">{{ route.name }}</div>
+                        <div class="route-type">{{ route.vehicleType }}</div>
+                    </div>
+                    <span class="arrow">→</span>
+                </button>
+
+                <p class="hint-text">
+                    Click to see all favorite routes
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
