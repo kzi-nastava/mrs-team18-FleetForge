@@ -41,12 +41,12 @@ public class DataLoader implements CommandLineRunner {
 
         Driver driver1 = new Driver();
         driver1.setEmail("driver1@test.com");
-        driver1.setPassword(passwordEncoder.encode("driver123"));
+        driver1.setPassword(passwordEncoder.encode("123"));
         driver1.setFirstName("John");
         driver1.setLastName("Doe");
         driver1.setPhoneNumber("+381641234567");
         driver1.setAddress("Bulevar oslobođenja 10, Novi Sad");
-        driver1.setProfilePicture("driver1.jpg");
+        driver1.setProfilePicture("default.png");
         driver1.setVehicle(vehicle1);
         driver1.setActive(true);
         driver1.setAvailable(false);
@@ -57,15 +57,15 @@ public class DataLoader implements CommandLineRunner {
 
         Driver driver2 = new Driver();
         driver2.setEmail("driver2@test.com");
-        driver2.setPassword(passwordEncoder.encode("driver123"));
+        driver2.setPassword(passwordEncoder.encode("123"));
         driver2.setFirstName("Jane");
         driver2.setLastName("Smith");
         driver2.setPhoneNumber("+381649876543");
         driver2.setAddress("Zmaj Jovina 5, Novi Sad");
-        driver2.setProfilePicture("driver2.jpg");
+        driver2.setProfilePicture("default.png");
         driver2.setVehicle(vehicle2);
         driver2.setActive(true);
-        driver2.setAvailable(false);
+        driver2.setAvailable(true);
         driver2.setCurrentLocation(new GeoPoint(45.2551, 19.8451));
         driver2.setRole(Role.ROLE_DRIVER);
         driver2.setActivated(true);
@@ -76,48 +76,48 @@ public class DataLoader implements CommandLineRunner {
 
         Passenger passenger1 = new Passenger();
         passenger1.setEmail("passenger1@test.com");
-        passenger1.setPassword(passwordEncoder.encode("passenger123"));
+        passenger1.setPassword(passwordEncoder.encode("123"));
         passenger1.setFirstName("Marko");
         passenger1.setLastName("Marković");
         passenger1.setPhoneNumber("+381641111111");
         passenger1.setAddress("Narodnih heroja 15, Novi Sad");
-        passenger1.setProfilePicture("passenger1.jpg");
+        passenger1.setProfilePicture("default.png");
         passenger1.setRole(Role.ROLE_PASSENGER);
         passenger1.setActivated(true);
         passenger1.setBlocked(false);
 
         Passenger passenger2 = new Passenger();
         passenger2.setEmail("passenger2@test.com");
-        passenger2.setPassword(passwordEncoder.encode("passenger123"));
+        passenger2.setPassword(passwordEncoder.encode("123"));
         passenger2.setFirstName("Ana");
         passenger2.setLastName("Anić");
         passenger2.setPhoneNumber("+381642222222");
         passenger2.setAddress("Dunavska 10, Novi Sad");
-        passenger2.setProfilePicture("passenger2.jpg");
+        passenger2.setProfilePicture("default.png");
         passenger2.setRole(Role.ROLE_PASSENGER);
         passenger2.setActivated(true);
         passenger2.setBlocked(false);
 
         Passenger passenger3 = new Passenger();
         passenger3.setEmail("mdamjanovic2004@gmail.com");
-        passenger3.setPassword(passwordEncoder.encode("passenger123"));
+        passenger3.setPassword(passwordEncoder.encode("123"));
         passenger3.setFirstName("Jovana");
         passenger3.setLastName("Jovanović");
         passenger3.setPhoneNumber("+381643333333");
         passenger3.setAddress("Tolstojeva 5, Novi Sad");
-        passenger3.setProfilePicture("passenger3.jpg");
+        passenger3.setProfilePicture("default.png");
         passenger3.setRole(Role.ROLE_PASSENGER);
         passenger3.setActivated(true);
         passenger3.setBlocked(false);
 
         Passenger passenger4 = new Passenger();
         passenger4.setEmail("passenger4@test.com");
-        passenger4.setPassword(passwordEncoder.encode("passenger123"));
+        passenger4.setPassword(passwordEncoder.encode("123"));
         passenger4.setFirstName("Petar");
         passenger4.setLastName("Petrović");
         passenger4.setPhoneNumber("+381644444444");
         passenger4.setAddress("Modene 20, Novi Sad");
-        passenger4.setProfilePicture("passenger4.jpg");
+        passenger4.setProfilePicture("default.png");
         passenger4.setRole(Role.ROLE_PASSENGER);
         passenger4.setActivated(true);
         passenger4.setBlocked(false);

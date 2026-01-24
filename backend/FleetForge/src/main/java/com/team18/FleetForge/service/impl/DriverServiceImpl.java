@@ -13,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -74,7 +73,7 @@ private List<Driver> filterByVehicleType(List<Driver> drivers, VehicleType vehic
 }
     private boolean canDriverRideNextRide(Driver driver, Ride ride) {// ako je voznja pending i ima vozaca tog znaci da ne moze da vozi
         // jer voznje koje imaju vozaca su samo one u bliskoj buducnosti nece imati vozaca voznja koja je za npr sat vremena ili vise od sad
-        List<Ride> pendingRides = rideRepository.findAllByDriverAndStatus(driver, RideStatus.PENDING);
+        List<Ride> pendingRides = rideRepository.findAllByDriverAndStatus(driver, RideStatus.ACCEPTED);
         if (!pendingRides.isEmpty()) {
             return false;
         }
@@ -191,7 +190,7 @@ private Driver scoring(List<Driver>drivers,Ride ride){
 
     @Override
     public void setDriversScheduledRides() {
-        List<Ride> pendingRides=rideRepository.findAllByDriverAndStatus(null,RideStatus.PENDING);
+        List<Ride> pendingRides=rideRepository.findAllByDriverAndStatus(null,RideStatus.ACCEPTED);
         List<Ride> upcominPendingRides=new ArrayList<>();
         for(Ride ride:pendingRides){
            Duration dur= Duration.between(LocalDateTime.now(),ride.getStartTime());
@@ -221,7 +220,7 @@ private Driver scoring(List<Driver>drivers,Ride ride){
     }
 
     public boolean checkAlreadyBookedDateTime(Ride ride){
-        List<Ride> allPending=rideRepository.findAllByDriverAndStatus(null,RideStatus.PENDING);
+        List<Ride> allPending=rideRepository.findAllByDriverAndStatus(null,RideStatus.ACCEPTED);
         for(Ride ride2:allPending){
             if(ride2.getVehicleType()==ride.getVehicleType()) {
                 LocalDateTime start = ride2.getStartTime();

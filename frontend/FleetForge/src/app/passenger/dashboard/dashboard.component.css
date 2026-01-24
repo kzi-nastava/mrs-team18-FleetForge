@@ -1,0 +1,210 @@
+.passenger-dashboard {
+  padding: 32px;
+  background-color: var(--color-background-gray);
+  height: 100%; 
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.dashboard-header h1 {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin: 0;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 24px;
+  flex: 1;
+  min-height: 0; 
+}
+
+.map-card {
+  background: var(--color-background-white);
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+}
+
+.map-wrapper {
+  flex: 1;
+  min-height: 0;
+}
+
+.map-wrapper app-map {
+  height: 100%;
+  width: 100%;
+  display: block;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-height: 440px;
+  overflow-y: auto; 
+  height: 100%;
+  
+  scrollbar-width: thin; 
+  padding-right: 8px; 
+}
+
+.card {
+  background: var(--color-background-white);
+  border-radius: 16px;
+  padding: 20px;
+  border: 1px solid var(--color-border);
+  margin-bottom: 2px;
+}
+
+.card-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 16px 0;
+  color: var(--color-secondary-dark);
+}
+
+.scheduled-ride {
+  padding: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
+
+.ride-meta {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.ride-date {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-gray);
+}
+
+.ride-route {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-secondary-dark);
+}
+
+.ride-route .arrow {
+  display: inline-block;
+  margin: 0 6px;
+}
+
+.route-name {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.route-type {
+  font-size: 12px;
+  color: var(--color-text-gray);
+}
+
+.passenger-dashboard {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.dashboard-grid {
+  flex: 1;
+  min-height: 0;
+}
+
+.btn-order {
+  width: 200px;
+  padding: 12px;
+  background-color: var(--color-primary);
+  border: 2px solid var(--color-primary);
+  color: var(--color-white);
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.card-subtitle {
+  font-size: 12px;
+  color: var(--color-text-gray);
+}
+
+.hint-link {
+  display: block;
+  font-size: 12px;
+  color: var(--color-primary);
+  text-align: center;
+  margin-top: 12px;
+  text-decoration: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.hint-link:hover {
+  text-decoration: underline;
+}
+
+.scheduled-ride {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
+
+.favorite-route-container {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--color-background-white);
+  border: 1px solid var(--color-border);
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.btn-action-small {
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.2s;
+}
+
+.btn-cancel {
+  background-color: var(--color-red);
+  color: var(--color-white);
+}
+
+.btn-order-small {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+}
+
+.btn-action-small:hover {
+  opacity: 0.8;
+}
+
+.favorite-route-info .route-name {
+  font-size: 14px;
+  font-weight: 600;
+}

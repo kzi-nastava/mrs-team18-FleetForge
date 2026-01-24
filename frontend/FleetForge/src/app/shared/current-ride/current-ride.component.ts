@@ -33,6 +33,7 @@ export class CurrentRideComponent {
   @Input() cardInfo: CardInfo | null = null;
   @Input() actionButtons: ActionButton[] = [];
   @Input() showRating: boolean = true;
+  @Input() subtitle: string = '';
 
   @Output() routeCalculated = new EventEmitter<{distanceKm: number, estimatedMinutes: number}>();
   @Output() routeCoordinatesReceived = new EventEmitter<Array<{latitude: number, longitude: number}>>();

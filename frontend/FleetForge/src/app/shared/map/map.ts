@@ -310,16 +310,39 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     });
   }
 
+  showDriverToPickupRoute(
+    driverLocation: { latitude: number; longitude: number },
+    pickupLocation: { latitude: number; longitude: number }
+  ): void {
+    if (!this.map || !this.routeControl) return;
 
-  updateCurrentLocation(location: {latitude: number, longitude: number}): void {
-    if (!this._currentRide || !this.map) {
+    const waypoints: L.LatLng[] = [
+      L.latLng(driverLocation.latitude, driverLocation.longitude),
+      L.latLng(pickupLocation.latitude, pickupLocation.longitude)
+    ];
+
+    this.routeControl.setWaypoints(waypoints);
+  }
+
+  updateCurrentLocation(location: { latitude: number; longitude: number }): void {
+    if (!this._currentRide || !this.map) return;
+
+    this.updateCurrentLocationMarker(location);
+
+    if (!this.routeControl) return;
+
+    // DRIVER COMING TO PICKUP
+    if (this._currentRide.status === 'ACCEPTED') {
+      const pickup = this._currentRide.route.startLocation;
+
+      this.showDriverToPickupRoute(location, pickup);
       return;
     }
 
-    this.updateCurrentLocationMarker(location);
-    if (this.routeControl) {
+    // RIDE IN PROGRESS
+    if (this._currentRide.status === 'IN_PROGRESS') {
       const route = this._currentRide.route;
-      
+
       const remainingWaypoints = route.waypoints
         .filter(wp => !wp.isCompleted)
         .sort((a, b) => a.order - b.order)
@@ -334,6 +357,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       this.routeControl.setWaypoints(waypoints);
     }
   }
+
 
   setMarkerWithCoords(address: string, lat: number, lng: number): void {
     const newMarker = L.marker([lat, lng]);
