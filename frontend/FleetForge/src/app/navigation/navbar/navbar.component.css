@@ -145,11 +145,6 @@
   transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 
-.profile:hover {
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-  transform: translateY(-1px);
-}
-
 .avatar {
   height: 32px;
   width: 32px;
@@ -194,7 +189,7 @@
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
   min-width: 140px;
   padding: 6px;
-  z-index: 10;
+  z-index: 1001;
 }
 
 .profile-menu-item {

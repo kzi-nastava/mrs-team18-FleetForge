@@ -2,8 +2,9 @@
   <app-current-ride
     [rideData]="rideData"
     [cardInfo]="cardInfo"
-    [actionButtons]="actionButtons"
+    [actionButtons]="activeActionButtons"
     [showRating]="true"
+    [subtitle]="getRideSubtitle()"
     (routeCoordinatesReceived)="onRouteCoordinatesReceived($event)"
     (actionButtonClicked)="onActionButton($event)">
   </app-current-ride>
