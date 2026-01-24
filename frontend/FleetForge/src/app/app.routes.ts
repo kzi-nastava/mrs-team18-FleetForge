@@ -18,12 +18,13 @@ import { PasswordSetComponent } from './driver/password-set/password-set.compone
 import { RegisterDriverComponent } from './admin/register-driver/register-driver.component';
 import { ActivateAccountComponent } from './auth/activate-account/activate-account.component';
 import { PassengerHomeComponent } from './passenger/passenger-home/passenger-home.component';
-import { CurrentRideComponent } from './passenger/current-ride/current-ride.component';
+import { CurrentRidePassengerComponent } from './passenger/current-ride-passenger/current-ride-passenger.component';
 
 import { authGuard, guestGuard, roleGuard } from './auth/guard/auth-guard';
 import { homeRedirectGuard } from './auth/guard/home-redirect-guard';
 import { PassengerHistoryComponent } from './passenger/passenger-history/passenger-history.component';
 import { PassengerFavoriteRoutesComponent } from './passenger/passenger-favorite-routes/passenger-favorite-routes.component';
+import { CurrentRideDriverComponent } from './driver/current-ride-driver/current-ride-driver.component';
 
 export const routes: Routes = [
   /** ROUTES WITH NAVBAR */
@@ -52,7 +53,7 @@ export const routes: Routes = [
       },
       { 
         path: 'passenger/current-ride', 
-        component: CurrentRideComponent,
+        component: CurrentRidePassengerComponent,
         canActivate: [authGuard, roleGuard(['PASSENGER'])]
       },
       {
@@ -87,6 +88,11 @@ export const routes: Routes = [
       { 
         path: 'profile-driver', 
         component: DriverProfileComponent,
+        canActivate: [authGuard, roleGuard(['DRIVER'])]
+      },
+      {
+        path : 'driver/current-ride', 
+        component: CurrentRideDriverComponent,
         canActivate: [authGuard, roleGuard(['DRIVER'])]
       },
       { 
