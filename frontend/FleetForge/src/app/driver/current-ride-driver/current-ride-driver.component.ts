@@ -17,6 +17,7 @@ export class CurrentRideDriverComponent implements OnInit, OnDestroy {
   rideData: RideTrackingDTO | null = null;
   cardInfo: CardInfo | null = null;
   actionButtons: ActionButton[] = [];
+  showCancelConfirm = false;
   
   private locationUpdateInterval: any;
   private routeCoordinates: Array<{latitude: number, longitude: number}> = [];
@@ -119,7 +120,28 @@ export class CurrentRideDriverComponent implements OnInit, OnDestroy {
     if (action === 'start-ride') this.onStartRide();
     if (action === 'finish-ride') this.onFinishRide();
     if (action === 'sos') console.log('SOS clicked');
+    if (action === 'cancel') this.openCancelConfirmation();
   }
+
+  private openCancelConfirmation(): void {
+    this.showCancelConfirm = true;
+  }
+
+  confirmCancelRide(): void {
+    this.showCancelConfirm = false;
+    this.clearTracking();
+
+    if (this.rideData) {
+      this.rideData.status = 'CANCELLED';
+    }
+
+    alert('Ride has been cancelled');
+  }
+
+  closeCancelConfirmation(): void {
+    this.showCancelConfirm = false;
+  }
+
 
   private onStartRide(): void {
     if (!this.rideStarted) {
@@ -146,7 +168,7 @@ export class CurrentRideDriverComponent implements OnInit, OnDestroy {
         ]
       : [
           { label: 'Start Ride', color: 'success', action: 'start-ride' },
-          { label: 'SOS', color: 'warn', action: 'sos' }
+          { label: 'Cancel', color: 'warn', action: 'cancel' }
         ];
   }
 
