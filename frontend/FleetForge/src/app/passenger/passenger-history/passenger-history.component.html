@@ -42,7 +42,7 @@
 						</td>
 						<td>{{ ride.pickupAddress }}</td>
 						<td>{{ ride.dropoffAddress }}</td>
-						<td>{{ ride.rideDate }}</td>
+						<td>{{ ride.rideDate | date: 'd MMM, y' }}</td>
 						<td>{{ ride.totalCost.toFixed(2) }}</td>
 						<td>{{ ride.cancellationStatus }}</td>
 						<td class="panic-cell">
@@ -51,9 +51,21 @@
 							</span>
 						</td>
 						<td class="action-cell">
-							<button type="button" class="action-btn rate" (click)="onRate(ride)">
-								Rate
-							</button>
+							<ng-container [ngSwitch]="getRatingState(ride)">
+								<div *ngSwitchCase="'rated'" class="stars">
+									<span
+										*ngFor="let filled of getStarArray(ride.driverRating || 0)"
+										class="star"
+										[class.filled]="filled"
+									>
+										★
+									</span>
+								</div>
+								<div *ngSwitchCase="'expired'" class="rating-expired">Rating closed</div>
+								<button *ngSwitchCase="'pending'" type="button" class="action-btn rate" (click)="openRating(ride)">
+									Rate
+								</button>
+							</ng-container>
 						</td>
 						<td class="action-cell">
 							<button type="button" class="action-btn details" (click)="onDetails(ride)">
@@ -74,6 +86,77 @@
 					</tr>
 				</tbody>
 			</table>
+		</div>
+	</div>
+
+	<!-- Rating modal -->
+	<div class="rating-modal-backdrop" *ngIf="isRatingModalOpen">
+		<div class="rating-modal" role="dialog" aria-modal="true">
+			<div class="rating-modal__header">
+				<div>
+					<h3 class="rating-modal__title">Rate your ride</h3>
+					<p class="rating-modal__subtitle">
+						{{ selectedRide?.pickupAddress }} → {{ selectedRide?.dropoffAddress }}
+					</p>
+				</div>
+				<button type="button" class="icon-btn close-btn" (click)="closeRatingModal()" aria-label="Close rating dialog">
+					✕
+				</button>
+			</div>
+
+			<div class="rating-modal__content">
+				<label class="field-label">Rate driver</label>
+				<div class="stars selectable">
+					<button
+						type="button"
+						*ngFor="let star of starScale"
+						class="star-btn"
+						[class.filled]="(hoverDriverRating || ratingForm.driverRating) >= star"
+						(click)="setDriverRating(star)"
+						(mouseenter)="setDriverHover(star)"
+						(mouseleave)="clearDriverHover()"
+						aria-label="Rate driver {{ star }} star"
+					>
+						★
+					</button>
+				</div>
+
+				<label class="field-label">Rate vehicle</label>
+				<div class="stars selectable">
+					<button
+						type="button"
+						*ngFor="let star of starScale"
+						class="star-btn"
+						[class.filled]="(hoverVehicleRating || ratingForm.vehicleRating) >= star"
+						(click)="setVehicleRating(star)"
+						(mouseenter)="setVehicleHover(star)"
+						(mouseleave)="clearVehicleHover()"
+						aria-label="Rate vehicle {{ star }} star"
+					>
+						★
+					</button>
+				</div>
+
+				<label class="field-label">Comment</label>
+				<textarea
+					rows="3"
+					[(ngModel)]="ratingForm.comment"
+					placeholder="Share more about your ride"
+					class="comment-input"
+				></textarea>
+			</div>
+
+			<div class="rating-modal__actions">
+				<button type="button" class="modal-btn ghost" (click)="closeRatingModal()">Close</button>
+				<button
+					type="button"
+					class="modal-btn primary"
+					[disabled]="ratingForm.driverRating === 0 || ratingForm.vehicleRating === 0"
+					(click)="submitRating()"
+				>
+					Submit
+				</button>
+			</div>
 		</div>
 	</div>
 </div>
