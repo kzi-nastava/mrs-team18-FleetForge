@@ -51,15 +51,14 @@
                         Favorite Routes
                     </h3>
                 </div>
-
-                <div class="favorite-route-container" *ngFor="let route of favoriteRoutes">
+                @for(route of favoriteRoutes().slice(0, 2); track route.id) {
+                <div class="favorite-route-container" >
                     <div class="favorite-route-info">
                         <div class="route-name">{{ route.name }}</div>
-                        <div class="route-type">{{ route.vehicleType }}</div>
                     </div>
-                    <button class="btn-action-small btn-order-small">Order</button>
+                    <button class="btn-action-small btn-order-small" (click)="orderRide(route)">Order</button>
                 </div>
-
+            }
                 <a routerLink="/passenger/favourite-rides" class="hint-link">
                     Click to see all favorite routes
                 </a>
