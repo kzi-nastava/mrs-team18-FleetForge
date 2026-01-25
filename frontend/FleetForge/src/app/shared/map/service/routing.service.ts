@@ -18,7 +18,11 @@ export class RoutingService {
   map: L.Map,
   start: L.LatLngExpression,
   end: L.LatLngExpression,
-  waypoints: L.LatLngExpression[] = []
+  waypoints: L.LatLngExpression[] = [],
+  opts?: {
+    color?: string;
+    createMarker?: (i: number, wp: L.Routing.Waypoint, n: number) => L.Marker | false;
+  }
 ): L.Routing.Control {
 
   const allWaypoints: L.Routing.Waypoint[] = [
@@ -34,14 +38,15 @@ export class RoutingService {
     }),
     collapsible: false,
     plan: L.Routing.plan(allWaypoints, {
-      addWaypoints: false,      
-      draggableWaypoints: false, 
-      createMarker: () => false 
+      addWaypoints: false,
+      draggableWaypoints: false,
+      createMarker: (i, wp, n) => opts?.createMarker ? opts.createMarker(i, wp, n) : false
     }),
     lineOptions: {
       addWaypoints: false,      
       extendToWaypoints: true,
-      missingRouteTolerance: 0
+      missingRouteTolerance: 0,
+      styles: [{ color: opts?.color ?? '#FF9900', weight: 4, opacity: 0.9 }]
     }
   }).addTo(map);
 

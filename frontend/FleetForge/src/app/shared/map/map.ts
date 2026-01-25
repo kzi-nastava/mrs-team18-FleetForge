@@ -18,6 +18,7 @@ import { Observable } from 'rxjs';
 export class MapComponent implements AfterViewInit, OnDestroy {
   private _vehicles: VehicleLocationDTO[] = [];
   private _currentRide: RideTrackingDTO | null = null;
+  private _staticRoute: { pickup: [number, number]; dropoff: [number, number]; waypoints?: [number, number][] } | null = null;
   private markers: L.Marker[] = [];
 
   private routeControl: L.Routing.Control | null = null;
@@ -29,6 +30,10 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   @Output() routeCalculated = new EventEmitter<{distanceKm: number, estimatedMinutes: number}>();
   @Output() routeCoordinatesAvailable = new EventEmitter<Array<{latitude: number, longitude: number}>>();  
   @Output() routeSummary = new EventEmitter<{ distanceKm: number; durationMin: number; cost: number }>();
+  @Input() set staticRoute(value: { pickup: [number, number]; dropoff: [number, number]; waypoints?: [number, number][] } | null) {
+    this._staticRoute = value;
+    this.applyStaticRoute();
+  }
   @Input() set vehicles(value: VehicleLocationDTO[]) {
     this._vehicles = value;
     if (this.map) {
@@ -91,6 +96,10 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     if (this._currentRide) {
       this.displayCurrentRide();
     }
+
+    if (this._staticRoute) {
+      this.applyStaticRoute();
+    }
   }
 
   private updateMarkerSizes(): void {
@@ -125,6 +134,10 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     this.routingService.routeSummary$.subscribe(summary => {
       this.routeSummary.emit(summary);
     });
+
+    if (this._staticRoute) {
+      this.applyStaticRoute();
+    }
 
   }
 
@@ -413,12 +426,56 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     }
 
     const waypointLatLngs = waypoints.map(wp => L.latLng(wp[0], wp[1]));
+    const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--color-primary')?.trim() || '#FF9900';
     
     this.routeControl = this.routingService.addRoute(
       this.map,
       L.latLng(pickup[0], pickup[1]),
       L.latLng(dropoff[0], dropoff[1]),
-      waypointLatLngs
+      waypointLatLngs,
+      {
+        color: primaryColor,
+        createMarker: (i, wp, n) => this.buildRouteMarker(i, wp, n)
+      }
+    );
+  }
+
+  private buildRouteMarker(index: number, wp: L.Routing.Waypoint, total: number): L.Marker {
+    const isStart = index === 0;
+    const isEnd = total > 0 && index === total - 1;
+    const type: 'pickup' | 'waypoint' | 'dropoff' = isStart ? 'pickup' : (isEnd ? 'dropoff' : 'waypoint');
+
+    let iconHtml = '';
+    if (type === 'pickup') {
+      // Green pointer (matches current-ride component)
+      iconHtml = '<img src="/map-pointer.svg" style="width: 28px; height: 28px; filter: invert(65%) sepia(74%) saturate(1200%) hue-rotate(65deg);" />';
+    } else if (type === 'dropoff') {
+      // Red pointer (matches current-ride component)
+      iconHtml = '<img src="/map-pointer.svg" style="width: 28px; height: 28px; filter: invert(35%) sepia(74%) saturate(1200%) hue-rotate(340deg);" />';
+    } else {
+      // Neutral waypoint circle
+      iconHtml = '<img src="/waypoint-circle.svg" style="width: 28px; height: 28px;" />';
+    }
+
+    const icon = L.divIcon({
+      html: iconHtml,
+      className: 'route-point-marker',
+      iconSize: [28, 28],
+      iconAnchor: [14, 28]
+    });
+
+    return L.marker(wp.latLng, { icon, title: type.toUpperCase() });
+  }
+
+  private applyStaticRoute(): void {
+    if (!this._staticRoute || !this.map) {
+      return;
+    }
+
+    this.updateRoute(
+      this._staticRoute.pickup,
+      this._staticRoute.dropoff,
+      this._staticRoute.waypoints ?? []
     );
   }
 
