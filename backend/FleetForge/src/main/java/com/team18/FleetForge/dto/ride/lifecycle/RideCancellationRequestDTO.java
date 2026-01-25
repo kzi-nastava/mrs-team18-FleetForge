@@ -6,7 +6,5 @@ import java.time.LocalDateTime;
 
 @Data
 public class RideCancellationRequestDTO {
-    private RideCancellationRole cancelledBy;
-    private String reason;
-    private LocalDateTime scheduledStartTime;
+    private String reason; // required for driver
 }
