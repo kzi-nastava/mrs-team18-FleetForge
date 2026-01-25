@@ -33,14 +33,14 @@
 
 .error-text {
   font-size: 0.9rem;
-  color: red;
+  color: var(--color-error);
   margin-bottom: 2rem;
 }
 
 .action-button {
   padding: 0.75rem;
   background-color: var(--color-primary);
-  color: #ffffff;
+  color: var(--color-white);
   border: none;
   border-radius: 6px;
   cursor: pointer;

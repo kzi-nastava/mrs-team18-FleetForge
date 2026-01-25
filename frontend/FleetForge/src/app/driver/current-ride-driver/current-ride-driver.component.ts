@@ -17,6 +17,7 @@ export class CurrentRideDriverComponent implements OnInit, OnDestroy {
   rideData: RideTrackingDTO | null = null;
   cardInfo: CardInfo | null = null;
   actionButtons: ActionButton[] = [];
+  showCancelConfirm = false;
   
   private locationUpdateInterval: any;
   private routeCoordinates: Array<{latitude: number, longitude: number}> = [];
@@ -32,30 +33,155 @@ export class CurrentRideDriverComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.clearTracking();
+  }
+
+  onRouteCoordinatesReceived(coords: Array<{ latitude: number; longitude: number }>): void {
+    this.routeCoordinates = coords;
+    this.currentCoordinateIndex = 0;
+    this.resolveSimulationFlow();
+  }
+
+  private resolveSimulationFlow(): void {
+    this.clearTracking();
+    if (!this.rideData) return;
+
+    if (this.rideData.status === 'ACCEPTED') {
+      this.startApproachToPickupSimulation();
+    }
+
+    if (this.rideData.status === 'IN_PROGRESS') {
+      this.startRideSimulation();
+    }
+  }
+
+  private startApproachToPickupSimulation(): void {
+    this.locationUpdateInterval = setInterval(() => {
+      if (!this.rideData || this.routeCoordinates.length === 0) return;
+
+      const targetIndex = Math.min(this.currentCoordinateIndex + 5, this.routeCoordinates.length - 1);
+      const coord = this.routeCoordinates[targetIndex];
+
+      this.updateLocationOnMap(coord);
+      this.currentCoordinateIndex = targetIndex;
+
+      if (this.currentCoordinateIndex >= this.routeCoordinates.length - 1) {
+        this.clearTracking();
+        console.log('Driver arrived at pickup location');
+      }
+    }, 1000);
+  }
+
+  private startRideSimulation(): void {
+    const waypointThreshold = 0.0005;
+
+    this.locationUpdateInterval = setInterval(() => {
+      if (!this.rideData || this.routeCoordinates.length === 0) return;
+
+      const targetIndex = Math.min(this.currentCoordinateIndex + 5, this.routeCoordinates.length - 1);
+      const coord = this.routeCoordinates[targetIndex];
+
+      this.rideData.route.waypoints.forEach(wp => {
+        if (!wp.isCompleted) {
+          const latDiff = Math.abs(coord.latitude - wp.location.latitude);
+          const lngDiff = Math.abs(coord.longitude - wp.location.longitude);
+          if (latDiff < waypointThreshold && lngDiff < waypointThreshold) {
+            wp.isCompleted = true;
+          }
+        }
+      });
+
+      this.updateLocationOnMap(coord);
+      this.currentCoordinateIndex = targetIndex;
+
+      if (this.currentCoordinateIndex >= this.routeCoordinates.length - 1) {
+        this.clearTracking();
+        this.rideData.status = 'COMPLETED';
+        console.log('Ride completed');
+      }
+    }, 2000);
+  }
+
+  private updateLocationOnMap(coord: { latitude: number; longitude: number }): void {
+    if (!this.rideData) return;
+
+    this.rideData.currentLocation.latitude = coord.latitude;
+    this.rideData.currentLocation.longitude = coord.longitude;
+    this.currentRideComponent?.mapComponent?.updateCurrentLocation(this.rideData.currentLocation);
+  }
+
+  private clearTracking(): void {
     if (this.locationUpdateInterval) {
       clearInterval(this.locationUpdateInterval);
     }
   }
 
-  loadMockData(): void {
+  onActionButton(action: string): void {
+    if (action === 'start-ride') this.onStartRide();
+    if (action === 'finish-ride') this.onFinishRide();
+    if (action === 'sos') console.log('SOS clicked');
+    if (action === 'cancel') this.openCancelConfirmation();
+  }
+
+  private openCancelConfirmation(): void {
+    this.showCancelConfirm = true;
+  }
+
+  confirmCancelRide(): void {
+    this.showCancelConfirm = false;
+    this.clearTracking();
+
+    if (this.rideData) {
+      this.rideData.status = 'CANCELLED';
+    }
+
+    alert('Ride has been cancelled');
+  }
+
+  closeCancelConfirmation(): void {
+    this.showCancelConfirm = false;
+  }
+
+
+  private onStartRide(): void {
+    if (!this.rideStarted) {
+      this.rideStarted = true;
+      if (this.rideData) this.rideData.status = 'IN_PROGRESS';
+      this.currentCoordinateIndex = 0;
+      this.updateActionButtons();
+      this.startRideSimulation();
+      alert('Ride started');
+    }
+  }
+
+  private onFinishRide(): void {
+    this.clearTracking();
+    if (this.rideData) this.rideData.status = 'COMPLETED';
+    alert('Ride finished');
+  }
+
+  private updateActionButtons(): void {
+    this.actionButtons = this.rideStarted
+      ? [
+          { label: 'Finish Ride', color: 'primary', action: 'finish-ride' },
+          { label: 'SOS', color: 'warn', action: 'sos' }
+        ]
+      : [
+          { label: 'Start Ride', color: 'success', action: 'start-ride' },
+          { label: 'Cancel', color: 'warn', action: 'cancel' }
+        ];
+  }
+
+  private loadMockData(): void {
     this.rideData = {
       rideId: 1,
       status: 'ACCEPTED',
-      currentLocation: {
-        latitude: 45.2454,
-        longitude: 19.8367
-      },
+      currentLocation: { latitude: 45.26, longitude: 19.84 },
       estimatedArrivalMinutes: 8,
       route: {
-        startLocation: {
-          latitude: 45.2454,
-          longitude: 19.8367
-        },
+        startLocation: { latitude: 45.2454, longitude: 19.8367 },
         startAddress: 'Gogoljeva 2, Novi Sad',
-        endLocation: {
-          latitude: 45.2462,
-          longitude: 19.8524
-        },
+        endLocation: { latitude: 45.2462, longitude: 19.8524 },
         endAddress: 'Bulevar Oslobođenja 11, Novi Sad',
         waypoints: [
           {
@@ -83,124 +209,15 @@ export class CurrentRideDriverComponent implements OnInit, OnDestroy {
         lastName: 'Brown',
         phoneNumber: '+381 69 123 4567',
         profileImage: '../../../../public/profile.svg'
-        },
+      },
       panicActivated: false
     };
 
-    // Set card info from passenger data
-    if (this.rideData.passenger) {
-      this.cardInfo = {
-        label: 'Passenger',
-        name: `${this.rideData.passenger.firstName} ${this.rideData.passenger.lastName}`,
-        phoneNumber: this.rideData.passenger.phoneNumber,
-        profileImage: this.rideData.passenger.profileImage
-      };
-    }
+    this.cardInfo = {
+      label: 'Passenger',
+      name: 'Jane Smith',
+      phoneNumber: '+381 69 987 6543',
+      profileImage: '../../../../public/profile.svg'
+    };
   }
-
-  onRouteCoordinatesReceived(coordinates: Array<{latitude: number, longitude: number}>): void {
-    this.routeCoordinates = coordinates;
-    this.currentCoordinateIndex = 0;
-  }
-
-  private updateActionButtons(): void {
-    if (!this.rideStarted) {
-      this.actionButtons = [
-        { label: 'Start Ride', color: 'success', action: 'start-ride' },
-        { label: 'SOS', color: 'warn', action: 'sos' }
-      ];
-    } else {
-      this.actionButtons = [
-        { label: 'Finish Ride', color: 'primary', action: 'finish-ride' },
-        { label: 'SOS', color: 'warn', action: 'sos' }
-      ];
-    }
-  }
-
-  private startLocationTracking(): void {
-    const waypointThreshold = 0.0005;
-    
-    this.locationUpdateInterval = setInterval(() => {
-      if (!this.rideData || this.routeCoordinates.length === 0) {
-        return;
-      }
-
-      const coordinatesPerUpdate = 5;
-      const targetIndex = Math.min(
-        this.currentCoordinateIndex + coordinatesPerUpdate,
-        this.routeCoordinates.length - 1
-      );
-
-      if (this.currentCoordinateIndex < this.routeCoordinates.length - 1) {
-        const coord = this.routeCoordinates[targetIndex];
-        
-        this.rideData.currentLocation.latitude = coord.latitude;
-        this.rideData.currentLocation.longitude = coord.longitude;
-
-        this.rideData.route.waypoints.forEach(waypoint => {
-          if (!waypoint.isCompleted) {
-            const latDiff = Math.abs(coord.latitude - waypoint.location.latitude);
-            const lngDiff = Math.abs(coord.longitude - waypoint.location.longitude);
-            
-            if (latDiff < waypointThreshold && lngDiff < waypointThreshold) {
-              waypoint.isCompleted = true;
-              console.log(`Waypoint reached: ${waypoint.address}`);
-            }
-          }
-        });
-
-        if (this.currentRideComponent && this.currentRideComponent.mapComponent) {
-          this.currentRideComponent.mapComponent.updateCurrentLocation(this.rideData.currentLocation);
-        }
-
-        this.currentCoordinateIndex = targetIndex;
-      } else {
-        if (this.locationUpdateInterval) {
-          clearInterval(this.locationUpdateInterval);
-        }
-        console.log('Destination reached!');
-      }
-    }, 2000);
-  }
-
-  onActionButton(action: string): void {
-    if (action === 'start-ride') {
-      this.onStartRide();
-    } else if (action === 'finish-ride') {
-      this.onFinishRide();
-    } else if (action === 'sos') {
-      this.onSOS();
-    }
-  }
-
-  private onStartRide(): void {
-    if (!this.rideStarted && this.routeCoordinates.length > 0) {
-      this.rideStarted = true;
-      if (this.rideData) {
-        this.rideData.status = 'IN_PROGRESS';
-      }
-      this.updateActionButtons();
-      this.startLocationTracking();
-      alert('Ride started - passengers picked up');
-    }
-  }
-
-  private onFinishRide(): void {
-    if (this.rideStarted) {
-      if (this.locationUpdateInterval) {
-        clearInterval(this.locationUpdateInterval);
-      }
-      if (this.rideData) {
-        this.rideData.status = 'COMPLETED';
-      }
-      console.log('Ride finished - destination reached');
-      alert('Ride completed successfully!');
-    }
-  }
-
-  private onSOS(): void {
-    // TODO: Implement SOS/panic functionality
-    console.log('SOS clicked');
-  }
-
 }

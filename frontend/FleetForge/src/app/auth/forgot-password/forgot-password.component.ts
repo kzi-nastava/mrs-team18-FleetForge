@@ -4,10 +4,11 @@ import { Router } from '@angular/router';
 import { AuthService } from '../service/auth.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { PopupDialogComponent   } from '../../shared/popup-dialog/popup-dialog.component';
 
 @Component({
   selector: 'app-forgot-password',
-  imports: [CommonModule, LogoComponent, FormsModule],
+  imports: [CommonModule, LogoComponent, FormsModule, PopupDialogComponent],
   templateUrl: './forgot-password.component.html',
   styleUrl: './forgot-password.component.css',
 })
@@ -19,8 +20,10 @@ export class ForgotPasswordComponent {
   serverError = '';
 
   showPopup = false;
+  popupTitle = '';
   popupMessage = '';
-  popupSuccess = false;
+  popupSuccess = true;
+  popupButtonText = 'OK';
 
   constructor(
     private router: Router,
@@ -47,18 +50,30 @@ export class ForgotPasswordComponent {
 
     this.authService.requestPasswordReset({ email: this.email }).subscribe({
       next: (response) => {
-        this.popupSuccess = true;
-        this.popupMessage = 'Reset link has been sent to your email.';
-        this.showPopup = true;
+        this.showSuccess('Reset link has been sent to your email.');
         this.cdr.detectChanges();
       },
       error: (err) => {
-        this.popupSuccess = false;
-        this.popupMessage = 'There has been an error sending the reset link.';
-        this.showPopup = true;
+        this.showError('There has been an error sending the reset link.');
         this.cdr.detectChanges();
       }
     });
+  }
+
+  showSuccess(message: string) {
+    this.popupTitle = 'Success';
+    this.popupMessage = message;
+    this.popupSuccess = true;
+    this.popupButtonText = 'Done';
+    this.showPopup = true;
+  }
+
+  showError(message: string) {
+    this.popupTitle = 'Error';
+    this.popupMessage = message;
+    this.popupSuccess = false;
+    this.popupButtonText = 'Close';
+    this.showPopup = true;
   }
 
   closePopup() {

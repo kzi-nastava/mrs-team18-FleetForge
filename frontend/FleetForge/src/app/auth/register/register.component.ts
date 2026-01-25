@@ -3,11 +3,12 @@ import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../service/auth.service';
+import { PopupDialogComponent   } from '../../shared/popup-dialog/popup-dialog.component';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PopupDialogComponent],
   templateUrl: './register.component.html',
   styleUrl: './register.component.css',
 })
@@ -31,7 +32,9 @@ export class RegisterComponent {
 
   showPopup = false;
   popupMessage = '';
+  popupTitle = '';        
   popupSuccess = false;
+  popupButtonText = '';   
 
   constructor(
     private authService: AuthService,
@@ -68,20 +71,31 @@ export class RegisterComponent {
 
     this.authService.register(formData).subscribe({
       next: () => {
-        this.popupSuccess = true;
-        this.popupMessage = 'Registration request successfully submitted. The verification email has been sent.';
-        this.showPopup = true;
+        this.showSuccess('Registration request successfully submitted. The verification email has been sent.');
         this.cdr.detectChanges();
       },
       error: () => {
-        this.popupSuccess = false;
-        this.popupMessage = 'Registration failed. Please try again.';
-        this.showPopup = true;
+        this.showError('Registration failed. Please try again.');
         this.cdr.detectChanges();
       }
     });
   }
+ 
+  showSuccess(message: string) {
+    this.popupTitle = 'Success';
+    this.popupMessage = message;
+    this.popupSuccess = true;
+    this.popupButtonText = 'Done';
+    this.showPopup = true;
+  }
 
+  showError(message: string) {
+    this.popupTitle = 'Error';
+    this.popupMessage = message;
+    this.popupSuccess = false;
+    this.popupButtonText = 'Close';
+    this.showPopup = true;
+  }
 
   closePopup() {
     this.showPopup = false;

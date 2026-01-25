@@ -4,11 +4,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../service/auth.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
+import { PopupDialogComponent   } from '../../shared/popup-dialog/popup-dialog.component';
+
 
 @Component({
   selector: 'app-reset-password',
   standalone: true,
-  imports: [LogoComponent, CommonModule, FormsModule],
+  imports: [LogoComponent, CommonModule, FormsModule, PopupDialogComponent],
   templateUrl: './reset-password.component.html',
   styleUrl: './reset-password.component.css',
 })
