@@ -9,6 +9,7 @@
             <table class="rides-table">
                 <thead>
                     <tr>
+                        <th class="col-fixed">Name</th>
                         <th class="col-fixed ">Start address</th>
                         <th class="col-fluid ">Waypoints</th>
                         <th class="col-fixed ">End address</th>
@@ -18,6 +19,9 @@
                 </thead>
                 <tbody>
                     <tr *ngFor="let route of routes()">
+                        <td class="col-fixed">
+                            <div class="route-name-box">{{ route.name }}</div>
+                        </td>
                         <td class="col-fixed">
                             <div class="address-box first-address">{{ route.startAddress }}</div>
                         </td>
