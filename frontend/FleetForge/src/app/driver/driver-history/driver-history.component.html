@@ -1,16 +1,15 @@
 <div class="driver-dashboard">
 
-  <!-- Title and Search -->
+  <!-- Title and Filters -->
   <div class="header-section">
     <h2 class="dashboard-title">Ride history</h2>
-    <div class="search-box">
-      <span class="search-icon">🔍</span>
-      <input 
-        type="text" 
-        placeholder="Search" 
-        [(ngModel)]="searchQuery"
-        class="search-input"
+    <div class="filter-bar">
+      <input
+        type="date"
+        [(ngModel)]="selectedDate"
+        class="date-input"
       />
+      <button class="primary-btn" (click)="filterByDate()">Filter</button>
     </div>
   </div>
 
@@ -22,49 +21,111 @@
       <table class="rides-table">
         <thead>
           <tr>
-            <th>Name</th>
-            <th>Pick up address</th>
-            <th>Drop off address</th>
-            <th>Ride date</th>
-            <th>Total Cost</th>
-            <th>Cancellation Status</th>
-            <th>Panic Activation</th>
-            <th>Feedback</th>
+            <th (click)="sortBy('name')" class="sortable">
+              Name
+              <span class="sort-indicator" *ngIf="sortColumn === 'name'">
+                {{ sortDirection === 'asc' ? '▲' : '▼' }}
+              </span>
+            </th>
+            <th (click)="sortBy('pickupAddress')" class="sortable">
+              Pick up address
+              <span class="sort-indicator" *ngIf="sortColumn === 'pickupAddress'">
+                {{ sortDirection === 'asc' ? '▲' : '▼' }}
+              </span>
+            </th>
+            <th (click)="sortBy('dropoffAddress')" class="sortable">
+              Drop off address
+              <span class="sort-indicator" *ngIf="sortColumn === 'dropoffAddress'">
+                {{ sortDirection === 'asc' ? '▲' : '▼' }}
+              </span>
+            </th>
+            <th (click)="sortBy('rideDate')" class="sortable">
+              Ride date
+              <span class="sort-indicator" *ngIf="sortColumn === 'rideDate'">
+                {{ sortDirection === 'asc' ? '▲' : '▼' }}
+              </span>
+            </th>
+            <th (click)="sortBy('totalCost')" class="sortable">
+              Total Cost
+              <span class="sort-indicator" *ngIf="sortColumn === 'totalCost'">
+                {{ sortDirection === 'asc' ? '▲' : '▼' }}
+              </span>
+            </th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let ride of rides">
-            <td>
-              <div class="passenger-info">
-                <div class="passenger-name">{{ ride.name }}</div>
-                <div class="ride-id">{{ ride.id }}</div>
-              </div>
-            </td>
-            <td>{{ ride.pickupAddress }}</td>
-            <td>{{ ride.dropoffAddress }}</td>
-            <td>{{ ride.rideDate }}</td>
-            <td>{{ ride.totalCost.toFixed(2) }}</td>
-            <td>{{ ride.cancellationStatus }}</td>
-            <td class="panic-cell">
-              <span class="panic-icon" [class.panic-active]="ride.panicActivation">
-                {{ ride.panicActivation ? '✓' : '✕' }}
-              </span>
-            </td>
-            <td class="feedback-cell">
-              <div class="stars" *ngIf="ride.feedback > 0">
-                <span 
-                  *ngFor="let filled of getStarArray(ride.feedback)" 
-                  class="star"
-                  [class.filled]="filled"
-                >
-                  ★
-                </span>
-              </div>
-              <div class="waiting-feedback" *ngIf="ride.feedback === 0">
-                Waiting
-              </div>
-            </td>
-          </tr>
+          <ng-container *ngFor="let ride of filteredRides">
+            <tr>
+              <td>
+                <div class="passenger-info">
+                  <div class="passenger-name">{{ ride.name }}</div>
+                  <div class="ride-id">{{ ride.id }}</div>
+                </div>
+              </td>
+              <td>{{ ride.pickupAddress }}</td>
+              <td>{{ ride.dropoffAddress }}</td>
+              <td>{{ ride.rideDate | date:'dd MMM, yyyy' }}</td>
+              <td>{{ ride.totalCost | number:'1.2-2' }}</td>
+              <td class="action-cell">
+                <button class="details-btn" (click)="toggleDetails(ride)">
+                  {{ isExpanded(ride) ? 'Hide details' : 'View details' }}
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="isExpanded(ride)" class="details-row">
+              <td colspan="6">
+                <div class="detail-layout">
+                  <div class="map-preview">
+                    <div class="map-header">Route</div>
+                    <app-map
+                      class="mini-map"
+                      [staticRoute]="{ pickup: ride.pickupCoords, dropoff: ride.dropoffCoords, waypoints: ride.waypoints }"
+                    ></app-map>
+                  </div>
+
+                  <div class="detail-grid">
+                    <div class="detail-card">
+                      <div class="detail-label">Other passengers</div>
+                      <ul *ngIf="ride.linkedPassengers.length; else noPassengers" class="passenger-list">
+                        <li *ngFor="let passenger of ride.linkedPassengers">{{ passenger }}</li>
+                      </ul>
+                      <ng-template #noPassengers>
+                        <div class="muted-text">No additional passengers</div>
+                      </ng-template>
+                    </div>
+
+                    <div class="detail-card">
+                      <div class="detail-label">Cancellation</div>
+                      <div class="detail-value">{{ getCancellationLabel(ride) }}</div>
+                      <div class="detail-label">Panic activation</div>
+                      <div class="detail-value panic-value" [class.active]="ride.panicActivation">
+                        {{ ride.panicActivation ? 'Activated' : 'Not activated' }}
+                      </div>
+                    </div>
+
+                    <div class="detail-card">
+                      <div class="detail-label">Total cost</div>
+                      <div class="detail-value">{{ ride.totalCost | number:'1.2-2' }} RSD</div>
+                      <div class="detail-label">Rating</div>
+                      <div class="stars" *ngIf="ride.feedback > 0; else waitingRating">
+                        <span 
+                          *ngFor="let filled of getStarArray(ride.feedback)" 
+                          class="star"
+                          [class.filled]="filled"
+                        >
+                          ★
+                        </span>
+                      </div>
+                      <ng-template #waitingRating>
+                        <div class="muted-text">Waiting for rating</div>
+                      </ng-template>
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </ng-container>
         </tbody>
       </table>
     </div>
