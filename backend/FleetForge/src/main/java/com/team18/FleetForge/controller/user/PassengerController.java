@@ -1,14 +1,10 @@
-package com.team18.FleetForge.controller;
+package com.team18.FleetForge.controller.user;
 
 import com.team18.FleetForge.dto.passenger.PassengerChangeInformationRequestDTO;
 import com.team18.FleetForge.dto.passenger.PassengerChangeInformationResponseDTO;
 import com.team18.FleetForge.dto.passenger.PassengerGetResponseDTO;
 import com.team18.FleetForge.dto.passenger.PassengerPasswordChangeRequestDTO;
 import com.team18.FleetForge.dto.ride.routes.FavoriteRouteGetResponseDTO;
-import com.team18.FleetForge.dto.ride.routes.FavoriteRoutePostDeleteRequestDTO;
-import com.team18.FleetForge.dto.ride.routes.FavoriteRoutePostDeleteResponseDTO;
-import com.team18.FleetForge.model.GeoPoint;
-import com.team18.FleetForge.model.Route;
 import com.team18.FleetForge.model.ride.Ride;
 import com.team18.FleetForge.model.users.Passenger;
 import com.team18.FleetForge.model.users.User;
@@ -22,7 +18,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 

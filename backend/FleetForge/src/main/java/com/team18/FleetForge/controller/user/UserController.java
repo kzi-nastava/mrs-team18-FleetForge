@@ -1,4 +1,4 @@
-package com.team18.FleetForge.controller;
+package com.team18.FleetForge.controller.user;
 
 
 import com.team18.FleetForge.model.users.User;
@@ -24,7 +24,6 @@ public class UserController {
 
     private final ProfilePictureService profilePictureService;
     private final UserService userService;
-    private final AuthService authService;
 
     /**
      * POST /api/users/profile-picture

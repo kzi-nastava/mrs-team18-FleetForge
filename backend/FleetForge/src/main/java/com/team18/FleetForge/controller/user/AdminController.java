@@ -1,10 +1,9 @@
-package com.team18.FleetForge.controller;
+package com.team18.FleetForge.controller.user;
 
 
 import com.team18.FleetForge.dto.RouteDTO;
 import com.team18.FleetForge.dto.UserSummaryDTO;
 import com.team18.FleetForge.dto.admin.*;
-import com.team18.FleetForge.dto.passenger.PassengerGetResponseDTO;
 import com.team18.FleetForge.dto.ride.view.AdminRideHistoryItemDTO;
 import com.team18.FleetForge.dto.ride.view.RideDetailsDTO;
 import com.team18.FleetForge.dto.vehicle.VehicleChangeInformationResponseDTO;
@@ -15,16 +14,11 @@ import com.team18.FleetForge.model.users.Driver;
 import com.team18.FleetForge.model.Vehicle;
 import com.team18.FleetForge.model.VehicleInformationChangeRequest;
 import com.team18.FleetForge.model.enums.InformationChangeRequestStatus;
-import com.team18.FleetForge.model.enums.VehicleType;
-import com.team18.FleetForge.model.users.Passenger;
-import com.team18.FleetForge.model.users.User;
 import com.team18.FleetForge.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
