@@ -1,9 +1,11 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, WritableSignal, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { MapComponent } from '../../shared/map/map';
 import { VehicleService } from '../../shared/services/vehicle.service';
 import { VehicleLocationDTO } from '../../shared/models/vehicle.model';
+import { RideFavoriteRoutesDTO } from '../../shared/dtos/ride.dtos';
+import { PassengerFavorite } from '../service/passenger-favorite/passenger-favorite';
 
 @Component({
   selector: 'app-passenger-dashboard',
@@ -33,24 +35,20 @@ export class PassengerDashboardComponent implements OnInit {
     }
   ];
 
-  favoriteRoutes = [
-    {
-      name: 'Home to Work',
-      vehicleType: 'Standard Vehicle'
-    },
-    {
-      name: 'Gym Route',
-      vehicleType: 'Luxury Vehicle'
-    }
-  ];
+  favoriteRoutes: WritableSignal<RideFavoriteRoutesDTO[]> = signal<RideFavoriteRoutesDTO[]>([]);
 
   constructor(
     private vehicleService: VehicleService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private router: Router,
+    private passengerFavorite: PassengerFavorite
   ) {}
 
   ngOnInit(): void {
     this.loadVehicles();
+    this.passengerFavorite.getFavoriteRoutes().subscribe(routes => {
+      this.favoriteRoutes.set(routes);
+    });
   }
 
   private loadVehicles(): void {
@@ -64,4 +62,8 @@ export class PassengerDashboardComponent implements OnInit {
       }
     });
   }
+  orderRide(route: RideFavoriteRoutesDTO): void {
+    this.router.navigate(['/passenger/passenger-home'], { state: { favoriteRoute: route } });
+  }
+
 }

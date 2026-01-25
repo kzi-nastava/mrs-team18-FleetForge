@@ -1,10 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, signal, WritableSignal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { PassengerHistory } from '../service/passenger-history/passenger-history';
+import { PassengerFavorite } from '../service/passenger-favorite/passenger-favorite';
+import { RideFavoriteRoutesDTO } from '../../shared/dtos/ride.dtos';
 
 interface Ride {
   name: string;
-  id: string;
+  id: number;
   pickupAddress: string;
   dropoffAddress: string;
   rideDate: string;
@@ -29,10 +32,15 @@ export class PassengerHistoryComponent {
   readonly starScale = [1, 2, 3, 4, 5];
   private readonly ratingWindowMs = 3 * 24 * 60 * 60 * 1000;
 
-  private readonly favoriteRideIds = new Set<string>();
-
+  private readonly favRideIds =signal<Set<number>>(new Set<number>());
+  private readonly favRoutes: WritableSignal<RideFavoriteRoutesDTO[]> = signal<RideFavoriteRoutesDTO[]>([]);
+  constructor(private passengerHistory: PassengerHistory,private passengerFavorite: PassengerFavorite) {}
   isRatingModalOpen = false;
   selectedRide: Ride | null = null;
+
+	isFavoriteModalOpen = false;
+	favoriteRide: Ride | null = null;
+	favoriteRouteName = '';
   ratingForm = {
     driverRating: 0,
     vehicleRating: 0,
@@ -42,10 +50,10 @@ export class PassengerHistoryComponent {
   hoverDriverRating = 0;
   hoverVehicleRating = 0;
 
-  rides: Ride[] = [
+  protected rides: WritableSignal<Ride[]> = signal<Ride[]>([
     {
       name: 'Petar Petrovic',
-      id: 'R123465798',
+      id: 1,
       pickupAddress: 'Kneza Milosa 3',
       dropoffAddress: 'Kajmakcalska 5',
       rideDate: this.buildRideDate(2),
@@ -58,7 +66,7 @@ export class PassengerHistoryComponent {
     },
     {
       name: 'Petar Petrovic',
-      id: 'R123465799',
+      id: 2,
       pickupAddress: 'Despota Stefana 4',
       dropoffAddress: 'Sekspiova 2',
       rideDate: this.buildRideDate(1),
@@ -68,7 +76,7 @@ export class PassengerHistoryComponent {
     },
     {
       name: 'Petar Petrovic',
-      id: 'R123465800',
+      id: 3,
       pickupAddress: 'Kozacinskog 1',
       dropoffAddress: 'Staljinova 10',
       rideDate: this.buildRideDate(6),
@@ -78,7 +86,7 @@ export class PassengerHistoryComponent {
     },
     {
       name: 'Petar Petrovic',
-      id: 'R123465801',
+      id: 4,
       pickupAddress: 'Mekinjeva 28',
       dropoffAddress: 'Mise Dimitrijevica 32',
       rideDate: this.buildRideDate(10),
@@ -89,13 +97,24 @@ export class PassengerHistoryComponent {
       vehicleRating: 4,
       ratingComment: 'Driver was courteous.',
     },
-  ];
 
+  ]);
+  ngOnInit(): void {
+    this.passengerFavorite.getFavoriteRoutes().subscribe(routes => {
+      const newFavs = new Set<number>();
+    routes.forEach((route) => newFavs.add(route.rideId));
+    this.favRoutes.set(routes);
+  
+    this.favRideIds.update(() => newFavs);
+    }
+    
+    );
+  }
   get displayedRides(): Ride[] {
     const q = this.searchQuery.trim().toLowerCase();
-    if (!q) return this.rides;
+    if (!q) return this.rides();
 
-    return this.rides.filter((ride) =>
+    return this.rides().filter((ride) =>
       [
         ride.name,
         ride.id,
@@ -189,16 +208,81 @@ export class PassengerHistoryComponent {
   }
 
   isFavorite(ride: Ride): boolean {
-    return this.favoriteRideIds.has(ride.id);
-  }
+    return this.favRideIds().has(ride.id);
+  }   
 
-  toggleFavorite(ride: Ride): void {
-    if (this.favoriteRideIds.has(ride.id)) {
-      this.favoriteRideIds.delete(ride.id);
+  onFavoriteClick(ride: Ride): void {
+    if (this.isFavorite(ride)) {
+      this.removeFavorite(ride);
       return;
     }
 
-    this.favoriteRideIds.add(ride.id);
+    this.openFavoriteModal(ride);
+  }
+
+  openFavoriteModal(ride: Ride): void {
+    this.favoriteRide = ride;
+    this.favoriteRouteName = '';
+    this.isFavoriteModalOpen = true;
+  }
+
+  closeFavoriteModal(): void {
+    this.isFavoriteModalOpen = false;
+    this.favoriteRide = null;
+    this.favoriteRouteName = '';
+  }
+
+  saveFavoriteRoute(): void {
+    if (!this.favoriteRide) {
+      return;
+    }
+
+    const name = this.favoriteRouteName.trim();
+    if (!name) {
+      return;
+    }
+
+    const rideId = this.favoriteRide.id;
+    this.passengerHistory.addFavoriteRoute(name, rideId).subscribe({
+      next: () => {
+        this.favRideIds.update((prev) => {
+          const next = new Set(prev);
+          next.add(rideId);
+          return next;
+        });
+
+        this.passengerFavorite.getFavoriteRoutes().subscribe((routes) => {
+          this.favRoutes.set(routes);
+        });
+
+        this.closeFavoriteModal();
+      },
+      error: (err) => {
+        console.error('Failed to add favorite route', err);
+      },
+    });
+  }
+
+  private removeFavorite(ride: Ride): void {
+    const rideId = ride.id;
+    const favRouteId= this.favRoutes().find(route => route.rideId === rideId)?.id;
+    if (favRouteId === undefined) {
+      console.error('Favorite route ID not found for ride ID', rideId);
+      return;
+    }
+    this.passengerHistory.deleteFavoriteRoute(favRouteId).subscribe({
+      next: () => {
+        this.favRideIds.update((prev) => {
+          const next = new Set(prev);
+          next.delete(rideId);
+          return next;
+        });
+        this.favRoutes.update((prev) => prev.filter(route => route.rideId !== rideId));
+      },
+      error: (err:any) => {
+        console.error('Failed to remove favorite route', err);
+      },
+    });
   }
 
   getStarArray(rating: number): boolean[] {

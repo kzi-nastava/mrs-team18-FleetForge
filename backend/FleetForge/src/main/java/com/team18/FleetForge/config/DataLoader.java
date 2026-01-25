@@ -6,6 +6,7 @@ import com.team18.FleetForge.model.enums.Role;
 import com.team18.FleetForge.model.enums.RideStatus;
 import com.team18.FleetForge.model.enums.VehicleType;
 import com.team18.FleetForge.model.enums.RideCancellationRole;
+import com.team18.FleetForge.model.ride.FavoriteRoute;
 import com.team18.FleetForge.model.ride.Ride;
 import com.team18.FleetForge.model.users.Admin;
 import com.team18.FleetForge.model.users.Driver;
@@ -29,6 +30,7 @@ public class DataLoader implements CommandLineRunner {
     private final UserRepository userRepository;
     private final RideRepository rideRepository;
     private final PasswordEncoder passwordEncoder;
+    private final FavoriteRouteRepo favoriteRouteRepo;
 
     @Override
     public void run(String... args) {
@@ -211,6 +213,12 @@ public class DataLoader implements CommandLineRunner {
         );
         ride6.setPanicActivatedAt(LocalDateTime.now().minusDays(3).withHour(20).withMinute(10));
         rideRepository.save(ride6);
+
+        FavoriteRoute route=new FavoriteRoute();
+        route.setRide(ride1);
+        route.setPassenger(passenger1);
+        route.setName("Home-work");
+        favoriteRouteRepo.save(route);
 
     }
 
