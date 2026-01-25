@@ -1,33 +1,29 @@
-package com.team18.FleetForge.controller;
+package com.team18.FleetForge.controller.ride;
 
 import com.team18.FleetForge.dto.ride.lifecycle.*;
 
-import com.team18.FleetForge.dto.ride.review.RideReviewRequestDTO;
-import com.team18.FleetForge.dto.ride.review.RideReviewResponseDTO;
 import com.team18.FleetForge.model.GeoPoint;
-import com.team18.FleetForge.model.Route;
-import com.team18.FleetForge.model.enums.RideCancellationRole;
 import com.team18.FleetForge.model.enums.RideStatus;
 import com.team18.FleetForge.model.ride.Ride;
+import com.team18.FleetForge.service.RideCancellationService;
 import com.team18.FleetForge.service.RideService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 
-import java.security.Principal;
-import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/rides")
 public class RideController {
 
     private final RideService rideService;
+    private final RideCancellationService rideCancellationService;
 
 
     /**
@@ -35,7 +31,6 @@ public class RideController {
      * Request Body:
      *  - cancelledBy (DRIVER | PASSENGER)
      *  - reason (String, required for DRIVER)
-     *  - scheduledStartTime (LocalDateTime)
      * Response:
      *  - success (boolean)
      *  - message (String)
@@ -47,44 +42,21 @@ public class RideController {
     )
     public ResponseEntity<RideCancellationResponseDTO> cancelRide(
             @PathVariable Long rideId,
-            @RequestBody RideCancellationRequestDTO request
+            @RequestBody RideCancellationRequestDTO request,
+            Authentication authentication
     ) {
-        LocalDateTime now = LocalDateTime.now();
+        RideCancellationResult result =
+                rideCancellationService.cancelRide(rideId, request, authentication);
 
-        if (request.getCancelledBy() == RideCancellationRole.PASSENGER) {
-            long minutesUntilStart =
-                    Duration.between(now, request.getScheduledStartTime()).toMinutes();
-
-            if (minutesUntilStart < 10) {
-                return new ResponseEntity<>(
-                        new RideCancellationResponseDTO(
-                                false,
-                                "Passenger cancellation allowed only 10 minutes before ride start."
-                        ),
-                        HttpStatus.BAD_REQUEST
-                );
-            }
-        }
-
-        if (request.getCancelledBy() == RideCancellationRole.DRIVER &&
-                (request.getReason() == null || request.getReason().isBlank())) {
-            return new ResponseEntity<>(
-                    new RideCancellationResponseDTO(
-                            false,
-                            "Driver must provide a cancellation reason."
-                    ),
-                    HttpStatus.BAD_REQUEST
-            );
-        }
-
-        return new ResponseEntity<>(
-                new RideCancellationResponseDTO(
-                        true,
-                        "Ride " + rideId + " successfully cancelled."
-                ),
-                HttpStatus.OK
-        );
+        return ResponseEntity
+                .status(result.getHttpStatus())
+                .body(new RideCancellationResponseDTO(
+                        result.isSuccess(),
+                        result.getMessage()
+                ));
     }
+
+
 
     /**
      * POST /api/rides/{rideId}/early-end

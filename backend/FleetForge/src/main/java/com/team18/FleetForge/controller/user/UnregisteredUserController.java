@@ -1,4 +1,4 @@
-package com.team18.FleetForge.controller;
+package com.team18.FleetForge.controller.user;
 
 import com.team18.FleetForge.dto.vehicle.VehicleLocationDTO;
 import com.team18.FleetForge.service.VehicleService;

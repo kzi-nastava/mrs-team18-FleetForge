@@ -1,4 +1,4 @@
-package com.team18.FleetForge.controller;
+package com.team18.FleetForge.controller.ride;
 
 import com.team18.FleetForge.dto.ride.reports.InconsistencyReportDTO;
 import com.team18.FleetForge.dto.ride.reports.InconsistencyReportResponseDTO;
