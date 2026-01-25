@@ -9,9 +9,11 @@ import com.team18.FleetForge.dto.ride.routes.FavoriteRoutePostDeleteRequestDTO;
 import com.team18.FleetForge.dto.ride.routes.FavoriteRoutePostDeleteResponseDTO;
 import com.team18.FleetForge.model.GeoPoint;
 import com.team18.FleetForge.model.Route;
+import com.team18.FleetForge.model.ride.FavoriteRoute;
 import com.team18.FleetForge.model.ride.Ride;
 import com.team18.FleetForge.model.users.Passenger;
 import com.team18.FleetForge.model.users.User;
+import com.team18.FleetForge.service.FavoriteRouteService;
 import com.team18.FleetForge.service.RideService;
 import com.team18.FleetForge.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +35,7 @@ public class PassengerController {
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final RideService rideService;
+    private final FavoriteRouteService favoriteRouteService;
 
     @GetMapping
     public ResponseEntity<PassengerGetResponseDTO> getCurrentPassenger() {
@@ -102,45 +105,38 @@ public class PassengerController {
     public ResponseEntity<List<FavoriteRouteGetResponseDTO>> getFavouriteRoutes() {
         Authentication  authentication = SecurityContextHolder.getContext().getAuthentication();
         Passenger passenger = (Passenger) authentication.getPrincipal();
+        List<FavoriteRoute> favRoutes=favoriteRouteService.findByPassengerId(passenger.getId());
         List<FavoriteRouteGetResponseDTO> responseDTOList = new ArrayList<>();
-        for(Long id:passenger.getFavoriteRidesIds()){
-            Ride ride=rideService.getRideById(id);
+        for(FavoriteRoute favRoute:favRoutes){
             FavoriteRouteGetResponseDTO responseDTO = new FavoriteRouteGetResponseDTO();
-            responseDTO.setId(ride.getId());
-            responseDTO.setStartAddress(ride.getStartAddress());
-            responseDTO.setEndAddress(ride.getEndAddress());
-            responseDTO.setWaypoints(ride.getWayPoints());
+            responseDTO.setId(favRoute.getId());
+            responseDTO.setStartAddress(favRoute.getRide().getStartAddress());
+            responseDTO.setEndAddress(favRoute.getRide().getEndAddress());
+            responseDTO.setWaypoints(favRoute.getRide().getWayPoints());
+            responseDTO.setName(favRoute.getName());
+            responseDTO.setRideId(favRoute.getRide().getId());
             responseDTOList.add(responseDTO);
         }
         return new ResponseEntity<>(responseDTOList, HttpStatus.OK);
     }
 
-    @PostMapping("/favorites/{rideId}")
-    public ResponseEntity<?> addFavoriteRoute(@PathVariable Long rideId) {
+    @PostMapping("/favorites/{routeName}/{rideId}")
+    public ResponseEntity<?> addFavoriteRoute(@PathVariable Long rideId, @PathVariable String routeName) {
         Authentication  authentication = SecurityContextHolder.getContext().getAuthentication();
         Passenger passenger = (Passenger) authentication.getPrincipal();
-        if(passenger.getFavoriteRidesIds()==null){
-            passenger.setFavoriteRidesIds(new ArrayList<>());
-        }
-        List<Long> favoritesIds = passenger.getFavoriteRidesIds();
-        favoritesIds.add(rideId);
-        passenger.setFavoriteRidesIds(favoritesIds);
-        userService.save(passenger);
-        return new ResponseEntity<>("success", HttpStatus.OK);
+        FavoriteRoute route=new FavoriteRoute();
+        Ride ride=rideService.getRideById(rideId);
+        route.setRide(ride);
+        route.setName(routeName);
+        route.setPassenger(passenger);
+        favoriteRouteService.save(route);
+        return new ResponseEntity<>( HttpStatus.OK);
     }
 
-    @DeleteMapping("/favorites/{rideId}")
-    public ResponseEntity<?> deleteFavoriteRoute(@PathVariable Long rideId) {
-        Authentication  authentication = SecurityContextHolder.getContext().getAuthentication();
-        Passenger passenger = (Passenger) authentication.getPrincipal();
-        if(passenger.getFavoriteRidesIds()==null){
-            passenger.setFavoriteRidesIds(new ArrayList<>());
-            throw new IllegalArgumentException();
-        }
-        List<Long> favoritesIds = passenger.getFavoriteRidesIds();
-        favoritesIds.remove(rideId);
-        passenger.setFavoriteRidesIds(favoritesIds);
-        userService.save(passenger);
-        return new ResponseEntity<>("success", HttpStatus.OK);
+    @DeleteMapping("/favorites/{id}")
+    public ResponseEntity<?> deleteFavoriteRoute(@PathVariable Long id) {
+        FavoriteRoute route= favoriteRouteService.findById(id);
+        favoriteRouteService.delete(route);
+        return new ResponseEntity<>( HttpStatus.OK);
     }
 }

@@ -16,9 +16,6 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-@AllArgsConstructor
 @SuperBuilder
 public class Passenger extends User {
-    @Column(name = "favorites")
-    private List<Long> favoriteRidesIds;
 }

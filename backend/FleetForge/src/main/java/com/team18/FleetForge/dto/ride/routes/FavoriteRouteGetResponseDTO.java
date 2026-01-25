@@ -14,7 +14,9 @@ import java.util.List;
 @AllArgsConstructor
 public class FavoriteRouteGetResponseDTO {
     private Long id;
+    private Long rideId;
     private String startAddress;
     private String endAddress;
     private List<WayPoint> waypoints;
+    private String name;
 }
