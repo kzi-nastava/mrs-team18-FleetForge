@@ -1,0 +1,15 @@
+<div class="popup-overlay" *ngIf="visible">
+  <div class="popup-box">
+    <h2 class="popup-title">
+      {{ title || (success ? 'Success' : 'Error') }}
+    </h2>
+
+    <p class="popup-message">
+      {{ message }}
+    </p>
+
+    <button class="popup-button" (click)="close()">
+      {{ okButtonText }}
+    </button>
+  </div>
+</div>
