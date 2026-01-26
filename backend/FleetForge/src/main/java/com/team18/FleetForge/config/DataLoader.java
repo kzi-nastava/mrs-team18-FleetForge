@@ -2,10 +2,10 @@ package com.team18.FleetForge.config;
 
 import com.team18.FleetForge.model.GeoPoint;
 import com.team18.FleetForge.model.Vehicle;
+import com.team18.FleetForge.model.enums.RideActor;
 import com.team18.FleetForge.model.enums.Role;
 import com.team18.FleetForge.model.enums.RideStatus;
 import com.team18.FleetForge.model.enums.VehicleType;
-import com.team18.FleetForge.model.enums.RideCancellationRole;
 import com.team18.FleetForge.model.ride.FavoriteRoute;
 import com.team18.FleetForge.model.ride.Ride;
 import com.team18.FleetForge.model.users.Admin;
@@ -185,7 +185,7 @@ public class DataLoader implements CommandLineRunner {
                 LocalDateTime.now().minusDays(5).withHour(16).withMinute(0),
                 null, // No end time because cancelled
                 8.0, 25.0, 1080.0,
-                RideStatus.CANCELLED, false, RideCancellationRole.PASSENGER,
+                RideStatus.CANCELLED, false, RideActor.PASSENGER,
                 "Changed plans, no longer need ride"
         );
         ride4.setCancelledAt(LocalDateTime.now().minusDays(5).withHour(15).withMinute(55));
@@ -262,7 +262,7 @@ public class DataLoader implements CommandLineRunner {
                             LocalDateTime startTime, LocalDateTime endTime,
                             Double distance, Double duration, Double cost,
                             RideStatus status, Boolean panicActivated,
-                            RideCancellationRole cancelledBy, String cancellationReason) {
+                            RideActor cancelledBy, String cancellationReason) {
 
         Ride ride = new Ride();
         ride.setDriver(driver);

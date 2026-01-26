@@ -1,6 +1,6 @@
 package com.team18.FleetForge.model.enums;
 
-public enum PanicInitiator {
+public enum RideActor  {
     DRIVER,
     PASSENGER
 }
