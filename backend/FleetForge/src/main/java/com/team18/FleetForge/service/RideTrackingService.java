@@ -3,13 +3,17 @@ package com.team18.FleetForge.service;
 import com.team18.FleetForge.dto.driver.DriverInfoDTO;
 import com.team18.FleetForge.dto.ride.reports.InconsistencyReportDTO;
 import com.team18.FleetForge.dto.ride.reports.InconsistencyReportResponseDTO;
+import com.team18.FleetForge.dto.ride.view.DriverLocationUpdateRequestDTO;
+import com.team18.FleetForge.dto.ride.view.DriverLocationUpdateResponseDTO;
 import com.team18.FleetForge.dto.ride.view.RideTrackingDTO;
+import com.team18.FleetForge.model.GeoPoint;
+import com.team18.FleetForge.model.enums.Role;
 import com.team18.FleetForge.model.ride.InconsistencyReport;
-import com.team18.FleetForge.model.enums.RideStatus;
 import com.team18.FleetForge.model.ride.Ride;
 import com.team18.FleetForge.model.ride.WayPoint;
 import com.team18.FleetForge.model.users.Driver;
 import com.team18.FleetForge.model.users.Passenger;
+import com.team18.FleetForge.repository.DriverRepository;
 import com.team18.FleetForge.repository.InconsistencyReportRepository;
 import com.team18.FleetForge.repository.PassengerRepository;
 import com.team18.FleetForge.repository.RideRepository;
@@ -30,22 +34,61 @@ public class RideTrackingService {
 
     private final RideRepository rideRepository;
     private final PassengerRepository passengerRepository;
+    private final DriverRepository driverRepository;
     private final InconsistencyReportRepository inconsistencyReportRepository;
 
 
-    public RideTrackingDTO getActiveRideForPassenger(Long passengerId) {
-        log.info("Fetching active ride for passenger ID: {}", passengerId);
-
-        Ride ride = rideRepository.findActiveRideByPassengerId(passengerId, RideStatus.IN_PROGRESS)
-                .orElse(null);
-
-        if (ride == null) {
-            log.info("No active ride found for passenger ID: {}", passengerId);
-            return null;
+    public RideTrackingDTO getActiveRideForUser(Long userId, Role role) {
+        
+        List<Ride> activeRides;
+        if (role.equals(Role.ROLE_DRIVER)) {
+            activeRides = rideRepository.findActiveRidesByDriverId(userId);
+        } else if (role.equals(Role.ROLE_PASSENGER)) {
+            activeRides = rideRepository.findActiveRidesByPassengerId(userId);
+        } else {
+            throw new IllegalArgumentException("Invalid role: " + role);
         }
+
+        if (activeRides.isEmpty()) {
+            throw new RuntimeException("No active ride found for user ID: " + userId);
+        }
+
+        activeRides.sort((r1, r2) -> r1.getStartTime().compareTo(r2.getStartTime()));
+        Ride ride = activeRides.get(0);
 
         return buildRideTrackingDTO(ride);
     }
+
+
+    @Transactional
+    public DriverLocationUpdateResponseDTO updateDriverLocation(
+            Long driverId,
+            DriverLocationUpdateRequestDTO request) {
+        log.info("Updating location for driver ID: {}", driverId);
+
+        List<Ride> activeRides = rideRepository.findActiveRidesByDriverId(driverId);
+
+        if (activeRides.isEmpty()) {
+            throw new RuntimeException("No active ride found for driver ID: " + driverId);
+        }
+
+        activeRides.sort((r1, r2) -> r1.getStartTime().compareTo(r2.getStartTime()));
+        Ride ride = activeRides.get(0);
+        Driver driver = ride.getDriver();
+        GeoPoint newLocation = new GeoPoint(
+                request.getCurrentLocation().getLatitude(),
+                request.getCurrentLocation().getLongitude()
+        );
+        driver.setCurrentLocation(newLocation);
+
+        driverRepository.save(driver);
+
+        return DriverLocationUpdateResponseDTO.builder()
+                .message("Driver location updated successfully")
+                .updatedAt(LocalDateTime.now())
+                .build();
+    }
+
 
     @Transactional
     public InconsistencyReportResponseDTO reportInconsistency(
@@ -83,6 +126,7 @@ public class RideTrackingService {
 
     private RideTrackingDTO buildRideTrackingDTO(Ride ride) {
         Driver driver = ride.getDriver();
+        Passenger passenger = ride.getPassenger();
 
         return RideTrackingDTO.builder()
                 .rideId(ride.getId())
@@ -91,6 +135,7 @@ public class RideTrackingService {
                 .estimatedArrivalMinutes(null)
                 .route(buildRouteInfo(ride))
                 .driver(buildDriverInfo(driver))
+                .passenger(buildPassengerInfo(passenger))
                 .panicActivated(ride.getPanicActivated() != null && ride.getPanicActivated())
                 .build();
     }
@@ -126,6 +171,16 @@ public class RideTrackingService {
                 .lastName(driver.getLastName())
                 .phoneNumber(driver.getPhoneNumber())
                 .profileImage(driver.getProfilePicture())
+                .build();
+    }
+
+    private RideTrackingDTO.PassengerInfoDTO buildPassengerInfo(Passenger passenger) {
+        return RideTrackingDTO.PassengerInfoDTO.builder()
+                .id(passenger.getId())
+                .firstName(passenger.getFirstName())
+                .lastName(passenger.getLastName())
+                .phoneNumber(passenger.getPhoneNumber())
+                .profileImage(passenger.getProfilePicture())
                 .build();
     }
 
