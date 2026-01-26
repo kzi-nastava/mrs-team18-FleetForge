@@ -53,3 +53,11 @@
     confirmButtonText="Cancel" cancelButtonText="Abort" confirmButtonColor="red"
     (confirmed)="confirmCancel()" (cancelled)="closePopup()">
 </app-confirmation-popup>
+<app-notification-popup
+  [visible]="notificationVisible"
+  [title]="notificationTitle"
+  [message]="notificationMessage"
+  [success]="notificationSuccess"
+  okButtonText="OK"
+  (closed)="onNotificationClosed()">
+</app-notification-popup>

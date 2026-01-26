@@ -48,3 +48,12 @@
     </div>
   </div>
 </div>
+<app-notification-popup
+  [visible]="notificationVisible"
+  [title]="notificationTitle"
+  [message]="notificationMessage"
+  [success]="notificationSuccess"
+  okButtonText="OK"
+  (closed)="onNotificationClosed()">
+</app-notification-popup>
+

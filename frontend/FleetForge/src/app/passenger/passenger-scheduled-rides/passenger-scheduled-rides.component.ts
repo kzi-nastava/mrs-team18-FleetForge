@@ -1,8 +1,9 @@
-import { Component, signal, WritableSignal } from '@angular/core';
+import { Component, signal, WritableSignal, ChangeDetectorRef} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RideService } from '../../shared/services/ride.service';
 import { ConfirmationPopupComponent } from '../../shared/popups/confirmation-popup/confirmation-popup.component';
+import { NotificationPopupComponent } from '../../shared/popups/popup-dialog/notification-popup.component';
 
 interface ScheduledRide {
   id: number;
@@ -16,7 +17,7 @@ interface ScheduledRide {
 @Component({
   selector: 'app-passenger-scheduled-rides',
   standalone: true,
-  imports: [CommonModule, FormsModule, ConfirmationPopupComponent],
+  imports: [CommonModule, FormsModule, ConfirmationPopupComponent, NotificationPopupComponent],
   templateUrl: './passenger-scheduled-rides.component.html',
   styleUrls: ['./passenger-scheduled-rides.component.css'],
 })
@@ -26,7 +27,15 @@ export class PassengerScheduledRidesComponent {
   showConfirmPopup = false;
   ridePendingCancel: ScheduledRide | null = null;
 
-  constructor(private rideService: RideService) {}
+  notificationVisible = false;
+  notificationTitle = '';
+  notificationMessage = '';
+  notificationSuccess = true;
+
+  constructor(
+    private rideService: RideService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   protected rides: WritableSignal<ScheduledRide[]> = signal([
     {
@@ -93,26 +102,43 @@ export class PassengerScheduledRidesComponent {
     const rideId = this.ridePendingCancel.id;
 
     this.rideService.cancelRide(rideId).subscribe({
-      next: () => {
+      next: (response) => {
         this.rides.update((rides) =>
           rides.map((r) =>
             r.id === rideId ? { ...r, status: 'CANCELLED' } : r
           )
         );
+
+        this.notificationTitle = 'Ride Cancelled';
+        this.notificationMessage = response.message;
+        this.notificationSuccess = true;
+        this.notificationVisible = true;
+
         this.closePopup();
+        this.cdr.detectChanges();
       },
       error: (err) => {
+        this.notificationTitle = 'Cancellation Failed';
+        this.notificationMessage =
+          err?.error?.message ?? 'Unable to cancel the scheduled ride.';
+        this.notificationSuccess = false;
+        this.notificationVisible = true;
+
         this.closePopup();
-        // todo: show error popup
+        this.cdr.detectChanges();
       },
     });
   }
+
 
   closePopup(): void {
     this.showConfirmPopup = false;
     this.ridePendingCancel = null;
   }
 
+  onNotificationClosed(): void {
+    this.notificationVisible = false;
+  }
   onDetails(ride: ScheduledRide): void {
     console.log('Scheduled ride details', ride);
   }
