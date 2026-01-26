@@ -10,11 +10,10 @@ export class RideService {
 
   constructor(private http: HttpClient) { }
 
-  cancelRide(rideId: number): Observable<void> {
-    
-    return this.http.post<void>(
+  cancelRide(rideId: number, reason?: string) {
+    return this.http.post(
       `${this.apiUrl}/${rideId}/cancellations`,
-      {}
+      reason ? { reason } : {}
     );
   }
   

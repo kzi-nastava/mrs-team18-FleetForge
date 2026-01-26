@@ -18,3 +18,33 @@
   (confirmed)="confirmCancelRide()"
   (cancelled)="closeCancelConfirmation()"
 ></app-confirmation-popup>
+<div class="popup-overlay" *ngIf="showCancelReasonPopup">
+  <div class="popup-box">
+    <h2 class="popup-title">Cancel Ride</h2>
+
+    <p class="popup-message">
+      Please provide a reason for cancelling this ride.
+    </p>
+
+    <textarea
+      class="popup-textarea"
+      [(ngModel)]="cancelReason"
+      rows="4"
+      placeholder="Enter cancellation reason..."
+    ></textarea>
+
+    <div class="popup-actions">
+      <button class="popup-button cancel" (click)="closeCancelReasonPopup()">
+        Abort
+      </button>
+
+      <button
+        class="popup-button confirm red"
+        [disabled]="!cancelReason.trim()"
+        (click)="submitCancelReason()"
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>

@@ -20,7 +20,10 @@ export class CurrentRideDriverComponent implements OnInit, OnDestroy {
   rideData: RideTrackingDTO | null = null;
   cardInfo: CardInfo | null = null;
   actionButtons: ActionButton[] = [];
-  showCancelConfirm = false;
+
+  showCancelConfirm = false;  
+  showCancelReasonPopup = false;
+  cancelReason: string = '';    
   
   private locationUpdateInterval: any;
   private routeCoordinates: Array<{latitude: number, longitude: number}> = [];
@@ -131,19 +134,26 @@ export class CurrentRideDriverComponent implements OnInit, OnDestroy {
 
   confirmCancelRide(): void {
     this.showCancelConfirm = false;
+    
+    this.showCancelReasonPopup = true;
+  }
+
+  submitCancelReason(): void {
+    if (!this.rideData || !this.cancelReason.trim()) return;
+
+    const reason = this.cancelReason.trim();
+
+    this.showCancelReasonPopup = false;
     this.clearTracking();
 
-    if (!this.rideData) return;
-
-    this.rideService.cancelRide(this.rideData.rideId).subscribe({
+    this.rideService.cancelRide(this.rideData.rideId, reason).subscribe({
       next: () => {
         this.rideData!.status = 'CANCELLED';
-        //todo notification popup
+        this.cancelReason = '';
         alert('Ride has been cancelled');
       },
       error: (err) => {
         console.error('Failed to cancel ride', err);
-        //todo notification popup
         alert('Failed to cancel ride');
       }
     });
@@ -151,8 +161,14 @@ export class CurrentRideDriverComponent implements OnInit, OnDestroy {
 
 
   closeCancelConfirmation(): void {
-    this.showCancelConfirm = false;
+  this.showCancelConfirm = false;
   }
+
+  closeCancelReasonPopup(): void {
+    this.showCancelReasonPopup = false;
+    this.cancelReason = '';
+  }
+
 
 
   private onStartRide(): void {
