@@ -1,5 +1,6 @@
 package com.team18.FleetForge.dto.ride.lifecycle;
 
+import com.team18.FleetForge.dto.ride.view.RideTrackingDTO;
 import com.team18.FleetForge.model.enums.RideStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,8 +20,6 @@ public class FinishRideResponseDTO {
     private LocalDateTime endTime;
     private Double totalCost;
     private String message;
-
-    // Driver availability info
     private boolean driverAvailable;
-    private Long nextScheduledRideId;
+    private RideTrackingDTO nextRide;
 }

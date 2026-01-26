@@ -159,8 +159,8 @@ public class DataLoader implements CommandLineRunner {
                 driver1, passenger2,
                 new GeoPoint(45.2600, 19.8400), "Futoška 10, Novi Sad",
                 new GeoPoint(45.2500, 19.8600), "Petrovaradin Tvrđava",
-                LocalDateTime.now().minusDays(14).withHour(18).withMinute(0),
-                LocalDateTime.now().minusDays(14).withHour(18).withMinute(30),
+                LocalDateTime.now().withHour(18).withMinute(0),
+                LocalDateTime.now().withHour(18).withMinute(30),
                 7.5, 30.0, 1120.0,
                 RideStatus.COMPLETED, false, null, null
         );
@@ -168,13 +168,13 @@ public class DataLoader implements CommandLineRunner {
         rideRepository.save(ride2);
 
         Ride ride3 = createRide(
-                driver1, passenger1,
-                new GeoPoint(45.2671, 19.8335), "Trg slobode 1, Novi Sad",
-                new GeoPoint(45.2550, 19.8450), "Bulevar oslobođenja 46, Novi Sad",
-                LocalDateTime.now(),
+                driver1, passenger2,
+                new GeoPoint(45.2731, 19.8535), "Trg slobode 1, Novi Sad",
+                new GeoPoint(45.2750, 19.8550), "Bulevar oslobođenja 46, Novi Sad",
+                LocalDateTime.now().plusMinutes(7),
                 null,
                 5.2, 20.0, 850.0,
-                RideStatus.COMPLETED, false, null, null
+                RideStatus.ACCEPTED, false, null, null
         );
         rideRepository.save(ride3);
 
@@ -195,8 +195,8 @@ public class DataLoader implements CommandLineRunner {
                 driver1, passenger4,
                 new GeoPoint(45.2580, 19.8420), "Modene 10, Novi Sad",
                 new GeoPoint(45.2620, 19.8380), "Dnevnik, Novi Sad",
-                LocalDateTime.now().minusDays(1).withHour(9).withMinute(0),
-                LocalDateTime.now().minusDays(1).withHour(9).withMinute(20),
+                LocalDateTime.now().withHour(9).withMinute(0),
+                LocalDateTime.now().withHour(9).withMinute(20),
                 4.5, 20.0, 780.0,
                 RideStatus.COMPLETED, false, null, null
         );

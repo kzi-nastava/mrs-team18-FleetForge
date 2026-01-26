@@ -3,6 +3,7 @@ package com.team18.FleetForge.controller.user;
 import com.team18.FleetForge.dto.auth.SetPasswordRequestDTO;
 import com.team18.FleetForge.dto.auth.SetPasswordResponseDTO;
 import com.team18.FleetForge.dto.driver.*;
+import com.team18.FleetForge.dto.ride.lifecycle.UpcomingRideDTO;
 import com.team18.FleetForge.dto.vehicle.VehicleInformationChangeRequestDTO;
 import com.team18.FleetForge.dto.vehicle.VehicleInformationChangeResponseDTO;
 import com.team18.FleetForge.model.*;
@@ -16,6 +17,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -40,10 +42,29 @@ public class DriverControler {
     private final AuthService  authService;
     private final EmailService emailService;
     private final ActivationTokenService activationTokenService;
-    private final ProfilePictureService profilePictureService;
     private final PasswordEncoder passwordEncoder;
     private final DriverSessionService driverSessionService;
-    private final DriverService driverService;
+    private final DriverDashboardService driverDashboardService;
+
+
+
+    @GetMapping("/upcoming-rides")
+    @PreAuthorize("hasRole('DRIVER')")
+    public ResponseEntity<List<UpcomingRideDTO>> getUpcomingRides(Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+
+        List<UpcomingRideDTO> upcomingRides = driverDashboardService.getUpcomingRides(user.getId());
+        return ResponseEntity.ok(upcomingRides);
+    }
+
+    @GetMapping("/daily-stats")
+    @PreAuthorize("hasRole('DRIVER')")
+    public ResponseEntity<DailyStatsDTO> getDailyStats(Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        DailyStatsDTO dailyStats = driverDashboardService.getDailyStats(user.getId());
+        return ResponseEntity.ok(dailyStats);
+    }
+
 
     @GetMapping
     public ResponseEntity<DriverGetResponseDTO> getCurrentDriver(){
