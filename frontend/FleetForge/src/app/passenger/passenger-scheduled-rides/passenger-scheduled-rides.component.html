@@ -3,10 +3,6 @@
     <div class="header-section">
         <h2 class="dashboard-title">Scheduled rides</h2>
 
-        <div class="search-box">
-            <span class="search-icon">🔍</span>
-            <input type="text" placeholder="Search" [(ngModel)]="searchQuery" class="search-input" />
-        </div>
     </div>
 
     <div class="rides-section">
@@ -38,9 +34,11 @@
                         <td>{{ ride.scheduledAt | date: 'd MMM, y • HH:mm' }}</td>
                         <td>{{ ride.estimatedCost.toFixed(2) }}</td>
                         <td class="action-cell">
-                            <button class="action-btn cancel" [disabled]="!canCancel(ride)" (click)="cancelRide(ride)">
+                            <button class="action-btn cancel" [disabled]="!canCancel(ride)"
+                                (click)="requestCancel(ride)">
                                 {{ canCancel(ride) ? 'Cancel' : 'Disabled' }}
                             </button>
+
 
                         </td>
                     </tr>
@@ -50,3 +48,16 @@
         </div>
     </div>
 </div>
+<app-confirmation-popup [visible]="showConfirmPopup" title="Cancel scheduled ride"
+    message="Are you sure you want to cancel this scheduled ride? This action cannot be undone."
+    confirmButtonText="Cancel" cancelButtonText="Abort" confirmButtonColor="red"
+    (confirmed)="confirmCancel()" (cancelled)="closePopup()">
+</app-confirmation-popup>
+<app-notification-popup
+  [visible]="notificationVisible"
+  [title]="notificationTitle"
+  [message]="notificationMessage"
+  [success]="notificationSuccess"
+  okButtonText="OK"
+  (closed)="onNotificationClosed()">
+</app-notification-popup>

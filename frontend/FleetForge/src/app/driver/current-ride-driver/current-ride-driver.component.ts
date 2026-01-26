@@ -4,37 +4,52 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CurrentRideComponent, ActionButton, CardInfo } from '../../shared/current-ride/current-ride.component';
 import { RideTrackingDTO } from '../../shared/dtos/ride-tracking.dtos';
+import { ConfirmationPopupComponent } from '../../shared/popups/confirmation-popup/confirmation-popup.component';
+import { NotificationPopupComponent } from '../../shared/popups/popup-dialog/notification-popup.component';
+import { RideService } from '../../shared/services/ride.service';
+
 import { DriverCurrentRide } from '../../driver/service/driver-current-ride/driver-current-ride';
 
 @Component({
   selector: 'app-current-ride-driver',
   standalone: true,
-  imports: [CommonModule, CurrentRideComponent, FormsModule],
+  imports: [CommonModule, CurrentRideComponent, FormsModule, ConfirmationPopupComponent, NotificationPopupComponent],
   templateUrl: './current-ride-driver.component.html',
   styleUrls: ['./current-ride-driver.component.css']
 })
 export class CurrentRideDriverComponent implements OnInit, OnDestroy {
   @ViewChild(CurrentRideComponent) currentRideComponent!: CurrentRideComponent;
-  
+
   rideData: RideTrackingDTO | null = null;
   cardInfo: CardInfo | null = null;
   actionButtons: ActionButton[] = [];
+
   showCancelConfirm = false;
+  showCancelReasonPopup = false;
+  cancelReason: string = '';
+
+  notificationVisible = false;
+  notificationTitle = '';
+  notificationMessage = '';
+  notificationSuccess = true;
+
   isLoading = false;
-  
+
   private locationUpdateInterval: any;
   private routeCoordinates: Array<{latitude: number, longitude: number}> = [];
   private currentCoordinateIndex: number = 0;
   private rideStarted: boolean = false;
 
-  
+
   constructor(
     private driverCurrentRideService: DriverCurrentRide,
     private cdr: ChangeDetectorRef,
-    private router: Router
+    private router: Router,
+    private rideService: RideService,
+
   ) {
   }
-  
+
   ngOnInit(): void {
     this.loadActiveRide();
     this.updateActionButtons();
@@ -100,7 +115,7 @@ export class CurrentRideDriverComponent implements OnInit, OnDestroy {
       });
 
       this.updateLocationOnMap(coord);
-      this.sendLocationUpdate(coord); 
+      this.sendLocationUpdate(coord);
       this.currentCoordinateIndex = targetIndex;
 
       if (this.currentCoordinateIndex >= this.routeCoordinates.length - 1) {
@@ -146,18 +161,60 @@ export class CurrentRideDriverComponent implements OnInit, OnDestroy {
 
   confirmCancelRide(): void {
     this.showCancelConfirm = false;
-    this.clearTracking();
 
-    if (this.rideData) {
-      this.rideData.status = 'CANCELLED';
+    this.showCancelReasonPopup = true;
+  }
+
+  submitCancelReason(): void {
+    if (!this.rideData || !this.cancelReason.trim()) {
+      return;
     }
 
-    alert('Ride has been cancelled');
+    const reason = this.cancelReason.trim();
+
+    this.showCancelReasonPopup = false;
+    this.clearTracking();
+
+    this.rideService.cancelRide(this.rideData.rideId, reason).subscribe({
+      next: (response) => {
+        this.rideData!.status = 'CANCELLED';
+        this.cancelReason = '';
+
+        this.notificationTitle = 'Ride Cancelled';
+        this.notificationMessage = response.message;
+        this.notificationSuccess = true;
+        this.notificationVisible = true;
+
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Failed to cancel ride', err);
+
+        this.notificationTitle = 'Cancellation Failed';
+        this.notificationMessage =
+          err?.error?.message ?? 'Unable to cancel the ride. Please try again.';
+        this.notificationSuccess = false;
+        this.notificationVisible = true;
+
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+
+  onNotificationClosed(): void {
+    this.notificationVisible = false;
   }
 
   closeCancelConfirmation(): void {
-    this.showCancelConfirm = false;
+  this.showCancelConfirm = false;
   }
+
+  closeCancelReasonPopup(): void {
+    this.showCancelReasonPopup = false;
+    this.cancelReason = '';
+  }
+
 
 
   private onStartRide(): void {
@@ -245,22 +302,22 @@ export class CurrentRideDriverComponent implements OnInit, OnDestroy {
 
   private loadActiveRide(): void {
     this.isLoading = true;
-    
+
     this.driverCurrentRideService.getActiveTracking()
       .subscribe({
         next: (data) => {
           this.rideData = data;
-          
+
           this.setCardInfoFromRide();
-  
+
           this.isLoading = false;
 
           this.cdr.detectChanges();
-          
+
           if (this.rideData?.currentLocation) {
             this.currentRideComponent?.mapComponent?.updateCurrentLocation(this.rideData.currentLocation);
           }
-          
+
           // Log again after change detection
           setTimeout(() => {
           }, 100);

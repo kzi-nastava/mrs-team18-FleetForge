@@ -4,8 +4,7 @@ import com.team18.FleetForge.model.GeoPoint;
 import com.team18.FleetForge.model.enums.VehicleType;
 import com.team18.FleetForge.model.users.Driver;
 import com.team18.FleetForge.model.users.Passenger;
-import com.team18.FleetForge.model.enums.PanicInitiator;
-import com.team18.FleetForge.model.enums.RideCancellationRole;
+import com.team18.FleetForge.model.enums.RideActor;
 import com.team18.FleetForge.model.enums.RideStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -94,7 +93,7 @@ public class Ride {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "cancelled_by")
-    private RideCancellationRole cancelledBy;
+    private RideActor cancelledBy;
 
     @Column(name = "panic_activated")
     private Boolean panicActivated = false;
@@ -104,7 +103,7 @@ public class Ride {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "panic_initiator")
-    private PanicInitiator panicInitiator;
+    private RideActor panicInitiator;
 
     @Column(name = "passenger_number")
     private int passengerNumber;

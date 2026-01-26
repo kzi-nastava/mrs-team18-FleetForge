@@ -4,11 +4,11 @@ import { Router } from '@angular/router';
 import { AuthService } from '../service/auth.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { PopupDialogComponent   } from '../../shared/popup-dialog/popup-dialog.component';
+import { NotificationPopupComponent   } from '../../shared/popups/popup-dialog/notification-popup.component';
 
 @Component({
   selector: 'app-forgot-password',
-  imports: [CommonModule, LogoComponent, FormsModule, PopupDialogComponent],
+  imports: [CommonModule, LogoComponent, FormsModule, NotificationPopupComponent],
   templateUrl: './forgot-password.component.html',
   styleUrl: './forgot-password.component.css',
 })

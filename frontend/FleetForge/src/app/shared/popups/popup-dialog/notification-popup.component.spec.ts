@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { PopupDialogComponent } from './popup-dialog.component';
+import { PopupDialogComponent } from './notification-popup.component';
 
 describe('PopupDialogComponent', () => {
   let component: PopupDialogComponent;

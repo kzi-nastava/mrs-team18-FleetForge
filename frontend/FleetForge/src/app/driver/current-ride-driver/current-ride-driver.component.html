@@ -8,31 +8,52 @@
     (actionButtonClicked)="onActionButton($event)">
   </app-current-ride>
 </ng-container>
-<!-- Cancel Ride Confirmation Modal -->
-<div class="modal-overlay" *ngIf="showCancelConfirm" (click)="closeCancelConfirmation()">
-  <div class="modal-content" (click)="$event.stopPropagation()">
-    
-    <div class="modal-header">
-      <h2 class="modal-title">Cancel Ride</h2>
-      <button class="modal-close-btn" (click)="closeCancelConfirmation()">✕</button>
-    </div>
+<app-confirmation-popup
+  [visible]="showCancelConfirm"
+  title="Cancel Ride"
+  message="Are you sure you want to cancel this ride? This action cannot be undone."
+  cancelButtonText="Abort"
+  confirmButtonText="Cancel"
+  confirmButtonColor="red"
+  (confirmed)="confirmCancelRide()"
+  (cancelled)="closeCancelConfirmation()"
+></app-confirmation-popup>
+<div class="popup-overlay" *ngIf="showCancelReasonPopup">
+  <div class="popup-box">
+    <h2 class="popup-title">Cancel Ride</h2>
 
-    <div class="modal-body">
-      <p>
-        Are you sure you want to cancel this ride?
-        This action cannot be undone.
-      </p>
-    </div>
+    <p class="popup-message">
+      Please provide a reason for cancelling this ride.
+    </p>
 
-    <div class="modal-footer">
-      <button class="btn-keep" (click)="closeCancelConfirmation()">
-        Keep Ride
+    <textarea
+      class="popup-textarea"
+      [(ngModel)]="cancelReason"
+      rows="4"
+      placeholder="Enter cancellation reason..."
+    ></textarea>
+
+    <div class="popup-actions">
+      <button class="popup-button cancel" (click)="closeCancelReasonPopup()">
+        Abort
       </button>
-      <button class="btn-cancel" (click)="confirmCancelRide()">
-        Cancel Ride
+
+      <button
+        class="popup-button confirm red"
+        [disabled]="!cancelReason.trim()"
+        (click)="submitCancelReason()"
+      >
+        Cancel
       </button>
     </div>
-
   </div>
 </div>
+<app-notification-popup
+  [visible]="notificationVisible"
+  [title]="notificationTitle"
+  [message]="notificationMessage"
+  [success]="notificationSuccess"
+  okButtonText="OK"
+  (closed)="onNotificationClosed()">
+</app-notification-popup>
 

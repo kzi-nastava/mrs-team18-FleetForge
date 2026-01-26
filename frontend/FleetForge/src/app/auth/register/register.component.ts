@@ -3,12 +3,12 @@ import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../service/auth.service';
-import { PopupDialogComponent   } from '../../shared/popup-dialog/popup-dialog.component';
+import { NotificationPopupComponent   } from '../../shared/popups/popup-dialog/notification-popup.component';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, FormsModule, PopupDialogComponent],
+  imports: [CommonModule, FormsModule, NotificationPopupComponent],
   templateUrl: './register.component.html',
   styleUrl: './register.component.css',
 })

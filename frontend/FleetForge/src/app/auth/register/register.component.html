@@ -131,9 +131,9 @@
         </form>
 
         <!-- POPUP -->
-        <app-popup-dialog [visible]="showPopup" [title]="popupTitle" [message]="popupMessage" [success]="popupSuccess"
+        <app-notification-popup [visible]="showPopup" [title]="popupTitle" [message]="popupMessage" [success]="popupSuccess"
             [okButtonText]="popupButtonText" (closed)="closePopup()">
-        </app-popup-dialog>
+        </app-notification-popup>
 
         <p class="login-link">
             Already have an account?
