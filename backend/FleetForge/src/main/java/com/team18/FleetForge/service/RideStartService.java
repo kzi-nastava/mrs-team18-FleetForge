@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class RideStartService {
 
-    RideRepository rideRepository;
+    private final RideRepository rideRepository;
 
     public ResponseEntity<RideStartResponseDTO> startRide(Ride ride) {
         ride.setStatus(RideStatus.IN_PROGRESS);

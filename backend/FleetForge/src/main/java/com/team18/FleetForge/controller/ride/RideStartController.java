@@ -23,7 +23,7 @@ public class RideStartController {
     private final RideService rideService;
 
     @PutMapping("/{id}/start")
-    public ResponseEntity<?> startRide(@PathVariable Long id) {
+    public ResponseEntity<RideStartResponseDTO> startRide(@PathVariable Long id) {
         Ride ride= rideService.getRideById(id);
         return service.startRide(ride);
     }

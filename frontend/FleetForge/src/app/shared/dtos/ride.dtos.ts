@@ -38,3 +38,8 @@ export interface RideFavoriteRoutesDTO{
     waypoints:WayPointDTO[];
     name:string;
 }
+
+export interface RideStartResponseDTO{
+    id:number;
+    status:string;
+}

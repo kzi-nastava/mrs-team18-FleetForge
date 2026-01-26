@@ -8,6 +8,7 @@ import { NotificationPopupComponent } from '../../shared/popups/popup-dialog/not
 import { RideService } from '../../shared/services/ride.service';
 
 import { DriverCurrentRide } from '../../driver/service/driver-current-ride/driver-current-ride';
+import { RideStartResponseDTO } from '../../shared/dtos/ride.dtos';
 
 @Component({
   selector: 'app-current-ride-driver',
@@ -221,6 +222,11 @@ export class CurrentRideDriverComponent implements OnInit, OnDestroy {
   private onStartRide(): void {
     if (!this.rideStarted) {
       this.rideStarted = true;
+      this.driverCurrentRideService.startRide(this.rideData!.rideId.toString()).subscribe({
+        next: (response:RideStartResponseDTO) => {
+          console.log('Ride started:', response);
+        }
+      });
       if (this.rideData) this.rideData.status = 'IN_PROGRESS';
       this.currentCoordinateIndex = 0;
       this.updateActionButtons();
