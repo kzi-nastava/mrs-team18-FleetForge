@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { CurrentRideComponent, ActionButton, CardInfo } from '../../shared/current-ride/current-ride.component';
 import { RideTrackingDTO } from '../../shared/dtos/ride-tracking.dtos';
 import { ConfirmationPopupComponent } from '../../shared/popups/confirmation-popup/confirmation-popup.component';
+import { RideService } from '../../shared/services/ride.service';
+
 
 @Component({
   selector: 'app-current-ride-driver',
@@ -25,8 +27,7 @@ export class CurrentRideDriverComponent implements OnInit, OnDestroy {
   private currentCoordinateIndex: number = 0;
   private rideStarted: boolean = false;
 
-  
-  constructor() {}
+  constructor(private rideService: RideService) {}
   
   ngOnInit(): void {
     this.loadMockData();
@@ -132,12 +133,22 @@ export class CurrentRideDriverComponent implements OnInit, OnDestroy {
     this.showCancelConfirm = false;
     this.clearTracking();
 
-    if (this.rideData) {
-      this.rideData.status = 'CANCELLED';
-    }
+    if (!this.rideData) return;
 
-    alert('Ride has been cancelled');
+    this.rideService.cancelRide(this.rideData.rideId).subscribe({
+      next: () => {
+        this.rideData!.status = 'CANCELLED';
+        //todo notification popup
+        alert('Ride has been cancelled');
+      },
+      error: (err) => {
+        console.error('Failed to cancel ride', err);
+        //todo notification popup
+        alert('Failed to cancel ride');
+      }
+    });
   }
+
 
   closeCancelConfirmation(): void {
     this.showCancelConfirm = false;
@@ -175,7 +186,7 @@ export class CurrentRideDriverComponent implements OnInit, OnDestroy {
 
   private loadMockData(): void {
     this.rideData = {
-      rideId: 1,
+      rideId: 9,
       status: 'ACCEPTED',
       currentLocation: { latitude: 45.26, longitude: 19.84 },
       estimatedArrivalMinutes: 8,

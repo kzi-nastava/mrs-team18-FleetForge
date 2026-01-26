@@ -1,7 +1,8 @@
 import { Component, signal, WritableSignal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { PassengerService } from '../service/passenger.service';
+import { RideService } from '../../shared/services/ride.service';
+import { ConfirmationPopupComponent } from '../../shared/popups/confirmation-popup/confirmation-popup.component';
 
 interface ScheduledRide {
   id: number;
@@ -15,14 +16,17 @@ interface ScheduledRide {
 @Component({
   selector: 'app-passenger-scheduled-rides',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ConfirmationPopupComponent],
   templateUrl: './passenger-scheduled-rides.component.html',
   styleUrls: ['./passenger-scheduled-rides.component.css'],
 })
 export class PassengerScheduledRidesComponent {
   searchQuery = '';
+  
+  showConfirmPopup = false;
+  ridePendingCancel: ScheduledRide | null = null;
 
-  constructor(private passengerService: PassengerService) {}
+  constructor(private rideService: RideService) {}
 
   protected rides: WritableSignal<ScheduledRide[]> = signal([
     {
@@ -76,23 +80,37 @@ export class PassengerScheduledRidesComponent {
     return diffMinutes > 10 && ride.status === 'SCHEDULED';
   }
 
-  cancelRide(ride: ScheduledRide): void {
+  requestCancel(ride: ScheduledRide): void {
     if (!this.canCancel(ride)) return;
 
-    // todo confirm popup
-    this.passengerService.cancelRide(ride.id).subscribe({
+    this.ridePendingCancel = ride;
+    this.showConfirmPopup = true;
+  }
+
+  confirmCancel(): void {
+    if (!this.ridePendingCancel) return;
+
+    const rideId = this.ridePendingCancel.id;
+
+    this.rideService.cancelRide(rideId).subscribe({
       next: () => {
         this.rides.update((rides) =>
           rides.map((r) =>
-            r.id === ride.id ? { ...r, status: 'CANCELLED' } : r
+            r.id === rideId ? { ...r, status: 'CANCELLED' } : r
           )
         );
+        this.closePopup();
       },
       error: (err) => {
-        console.error('Failed to cancel ride', err);
-        // todo show popup error
+        this.closePopup();
+        // todo: show error popup
       },
     });
+  }
+
+  closePopup(): void {
+    this.showConfirmPopup = false;
+    this.ridePendingCancel = null;
   }
 
   onDetails(ride: ScheduledRide): void {
