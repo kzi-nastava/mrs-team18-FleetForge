@@ -1,6 +1,7 @@
 import { Component, signal, WritableSignal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { PassengerService } from '../service/passenger.service';
 
 interface ScheduledRide {
   id: number;
@@ -21,7 +22,9 @@ interface ScheduledRide {
 export class PassengerScheduledRidesComponent {
   searchQuery = '';
 
-  protected rides: WritableSignal<ScheduledRide[]> = signal<ScheduledRide[]>([
+  constructor(private passengerService: PassengerService) {}
+
+  protected rides: WritableSignal<ScheduledRide[]> = signal([
     {
       id: 7,
       pickupAddress: 'Bulevar oslobođenja 12, Novi Sad',
@@ -76,8 +79,20 @@ export class PassengerScheduledRidesComponent {
   cancelRide(ride: ScheduledRide): void {
     if (!this.canCancel(ride)) return;
 
-    // todo: call backend cancel endpoint
-    ride.status = 'CANCELLED';
+    // todo confirm popup
+    this.passengerService.cancelRide(ride.id).subscribe({
+      next: () => {
+        this.rides.update((rides) =>
+          rides.map((r) =>
+            r.id === ride.id ? { ...r, status: 'CANCELLED' } : r
+          )
+        );
+      },
+      error: (err) => {
+        console.error('Failed to cancel ride', err);
+        // todo show popup error
+      },
+    });
   }
 
   onDetails(ride: ScheduledRide): void {

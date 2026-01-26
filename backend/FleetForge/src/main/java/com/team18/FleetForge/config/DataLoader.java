@@ -51,7 +51,7 @@ public class DataLoader implements CommandLineRunner {
         driver1.setProfilePicture("default.png");
         driver1.setVehicle(vehicle1);
         driver1.setActive(true);
-        driver1.setAvailable(false);
+        driver1.setAvailable(true);
         driver1.setCurrentLocation(new GeoPoint(45.2671, 19.8335));
         driver1.setRole(Role.ROLE_DRIVER);
         driver1.setActivated(true);
