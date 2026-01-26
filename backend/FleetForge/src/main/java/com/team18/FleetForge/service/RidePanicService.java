@@ -1,7 +1,7 @@
 package com.team18.FleetForge.service;
 
 import com.team18.FleetForge.dto.ride.panic.RidePanicResponseDTO;
-import com.team18.FleetForge.model.enums.PanicInitiator;
+import com.team18.FleetForge.model.enums.RideActor;
 import com.team18.FleetForge.model.enums.RideStatus;
 import com.team18.FleetForge.model.ride.Ride;
 import com.team18.FleetForge.repository.RideRepository;
@@ -46,11 +46,11 @@ public class RidePanicService {
         }
 
         Object principal = authentication.getPrincipal();
-        PanicInitiator initiator;
+        RideActor initiator;
         if (principal instanceof com.team18.FleetForge.model.users.Driver) {
-            initiator = PanicInitiator.DRIVER;
+            initiator = RideActor.DRIVER;
         } else if (principal instanceof com.team18.FleetForge.model.users.Passenger) {
-            initiator = PanicInitiator.PASSENGER;
+            initiator = RideActor.PASSENGER;
         } else {
             initiator = null;
         }
