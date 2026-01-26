@@ -2,10 +2,12 @@ package com.team18.FleetForge.controller.ride;
 
 import com.team18.FleetForge.dto.ride.lifecycle.*;
 
+import com.team18.FleetForge.dto.ride.panic.RidePanicResponseDTO;
 import com.team18.FleetForge.model.GeoPoint;
 import com.team18.FleetForge.model.enums.RideStatus;
 import com.team18.FleetForge.model.ride.Ride;
 import com.team18.FleetForge.service.RideCancellationService;
+import com.team18.FleetForge.service.RidePanicService;
 import com.team18.FleetForge.service.RideService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -24,6 +26,7 @@ public class RideController {
 
     private final RideService rideService;
     private final RideCancellationService rideCancellationService;
+    private final RidePanicService ridePanicService;
 
 
     /**
@@ -56,7 +59,22 @@ public class RideController {
                 ));
     }
 
-
+    /**
+     * POST /api/rides/{rideId}/panic
+     * Response:
+     *  - success (boolean)
+     *  - message (String)
+     */
+    @PostMapping("/{rideId}/panic")
+    public ResponseEntity<RidePanicResponseDTO> triggerPanic(
+            @PathVariable Long rideId,
+            Authentication authentication
+    ) {
+        RidePanicResponseDTO response = ridePanicService.triggerPanic(rideId, authentication);
+        return ResponseEntity
+                .status(response.isSuccess() ? HttpStatus.OK : HttpStatus.BAD_REQUEST)
+                .body(response);
+    }
 
     /**
      * POST /api/rides/{rideId}/early-end
