@@ -17,5 +17,10 @@ export const homeRedirectGuard: CanActivateFn = () => {
     return false;
   }
 
+  if (role === 'DRIVER') {
+    router.navigate(['/driver/dashboard']);
+    return false;
+  }
+
   return true;
 };
