@@ -6,6 +6,7 @@ import com.team18.FleetForge.model.enums.Role;
 import com.team18.FleetForge.model.enums.RideStatus;
 import com.team18.FleetForge.model.enums.VehicleType;
 import com.team18.FleetForge.model.enums.RideCancellationRole;
+import com.team18.FleetForge.model.ride.FavoriteRoute;
 import com.team18.FleetForge.model.ride.Ride;
 import com.team18.FleetForge.model.users.Admin;
 import com.team18.FleetForge.model.users.Driver;
@@ -29,6 +30,7 @@ public class DataLoader implements CommandLineRunner {
     private final UserRepository userRepository;
     private final RideRepository rideRepository;
     private final PasswordEncoder passwordEncoder;
+    private final FavoriteRouteRepo favoriteRouteRepo;
 
     @Override
     public void run(String... args) {
@@ -211,6 +213,46 @@ public class DataLoader implements CommandLineRunner {
         );
         ride6.setPanicActivatedAt(LocalDateTime.now().minusDays(3).withHour(20).withMinute(10));
         rideRepository.save(ride6);
+
+        Ride ride7 = createRide(
+                driver1, passenger1,
+                new GeoPoint(45.2605, 19.8421), "Bulevar oslobođenja 12, Novi Sad",
+                new GeoPoint(45.2510, 19.8640), "Liman 4",
+                LocalDateTime.now().plusDays(2).withHour(14).withMinute(0),
+                null,
+                6.3, 22.0, 920.0,
+                RideStatus.ACCEPTED, false, null, null
+        );
+        rideRepository.save(ride7);
+
+        Ride ride8 = createRide(
+                driver2, passenger2,
+                new GeoPoint(45.2670, 19.8305), "Cara Dušana 55, Novi Sad",
+                new GeoPoint(45.2520, 19.8615), "Petrovaradin",
+                LocalDateTime.now().plusDays(1).withHour(16).withMinute(30),
+                null,
+                7.1, 25.0, 1100.0,
+                RideStatus.ACCEPTED, false, null, null
+        );
+        rideRepository.save(ride8);
+
+        Ride ride9 = createRide(
+                driver1, passenger3,
+                new GeoPoint(45.2590, 19.8350), "Futoška 18, Novi Sad",
+                new GeoPoint(45.2671, 19.8335), "Trg slobode",
+                LocalDateTime.now().plusDays(5).withHour(9).withMinute(0),
+                null,
+                4.8, 18.0, 760.0,
+                RideStatus.ACCEPTED, false, null, null
+        );
+        rideRepository.save(ride9);
+
+
+        FavoriteRoute route=new FavoriteRoute();
+        route.setRide(ride1);
+        route.setPassenger(passenger1);
+        route.setName("Home-work");
+        favoriteRouteRepo.save(route);
 
     }
 

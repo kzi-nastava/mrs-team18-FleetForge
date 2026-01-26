@@ -26,6 +26,7 @@ import { PassengerHistoryComponent } from './passenger/passenger-history/passeng
 import { PassengerFavoriteRoutesComponent } from './passenger/passenger-favorite-routes/passenger-favorite-routes.component';
 import { PassengerDashboardComponent } from './passenger/dashboard/dashboard.component';
 import { CurrentRideDriverComponent } from './driver/current-ride-driver/current-ride-driver.component';
+import { PassengerScheduledRidesComponent } from './passenger/passenger-scheduled-rides/passenger-scheduled-rides.component';
 
 export const routes: Routes = [
   /** ROUTES WITH NAVBAR */
@@ -70,6 +71,11 @@ export const routes: Routes = [
       {
         path: 'passenger/dashboard',
         component: PassengerDashboardComponent,
+        canActivate: [authGuard, roleGuard(['PASSENGER'])]
+      },
+      {
+        path: 'passenger/scheduled-rides',
+        component: PassengerScheduledRidesComponent,
         canActivate: [authGuard, roleGuard(['PASSENGER'])]
       },
 

@@ -32,7 +32,9 @@ export interface RideCreateResponseDTO{
 
 export interface RideFavoriteRoutesDTO{
     id:number;
+    rideId:number;
     startAddress:string;
     endAddress:string;
     waypoints:WayPointDTO[];
+    name:string;
 }

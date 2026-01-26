@@ -68,6 +68,30 @@ vehicles: VehicleLocationDTO[] = [];
      this.updateMinDateTime();
     setInterval(() => this.updateMinDateTime(), 60000);
   }
+  ngAfterViewInit(): void {
+        const data=history.state.favoriteRoute;
+    if(data){
+      this.rideForm.get('pickup')?.setValue(data.startAddress);
+      this.mapComponent.setMarker(data.startAddress).subscribe(() => {
+        this.markers.push(data.startAddress);
+        this.checkAndUpdateRoute();
+      });
+      this.rideForm.get('dropoff')?.setValue(data.endAddress);
+      this.mapComponent.setMarker(data.endAddress).subscribe(() => {
+        this.markers.push(data.endAddress);
+        this.checkAndUpdateRoute();
+      });
+      data.waypoints.forEach((wp: WayPointDTO, index: number) => {
+        this.mapComponent.setMarker(wp.address).subscribe(() => {
+          this.markers.push(wp.address);
+          this.checkAndUpdateRoute();
+        });
+        const newControl = new FormControl(wp.address, { validators: Validators.required, nonNullable: true });
+        this.waypointArray.push(newControl);
+      });
+      this.waypointsNumber = this.waypointArray.length;
+    }
+  }
 
   private updateMinDateTime(): void {
    const now = new Date();

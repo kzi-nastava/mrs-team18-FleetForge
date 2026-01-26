@@ -1,0 +1,52 @@
+<div class="passenger-dashboard">
+
+    <div class="header-section">
+        <h2 class="dashboard-title">Scheduled rides</h2>
+
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" placeholder="Search" [(ngModel)]="searchQuery" class="search-input" />
+        </div>
+    </div>
+
+    <div class="rides-section">
+        <h3 class="section-title">
+            Upcoming rides
+            <span class="subtitle">
+                Rides can be canceled up to 10 minutes before start.
+            </span>
+        </h3>
+
+        <div class="table-container">
+            <table class="rides-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Pick up</th>
+                        <th>Drop off</th>
+                        <th>Scheduled time</th>
+                        <th>Estimated cost</th>
+                        <th>Cancel</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr *ngFor="let ride of displayedRides">
+                        <td>{{ ride.id }}</td>
+                        <td>{{ ride.pickupAddress }}</td>
+                        <td>{{ ride.dropoffAddress }}</td>
+                        <td>{{ ride.scheduledAt | date: 'd MMM, y • HH:mm' }}</td>
+                        <td>{{ ride.estimatedCost.toFixed(2) }}</td>
+                        <td class="action-cell">
+                            <button class="action-btn cancel" [disabled]="!canCancel(ride)" (click)="cancelRide(ride)">
+                                {{ canCancel(ride) ? 'Cancel' : 'Disabled' }}
+                            </button>
+
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</div>

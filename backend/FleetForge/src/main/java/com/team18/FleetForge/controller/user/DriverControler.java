@@ -1,10 +1,8 @@
-package com.team18.FleetForge.controller;
+package com.team18.FleetForge.controller.user;
 
 import com.team18.FleetForge.dto.auth.SetPasswordRequestDTO;
 import com.team18.FleetForge.dto.auth.SetPasswordResponseDTO;
-import com.team18.FleetForge.dto.auth.ValidateTokenResponseDTO;
 import com.team18.FleetForge.dto.driver.*;
-import com.team18.FleetForge.dto.vehicle.VehicleCreateResponseDTO;
 import com.team18.FleetForge.dto.vehicle.VehicleInformationChangeRequestDTO;
 import com.team18.FleetForge.dto.vehicle.VehicleInformationChangeResponseDTO;
 import com.team18.FleetForge.model.*;
@@ -13,7 +11,6 @@ import com.team18.FleetForge.model.users.User;
 import com.team18.FleetForge.model.enums.InformationChangeRequestStatus;
 import com.team18.FleetForge.service.*;
 import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.Email;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -31,7 +28,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/drivers")

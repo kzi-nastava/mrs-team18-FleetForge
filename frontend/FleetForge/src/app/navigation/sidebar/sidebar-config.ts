@@ -25,8 +25,13 @@ export const SIDEBAR_MENU_CONFIG: Record<UserRole, SidebarMenuItem[]> = {
       path: '/passenger/current-ride'
     },
     {
+      label: 'Scheduled Rides',
+      icon: '📅',
+      path: '/passenger/scheduled-rides'
+    },
+    {
       label: 'Ride History',
-      icon: '⏱', // history/time icon
+      icon: '📜', // history/time icon
       path: '/passenger/ride-history'
     },
     {
