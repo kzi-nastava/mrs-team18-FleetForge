@@ -2,6 +2,8 @@ package com.team18.FleetForge.controller;
 
 import com.team18.FleetForge.dto.ride.reports.InconsistencyReportDTO;
 import com.team18.FleetForge.dto.ride.reports.InconsistencyReportResponseDTO;
+import com.team18.FleetForge.dto.ride.view.DriverLocationUpdateRequestDTO;
+import com.team18.FleetForge.dto.ride.view.DriverLocationUpdateResponseDTO;
 import com.team18.FleetForge.dto.ride.view.RideTrackingDTO;
 import com.team18.FleetForge.model.users.User;
 import com.team18.FleetForge.service.RideTrackingService;
@@ -13,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
 
 @RestController
 @RequestMapping("/api/rides")
@@ -30,11 +33,11 @@ public class RideTrackingController {
             value = "/active-tracking",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    @PreAuthorize("hasRole('PASSENGER')")
+    @PreAuthorize("hasAnyRole('PASSENGER', 'DRIVER')")
     public ResponseEntity<RideTrackingDTO> getActiveRideTracking(Authentication authentication) {
         User user = (User) authentication.getPrincipal();
 
-        RideTrackingDTO tracking = rideTrackingService.getActiveRideForPassenger(user.getId());
+        RideTrackingDTO tracking = rideTrackingService.getActiveRideForUser(user.getId(), user.getRole());
 
         if (tracking == null) {
             return ResponseEntity.notFound().build();
@@ -42,6 +45,33 @@ public class RideTrackingController {
 
         return new ResponseEntity<>(tracking, HttpStatus.OK);
     }
+
+    /**
+     * POST /api/rides/driver-location-update
+     * Update driver's current location during an active ride
+     * Request Body:
+     *  - currentLocation (GeoPoint, required)
+     * Response:
+     *  - updatedAt (LocalDateTime)
+     *  - message (String)
+     */
+    @PostMapping(
+            value = "/driver-location-update",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    @PreAuthorize("hasRole('DRIVER')")
+    public ResponseEntity<DriverLocationUpdateResponseDTO> updateDriverLocation(
+            @Valid @RequestBody DriverLocationUpdateRequestDTO request,
+            Authentication authentication
+    ) {
+            User user= (User) authentication.getPrincipal();
+            DriverLocationUpdateResponseDTO response =
+                    rideTrackingService.updateDriverLocation(user.getId(), request);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
 
     /**
      * POST /api/rides/{rideId}/report-inconsistency
@@ -65,7 +95,7 @@ public class RideTrackingController {
             Authentication authentication
     ) {
         User user = (User) authentication.getPrincipal();
-        RideTrackingDTO tracking = rideTrackingService.getActiveRideForPassenger(user.getId());
+        RideTrackingDTO tracking = rideTrackingService.getActiveRideForUser(user.getId(), user.getRole());
 
         if (tracking == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
