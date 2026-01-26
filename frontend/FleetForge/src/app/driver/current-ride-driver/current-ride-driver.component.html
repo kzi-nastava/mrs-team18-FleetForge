@@ -8,31 +8,13 @@
     (actionButtonClicked)="onActionButton($event)">
   </app-current-ride>
 </ng-container>
-<!-- Cancel Ride Confirmation Modal -->
-<div class="modal-overlay" *ngIf="showCancelConfirm" (click)="closeCancelConfirmation()">
-  <div class="modal-content" (click)="$event.stopPropagation()">
-    
-    <div class="modal-header">
-      <h2 class="modal-title">Cancel Ride</h2>
-      <button class="modal-close-btn" (click)="closeCancelConfirmation()">✕</button>
-    </div>
-
-    <div class="modal-body">
-      <p>
-        Are you sure you want to cancel this ride?
-        This action cannot be undone.
-      </p>
-    </div>
-
-    <div class="modal-footer">
-      <button class="btn-keep" (click)="closeCancelConfirmation()">
-        Keep Ride
-      </button>
-      <button class="btn-cancel" (click)="confirmCancelRide()">
-        Cancel Ride
-      </button>
-    </div>
-
-  </div>
-</div>
-
+<app-confirmation-popup
+  [visible]="showCancelConfirm"
+  title="Cancel Ride"
+  message="Are you sure you want to cancel this ride? This action cannot be undone."
+  cancelButtonText="Keep Ride"
+  confirmButtonText="Cancel Ride"
+  confirmButtonColor="red"
+  (confirmed)="confirmCancelRide()"
+  (cancelled)="closeCancelConfirmation()"
+></app-confirmation-popup>

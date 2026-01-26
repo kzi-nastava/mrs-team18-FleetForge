@@ -1,0 +1,73 @@
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.popup-box {
+  background: var(--color-background-white);
+  padding: 2rem;
+  border-radius: 10px;
+  width: 340px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.popup-title {
+  color: var(--color-primary);
+  margin-bottom: 1rem;
+}
+
+.popup-message {
+  font-size: 0.9rem;
+  color: var(--color-text-gray);
+  margin-bottom: 2rem;
+}
+
+.popup-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.popup-button {
+  flex: 1;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+/* Left button (always gray) */
+.popup-button.cancel {
+  background-color: var(--color-border);
+  color: var(--color-dark-gray);
+}
+
+.popup-button.cancel:hover {
+  background-color: var(--color-text-gray);
+}
+
+/* Right button colors */
+.popup-button.confirm.green {
+  background-color: var(--color-green);
+  color: var(--color-white);
+}
+
+.popup-button.confirm.green:hover {
+  background-color: var(--color-green-hover);
+}
+
+.popup-button.confirm.red {
+  background-color: var(--color-red);
+  color: var(--color-white);
+}
+
+.popup-button.confirm.red:hover {
+  background-color: var(--color-red-hover);
+  color: var(--color-white);
+}

@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CurrentRideComponent, ActionButton, CardInfo } from '../../shared/current-ride/current-ride.component';
 import { RideTrackingDTO } from '../../shared/dtos/ride-tracking.dtos';
+import { ConfirmationPopupComponent } from '../../shared/popups/confirmation-popup/confirmation-popup.component';
 
 @Component({
   selector: 'app-current-ride-driver',
   standalone: true,
-  imports: [CommonModule, CurrentRideComponent, FormsModule],
+  imports: [CommonModule, CurrentRideComponent, FormsModule, ConfirmationPopupComponent],
   templateUrl: './current-ride-driver.component.html',
   styleUrls: ['./current-ride-driver.component.css']
 })
