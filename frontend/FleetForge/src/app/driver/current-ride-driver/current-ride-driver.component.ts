@@ -7,6 +7,7 @@ import { ConfirmationPopupComponent } from '../../shared/popups/confirmation-pop
 import { NotificationPopupComponent } from '../../shared/popups/popup-dialog/notification-popup.component';
 import { RideService } from '../../shared/services/ride.service';
 
+import { DriverCurrentRide } from '../../driver/service/driver-current-ride/driver-current-ride';
 
 @Component({
   selector: 'app-current-ride-driver',
@@ -17,30 +18,37 @@ import { RideService } from '../../shared/services/ride.service';
 })
 export class CurrentRideDriverComponent implements OnInit, OnDestroy {
   @ViewChild(CurrentRideComponent) currentRideComponent!: CurrentRideComponent;
-  
+
   rideData: RideTrackingDTO | null = null;
   cardInfo: CardInfo | null = null;
   actionButtons: ActionButton[] = [];
 
-  showCancelConfirm = false;  
+  showCancelConfirm = false;
   showCancelReasonPopup = false;
-  cancelReason: string = '';    
+  cancelReason: string = '';
 
   notificationVisible = false;
   notificationTitle = '';
   notificationMessage = '';
   notificationSuccess = true;
-  
+
+  isLoading = false;
+
   private locationUpdateInterval: any;
   private routeCoordinates: Array<{latitude: number, longitude: number}> = [];
   private currentCoordinateIndex: number = 0;
   private rideStarted: boolean = false;
 
-  constructor(private rideService: RideService,
-    private cdr: ChangeDetectorRef) {}
-  
+
+  constructor(
+    private driverCurrentRideService: DriverCurrentRide,
+    private rideService: RideService,
+    private cdr: ChangeDetectorRef
+  ) {
+  }
+
   ngOnInit(): void {
-    this.loadMockData();
+    this.loadActiveRide();
     this.updateActionButtons();
   }
 
@@ -75,13 +83,14 @@ export class CurrentRideDriverComponent implements OnInit, OnDestroy {
       const coord = this.routeCoordinates[targetIndex];
 
       this.updateLocationOnMap(coord);
+      this.sendLocationUpdate(coord);
       this.currentCoordinateIndex = targetIndex;
 
       if (this.currentCoordinateIndex >= this.routeCoordinates.length - 1) {
         this.clearTracking();
         console.log('Driver arrived at pickup location');
       }
-    }, 1000);
+    }, 3000);
   }
 
   private startRideSimulation(): void {
@@ -104,6 +113,7 @@ export class CurrentRideDriverComponent implements OnInit, OnDestroy {
       });
 
       this.updateLocationOnMap(coord);
+      this.sendLocationUpdate(coord);
       this.currentCoordinateIndex = targetIndex;
 
       if (this.currentCoordinateIndex >= this.routeCoordinates.length - 1) {
@@ -111,7 +121,7 @@ export class CurrentRideDriverComponent implements OnInit, OnDestroy {
         this.rideData.status = 'COMPLETED';
         console.log('Ride completed');
       }
-    }, 2000);
+    }, 3000);
   }
 
   private updateLocationOnMap(coord: { latitude: number; longitude: number }): void {
@@ -120,6 +130,17 @@ export class CurrentRideDriverComponent implements OnInit, OnDestroy {
     this.rideData.currentLocation.latitude = coord.latitude;
     this.rideData.currentLocation.longitude = coord.longitude;
     this.currentRideComponent?.mapComponent?.updateCurrentLocation(this.rideData.currentLocation);
+  }
+
+  private sendLocationUpdate(coord: { latitude: number; longitude: number }): void {
+    if (!this.rideData) return;
+
+    this.driverCurrentRideService.updateLocation({
+      currentLocation: { latitude: coord.latitude, longitude: coord.longitude }
+    }).subscribe({
+      next: (response) => console.log('Location updated:', response.message),
+      error: (err) => console.error('Location update failed:', err)
+    });
   }
 
   private clearTracking(): void {
@@ -141,7 +162,7 @@ export class CurrentRideDriverComponent implements OnInit, OnDestroy {
 
   confirmCancelRide(): void {
     this.showCancelConfirm = false;
-    
+
     this.showCancelReasonPopup = true;
   }
 
@@ -226,52 +247,52 @@ export class CurrentRideDriverComponent implements OnInit, OnDestroy {
         ];
   }
 
-  private loadMockData(): void {
-    this.rideData = {
-      rideId: 9,
-      status: 'ACCEPTED',
-      currentLocation: { latitude: 45.26, longitude: 19.84 },
-      estimatedArrivalMinutes: 8,
-      route: {
-        startLocation: { latitude: 45.2454, longitude: 19.8367 },
-        startAddress: 'Gogoljeva 2, Novi Sad',
-        endLocation: { latitude: 45.2462, longitude: 19.8524 },
-        endAddress: 'Bulevar Oslobođenja 11, Novi Sad',
-        waypoints: [
-          {
-            location: {
-              latitude: 45.2458,
-              longitude: 19.8445
-            },
-            address: 'Preradovićeva 72, Novi Sad',
-            order: 1,
-            isCompleted: false
-          }
-        ],
-        totalDistanceKm: 2.5
-      },
-      passenger: {
-        id: 1,
-        firstName: 'Jane',
-        lastName: 'Smith',
-        phoneNumber: '+381 69 987 6543',
-        profileImage: '../../../../public/profile.svg'
-      },
-      driver: {
-        id: 2,
-        firstName: 'Bob',
-        lastName: 'Brown',
-        phoneNumber: '+381 69 123 4567',
-        profileImage: '../../../../public/profile.svg'
-      },
-      panicActivated: false
-    };
+  private setCardInfoFromRide(): void {
+    if (this.rideData && this.rideData.passenger) {
+      const passenger = this.rideData.passenger;
+      this.cardInfo = {
+        label: 'Passenger',
+        name: `${passenger.firstName} ${passenger.lastName}`,
+        rating: 4.8,
+        phoneNumber: passenger.phoneNumber,
+        profileImage: passenger.profileImage
+      };
+    } else {
+      this.cardInfo = null;
+    }
+  }
 
-    this.cardInfo = {
-      label: 'Passenger',
-      name: 'Jane Smith',
-      phoneNumber: '+381 69 987 6543',
-      profileImage: '../../../../public/profile.svg'
-    };
+  private loadActiveRide(): void {
+    this.isLoading = true;
+
+    this.driverCurrentRideService.getActiveTracking()
+      .subscribe({
+        next: (data) => {
+          this.rideData = data;
+
+          this.setCardInfoFromRide();
+
+          this.isLoading = false;
+
+          this.cdr.detectChanges();
+
+          if (this.rideData?.currentLocation) {
+            this.currentRideComponent?.mapComponent?.updateCurrentLocation(this.rideData.currentLocation);
+          }
+
+          // Log again after change detection
+          setTimeout(() => {
+          }, 100);
+        },
+        error: (err) => {
+          this.isLoading = false;
+          if (err?.status === 404) {
+            this.rideData = null;
+            this.cardInfo = null;
+          } else {
+          }
+          this.cdr.detectChanges();
+        }
+      });
   }
 }

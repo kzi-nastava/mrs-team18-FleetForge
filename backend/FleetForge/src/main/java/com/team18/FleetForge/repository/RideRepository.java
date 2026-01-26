@@ -12,7 +12,6 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface RideRepository extends JpaRepository<Ride, Long> {
@@ -49,19 +48,12 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
     List<Ride> findActiveRidesByDriverId(@Param("driverId") Long driverId);
 
 
-    Optional<Ride> findByIdAndStatus(Long id, RideStatus status);
-
-    // Find all rides by status
-    List<Ride> findByStatus(RideStatus status);
-
     // Find active ride for a passenger (including linked passengers)
-    @Query("SELECT r FROM Ride r WHERE r.status = :status " +
+    @Query("SELECT r FROM Ride r WHERE r.status IN ('ACCEPTED', 'IN_PROGRESS') " +
             "AND (r.passenger.id = :passengerId OR :passengerId IN " +
             "(SELECT lp.id FROM r.linkedPassengers lp))")
-    Optional<Ride> findActiveRideByPassengerId(
-            @Param("passengerId") Long passengerId,
-            @Param("status") RideStatus status
-    );
+    List<Ride> findActiveRidesByPassengerId(@Param("passengerId") Long passengerId);
+
 
     @NonNull
     List<Ride> findAllByStatus(RideStatus status);
