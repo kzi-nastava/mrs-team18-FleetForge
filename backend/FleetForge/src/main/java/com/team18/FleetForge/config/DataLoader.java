@@ -146,10 +146,10 @@ public class DataLoader implements CommandLineRunner {
                 driver1, passenger1,
                 new GeoPoint(45.2550, 19.8450), "Bulevar oslobođenja 46, Novi Sad",
                 new GeoPoint(45.2671, 19.8335), "Trg slobode 1, Novi Sad",
-                LocalDateTime.now().minusDays(1).withHour(12).withMinute(30),
-                LocalDateTime.now().minusDays(1).withHour(12).withMinute(50),
+                LocalDateTime.now(),
+                null,
                 5.2, 20.0, 850.0,
-                RideStatus.COMPLETED, false, null, null
+                RideStatus.ACCEPTED, false, null, null
         );
         rideRepository.save(ride1);
 
@@ -169,8 +169,8 @@ public class DataLoader implements CommandLineRunner {
                 driver1, passenger1,
                 new GeoPoint(45.2671, 19.8335), "Trg slobode 1, Novi Sad",
                 new GeoPoint(45.2550, 19.8450), "Bulevar oslobođenja 46, Novi Sad",
-                LocalDateTime.now().minusDays(7).withHour(10).withMinute(15),
-                LocalDateTime.now().minusDays(7).withHour(10).withMinute(35),
+                LocalDateTime.now(),
+                null,
                 5.2, 20.0, 850.0,
                 RideStatus.COMPLETED, false, null, null
         );
@@ -196,7 +196,7 @@ public class DataLoader implements CommandLineRunner {
                 LocalDateTime.now().minusDays(1).withHour(9).withMinute(0),
                 LocalDateTime.now().minusDays(1).withHour(9).withMinute(20),
                 4.5, 20.0, 780.0,
-                RideStatus.IN_PROGRESS, false, null, null
+                RideStatus.COMPLETED, false, null, null
         );
         rideRepository.save(ride5);
 
