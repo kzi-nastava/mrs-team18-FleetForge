@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { DriverLocationUpdateRequestDTO, DriverLocationUpdateResponseDTO } from '../../../shared/dtos/driver-location-update.dto';
 import { RideTrackingDTO } from '../../../shared/dtos/ride-tracking.dtos';
+import { FinishRideResponseDTO } from '../../../shared/dtos/finish-ride.dto';
 
 @Injectable({
   providedIn: 'root',
@@ -21,5 +22,12 @@ export class DriverCurrentRide {
 
   getActiveTracking(): Observable<RideTrackingDTO> {
     return this.http.get<RideTrackingDTO>(`${this.apiUrl}/active-tracking`);
+  }
+
+  finishRide(rideId: number): Observable<FinishRideResponseDTO> {
+    return this.http.put<FinishRideResponseDTO>(
+      `${this.apiUrl}/${rideId}/finish`,
+      {}
+    );
   }
 }
