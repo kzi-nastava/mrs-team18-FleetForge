@@ -21,6 +21,7 @@ public class RideTrackingDTO {
     private Integer estimatedArrivalMinutes;
     private RouteInfoDTO route;
     private DriverInfoDTO driver;
+    private PassengerInfoDTO passenger;
     private Boolean panicActivated;
 
     @Data
@@ -44,6 +45,18 @@ public class RideTrackingDTO {
         private GeoPoint location;
         private String address;
         private Integer order;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class PassengerInfoDTO {
+        private Long id;
+        private String firstName;
+        private String lastName;
+        private String phoneNumber;
+        private String profileImage;
     }
 
 }
