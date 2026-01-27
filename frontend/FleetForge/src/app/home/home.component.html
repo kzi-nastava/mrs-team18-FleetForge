@@ -19,7 +19,7 @@
 
         <!-- Dynamic Location Fields -->
         <div *ngFor="let field of locationFields; let i = index" class="form-group">
-          
+
           <!-- Label -->
           <label [for]="field.id">
             <span *ngIf="field.type === 'pickup'">Pick Up Address</span>
@@ -29,23 +29,12 @@
 
           <!-- Input with optional remove button for waypoints -->
           <div class="input-wrapper" [class.has-remove-btn]="field.type === 'waypoint'">
-            <input
-              [id]="field.id"
-              type="text"
-              [placeholder]="field.type === 'pickup' ? 'Pick Destination' : 
+            <input [id]="field.id" type="text" [placeholder]="field.type === 'pickup' ? 'Pick Destination' : 
                             field.type === 'dropoff' ? 'Pick Destination' : 
-                            'New Waypoint'"
-              [(ngModel)]="field.query"
-              (input)="onLocationInput(field)"
-              autocomplete="off"
-            />
-            <button 
-              *ngIf="field.type === 'waypoint'" 
-              class="btn-remove-waypoint" 
-              type="button"
-              (click)="removeWaypoint(field.id)"
-              aria-label="Remove waypoint"
-            >
+                            'New Waypoint'" [(ngModel)]="field.query" (input)="onLocationInput(field)"
+              autocomplete="off" />
+            <button *ngIf="field.type === 'waypoint'" class="btn-remove-waypoint" type="button"
+              (click)="removeWaypoint(field.id)" aria-label="Remove waypoint">
               ✕
             </button>
           </div>
@@ -66,21 +55,18 @@
         </div>
 
         <div class="button-group">
-          <button class="btn btn-estimate" (click)="estimateRide()">Estimate</button>
           <button class="btn btn-order" (click)="orderRide()">Order</button>
         </div>
       </div>
       <div class="map-section">
-        <app-map
-          [vehicles]="vehicles"
-          (routeSummary)="onRouteSummary($event)">
+        <app-map [vehicles]="vehicles" (routeSummary)="onRouteSummary($event)">
         </app-map>
-        <div *ngIf="estimatedDistance" class="estimate-result">
-        <p>Distance: {{ estimatedDistance }} km</p>
-        <p>Duration: {{ estimatedDuration }} min</p>
-        <p>Cost: {{ estimatedCost }} RSD</p>
+        <div *ngIf="pickup?.coordinates && dropoff?.coordinates && estimatedCost != null" class="estimate-result">
+          <p>Distance: {{ estimatedDistance }} km</p>
+          <p>Duration: {{ estimatedDuration }} min</p>
+          <p>Cost: {{ estimatedCost }} RSD</p>
+        </div>
       </div>
-      </div>      
     </div>
   </div>
 </div>
