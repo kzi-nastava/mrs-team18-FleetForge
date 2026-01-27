@@ -231,8 +231,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     this.addRouteMarkers(route.endLocation, route.endAddress, 'end');
     this.updateCurrentLocationMarker(this._currentRide.currentLocation);
 
-    const bounds = L.latLngBounds(waypoints);
-    
+    const bounds = L.latLngBounds(waypoints);    
   }
 
   private addRouteMarkers(location: {latitude: number, longitude: number}, address: string, type: 'start' | 'waypoint' | 'end', order?: number): void {
@@ -288,28 +287,28 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   }
 
   setMarker(address: string): Observable<void> {
-  return new Observable(observer => {
-    this.nominatimService.search(address + " Novi Sad").subscribe((data) => {
-      console.log('Geocoding data:', data);
-      if (data && data.length > 0) {
-        const lat = parseFloat(data[0].lat);
-        const lon = parseFloat(data[0].lon);
-        const newMarker = L.marker([lat, lon]);
-        this.locationMarkers.set(address, newMarker);
-      
-        (newMarker as any).customAddress = address;
-        newMarker.addTo(this.map);
-        this.markers.push(newMarker);
-        newMarker.bindPopup(address).openPopup();
+    return new Observable(observer => {
+      this.nominatimService.search(address + " Novi Sad").subscribe((data) => {
+        console.log('Geocoding data:', data);
+        if (data && data.length > 0) {
+          const lat = parseFloat(data[0].lat);
+          const lon = parseFloat(data[0].lon);
+          const newMarker = L.marker([lat, lon]);
+          this.locationMarkers.set(address, newMarker);
         
-        observer.next();
-        observer.complete();
-      } else {
-        observer.error('No results found');
-      }
+          (newMarker as any).customAddress = address;
+          newMarker.addTo(this.map);
+          this.markers.push(newMarker);
+          newMarker.bindPopup(address).openPopup();
+          
+          observer.next();
+          observer.complete();
+        } else {
+          observer.error('No results found');
+        }
+      });
     });
-  });
-}
+  }
   
   removeMarker(address: string): void {
     this.markers = this.markers.filter(marker => {
@@ -387,19 +386,28 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       this.locationMarkers.delete(id);
     }
 
-    const iconHtml = this.getLocationIconHtml(type);
+    let iconHtml = '';
+    if (type === 'pickup') {
+      // Green pointer - same as route markers
+      iconHtml = '<img src="/map-pointer.svg" style="width: 28px; height: 28px; filter: invert(65%) sepia(74%) saturate(1200%) hue-rotate(65deg);" />';
+    } else if (type === 'dropoff') {
+      // Red pointer - same as route markers
+      iconHtml = '<img src="/map-pointer.svg" style="width: 28px; height: 28px; filter: invert(35%) sepia(74%) saturate(1200%) hue-rotate(340deg);" />';
+    } else {
+      // Neutral waypoint circle - same as route markers
+      iconHtml = '<img src="/waypoint-circle.svg" style="width: 28px; height: 28px;" />';
+    }
     
     const locationIcon = L.divIcon({
       html: iconHtml,
       className: 'location-marker-icon',
-      iconSize: [32, 32],
-      iconAnchor: [16, 32],
-      popupAnchor: [0, -32],
+      iconSize: [28, 28],
+      iconAnchor: [14, 28],
+      popupAnchor: [0, -28],
     });
 
     const marker = L.marker([lat, lon], { icon: locationIcon })
       .addTo(this.map)
-      .bindPopup(`<strong>${this.getTypeLabel(type)}</strong><br/>${label}`);
 
     this.locationMarkers.set(id, marker);
 
@@ -476,35 +484,6 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       this._staticRoute.dropoff,
       this._staticRoute.waypoints ?? []
     );
-  }
-
-  private getLocationIconHtml(type: 'pickup' | 'waypoint' | 'dropoff'): string {
-    const colors = {
-      pickup: '#ef4444',  // red
-      waypoint: '#3b82f6',  // blue
-      dropoff: '#22c55e'    // green
-    };
-
-    const color = colors[type];
-
-    return `
-      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" 
-              fill="${color}" 
-              stroke="white" 
-              stroke-width="1.5"/>
-        <circle cx="12" cy="9" r="2.5" fill="white"/>
-      </svg>
-    `;
-  }
-
-  private getTypeLabel(type: 'pickup' | 'waypoint' | 'dropoff'): string {
-    const labels = {
-      pickup: 'Pickup',
-      waypoint: 'Waypoint',
-      dropoff: 'Dropoff'
-    };
-    return labels[type];
   }
 
   private displayVehicles(): void {

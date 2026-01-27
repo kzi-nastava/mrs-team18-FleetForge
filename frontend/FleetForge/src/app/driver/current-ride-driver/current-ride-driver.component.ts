@@ -25,6 +25,8 @@ export class CurrentRideDriverComponent implements OnInit, OnDestroy {
   cardInfo: CardInfo | null = null;
   actionButtons: ActionButton[] = [];
 
+  showSosConfirmPopup = false;
+
   showCancelConfirm = false;
   showCancelReasonPopup = false;
   cancelReason: string = '';
@@ -152,9 +154,44 @@ export class CurrentRideDriverComponent implements OnInit, OnDestroy {
   onActionButton(action: string): void {
     if (action === 'start-ride') this.onStartRide();
     if (action === 'finish-ride') this.onFinishRide();
-    if (action === 'sos') console.log('SOS clicked');
+    if (action === 'sos') {
+      this.showSosConfirmPopup = true;
+    }
     if (action === 'cancel') this.openCancelConfirmation();
   }
+
+  confirmSos(): void {
+    if (!this.rideData?.rideId) return;
+
+    const rideId = this.rideData.rideId;
+
+    this.rideService.triggerPanic(rideId).subscribe({
+      next: (response) => {
+        this.notificationTitle = 'SOS Activated';
+        this.notificationMessage = response.message;
+        this.notificationSuccess = true;
+        this.notificationVisible = true;
+
+        this.closeSosPopup();
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.notificationTitle = 'SOS Failed';
+        this.notificationMessage =
+          err?.error?.message ?? 'Unable to activate SOS.';
+        this.notificationSuccess = false;
+        this.notificationVisible = true;
+
+        this.closeSosPopup();
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  closeSosPopup(): void {
+    this.showSosConfirmPopup = false;
+  }
+
 
   private openCancelConfirmation(): void {
     this.showCancelConfirm = true;

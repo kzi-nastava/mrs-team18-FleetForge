@@ -76,20 +76,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.estimatedCost = summary.cost;
   }
 
-  estimateRide(): void {
-    if (this.estimatedCost == null) {
-      console.warn('Estimate not ready yet');
-      return;
-    }
-
-    console.log('Estimate:', {
-      distance: this.estimatedDistance,
-      duration: this.estimatedDuration,
-      cost: this.estimatedCost
-    });
-  }
-
-
   orderRide(): void {
     this.router.navigate(['/login']);
   }
@@ -142,7 +128,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     this.cdr.markForCheck();
 
-    // restore markers + route
+    // Restore markers first, then try to create route
     setTimeout(() => {
       this.locationFields.forEach(f => {
         if (f.coordinates && this.mapComponent) {
@@ -311,15 +297,32 @@ export class HomeComponent implements OnInit, OnDestroy {
     });
     this.persistState();
   }
+
+  private clearEstimate(): void {
+    this.estimatedDistance = undefined;
+    this.estimatedDuration = undefined;
+    this.estimatedCost = undefined;
+  }
+
   
   private updateRoute(): void {
     const pickupField = this.pickup;
     const dropoffField = this.dropoff;
     
     if (!pickupField?.coordinates || !dropoffField?.coordinates) {
-    this.mapComponent?.clearRoute();
-    return;
-  }
+      this.mapComponent?.clearRoute();
+      this.clearEstimate();   
+      this.cdr.markForCheck();
+      return;
+    }
+    
+    if (this.mapComponent) {
+      this.locationFields.forEach(field => {
+        if (field.coordinates) {
+          this.mapComponent.removeLocationMarker(field.id);
+        }
+      });
+    }
     
     const waypointCoords = this.waypoints
       .filter(w => w.coordinates)
