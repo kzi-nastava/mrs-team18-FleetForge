@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { DriverLocationUpdateRequestDTO, DriverLocationUpdateResponseDTO } from '../../../shared/dtos/driver-location-update.dto';
 import { RideTrackingDTO } from '../../../shared/dtos/ride-tracking.dtos';
 import { RideStartResponseDTO } from '../../../shared/dtos/ride.dtos';
+import { FinishRideResponseDTO } from '../../../shared/dtos/finish-ride.dto';
 
 @Injectable({
   providedIn: 'root',
@@ -26,5 +27,11 @@ export class DriverCurrentRide {
 
   startRide(rideId: string): Observable<RideStartResponseDTO> {
     return this.http.put<RideStartResponseDTO>(`${this.apiUrl}/${rideId}/start`, {});
+}
+  finishRide(rideId: number): Observable<FinishRideResponseDTO> {
+    return this.http.put<FinishRideResponseDTO>(
+      `${this.apiUrl}/${rideId}/finish`,
+      {}
+    );
   }
 }
