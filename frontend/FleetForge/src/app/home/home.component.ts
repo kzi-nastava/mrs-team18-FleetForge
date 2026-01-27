@@ -142,7 +142,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     this.cdr.markForCheck();
 
-    // restore markers + route
+    // Restore markers first, then try to create route
     setTimeout(() => {
       this.locationFields.forEach(f => {
         if (f.coordinates && this.mapComponent) {
@@ -317,9 +317,17 @@ export class HomeComponent implements OnInit, OnDestroy {
     const dropoffField = this.dropoff;
     
     if (!pickupField?.coordinates || !dropoffField?.coordinates) {
-    this.mapComponent?.clearRoute();
-    return;
-  }
+      this.mapComponent?.clearRoute();
+      return;
+    }
+    
+    if (this.mapComponent) {
+      this.locationFields.forEach(field => {
+        if (field.coordinates) {
+          this.mapComponent.removeLocationMarker(field.id);
+        }
+      });
+    }
     
     const waypointCoords = this.waypoints
       .filter(w => w.coordinates)
