@@ -3,6 +3,7 @@ package com.team18.FleetForge.dto.admin;
 import com.team18.FleetForge.model.DriverProfileChangeRequest;
 import com.team18.FleetForge.model.enums.InformationChangeRequestStatus;
 import com.team18.FleetForge.model.users.Driver;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,19 +14,31 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AdminViewProfileChangeRequestDTO {
+    @NotNull
     private Long requestId;
+    @NotNull
     private Long driverId;
 
+    @NotNull
     private String firstName;
+    @NotNull
     private String lastName;
+    @NotNull
     private String email;
+    @NotNull
     private String phoneNumber;
+    @NotNull
     private String address;
 
+    @NotNull
     private String newFirstName;
+    @NotNull
     private String newLastName;
+    @NotNull
     private String newEmail;
+    @NotNull
     private String newPhoneNumber;
+    @NotNull
     private String newAddress;
 
 

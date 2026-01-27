@@ -583,88 +583,107 @@ get passengerArray(): FormArray<FormControl<string>> {
 }
 onSubmit(): void {
   console.log(this.rideForm.value);
-    if (this.rideForm.valid) {
-      const wayPointsDto: WayPointDTO[] = [];
-      const pickupLatLng = this.mapComponent['locationMarkers'].get(this.rideForm.value.pickup!);
-if(pickupLatLng){
-  wayPointsDto.push({
-    location: {
-      latitude: pickupLatLng.getLatLng().lat,
-      longitude: pickupLatLng.getLatLng().lng
-    },
-    address: this.rideForm.value.pickup!,
-    orderIndex: 0
-  });
-}
-      for(let i=0;i<this.waypointArray.length;i++){
-        wayPointsDto.push({
-          location: {
-            latitude: this.mapComponent['locationMarkers'].get(this.waypointArray.at(i).value)?.getLatLng().lat || 0,
-            longitude: this.mapComponent['locationMarkers'].get(this.waypointArray.at(i).value)?.getLatLng().lng || 0
-          },
-          address: this.waypointArray.at(i).value,
-          orderIndex: i
-        });
-      }
-      const dropoffLatLng = this.mapComponent['locationMarkers'].get(this.rideForm.value.dropoff!);
-if(dropoffLatLng){
-  wayPointsDto.push({
-    location: {
-      latitude: dropoffLatLng.getLatLng().lat,
-      longitude: dropoffLatLng.getLatLng().lng
-    },
-    address: this.rideForm.value.dropoff!,
-    orderIndex: wayPointsDto.length
-  });
-}
-      const rideRequest = {
-        coordinates: wayPointsDto,
-        passengerNumber: this.rideForm.value.passengers || 0,
-        rideTime:this.rideForm.value.now ? new Date().toISOString().slice(0, -1) :new Date(this.rideForm.value.datetime!).toISOString().slice(0, -1),// Skidanje Z sa kraja stringa za pravilni format
-        rideNow: this.rideForm.value.now || false,
-        passengerEmails: this.passengerArray.value || [],
-        vehicleType: this.rideForm.value.type as VehicleType || VehicleType.STANDARD,
-        babySeat: this.rideForm.value.babySeat || false,
-        petFriendly: this.rideForm.value.petFriendly || false,
-        startAddress: this.rideForm.value.pickup || '',
-        endAddress: this.rideForm.value.dropoff || '',
-        totalDistance: this.estimatedDistance || 0,
-        estimatedDuration: this.estimatedDuration || 0
-      };
-      console.log('Ride Request:', rideRequest);
-      this.passengerHomeService.createRide(rideRequest).subscribe({
-        next: (response) => {
-          if(response.created){
+  if (this.rideForm.valid) {
+    const wayPointsDto: WayPointDTO[] = [];
+    const pickupLatLng = this.mapComponent['locationMarkers'].get(this.rideForm.value.pickup!);
+    if (pickupLatLng) {
+      wayPointsDto.push({
+        location: {
+          latitude: pickupLatLng.getLatLng().lat,
+          longitude: pickupLatLng.getLatLng().lng
+        },
+        address: this.rideForm.value.pickup!,
+        orderIndex: 0
+      });
+    }
+    
+    for (let i = 0; i < this.waypointArray.length; i++) {
+      wayPointsDto.push({
+        location: {
+          latitude: this.mapComponent['locationMarkers'].get(this.waypointArray.at(i).value)?.getLatLng().lat || 0,
+          longitude: this.mapComponent['locationMarkers'].get(this.waypointArray.at(i).value)?.getLatLng().lng || 0
+        },
+        address: this.waypointArray.at(i).value,
+        orderIndex: i
+      });
+    }
+    
+    const dropoffLatLng = this.mapComponent['locationMarkers'].get(this.rideForm.value.dropoff!);
+    if (dropoffLatLng) {
+      wayPointsDto.push({
+        location: {
+          latitude: dropoffLatLng.getLatLng().lat,
+          longitude: dropoffLatLng.getLatLng().lng
+        },
+        address: this.rideForm.value.dropoff!,
+        orderIndex: wayPointsDto.length
+      });
+    }
+    
+    const rideRequest = {
+      coordinates: wayPointsDto,
+      passengerNumber: this.rideForm.value.passengers || 0,
+      rideTime: this.rideForm.value.now ? new Date().toISOString().slice(0, -1) : new Date(this.rideForm.value.datetime!).toISOString().slice(0, -1),
+      rideNow: this.rideForm.value.now || false,
+      passengerEmails: this.passengerArray.value || [],
+      vehicleType: this.rideForm.value.type as VehicleType || VehicleType.STANDARD,
+      babySeat: this.rideForm.value.babySeat || false,
+      petFriendly: this.rideForm.value.petFriendly || false,
+      startAddress: this.rideForm.value.pickup || '',
+      endAddress: this.rideForm.value.dropoff || '',
+      totalDistance: this.estimatedDistance || 0,
+      estimatedDuration: this.estimatedDuration || 0
+    };
+    
+    console.log('Ride Request:', rideRequest);
+    this.passengerHomeService.createRide(rideRequest).subscribe({
+      next: (response) => {
+        if (response.created) {
           console.log('Ride created successfully:', response);
           alert('Ride created successfully!');
-          this.rideForm.reset();
-          this.waypointArray.clear();
-          this.passengerArray.clear();
-          this.markers.forEach(marker => this.mapComponent.removeMarker(marker));
-          this.mapComponent.clearRoute();
-          this.markers = [];
-          this.rideForm.get('datetime')?.enable();
-          }else{
-            alert('Failed to create ride. There is no free drivers.');
-              this.rideForm.reset();
-          this.waypointArray.clear();
-          this.passengerArray.clear();
-          this.markers.forEach(marker => this.mapComponent.removeMarker(marker));
-          this.mapComponent.clearRoute();
-          this.markers = [];
-          this.rideForm.get('datetime')?.enable();
-          }
-        },
-        error: (error) => {
-          console.error('Error creating ride:', error);
-          alert('Error creating ride. Please try again.');
+        } else {
+          alert('Failed to create ride. There is no free drivers.');
         }
-      });
-    }else{
-      alert("Form is not valid!");
-    }
+        
+        this.mapComponent.removeLocationMarker('pickup');
+        this.mapComponent.removeLocationMarker('dropoff');
+        
+        for (let i = 0; i < this.waypointArray.length; i++) {
+          this.mapComponent.removeLocationMarker(`waypoint-${i}`);
+        }
+        
+        this.markers.forEach(marker => {
+          this.mapComponent.removeMarker(marker);
+          this.mapComponent['locationMarkers'].delete(marker);
+        });
+        
+        this.mapComponent.clearRoute();
+        
+        this.rideForm.reset();
+        this.waypointArray.clear();
+        this.passengerArray.clear();
+        this.markers = [];
+        this.rideForm.get('datetime')?.enable();
+        this.rideForm.get('passengers')?.setValue(0);
+        
+        this.suggestions.pickup = [];
+        this.suggestions.dropoff = [];
+        this.suggestions.waypoints.clear();
+        this.showSuggestions.pickup = false;
+        this.showSuggestions.dropoff = false;
+        this.showSuggestions.waypoints.clear();
+        
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error('Error creating ride:', error);
+        alert('Error creating ride. Please try again.');
+      }
+    });
+  } else {
+    alert("Form is not valid!");
   }
-
+}
   
 removeWaypoint(index: number): void {
   const value = this.waypointArray.at(index).value;

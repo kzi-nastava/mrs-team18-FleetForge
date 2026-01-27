@@ -1,6 +1,7 @@
 package com.team18.FleetForge.dto.passenger;
 
 import com.team18.FleetForge.model.users.Passenger;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,11 +10,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PassengerGetResponseDTO {
+    @NotNull
     private  String firstName;
+    @NotNull
     private String lastName;
+    @NotNull
     private String email;
+    @NotNull
     private String phoneNumber;
+    @NotNull
     private String address;
+    @NotNull
     private String profilePicture;
 
     public PassengerGetResponseDTO(Passenger passenger) {

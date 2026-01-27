@@ -23,8 +23,8 @@ export class PasswordResetComponent {
   constructor(protected router: Router, protected location: Location, private passwordService: PasswordReset) {}
 
   editUsersPassword=new FormGroup({
-    newPassword: new FormControl('', Validators.required),
-    repeatPassword: new FormControl('', Validators.required)
+    newPassword: new FormControl('', [Validators.required, Validators.minLength(8)]),
+    repeatPassword: new FormControl('', [Validators.required, Validators.minLength(8)])
   });
   resetPassword(): void {
     if (this.editUsersPassword.invalid) return;

@@ -2,6 +2,7 @@ package com.team18.FleetForge.dto.driver;
 
 import com.team18.FleetForge.model.DriverProfileChangeRequest;
 import com.team18.FleetForge.model.enums.InformationChangeRequestStatus;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,8 +14,11 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DriverProfileChangeResponseDTO {
+    @NotNull
     InformationChangeRequestStatus status;
+    @NotNull
     LocalDateTime createdAt;
+    @NotNull
     Long requestId;
 
     public DriverProfileChangeResponseDTO(DriverProfileChangeRequest driverProfileChangeRequest) {
