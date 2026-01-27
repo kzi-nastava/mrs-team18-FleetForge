@@ -232,7 +232,6 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     this.updateCurrentLocationMarker(this._currentRide.currentLocation);
 
     const bounds = L.latLngBounds(waypoints);
-    this.map.fitBounds(bounds, { padding: [50, 50] });
     
   }
 

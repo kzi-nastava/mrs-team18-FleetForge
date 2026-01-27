@@ -1,0 +1,91 @@
+<div class="rating-modal-backdrop" *ngIf="isOpen">
+  <div class="rating-modal" role="dialog" aria-modal="true">
+    <div class="rating-modal__header">
+      <div>
+        <h3 class="rating-modal__title">Rate your ride</h3>
+        <p class="rating-modal__subtitle" *ngIf="!showFinishedMessage">
+          {{ pickupAddress }} → {{ dropoffAddress }}
+        </p>
+        <p class="rating-modal__message" *ngIf="showFinishedMessage">
+          Ride finished, you can rate ride if you want
+        </p>
+      </div>
+      <button
+        type="button"
+        class="icon-btn close-btn"
+        (click)="onClose()"
+        aria-label="Close rating dialog"
+        *ngIf="!showFinishedMessage"
+      >
+        ✕
+      </button>
+    </div>
+
+    <div class="rating-modal__content">
+      <label class="field-label">Rate driver</label>
+      <div class="stars selectable">
+        <button
+          type="button"
+          *ngFor="let star of starScale"
+          class="star-btn"
+          [class.filled]="(hoverDriverRating || formData.driverRating) >= star"
+          (click)="setDriverRating(star)"
+          (mouseenter)="setDriverHover(star)"
+          (mouseleave)="clearDriverHover()"
+          [disabled]="isLoading"
+          aria-label="Rate driver {{ star }} star"
+        >
+          ★
+        </button>
+      </div>
+
+      <label class="field-label">Rate vehicle</label>
+      <div class="stars selectable">
+        <button
+          type="button"
+          *ngFor="let star of starScale"
+          class="star-btn"
+          [class.filled]="(hoverVehicleRating || formData.vehicleRating) >= star"
+          (click)="setVehicleRating(star)"
+          (mouseenter)="setVehicleHover(star)"
+          (mouseleave)="clearVehicleHover()"
+          [disabled]="isLoading"
+          aria-label="Rate vehicle {{ star }} star"
+        >
+          ★
+        </button>
+      </div>
+
+      <label class="field-label">Comment</label>
+      <textarea
+        rows="3"
+        [(ngModel)]="formData.comment"
+        placeholder="Share more about your ride"
+        class="comment-input"
+        [disabled]="isLoading"
+        maxlength="500"
+      ></textarea>
+    </div>
+
+    <div class="rating-modal__actions">
+      <button
+        type="button"
+        class="modal-btn ghost"
+        (click)="showFinishedMessage ? onNotNow() : onClose()"
+        [disabled]="isLoading"
+      >
+        {{ showFinishedMessage ? 'Not now' : 'Close' }}
+      </button>
+      <button
+        type="button"
+        class="modal-btn primary"
+        [disabled]="
+          formData.driverRating === 0 || formData.vehicleRating === 0 || isLoading
+        "
+        (click)="onSubmit()"
+      >
+        {{ isLoading ? 'Submitting...' : 'Submit' }}
+      </button>
+    </div>
+  </div>
+</div>

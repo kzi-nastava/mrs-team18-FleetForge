@@ -54,10 +54,16 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
 
 
     // Find active ride for a passenger (including linked passengers)
-    @Query("SELECT r FROM Ride r WHERE r.status IN ('ACCEPTED', 'IN_PROGRESS') " +
+    @Query("SELECT r FROM Ride r WHERE " +
+            "(r.status IN ('ACCEPTED', 'IN_PROGRESS') OR " +
+            "(r.status = 'COMPLETED' AND r.endTime >= :fiveMinutesAgo)) " +
             "AND (r.passenger.id = :passengerId OR :passengerId IN " +
             "(SELECT lp.id FROM r.linkedPassengers lp))")
-    List<Ride> findActiveRidesByPassengerId(@Param("passengerId") Long passengerId);
+    List<Ride> findActiveRidesByPassengerId(
+            @Param("passengerId") Long passengerId,
+            @Param("fiveMinutesAgo") LocalDateTime fiveMinutesAgo
+    );
+
 
     List<Ride> findAllByDriverAndStatusAndEndTimeBetween(
             Driver driver,
