@@ -38,6 +38,18 @@
       </div>
     </div>
   </div>
+
+  <app-ride-rating-modal
+    [isOpen]="showRatingModal && isCompleted()"
+    [pickupAddress]="rideData.route.startAddress || ''"
+    [dropoffAddress]="rideData.route.endAddress || ''"
+    [formData]="ratingForm"
+    [isLoading]="isRatingLoading"
+    [showFinishedMessage]="true"
+    (closed)="closeRatingModal()"
+    (submitted)="onRatingSubmitted($event)"
+    (notNow)="onRatingNotNow()"
+  ></app-ride-rating-modal>
 </ng-container>
 <app-confirmation-popup
   [visible]="showSosConfirmPopup"

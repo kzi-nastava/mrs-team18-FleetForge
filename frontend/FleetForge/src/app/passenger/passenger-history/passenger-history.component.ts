@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { PassengerHistory } from '../service/passenger-history/passenger-history';
 import { PassengerFavorite } from '../service/passenger-favorite/passenger-favorite';
 import { RideFavoriteRoutesDTO } from '../../shared/dtos/ride.dtos';
+import { RideRatingModalComponent, RatingFormData } from '../../shared/popups/ride-rating-modal/ride-rating-modal.component';
+import { RideReviewService } from '../service/passenger-ride-review/ride-review.service';
 
 interface Ride {
   name: string;
@@ -22,7 +24,7 @@ interface Ride {
 @Component({
   selector: 'app-passenger-history',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RideRatingModalComponent],
   templateUrl: './passenger-history.component.html',
   styleUrls: ['./passenger-history.component.css'],
 })
@@ -34,21 +36,23 @@ export class PassengerHistoryComponent {
 
   private readonly favRideIds =signal<Set<number>>(new Set<number>());
   private readonly favRoutes: WritableSignal<RideFavoriteRoutesDTO[]> = signal<RideFavoriteRoutesDTO[]>([]);
-  constructor(private passengerHistory: PassengerHistory,private passengerFavorite: PassengerFavorite) {}
+  constructor(
+    private passengerHistory: PassengerHistory,
+    private passengerFavorite: PassengerFavorite,
+    private rideReviewService: RideReviewService
+  ) {}
   isRatingModalOpen = false;
   selectedRide: Ride | null = null;
+  isRatingLoading = false;
 
 	isFavoriteModalOpen = false;
 	favoriteRide: Ride | null = null;
 	favoriteRouteName = '';
-  ratingForm = {
+  ratingForm: RatingFormData = {
     driverRating: 0,
     vehicleRating: 0,
     comment: '',
   };
-
-  hoverDriverRating = 0;
-  hoverVehicleRating = 0;
 
   protected rides: WritableSignal<Ride[]> = signal<Ride[]>([
     {
@@ -164,43 +168,36 @@ export class PassengerHistoryComponent {
     this.ratingForm = { driverRating: 0, vehicleRating: 0, comment: '' };
   }
 
-  setDriverRating(value: number): void {
-    this.ratingForm.driverRating = value;
-  }
-
-  setVehicleRating(value: number): void {
-    this.ratingForm.vehicleRating = value;
-  }
-
-  setDriverHover(value: number): void {
-    this.hoverDriverRating = value;
-  }
-
-  clearDriverHover(): void {
-    this.hoverDriverRating = 0;
-  }
-
-  setVehicleHover(value: number): void {
-    this.hoverVehicleRating = value;
-  }
-
-  clearVehicleHover(): void {
-    this.hoverVehicleRating = 0;
-  }
-
-  submitRating(): void {
+  submitRating(formData: RatingFormData): void {
     if (!this.selectedRide) {
       return;
     }
 
-    const driverRating = Math.min(Math.max(this.ratingForm.driverRating, 1), 5);
-    const vehicleRating = Math.min(Math.max(this.ratingForm.vehicleRating, 1), 5);
+    this.isRatingLoading = true;
 
-    this.selectedRide.driverRating = driverRating;
-    this.selectedRide.vehicleRating = vehicleRating;
-    this.selectedRide.ratingComment = this.ratingForm.comment.trim();
+    const driverRating = Math.min(Math.max(formData.driverRating, 1), 5);
+    const vehicleRating = Math.min(Math.max(formData.vehicleRating, 1), 5);
+    console.log ("Submitting rating for ride", this.selectedRide.id, formData);
+    this.rideReviewService
+      .createReview(this.selectedRide.id, {
+        driverRating,
+        vehicleRating,
+        comment: formData.comment.trim(),
+      })
+      .subscribe({
+        next: (response) => {
+          this.selectedRide!.driverRating = response.driverRating;
+          this.selectedRide!.vehicleRating = response.vehicleRating;
+          this.selectedRide!.ratingComment = response.comment;
 
-    this.closeRatingModal();
+          this.isRatingLoading = false;
+          this.closeRatingModal();
+        },
+        error: (err) => {
+          console.error('Failed to submit rating:', err);
+          this.isRatingLoading = false;
+        },
+      });
   }
 
   onDetails(ride: Ride): void {

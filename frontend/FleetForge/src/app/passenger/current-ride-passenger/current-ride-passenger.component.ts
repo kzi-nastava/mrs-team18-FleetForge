@@ -1,20 +1,23 @@
 import { Component, OnInit, OnDestroy, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { CurrentRideComponent, ActionButton, CardInfo } from '../../shared/current-ride/current-ride.component';
 import { RideTrackingDTO } from '../../shared/dtos/ride-tracking.dtos';
 import { PassengerCurrentRide } from '../../passenger/service/passenger-current-ride/passenger-current-ride';
 import { interval, Subscription, of } from 'rxjs';
 import { catchError, startWith, switchMap } from 'rxjs/operators';
 import { RideService } from '../../shared/services/ride.service';
+import { RideReviewService } from '../service/passenger-ride-review/ride-review.service';
 import { ConfirmationPopupComponent } from '../../shared/popups/confirmation-popup/confirmation-popup.component';
 import { NotificationPopupComponent } from '../../shared/popups/popup-dialog/notification-popup.component';
+import { RideRatingModalComponent, RatingFormData } from '../../shared/popups/ride-rating-modal/ride-rating-modal.component';
 
 
 @Component({
   selector: 'app-current-ride-passenger',
   standalone: true,
-  imports: [CommonModule, CurrentRideComponent, FormsModule, ConfirmationPopupComponent, NotificationPopupComponent],
+  imports: [CommonModule, CurrentRideComponent, FormsModule, ConfirmationPopupComponent, NotificationPopupComponent, RideRatingModalComponent],
   templateUrl: './current-ride-passenger.component.html',
   styleUrls: ['./current-ride-passenger.component.css']
 })
@@ -39,10 +42,21 @@ export class CurrentRidePassengerComponent implements OnInit, OnDestroy {
   notificationTitle = '';
   notificationMessage = '';
   notificationSuccess = true;
+
+  showRatingModal = false;
+  isRatingLoading = false;
+  ratingForm: RatingFormData = {
+    driverRating: 0,
+    vehicleRating: 0,
+    comment: '',
+  };
+  rideHasBeenRated = false;
   
   constructor(
     private passengerCurrentRideService: PassengerCurrentRide,
     private rideService: RideService,
+    private rideReviewService: RideReviewService,
+    private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
     
@@ -65,7 +79,6 @@ export class CurrentRidePassengerComponent implements OnInit, OnDestroy {
     if (this.isInProgress()) {
       return this.actionButtons;
     }
-    //TODO - after ride is completed, allow feedback submission 
     return [];
   }
 
@@ -114,9 +127,10 @@ export class CurrentRidePassengerComponent implements OnInit, OnDestroy {
           this.currentRideComponent?.mapComponent?.updateCurrentLocation(this.rideData.currentLocation);
         }
         
-        if (this.isCompleted()) {
+        if (this.isCompleted() && !this.rideHasBeenRated) {
           this.trackingSub?.unsubscribe();
           this.trackingSub = undefined;
+          this.showRatingModal = true;
         }
       });
   }
@@ -210,5 +224,48 @@ export class CurrentRidePassengerComponent implements OnInit, OnDestroy {
     }
 
     return '';
+  }
+
+  closeRatingModal(): void {
+    this.showRatingModal = false;
+    this.ratingForm = { driverRating: 0, vehicleRating: 0, comment: '' };
+  }
+
+  onRatingSubmitted(formData: RatingFormData): void {
+    if (!this.rideData?.rideId) return;
+
+    this.isRatingLoading = true;
+
+    const driverRating = Math.min(Math.max(formData.driverRating, 1), 5);
+    const vehicleRating = Math.min(Math.max(formData.vehicleRating, 1), 5);
+
+    this.rideReviewService
+      .createReview(this.rideData.rideId, {
+        driverRating,
+        vehicleRating,
+        comment: formData.comment.trim(),
+      })
+      .subscribe({
+        next: (response) => {
+          this.isRatingLoading = false;
+          this.rideHasBeenRated = true;
+          this.showRatingModal = false;
+          this.navigateToDashboard();
+        },
+        error: (err) => {
+          console.error('Failed to submit rating:', err);
+          this.isRatingLoading = false;
+        },
+      });
+  }
+
+  onRatingNotNow(): void {
+    this.rideHasBeenRated = true;
+    this.showRatingModal = false;
+    this.navigateToDashboard();
+  }
+
+  private navigateToDashboard(): void {
+    this.router.navigate(['/passenger/dashboard']);
   }
 }
