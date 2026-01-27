@@ -5,12 +5,16 @@ import com.team18.FleetForge.dto.ride.lifecycle.FinishRideRequestDTO;
 import com.team18.FleetForge.dto.ride.lifecycle.FinishRideResponseDTO;
 import com.team18.FleetForge.dto.ride.view.RideTrackingDTO;
 import com.team18.FleetForge.model.enums.RideStatus;
+import com.team18.FleetForge.model.enums.VehicleType;
 import com.team18.FleetForge.model.ride.Ride;
+import com.team18.FleetForge.model.ride.RideLocation;
 import com.team18.FleetForge.model.ride.WayPoint;
 import com.team18.FleetForge.model.users.Driver;
 import com.team18.FleetForge.model.users.Passenger;
+import com.team18.FleetForge.repository.RideLocationRepository;
 import com.team18.FleetForge.repository.RideRepository;
 import com.team18.FleetForge.repository.DriverRepository;
+import com.team18.FleetForge.util.GeoUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +31,8 @@ public class RideFinishService {
     private final RideRepository rideRepository;
     private final DriverRepository driverRepository;
     private final EmailService emailService;
+    private final RideLocationRepository rideLocationRepository;
+    private final PriceCalculationService priceCalculationService;
 
     @Transactional
     public FinishRideResponseDTO finishRide(FinishRideRequestDTO request) {
@@ -39,6 +45,39 @@ public class RideFinishService {
 
         ride.setStatus(RideStatus.COMPLETED);
         ride.setEndTime(LocalDateTime.now());
+
+        LocalDateTime startTime = ride.getStartTime();
+
+        List<RideLocation> locations =
+                rideLocationRepository
+                        .findByRideAndRecordedAtAfterOrderByRecordedAtAsc(
+                                ride,
+                                startTime
+                        );
+
+        double totalDistanceKm = 0.0;
+
+        for (int i = 1; i < locations.size(); i++) {
+
+            RideLocation prev = locations.get(i - 1);
+            RideLocation curr = locations.get(i);
+
+            totalDistanceKm += GeoUtils.distanceKm(
+                    prev.getLatitude(), prev.getLongitude(),
+                    curr.getLatitude(), curr.getLongitude()
+            );
+        }
+
+        ride.setTotalDistance(totalDistanceKm);
+
+        VehicleType vehicleType = ride.getVehicleType();
+
+        double totalCost = priceCalculationService.calculatePrice(
+                totalDistanceKm,
+                vehicleType
+        );
+
+        ride.setTotalCost(totalCost);
         rideRepository.save(ride);
 
         Driver driver = ride.getDriver();
@@ -49,7 +88,7 @@ public class RideFinishService {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime tenMinutesFromNow = now.plusMinutes(10);
 
-       RideTrackingDTO nextScheduledRide = null;
+        RideTrackingDTO nextScheduledRide = null;
 
         if (!activeRides.isEmpty()) {
             Ride nextRide = activeRides.get(0);

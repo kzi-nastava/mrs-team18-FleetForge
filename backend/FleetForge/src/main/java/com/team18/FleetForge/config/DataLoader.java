@@ -282,6 +282,7 @@ public class DataLoader implements CommandLineRunner {
         ride.setCancellationReason(cancellationReason);
         ride.setLinkedPassengers(new ArrayList<>());
         ride.setWayPoints(new ArrayList<>());
+        ride.setVehicleType(VehicleType.STANDARD);
 
         return ride;
     }
