@@ -56,4 +56,14 @@
   okButtonText="OK"
   (closed)="onNotificationClosed()">
 </app-notification-popup>
+<app-confirmation-popup
+  [visible]="showSosConfirmPopup"
+  title="Emergency SOS"
+  message="Are you sure you want to activate SOS? Emergency services and support will be notified immediately."
+  confirmButtonText="Activate SOS"
+  cancelButtonText="Cancel"
+  confirmButtonColor="red"
+  (confirmed)="confirmSos()"
+  (cancelled)="closeSosPopup()">
+</app-confirmation-popup>
 
