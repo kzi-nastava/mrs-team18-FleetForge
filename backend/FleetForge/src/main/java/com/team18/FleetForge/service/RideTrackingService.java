@@ -10,13 +10,11 @@ import com.team18.FleetForge.model.GeoPoint;
 import com.team18.FleetForge.model.enums.Role;
 import com.team18.FleetForge.model.ride.InconsistencyReport;
 import com.team18.FleetForge.model.ride.Ride;
+import com.team18.FleetForge.model.ride.RideLocation;
 import com.team18.FleetForge.model.ride.WayPoint;
 import com.team18.FleetForge.model.users.Driver;
 import com.team18.FleetForge.model.users.Passenger;
-import com.team18.FleetForge.repository.DriverRepository;
-import com.team18.FleetForge.repository.InconsistencyReportRepository;
-import com.team18.FleetForge.repository.PassengerRepository;
-import com.team18.FleetForge.repository.RideRepository;
+import com.team18.FleetForge.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,6 +34,7 @@ public class RideTrackingService {
     private final PassengerRepository passengerRepository;
     private final DriverRepository driverRepository;
     private final InconsistencyReportRepository inconsistencyReportRepository;
+    private final RideLocationRepository rideLocationRepository;
 
 
     public RideTrackingDTO getActiveRideForUser(Long userId, Role role) {
@@ -50,12 +49,6 @@ public class RideTrackingService {
             throw new IllegalArgumentException("Invalid role: " + role);
         }
 
-        LocalDateTime tenMinutesFromNow = LocalDateTime.now().plusMinutes(10);
-
-        activeRides = activeRides.stream()
-                .filter(ride -> ride.getStartTime().isBefore(tenMinutesFromNow))
-                .collect(Collectors.toList());
-
         if (activeRides.isEmpty()) {
             throw new RuntimeException("No active ride found for user ID: " + userId);
         }
@@ -65,7 +58,6 @@ public class RideTrackingService {
 
         return buildRideTrackingDTO(ride);
     }
-
 
 
     @Transactional
@@ -90,6 +82,15 @@ public class RideTrackingService {
         driver.setCurrentLocation(newLocation);
 
         driverRepository.save(driver);
+
+        // Save ride track point
+        RideLocation trackPoint = new RideLocation();
+        trackPoint.setRide(ride);
+        trackPoint.setLatitude(newLocation.getLatitude());
+        trackPoint.setLongitude(newLocation.getLongitude());
+        trackPoint.setRecordedAt(LocalDateTime.now());
+        rideLocationRepository.save(trackPoint);
+
 
         return DriverLocationUpdateResponseDTO.builder()
                 .message("Driver location updated successfully")

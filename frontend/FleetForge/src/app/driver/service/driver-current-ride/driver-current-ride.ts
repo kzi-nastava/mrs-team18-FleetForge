@@ -27,7 +27,8 @@ export class DriverCurrentRide {
 
   startRide(rideId: string): Observable<RideStartResponseDTO> {
     return this.http.put<RideStartResponseDTO>(`${this.apiUrl}/${rideId}/start`, {});
-}
+  }
+
   finishRide(rideId: number): Observable<FinishRideResponseDTO> {
     return this.http.put<FinishRideResponseDTO>(
       `${this.apiUrl}/${rideId}/finish`,
