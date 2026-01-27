@@ -1,17 +1,4 @@
 <div class="home-container">
-  <div class="hero-section">
-    <div class="hero-content">
-      <h1>Book Rides<br>Anywhere</h1>
-      <div class="hero-buttons">
-        <button class="btn btn-primary" type="button" (click)="scrollToBookRide()">Book Now</button>
-        <button class="btn btn-secondary">Call Operator</button>
-      </div>
-    </div>
-    <div class="hero-image">
-      <img src="home-screen.png" alt="Taxi and passengers" />
-    </div>
-  </div>
-
   <div class="find-vehicle-section">
     <div class="find-vehicle-container">
       
@@ -26,9 +13,18 @@
               id="pickup" 
               formControlName="pickup" 
               placeholder="Pick Destination" 
-              (change)="onWaypointChange($event, -2)" 
+              (input)="onPickupInput($event)" 
               autocomplete="off"
             />
+            <ul class="suggestions-list" *ngIf="showSuggestions.pickup && suggestions.pickup.length > 0">
+              <li 
+                *ngFor="let suggestion of suggestions.pickup"
+                (click)="selectPickupSuggestion(suggestion)"
+                class="suggestion-item"
+              >
+                {{ formatSuggestion(suggestion) }}
+              </li>
+            </ul>
           </div>
         </div>
 
@@ -41,7 +37,7 @@
                 type="text" 
                 id="waypoint{{i}}"
                 placeholder="Enter waypoint"
-                (change)="onWaypointChange($event, i)"
+                (input)="onWaypointInput($event, i)"
                 autocomplete="off"
               >
               <button 
@@ -51,6 +47,15 @@
                 aria-label="Remove waypoint">
                 ✕
               </button>
+               <ul class="suggestions-list" *ngIf="showSuggestions.waypoints.get(i) && suggestions.waypoints.get(i)?.length">
+                <li 
+                  *ngFor="let suggestion of suggestions.waypoints.get(i)"
+                  (click)="selectWaypointSuggestion(suggestion, i)"
+                  class="suggestion-item"
+                >
+                  {{ formatSuggestion(suggestion) }}
+                </li>
+              </ul>
             </div>
           </div>
 
@@ -67,9 +72,18 @@
               id="dropoff" 
               formControlName="dropoff" 
               placeholder="Pick Destination" 
-              (change)="onWaypointChange($event, -1)" 
+              (input)="onDropoffInput($event)" 
               autocomplete="off"
             />
+             <ul class="suggestions-list" *ngIf="showSuggestions.dropoff && suggestions.dropoff.length > 0">
+              <li 
+                *ngFor="let suggestion of suggestions.dropoff"
+                (click)="selectDropoffSuggestion(suggestion)"
+                class="suggestion-item"
+              >
+                {{ formatSuggestion(suggestion) }}
+              </li>
+            </ul>
           </div>
         </div>
 

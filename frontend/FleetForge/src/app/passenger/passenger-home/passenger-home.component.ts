@@ -1,9 +1,9 @@
-import { ChangeDetectorRef, Component, ViewChild, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, ViewChild, ViewEncapsulation } from '@angular/core';
 import { VehicleLocationDTO, VehicleType } from '../../shared/models/vehicle.model';
 import { VehicleService } from '../../shared/services/vehicle.service';
 import { MapComponent } from '../../shared/map/map';
 import { RouterModule } from '@angular/router';
-import { forkJoin, last, map } from 'rxjs';
+import { debounceTime, distinctUntilChanged, forkJoin, last, map, Subject, Subscription, switchMap } from 'rxjs';
 import * as L from 'leaflet';
 import {
   AbstractControl,
@@ -18,8 +18,20 @@ import {
 import { PassengerHome } from '../service/passenger-home/passenger-home';
 import { CommonModule } from '@angular/common';
 import { WayPointDTO } from '../../shared/dtos/ride.dtos';
-import { PhotonService } from '../../shared/services/photon.service';
+import { PhotonFeature, PhotonService } from '../../shared/services/photon.service';
 import { RideService } from '../../shared/services/ride.service';
+
+interface LocationSuggestions {
+  pickup: PhotonFeature[];
+  dropoff: PhotonFeature[];
+  waypoints: Map<number, PhotonFeature[]>;
+}
+
+interface SuggestionsVisibility {
+  pickup: boolean;
+  dropoff: boolean;
+  waypoints: Map<number, boolean>;
+}
 
 @Component({
   selector: 'app-passenger-home',
@@ -28,7 +40,23 @@ import { RideService } from '../../shared/services/ride.service';
   styleUrl: './passenger-home.component.css',
   encapsulation: ViewEncapsulation.None
 })
-export class PassengerHomeComponent {
+export class PassengerHomeComponent implements OnDestroy {
+  suggestions: LocationSuggestions = {
+    pickup: [],
+    dropoff: [],
+    waypoints: new Map()
+  };
+
+  showSuggestions: SuggestionsVisibility = {
+    pickup: false,
+    dropoff: false,
+    waypoints: new Map()
+  };
+  private pickupSearchSubject = new Subject<string>();
+  private dropoffSearchSubject = new Subject<string>();
+  private waypointSearchSubjects = new Map<number, Subject<string>>();
+  
+  private subscriptions: Subscription[] = [];
   estimatedDistance: number = 0;
   estimatedDuration: number = 0;
   estimatedCost: number = 0;
@@ -70,8 +98,303 @@ vehicles: VehicleLocationDTO[] = [];
      // this.loadVehicles();
      this.updateMinDateTime();
     setInterval(() => this.updateMinDateTime(), 60000);
+    this.setupPickupSearch();
+    this.setupDropoffSearch();
+  }
+   ngOnDestroy(): void {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+    this.pickupSearchSubject.complete();
+    this.dropoffSearchSubject.complete();
+    this.waypointSearchSubjects.forEach(subject => subject.complete());
   }
 
+   private setupPickupSearch(): void {
+    const subscription = this.pickupSearchSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap((query: string) => {
+        if (query.length < 2) {
+          this.suggestions.pickup = [];
+          this.showSuggestions.pickup = false;
+          return [];
+        }
+        return this.photonService.searchSuggestions(query);
+      })
+    ).subscribe({
+      next: (features: PhotonFeature[]) => {
+        this.suggestions.pickup = features;
+        this.showSuggestions.pickup = features.length > 0;
+        this.cdr.markForCheck();
+      },
+      error: (error) => {
+        console.error('Error fetching pickup suggestions:', error);
+        this.suggestions.pickup = [];
+        this.showSuggestions.pickup = false;
+      }
+    });
+
+    this.subscriptions.push(subscription);
+  }
+
+  private setupDropoffSearch(): void {
+    const subscription = this.dropoffSearchSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap((query: string) => {
+        if (query.length < 2) {
+          this.suggestions.dropoff = [];
+          this.showSuggestions.dropoff = false;
+          return [];
+        }
+        return this.photonService.searchSuggestions(query);
+      })
+    ).subscribe({
+      next: (features: PhotonFeature[]) => {
+        this.suggestions.dropoff = features;
+        this.showSuggestions.dropoff = features.length > 0;
+        this.cdr.markForCheck();
+      },
+      error: (error) => {
+        console.error('Error fetching dropoff suggestions:', error);
+        this.suggestions.dropoff = [];
+        this.showSuggestions.dropoff = false;
+      }
+    });
+
+    this.subscriptions.push(subscription);
+  }
+
+  private setupWaypointSearch(index: number): void {
+    const subject = new Subject<string>();
+    this.waypointSearchSubjects.set(index, subject);
+
+    const subscription = subject.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap((query: string) => {
+        if (query.length < 2) {
+          this.suggestions.waypoints.set(index, []);
+          this.showSuggestions.waypoints.set(index, false);
+          return [];
+        }
+        return this.photonService.searchSuggestions(query);
+      })
+    ).subscribe({
+      next: (features: PhotonFeature[]) => {
+        this.suggestions.waypoints.set(index, features);
+        this.showSuggestions.waypoints.set(index, features.length > 0);
+        this.cdr.markForCheck();
+      },
+      error: (error) => {
+        console.error(`Error fetching waypoint ${index} suggestions:`, error);
+        this.suggestions.waypoints.set(index, []);
+        this.showSuggestions.waypoints.set(index, false);
+      }
+    });
+
+    this.subscriptions.push(subscription);
+  }
+
+   onPickupInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const query = input.value;
+
+    if (!query || query.trim().length === 0) {
+      const oldValue = this.rideForm.get('pickup')?.value;
+      if (this.mapComponent) {
+        this.mapComponent.removeLocationMarker('pickup');
+        if (oldValue) {
+           this.markers = this.markers.filter(m => m !== oldValue);
+           this.mapComponent['locationMarkers'].delete(oldValue);
+        }
+      }
+
+      this.rideForm.get('pickup')?.setValue('');
+      this.suggestions.pickup = [];
+      this.showSuggestions.pickup = false;
+      this.checkAndUpdateRoute();
+      return;
+    }
+
+    this.pickupSearchSubject.next(query);
+  }
+
+  onDropoffInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const query = input.value;
+
+    if (!query || query.trim().length === 0) {
+       const oldValue = this.rideForm.get('dropoff')?.value;
+      if (this.mapComponent) {
+        this.mapComponent.removeLocationMarker('dropoff');
+        if (oldValue) {
+          this.markers = this.markers.filter(m => m !== oldValue);
+          this.mapComponent['locationMarkers'].delete(oldValue);
+        }
+    }
+    
+    this.rideForm.get('dropoff')?.setValue('');
+    this.suggestions.dropoff = [];
+    this.showSuggestions.dropoff = false;
+    this.checkAndUpdateRoute();
+      return;
+    }
+
+    this.dropoffSearchSubject.next(query);
+  }
+
+  onWaypointInput(event: Event, index: number): void {
+    const input = event.target as HTMLInputElement;
+    const query = input.value;
+
+    if (!this.waypointSearchSubjects.has(index)) {
+      this.setupWaypointSearch(index);
+    }
+
+    if (!query || query.trim().length === 0) {
+      const oldValue = this.waypointArray.at(index).value;
+    const waypointId = `waypoint-${index}`;
+    
+    if (oldValue && this.mapComponent) {
+      this.mapComponent.removeLocationMarker(waypointId);
+      this.markers = this.markers.filter(m => m !== oldValue);
+      this.mapComponent['locationMarkers'].delete(oldValue);
+    }
+    
+    this.waypointArray.at(index).setValue('');
+    this.suggestions.waypoints.set(index, []);
+    this.showSuggestions.waypoints.set(index, false);
+    this.checkAndUpdateRoute();
+    return;
+    }
+
+    this.waypointSearchSubjects.get(index)!.next(query);
+  }
+    selectPickupSuggestion(feature: PhotonFeature): void {
+    const displayName = this.getDisplayName(feature);
+    const oldValue = this.rideForm.get('pickup')?.value;
+
+    // Ukloni stari marker
+    if (oldValue && this.mapComponent) {
+      this.mapComponent.removeLocationMarker('pickup');
+      this.markers = this.markers.filter(m => m !== oldValue);
+    }
+
+    this.rideForm.get('pickup')?.setValue(displayName);
+    this.suggestions.pickup = [];
+    this.showSuggestions.pickup = false;
+
+    const [lon, lat] = feature.geometry.coordinates;
+
+    if (this.mapComponent) {
+      this.mapComponent.setLocationMarker('pickup', 'pickup', displayName, lat, lon);
+    }
+
+    const marker = L.marker([lat, lon]);
+    this.mapComponent['locationMarkers'].set(displayName, marker);
+
+    if (!this.markers.includes(displayName)) {
+      this.markers.push(displayName);
+    }
+
+    this.checkAndUpdateRoute();
+    this.cdr.markForCheck();
+  }
+
+  selectDropoffSuggestion(feature: PhotonFeature): void {
+    const displayName = this.getDisplayName(feature);
+    const oldValue = this.rideForm.get('dropoff')?.value;
+
+    // Ukloni stari marker
+    if (oldValue && this.mapComponent) {
+      this.mapComponent.removeLocationMarker('dropoff');
+      this.markers = this.markers.filter(m => m !== oldValue);
+    }
+
+    this.rideForm.get('dropoff')?.setValue(displayName);
+    this.suggestions.dropoff = [];
+    this.showSuggestions.dropoff = false;
+
+    const [lon, lat] = feature.geometry.coordinates;
+
+    if (this.mapComponent) {
+      this.mapComponent.setLocationMarker('dropoff', 'dropoff', displayName, lat, lon);
+    }
+
+    const marker = L.marker([lat, lon]);
+    this.mapComponent['locationMarkers'].set(displayName, marker);
+
+    if (!this.markers.includes(displayName)) {
+      this.markers.push(displayName);
+    }
+
+    this.checkAndUpdateRoute();
+    this.cdr.markForCheck();
+  }
+
+  selectWaypointSuggestion(feature: PhotonFeature, index: number): void {
+    const displayName = this.getDisplayName(feature);
+    const oldValue = this.waypointArray.at(index).value;
+    const waypointId = `waypoint-${index}`;
+
+    // Ukloni stari marker
+    if (oldValue && this.mapComponent) {
+      this.mapComponent.removeLocationMarker(waypointId);
+      this.markers = this.markers.filter(m => m !== oldValue);
+    }
+
+    this.waypointArray.at(index).setValue(displayName);
+    this.suggestions.waypoints.set(index, []);
+    this.showSuggestions.waypoints.set(index, false);
+
+    const [lon, lat] = feature.geometry.coordinates;
+
+    if (this.mapComponent) {
+      this.mapComponent.setLocationMarker(waypointId, 'waypoint', displayName, lat, lon);
+    }
+
+    const marker = L.marker([lat, lon]);
+    this.mapComponent['locationMarkers'].set(displayName, marker);
+
+    if (!this.markers.includes(displayName)) {
+      this.markers.push(displayName);
+    }
+
+    this.checkAndUpdateRoute();
+    this.cdr.markForCheck();
+  }
+    private getDisplayName(feature: PhotonFeature): string {
+    const props = feature.properties;
+    let displayName = props.name || '';
+
+    if (props.street) {
+      displayName = props.street;
+      if (props.housenumber) {
+        displayName = `${props.street} ${props.housenumber}`;
+      }
+    }
+
+    if (!displayName && props.name) {
+      displayName = props.name;
+    }
+
+    return displayName;
+  }
+  formatSuggestion(feature: PhotonFeature): string {
+    const props = feature.properties;
+    let parts: string[] = [];
+
+    if (props.name) parts.push(props.name);
+    if (props.street) {
+      const street = props.housenumber
+        ? `${props.street} ${props.housenumber}`
+        : props.street;
+      parts.push(street);
+    }
+    if (props.city && props.city !== props.name) parts.push(props.city);
+
+    return parts.join(', ');
+  }
   ngAfterViewInit(): void {
     const data = history.state.favoriteRoute;
     if (data) {
@@ -178,40 +501,6 @@ vehicles: VehicleLocationDTO[] = [];
   });
   }
 
- onWaypointChange(event: Event, index: number): void {
-  const inputElement = event.target as HTMLInputElement;
-  const newValue = inputElement.value;
-  
-  const oldValue = inputElement.dataset['previousValue'] || '';
-  if (oldValue && oldValue.trim() !== '') {
-    this.mapComponent.removeMarker(oldValue);
-    this.markers = this.markers.filter(marker => marker !== oldValue);
-    this.checkAndUpdateRoute();
-  }
-  inputElement.dataset['previousValue'] = newValue;
-  if (index >= 0) {
-    this.waypointArray.at(index).setValue(newValue);
-  }
-  
-   if (newValue && newValue.trim() !== '') {
-      this.photonService.searchSuggestions(newValue).subscribe({
-        next: (features) => {
-          if (features && features.length > 0) {
-            const [lon, lat] = features[0].geometry.coordinates;
-            const marker = L.marker([lat, lon]);
-            this.mapComponent['locationMarkers'].set(newValue, marker);
-            this.markers.push(newValue);
-            this.checkAndUpdateRoute();
-          }
-        },
-        error: (error) => {
-          console.error('Geocoding error:', error);
-        }
-      });
-  } else {
-    this.checkAndUpdateRoute();
-  }
-}
 
 private checkAndUpdateRoute(): void {
   const startingPoint = document.getElementById('pickup') as HTMLInputElement;
@@ -378,15 +667,21 @@ if(dropoffLatLng){
 
   
 removeWaypoint(index: number): void {
-    const value = this.waypointArray.at(index).value;
-    if (value) {
-      this.mapComponent.removeMarker(value);
-    }
-    this.waypointArray.removeAt(index);
-    this.waypointsNumber--;
-    this.refactorIdsWaypoints();
-    this.checkAndUpdateRoute();
+  const value = this.waypointArray.at(index).value;
+  const waypointId = `waypoint-${index}`;
+  
+  if (value) {
+    this.mapComponent.removeLocationMarker(waypointId);
+    this.mapComponent.removeMarker(value);
+    this.markers = this.markers.filter(m => m !== value);
+    this.mapComponent['locationMarkers'].delete(value);
   }
+  
+  this.waypointArray.removeAt(index);
+  this.waypointsNumber--;
+  this.refactorIdsWaypoints();
+  this.checkAndUpdateRoute();
+}
   removePassenger(index: number): void {
     this.passengerArray.removeAt(index);
     this.passengersNumber--;

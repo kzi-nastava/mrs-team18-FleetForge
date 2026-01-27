@@ -329,3 +329,46 @@ form select:focus {
     gap: 10px;
   }
 }
+.input-wrapper {
+  position: relative;
+  width: 100%;
+  display: flex;       
+  align-items: center; 
+}
+
+.suggestions-list {
+  position: absolute;
+  top: 100%;        
+  left: 0;
+  right: 0;           
+  width: 100%;     
+  
+  background: white;
+  border: 1px solid #ccc;
+  border-top: none;
+  max-height: 200px;
+  overflow-y: auto;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  
+  z-index: 9999;      
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.suggestion-item {
+  padding: 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+  background-color: white; 
+  color: black;
+  text-align: left;
+}
+
+.suggestion-item:hover {
+  background-color: #f0f0f0;
+}
+
+.suggestion-item:last-child {
+  border-bottom: none;
+}
