@@ -1,0 +1,116 @@
+<div class="dashboard-container">
+  <!-- Header Section -->
+  <div class="dashboard-header">
+    <div class="header-content">
+      <h1 class="dashboard-title">Driver Dashboard</h1>
+      <div class="availability-toggle">
+        <span class="status-label">Status:</span>
+        <button 
+          class="status-btn" 
+          [ngClass]="{'available': isAvailable, 'unavailable': !isAvailable}"
+          (click)="toggleAvailability()">
+          <span class="status-indicator"></span>
+          {{ isAvailable ? 'Available' : 'Unavailable' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="dashboard-content">
+    
+    <!-- Stats Section -->
+    <div class="stats-section">
+      <div class="stat-card earnings">
+        <div class="stat-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20ZM12.31 11.14C10.54 10.69 10 10.24 10 9.5C10 8.63 10.83 8 12.09 8C13.42 8 13.95 8.69 14 9.5H15.91C15.85 8.28 15.06 7.16 13.5 6.69V5.5H10.5V6.66C9.07 7.06 8 8.03 8 9.5C8 11.26 9.45 12.13 11.69 12.66C13.61 13.13 14 13.72 14 14.5C14 15.13 13.5 16 12.09 16C10.79 16 10.14 15.38 10.04 14.5H8.14C8.25 16.08 9.42 17.06 10.5 17.39V18.5H13.5V17.41C14.93 17.08 16 16.15 16 14.5C16 12.38 14.45 11.59 12.31 11.14Z" fill="currentColor"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <span class="stat-label">Today's Earnings</span>
+          <span class="stat-value">{{ dailyStats.totalEarnings }} RSD</span>
+        </div>
+      </div>
+
+      <div class="stat-card hours">
+        <div class="stat-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20ZM12.5 7H11V13L16.25 16.15L17 14.92L12.5 12.25V7Z" fill="currentColor"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <span class="stat-label">Hours Worked</span>
+          <span class="stat-value">{{ dailyStats.hoursWorked }}h</span>
+        </div>
+      </div>
+
+      <div class="stat-card rides">
+        <div class="stat-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5H6.5C5.84 5 5.28 5.42 5.08 6.01L3 12V20C3 20.55 3.45 21 4 21H5C5.55 21 6 20.55 6 20V19H18V20C18 20.55 18.45 21 19 21H20C20.55 21 21 20.55 21 20V12L18.92 6.01ZM6.85 7H17.14L18.22 10H5.78L6.85 7ZM19 17H5V12H19V17Z" fill="currentColor"/>
+            <circle cx="7.5" cy="14.5" r="1.5" fill="currentColor"/>
+            <circle cx="16.5" cy="14.5" r="1.5" fill="currentColor"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <span class="stat-label">Rides Completed</span>
+          <span class="stat-value">{{ dailyStats.ridesCompleted }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upcoming Rides Section -->
+    <div class="rides-section">
+      <h2 class="section-title">Upcoming Rides</h2>
+      
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="upcomingRides.length === 0">
+        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#ccc"/>
+          <path d="M12 6V12L16 14" stroke="#ccc" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <p class="empty-message">No upcoming rides scheduled</p>
+        <p class="empty-submessage">You'll be notified when a new ride is assigned</p>
+      </div>
+
+      <!-- Rides List -->
+      <div class="rides-list" *ngIf="upcomingRides.length > 0">
+        <div class="ride-card" *ngFor="let ride of upcomingRides">
+          <div class="ride-header">
+            <div class="passenger-info">
+              <img [src]="ride.passengerImage" alt="Passenger" class="passenger-avatar">
+              <div class="passenger-details">
+                <span class="passenger-name">{{ ride.passengerName }}</span>
+                <span class="ride-time">{{ formatTime(ride.startTime) }} • {{ getTimeUntilRide(ride.startTime) }}</span>
+              </div>
+            </div>
+            <div class="ride-cost">{{ ride.cost }} RSD</div>
+          </div>
+
+          <div class="ride-route">
+            <div class="route-point">
+              <div class="route-marker pickup"></div>
+              <span class="route-address">{{ ride.startAddress }}</span>
+            </div>
+            <div class="route-line"></div>
+            <div class="route-point">
+              <div class="route-marker dropoff"></div>
+              <span class="route-address">{{ ride.endAddress }}</span>
+            </div>
+          </div>
+
+          <div class="ride-actions">
+            <button 
+              class="btn-start-ride" 
+              [disabled]="!ride.canStart"
+              (click)="goToCurrentRide()">
+              {{ ride.canStart ? 'Go to Ride' : 'Starts ' + getTimeUntilRide(ride.startTime) }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

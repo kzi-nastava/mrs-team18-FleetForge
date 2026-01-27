@@ -19,13 +19,14 @@ import { RegisterDriverComponent } from './admin/register-driver/register-driver
 import { ActivateAccountComponent } from './auth/activate-account/activate-account.component';
 import { PassengerHomeComponent } from './passenger/passenger-home/passenger-home.component';
 import { CurrentRidePassengerComponent } from './passenger/current-ride-passenger/current-ride-passenger.component';
+import { CurrentRideDriverComponent } from './driver/current-ride-driver/current-ride-driver.component';
+import { DriverDashboardComponent } from './driver/driver-dashboard/driver-dashboard.component';
 
 import { authGuard, guestGuard, roleGuard } from './auth/guard/auth-guard';
 import { homeRedirectGuard } from './auth/guard/home-redirect-guard';
 import { PassengerHistoryComponent } from './passenger/passenger-history/passenger-history.component';
 import { PassengerFavoriteRoutesComponent } from './passenger/passenger-favorite-routes/passenger-favorite-routes.component';
 import { PassengerDashboardComponent } from './passenger/dashboard/dashboard.component';
-import { CurrentRideDriverComponent } from './driver/current-ride-driver/current-ride-driver.component';
 import { PassengerScheduledRidesComponent } from './passenger/passenger-scheduled-rides/passenger-scheduled-rides.component';
 
 export const routes: Routes = [
@@ -97,6 +98,11 @@ export const routes: Routes = [
       },
 
       // Driver routes - require authentication and DRIVER role
+      {
+        path: 'driver/dashboard',
+        component: DriverDashboardComponent,
+        canActivate: [authGuard, roleGuard(['DRIVER'])]
+      },
       {
         path: 'profile-driver',
         component: DriverProfileComponent,

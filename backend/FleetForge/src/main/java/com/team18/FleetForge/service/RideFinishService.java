@@ -1,9 +1,12 @@
 package com.team18.FleetForge.service;
 
+import com.team18.FleetForge.dto.driver.DriverInfoDTO;
 import com.team18.FleetForge.dto.ride.lifecycle.FinishRideRequestDTO;
 import com.team18.FleetForge.dto.ride.lifecycle.FinishRideResponseDTO;
+import com.team18.FleetForge.dto.ride.view.RideTrackingDTO;
 import com.team18.FleetForge.model.enums.RideStatus;
 import com.team18.FleetForge.model.ride.Ride;
+import com.team18.FleetForge.model.ride.WayPoint;
 import com.team18.FleetForge.model.users.Driver;
 import com.team18.FleetForge.model.users.Passenger;
 import com.team18.FleetForge.repository.RideRepository;
@@ -15,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,19 +33,50 @@ public class RideFinishService {
         Ride ride = rideRepository.findById(request.getRideId())
                 .orElseThrow(() -> new RuntimeException("Ride not found with id: " + request.getRideId()));
 
-        if (ride.getStatus() != RideStatus.IN_PROGRESS) {
-            throw new RuntimeException("Cannot finish ride. Ride is not in progress. Current status: " + ride.getStatus());
-        }
+//        if (ride.getStatus() != RideStatus.IN_PROGRESS) {
+//            throw new RuntimeException("Cannot finish ride. Ride is not in progress. Current status: " + ride.getStatus());
+//        }
 
         ride.setStatus(RideStatus.COMPLETED);
         ride.setEndTime(LocalDateTime.now());
         rideRepository.save(ride);
 
         Driver driver = ride.getDriver();
+        List<Ride> activeRides = rideRepository.findAllByDriverAndStatus(driver, RideStatus.ACCEPTED);
+        activeRides.sort((r1, r2) -> r1.getStartTime().compareTo(r2.getStartTime()));
 
-        // TODO: Check for scheduled rides when that feature is implemented
-        Long nextScheduledRideId = null;
-        driver.setAvailable(true);
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime tenMinutesFromNow = now.plusMinutes(10);
+
+       RideTrackingDTO nextScheduledRide = null;
+
+        if (!activeRides.isEmpty()) {
+            Ride nextRide = activeRides.get(0);
+            Passenger passenger = nextRide.getPassenger();
+            boolean isWithinTenMinutes = nextRide.getStartTime().isAfter(now)
+                    && nextRide.getStartTime().isBefore(tenMinutesFromNow);
+
+            if (isWithinTenMinutes) {
+                nextScheduledRide = RideTrackingDTO.builder()
+                        .rideId(nextRide.getId())
+                        .status(nextRide.getStatus().name())
+                        .currentLocation(driver.getCurrentLocation())
+                        .estimatedArrivalMinutes(null)
+                        .route(buildRouteInfo(nextRide))
+                        .driver(buildDriverInfo(driver))
+                        .passenger(buildPassengerInfo(passenger))
+                        .panicActivated(nextRide.getPanicActivated() != null && nextRide.getPanicActivated())
+                        .build();
+
+            } else {
+                driver.setAvailable(true);
+            }
+        } else {
+            driver.setAvailable(true);
+        }
+
+
         driverRepository.save(driver);
 
         sendRideCompletionEmails(ride);
@@ -53,7 +88,7 @@ public class RideFinishService {
                 .totalCost(ride.getTotalCost())
                 .message("Ride completed successfully")
                 .driverAvailable(driver.isAvailable())
-                .nextScheduledRideId(nextScheduledRideId)
+                .nextRide(nextScheduledRide)
                 .build();
     }
 
@@ -99,4 +134,49 @@ public class RideFinishService {
                 ride.getTotalCost()
         );
     }
+
+    private RideTrackingDTO.RouteInfoDTO buildRouteInfo(Ride ride) {
+        List<RideTrackingDTO.WaypointDTO> waypointDTOs = ride.getWayPoints().stream()
+                .map(this::buildWaypointDTO)
+                .collect(Collectors.toList());
+
+        return RideTrackingDTO.RouteInfoDTO.builder()
+                .startLocation(ride.getStartLocation())
+                .startAddress(ride.getStartAddress())
+                .endLocation(ride.getEndLocation())
+                .endAddress(ride.getEndAddress())
+                .waypoints(waypointDTOs)
+                .totalDistanceKm(ride.getTotalDistance())
+                .build();
+    }
+
+    private RideTrackingDTO.WaypointDTO buildWaypointDTO(WayPoint wayPoint) {
+        return RideTrackingDTO.WaypointDTO.builder()
+                .location(wayPoint.getLocation())
+                .address(wayPoint.getAddress())
+                .order(wayPoint.getOrderIndex())
+                .build();
+    }
+
+
+    private DriverInfoDTO buildDriverInfo(Driver driver) {
+        return DriverInfoDTO.builder()
+                .id(driver.getId())
+                .firstName(driver.getFirstName())
+                .lastName(driver.getLastName())
+                .phoneNumber(driver.getPhoneNumber())
+                .profileImage(driver.getProfilePicture())
+                .build();
+    }
+
+    private RideTrackingDTO.PassengerInfoDTO buildPassengerInfo(Passenger passenger) {
+        return RideTrackingDTO.PassengerInfoDTO.builder()
+                .id(passenger.getId())
+                .firstName(passenger.getFirstName())
+                .lastName(passenger.getLastName())
+                .phoneNumber(passenger.getPhoneNumber())
+                .profileImage(passenger.getProfilePicture())
+                .build();
+    }
+
 }

@@ -54,6 +54,13 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
             "(SELECT lp.id FROM r.linkedPassengers lp))")
     List<Ride> findActiveRidesByPassengerId(@Param("passengerId") Long passengerId);
 
+    List<Ride> findAllByDriverAndStatusAndEndTimeBetween(
+            Driver driver,
+            RideStatus status,
+            LocalDateTime startTime,
+            LocalDateTime endTime
+    );
+
 
     @NonNull
     List<Ride> findAllByStatus(RideStatus status);
