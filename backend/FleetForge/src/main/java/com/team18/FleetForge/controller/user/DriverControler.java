@@ -3,6 +3,7 @@ package com.team18.FleetForge.controller.user;
 import com.team18.FleetForge.dto.auth.SetPasswordRequestDTO;
 import com.team18.FleetForge.dto.auth.SetPasswordResponseDTO;
 import com.team18.FleetForge.dto.driver.*;
+import com.team18.FleetForge.dto.ride.lifecycle.CompletedRideDTO;
 import com.team18.FleetForge.dto.ride.lifecycle.UpcomingRideDTO;
 import com.team18.FleetForge.dto.vehicle.VehicleInformationChangeRequestDTO;
 import com.team18.FleetForge.dto.vehicle.VehicleInformationChangeResponseDTO;
@@ -45,7 +46,7 @@ public class DriverControler {
     private final PasswordEncoder passwordEncoder;
     private final DriverSessionService driverSessionService;
     private final DriverDashboardService driverDashboardService;
-
+    private final DriverHistoryService driverHistoryService;
 
 
     @GetMapping("/upcoming-rides")
@@ -268,36 +269,18 @@ public class DriverControler {
 
 
     /**
-     * GET /api/drivers/ride-history
-     * Query params:
-     * - startDate (LocalDate, optional) - Filter rides from this date
-     * Response: List of all rides with passenger information
-     * - rideId, startTime, endTime
-     * - startLocation, startAddress, endLocation, endAddress
-     * - totalPrice
-     * - cancelled (Boolean), cancelledBy (String)
-     * - panicActivated (Boolean)
-     * - passengers (List with all passenger info)
+     * Get ride history for the authenticated driver
+     *
+     * @param authentication Spring Security authentication object containing the logged-in driver
+     * @return List of CompletedRideDTO representing the driver's ride history
      */
-    @GetMapping(
-            value = "/ride-history",
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    public ResponseEntity<List<DriverRideHistoryDTO>> getRideHistory(
-            @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate startDate) {
+    @GetMapping("/ride-history")
+    @PreAuthorize("hasRole('DRIVER')")
+    public ResponseEntity<List<CompletedRideDTO>> getDriverHistory(Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        List<CompletedRideDTO> rideHistory = driverHistoryService.getDriverRideHistory(user.getId());
 
-        Long driverId = null;
-
-        if (authentication != null && authentication.getPrincipal() instanceof User user) {
-            driverId = user.getId();
-        }
-
-        List<DriverRideHistoryDTO> history = rideService.getDriverRideHistory(driverId, startDate);
-
-        return new ResponseEntity<>(history, HttpStatus.OK);
+        return new ResponseEntity<>(rideHistory, HttpStatus.OK);
     }
 }

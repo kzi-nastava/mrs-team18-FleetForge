@@ -47,6 +47,11 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
             "ORDER BY r.startTime ASC")
     List<Ride> findActiveRidesByDriverId(@Param("driverId") Long driverId);
 
+    @Query("SELECT r FROM Ride r WHERE r.driver.id = :driverId " +
+            "AND r.status = 'COMPLETED' "+
+            "ORDER BY r.startTime ASC")
+    List<Ride> findCompletedRidesByDriverId(@Param("driverId") Long driverId);
+
 
     // Find active ride for a passenger (including linked passengers)
     @Query("SELECT r FROM Ride r WHERE r.status IN ('ACCEPTED', 'IN_PROGRESS') " +
