@@ -3,7 +3,8 @@ import { VehicleLocationDTO, VehicleType } from '../../shared/models/vehicle.mod
 import { VehicleService } from '../../shared/services/vehicle.service';
 import { MapComponent } from '../../shared/map/map';
 import { RouterModule } from '@angular/router';
-import { last, map } from 'rxjs';
+import { forkJoin, last, map } from 'rxjs';
+import * as L from 'leaflet';
 import {
   AbstractControl,
   FormArray,
@@ -17,6 +18,8 @@ import {
 import { PassengerHome } from '../service/passenger-home/passenger-home';
 import { CommonModule } from '@angular/common';
 import { WayPointDTO } from '../../shared/dtos/ride.dtos';
+import { PhotonService } from '../../shared/services/photon.service';
+import { RideService } from '../../shared/services/ride.service';
 
 @Component({
   selector: 'app-passenger-home',
@@ -35,14 +38,14 @@ vehicles: VehicleLocationDTO[] = [];
 
   minDateTime: string = '';
 
-  constructor(private vehicleService: VehicleService, private cdr: ChangeDetectorRef,private passengerHomeService:PassengerHome) {}
+  constructor(public rideService: RideService, private cdr: ChangeDetectorRef,private passengerHomeService:PassengerHome,private photonService:PhotonService) {}
   @ViewChild(MapComponent) mapComponent!: MapComponent;
   markers: string[] = [];
 
   private minDateTimeValidator(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
       if (!control.value) {
-        return null; // Ako nema vrednosti, required validator će to uhvatiti
+        return null; 
       }
 
       const selectedDate = new Date(control.value);
@@ -68,31 +71,51 @@ vehicles: VehicleLocationDTO[] = [];
      this.updateMinDateTime();
     setInterval(() => this.updateMinDateTime(), 60000);
   }
+
   ngAfterViewInit(): void {
-        const data=history.state.favoriteRoute;
-    if(data){
+    const data = history.state.favoriteRoute;
+    if (data) {
       this.rideForm.get('pickup')?.setValue(data.startAddress);
-      this.mapComponent.setMarker(data.startAddress).subscribe(() => {
-        this.markers.push(data.startAddress);
-        this.checkAndUpdateRoute();
-      });
       this.rideForm.get('dropoff')?.setValue(data.endAddress);
-      this.mapComponent.setMarker(data.endAddress).subscribe(() => {
-        this.markers.push(data.endAddress);
-        this.checkAndUpdateRoute();
-      });
-      data.waypoints.forEach((wp: WayPointDTO, index: number) => {
-        this.mapComponent.setMarker(wp.address).subscribe(() => {
-          this.markers.push(wp.address);
+
+      const addresses = [
+        data.startAddress,
+        data.endAddress,
+        ...data.waypoints.map((wp: WayPointDTO) => wp.address)
+      ];
+
+      const geocodeObservables = addresses.map(addr =>
+        this.photonService.searchSuggestions(addr)
+      );
+
+      forkJoin(geocodeObservables).subscribe({
+        next: (results) => {
+          results.forEach((features, index) => {
+            if (features && features.length > 0) {
+              const [lon, lat] = features[0].geometry.coordinates;
+              const marker = L.marker([lat, lon]);
+              const address = addresses[index];
+
+              this.mapComponent['locationMarkers'].set(address, marker);
+              this.markers.push(address);
+            }
+          });
+
+          data.waypoints.forEach((wp: WayPointDTO) => {
+            const newControl = new FormControl(wp.address, { validators: Validators.required, nonNullable: true });
+            this.waypointArray.push(newControl);
+          });
+
+          this.waypointsNumber = this.waypointArray.length;
           this.checkAndUpdateRoute();
-        });
-        const newControl = new FormControl(wp.address, { validators: Validators.required, nonNullable: true });
-        this.waypointArray.push(newControl);
+          this.cdr.detectChanges();
+        },
+        error: (error:any) => {
+          console.error('Geocoding error:', error);
+        }
       });
-      this.waypointsNumber = this.waypointArray.length;
     }
   }
-
   private updateMinDateTime(): void {
    const now = new Date();
   now.setMinutes(now.getMinutes() + 60); 
@@ -139,7 +162,8 @@ vehicles: VehicleLocationDTO[] = [];
 
   handleMapClick(event: {address:string, lat:number, lng:number}): void {
     this.markers.push(event.address);
-    this.mapComponent.setMarkerWithCoords(event.address, event.lat, event.lng);
+    const marker = L.marker([event.lat, event.lng]);
+    this.mapComponent['locationMarkers'].set(event.address, marker);
     const newControl = new FormControl(event.address, { validators: Validators.required, nonNullable: true });
   this.waypointArray.push(newControl);
   this.waypointsNumber = this.waypointArray.length;
@@ -169,11 +193,21 @@ vehicles: VehicleLocationDTO[] = [];
     this.waypointArray.at(index).setValue(newValue);
   }
   
-  if (newValue && newValue.trim() !== '') {
-    this.mapComponent.setMarker(newValue).subscribe(() => {
-      this.markers.push(newValue);
-      this.checkAndUpdateRoute();
-    });
+   if (newValue && newValue.trim() !== '') {
+      this.photonService.searchSuggestions(newValue).subscribe({
+        next: (features) => {
+          if (features && features.length > 0) {
+            const [lon, lat] = features[0].geometry.coordinates;
+            const marker = L.marker([lat, lon]);
+            this.mapComponent['locationMarkers'].set(newValue, marker);
+            this.markers.push(newValue);
+            this.checkAndUpdateRoute();
+          }
+        },
+        error: (error) => {
+          console.error('Geocoding error:', error);
+        }
+      });
   } else {
     this.checkAndUpdateRoute();
   }
