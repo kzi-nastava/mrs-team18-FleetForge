@@ -90,15 +90,15 @@ public class PassengerController {
         return new ResponseEntity<>(passengerChanged, HttpStatus.OK);
     }
 
-    @PutMapping("password")
-    public ResponseEntity<String> passwordChange(@RequestBody PassengerPasswordChangeRequestDTO request){
+    @PutMapping("/password")
+    public ResponseEntity<?> passwordChange(@RequestBody PassengerPasswordChangeRequestDTO request){
         Passenger passenger = userService.getCurrentPassenger();
         if(passenger == null){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         passenger.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userService.save(passenger);
-        return ResponseEntity.ok("password changed");
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/favorites")

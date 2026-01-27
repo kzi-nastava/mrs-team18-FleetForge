@@ -236,14 +236,14 @@ public class DriverControler {
     }
 
     @PutMapping("/password")
-    public ResponseEntity<String> passwordChange(@RequestBody DriverPasswordChangeRequestDTO request) {
+    public ResponseEntity<?> passwordChange(@RequestBody DriverPasswordChangeRequestDTO request) {
         Driver foundDriver = userService.getCurrentDriver();
 
         foundDriver.setPassword(passwordEncoder.encode(request.getNewPassword()));
 
         userService.save(foundDriver);
 
-        return ResponseEntity.ok("password changed");
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/set-password")

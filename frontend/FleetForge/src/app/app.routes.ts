@@ -120,8 +120,7 @@ export const routes: Routes = [
       },
       {
         path: 'set-password',
-        component: PasswordSetComponent,
-        canActivate: [authGuard, roleGuard(['DRIVER'])]
+        component: PasswordSetComponent
       },
 
       // Password reset - accessible by all authenticated users
