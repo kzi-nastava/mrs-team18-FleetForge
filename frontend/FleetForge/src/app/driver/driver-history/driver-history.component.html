@@ -21,9 +21,9 @@
       <table class="rides-table">
         <thead>
           <tr>
-            <th (click)="sortBy('name')" class="sortable">
+            <th (click)="sortBy('passengerName')" class="sortable">
               Name
-              <span class="sort-indicator" *ngIf="sortColumn === 'name'">
+              <span class="sort-indicator" *ngIf="sortColumn === 'passengerName'">
                 {{ sortDirection === 'asc' ? '▲' : '▼' }}
               </span>
             </th>
@@ -59,7 +59,7 @@
             <tr>
               <td>
                 <div class="passenger-info">
-                  <div class="passenger-name">{{ ride.name }}</div>
+                  <div class="passenger-name">{{ ride.passengerName }}</div>
                   <div class="ride-id">{{ ride.id }}</div>
                 </div>
               </td>
