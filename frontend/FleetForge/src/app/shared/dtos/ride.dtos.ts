@@ -43,3 +43,17 @@ export interface RideStartResponseDTO{
     id:number;
     status:string;
 }
+
+export interface RideReviewRequestDTO {
+    driverRating: number;
+    vehicleRating: number;
+    comment?: string;
+}
+
+export interface RideReviewResponseDTO {
+    rideId: number;
+    driverRating: number;
+    vehicleRating: number;
+    comment: string;
+    reviewedAt: string;
+}
