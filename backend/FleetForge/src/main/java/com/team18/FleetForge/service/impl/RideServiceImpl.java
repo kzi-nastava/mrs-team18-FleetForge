@@ -233,6 +233,8 @@ public class RideServiceImpl implements RideService {
             if (driver == null) {
                 return null;
             }
+            driver.setAvailable(false);
+            userRepository.save(driver);
             ride.setDriver(driver);
         }else{
             if(!driverService.checkAlreadyBookedDateTime(ride)){

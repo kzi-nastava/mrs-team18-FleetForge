@@ -15,6 +15,11 @@ export const SIDEBAR_MENU_CONFIG: Record<UserRole, SidebarMenuItem[]> = {
   // PASSENGER role - customer side functionalities
   PASSENGER: [
     {
+      label: 'Order Ride',
+      icon: '🏠', // home icon
+      path: '/passenger/passenger-home'
+    },
+    {
       label: 'Dashboard',
       icon: '⊞', // grid/dashboard icon
       path: '/passenger/dashboard'
