@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -18,6 +20,7 @@ public class RideStartService {
 
     public ResponseEntity<RideStartResponseDTO> startRide(Ride ride) {
         ride.setStatus(RideStatus.IN_PROGRESS);
+        ride.setStartTime(LocalDateTime.now());
         rideRepository.save(ride);
         RideStartResponseDTO responseDTO = new RideStartResponseDTO();
         responseDTO.setStatus(ride.getStatus());

@@ -242,6 +242,10 @@ export class CurrentRideDriverComponent implements OnInit, OnDestroy {
 
   onNotificationClosed(): void {
     this.notificationVisible = false;
+
+    if (!this.rideData) {
+      this.router.navigate(['/']);
+    }
   }
 
   closeCancelConfirmation(): void {
@@ -274,7 +278,6 @@ export class CurrentRideDriverComponent implements OnInit, OnDestroy {
   private onFinishRide(): void {
     if (!this.rideData) return;
 
-    this.showCancelConfirm = false;
     this.isLoading = true;
     this.clearTracking();
 
@@ -283,38 +286,44 @@ export class CurrentRideDriverComponent implements OnInit, OnDestroy {
         console.log('Ride finished successfully:', response);
         this.isLoading = false;
 
+        this.notificationTitle = 'Ride Completed';
+        this.notificationMessage = `Total price: ${response.totalCost.toFixed(2)} RSD`;
+        this.notificationSuccess = true;
+        this.notificationVisible = true;
+
         if (response.nextRide) {
-          // Driver has next scheduled ride - load it
-          alert(`Ride completed! Loading your next scheduled ride...`);
           console.log('Loading next scheduled ride:', response.nextRide.rideId);
           this.rideData = response.nextRide;
           this.setCardInfoFromRide();
           this.rideStarted = false;
           this.currentCoordinateIndex = 0;
           this.updateActionButtons();
-          this.cdr.detectChanges();
 
           if (this.rideData?.currentLocation) {
-            this.currentRideComponent?.mapComponent?.updateCurrentLocation(this.rideData.currentLocation);
+            this.currentRideComponent?.mapComponent
+              ?.updateCurrentLocation(this.rideData.currentLocation);
           }
         } else {
-          // No next ride - driver is available, redirect to home
-          alert('Ride completed successfully! You are now available for new rides.');
-          console.log('Driver is now available, redirecting to home');
           this.rideData = null;
           this.cardInfo = null;
-          this.cdr.detectChanges();
-          this.router.navigate(['/']);
         }
+
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.isLoading = false;
-        console.error('Error finishing ride:', err);
-        alert('Failed to finish ride. Please try again.');
+
+        this.notificationTitle = 'Finish Ride Failed';
+        this.notificationMessage =
+          err?.error?.message ?? 'Unable to finish ride.';
+        this.notificationSuccess = false;
+        this.notificationVisible = true;
+
         this.cdr.detectChanges();
       }
     });
   }
+
 
   private updateActionButtons(): void {
     this.actionButtons = this.rideStarted

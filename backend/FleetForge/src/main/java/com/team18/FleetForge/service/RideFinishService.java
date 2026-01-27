@@ -18,6 +18,9 @@ import com.team18.FleetForge.util.GeoUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -46,7 +49,10 @@ public class RideFinishService {
         ride.setStatus(RideStatus.COMPLETED);
         ride.setEndTime(LocalDateTime.now());
 
+
+        System.out.println("FFLOG: Ride ID: " + ride.getId());
         LocalDateTime startTime = ride.getStartTime();
+
 
         List<RideLocation> locations =
                 rideLocationRepository
@@ -56,6 +62,10 @@ public class RideFinishService {
                         );
 
         double totalDistanceKm = 0.0;
+
+
+        System.out.println("FFLOG: RideLocation ID: " + locations.get(0).getId());
+        System.out.println("FFLOG: Number of RideLocations: " + locations.size());
 
         for (int i = 1; i < locations.size(); i++) {
 
@@ -68,7 +78,11 @@ public class RideFinishService {
             );
         }
 
-        ride.setTotalDistance(totalDistanceKm);
+        double roundedDistance = BigDecimal.valueOf(totalDistanceKm)
+                .setScale(2, RoundingMode.HALF_UP)
+                .doubleValue();
+
+        ride.setTotalDistance(roundedDistance);
 
         VehicleType vehicleType = ride.getVehicleType();
 
@@ -77,7 +91,12 @@ public class RideFinishService {
                 vehicleType
         );
 
-        ride.setTotalCost(totalCost);
+        double roundedCost = BigDecimal.valueOf(totalCost)
+                .setScale(2, RoundingMode.HALF_UP)
+                .doubleValue();
+
+        ride.setTotalCost(roundedCost);
+
         rideRepository.save(ride);
 
         Driver driver = ride.getDriver();
