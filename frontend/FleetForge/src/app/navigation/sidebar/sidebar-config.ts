@@ -88,11 +88,6 @@ export const SIDEBAR_MENU_CONFIG: Record<UserRole, SidebarMenuItem[]> = {
   // ADMIN role - administrator side functionalities
   ADMIN: [
     {
-      label: 'Register Driver',
-      icon: '👤',
-      path: '/admin/register-driver'
-    },
-    {
       label: 'Ride History',
       icon: '⏱',
       path: '/admin/ride-history'
