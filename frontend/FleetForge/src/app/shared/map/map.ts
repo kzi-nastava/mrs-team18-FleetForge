@@ -231,9 +231,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     this.addRouteMarkers(route.endLocation, route.endAddress, 'end');
     this.updateCurrentLocationMarker(this._currentRide.currentLocation);
 
-    const bounds = L.latLngBounds(waypoints);
-    this.map.fitBounds(bounds, { padding: [50, 50] });
-    
+    const bounds = L.latLngBounds(waypoints);    
   }
 
   private addRouteMarkers(location: {latitude: number, longitude: number}, address: string, type: 'start' | 'waypoint' | 'end', order?: number): void {
