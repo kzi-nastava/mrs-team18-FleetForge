@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { RideTrackingDTO } from '../dtos/ride-tracking.dtos';
 
 export interface CancelRideResponse {
   success: boolean;
@@ -32,5 +33,15 @@ export class RideService {
       `${this.apiUrl}/${rideId}/panic`,
       {}
     );
+  }
+  private activeRideSubject = new BehaviorSubject<RideTrackingDTO | null>(null);
+  activeRide$ = this.activeRideSubject.asObservable();
+
+  setActiveRide(ride: RideTrackingDTO | null) {
+    this.activeRideSubject.next(ride);
+  }
+
+  get isRideActive(): boolean {
+    return this.activeRideSubject.value !== null;
   }
 }

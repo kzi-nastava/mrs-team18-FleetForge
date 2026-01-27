@@ -138,7 +138,7 @@
           </div>
         </div>
 
-        <button class="btn btn-order" type="submit">Order Ride</button>
+        <button class="btn btn-order" type="submit" [disabled]="rideService.isRideActive">Order Ride</button>
 
       </form>
 

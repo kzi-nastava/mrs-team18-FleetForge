@@ -95,6 +95,7 @@ export class CurrentRidePassengerComponent implements OnInit, OnDestroy {
               if (err?.status === 404) {
                 this.rideData = null;
                 this.cardInfo = null;
+                this.rideService.setActiveRide(null);
                 this.clearTracking();
                 this.cdr.detectChanges();
               }
@@ -104,8 +105,12 @@ export class CurrentRidePassengerComponent implements OnInit, OnDestroy {
         )
       )
       .subscribe((data) => {
-        if (!data) return;
+        if (!data) {
+          this.rideService.setActiveRide(null);
+          return;
+        }
         this.rideData = data as RideTrackingDTO;
+        this.rideService.setActiveRide(this.rideData);
         this.setCardInfoFromRide();
 
         this.cdr.detectChanges();
