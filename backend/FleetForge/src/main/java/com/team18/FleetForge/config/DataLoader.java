@@ -192,7 +192,7 @@ public class DataLoader implements CommandLineRunner {
         rideRepository.save(ride4);
 
         Ride ride5 = createRide(
-                driver1, passenger4,
+                driver1, passenger1,
                 new GeoPoint(45.2580, 19.8420), "Modene 10, Novi Sad",
                 new GeoPoint(45.2620, 19.8380), "Dnevnik, Novi Sad",
                 LocalDateTime.now().withHour(9).withMinute(0),
@@ -214,16 +214,16 @@ public class DataLoader implements CommandLineRunner {
         ride6.setPanicActivatedAt(LocalDateTime.now().minusDays(3).withHour(20).withMinute(10));
         rideRepository.save(ride6);
 
-        Ride ride7 = createRide(
-                driver1, passenger1,
-                new GeoPoint(45.2605, 19.8421), "Bulevar oslobođenja 12, Novi Sad",
-                new GeoPoint(45.2510, 19.8640), "Liman 4",
-                LocalDateTime.now().plusDays(2).withHour(14).withMinute(0),
-                null,
-                6.3, 22.0, 920.0,
-                RideStatus.ACCEPTED, false, null, null
-        );
-        rideRepository.save(ride7);
+//        Ride ride7 = createRide(
+//                driver1, passenger1,
+//                new GeoPoint(45.2605, 19.8421), "Bulevar oslobođenja 12, Novi Sad",
+//                new GeoPoint(45.2510, 19.8640), "Liman 4",
+//                LocalDateTime.now().plusDays(2).withHour(14).withMinute(0),
+//                null,
+//                6.3, 22.0, 920.0,
+//                RideStatus.ACCEPTED, false, null, null
+//        );
+//        rideRepository.save(ride7);
 
         Ride ride8 = createRide(
                 driver2, passenger2,
