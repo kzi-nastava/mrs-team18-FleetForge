@@ -39,3 +39,22 @@
     </div>
   </div>
 </ng-container>
+<app-confirmation-popup
+  [visible]="showSosConfirmPopup"
+  title="Emergency SOS"
+  message="Are you sure you want to activate SOS? Emergency services and support will be notified."
+  confirmButtonText="Activate SOS"
+  cancelButtonText="Cancel"
+  confirmButtonColor="red"
+  (confirmed)="confirmSos()"
+  (cancelled)="closeSosPopup()">
+</app-confirmation-popup>
+
+<app-notification-popup
+  [visible]="notificationVisible"
+  [title]="notificationTitle"
+  [message]="notificationMessage"
+  [success]="notificationSuccess"
+  okButtonText="OK"
+  (closed)="onNotificationClosed()">
+</app-notification-popup>

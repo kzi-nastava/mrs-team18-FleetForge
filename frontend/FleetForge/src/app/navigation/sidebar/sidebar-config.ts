@@ -7,7 +7,7 @@ export interface SidebarMenuItem {
   label: string;
   icon: string;
   path?: string;
-  action?: string; // For special actions like PANIC button
+  action?: string; // For special actions like buttons
   class?: string;  // For special styling
 }
 
@@ -45,12 +45,6 @@ export const SIDEBAR_MENU_CONFIG: Record<UserRole, SidebarMenuItem[]> = {
       path: '/passenger/live-chat'
     },
     {
-      label: 'PANIC',
-      icon: '⚠', // warning/panic icon
-      action: 'panic',
-      class: 'panic-btn'
-    },
-    {
       label: 'Settings',
       icon: '⚙', // settings/gear icon
       path: '/passenger/settings'
@@ -80,12 +74,6 @@ export const SIDEBAR_MENU_CONFIG: Record<UserRole, SidebarMenuItem[]> = {
       path: '/driver/live-chat'
     },
     {
-      label: 'PANIC',
-      icon: '⚠',
-      action: 'panic',
-      class: 'panic-btn'
-    },
-    {
       label: 'Settings',
       icon: '⚙',
       path: '/driver/settings'
@@ -108,11 +96,6 @@ export const SIDEBAR_MENU_CONFIG: Record<UserRole, SidebarMenuItem[]> = {
       label: 'Block Users',
       icon: '🚫',
       path: '/admin/block-users'
-    },
-    {
-      label: 'PANIC Status',
-      icon: '⚠',
-      path: '/admin/panic-status'
     },
     {
       label: 'Live Chat',

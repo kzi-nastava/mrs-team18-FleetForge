@@ -6,11 +6,15 @@ import { RideTrackingDTO } from '../../shared/dtos/ride-tracking.dtos';
 import { PassengerCurrentRide } from '../../passenger/service/passenger-current-ride/passenger-current-ride';
 import { interval, Subscription, of } from 'rxjs';
 import { catchError, startWith, switchMap } from 'rxjs/operators';
+import { RideService } from '../../shared/services/ride.service';
+import { ConfirmationPopupComponent } from '../../shared/popups/confirmation-popup/confirmation-popup.component';
+import { NotificationPopupComponent } from '../../shared/popups/popup-dialog/notification-popup.component';
+
 
 @Component({
   selector: 'app-current-ride-passenger',
   standalone: true,
-  imports: [CommonModule, CurrentRideComponent, FormsModule],
+  imports: [CommonModule, CurrentRideComponent, FormsModule, ConfirmationPopupComponent, NotificationPopupComponent],
   templateUrl: './current-ride-passenger.component.html',
   styleUrls: ['./current-ride-passenger.component.css']
 })
@@ -28,12 +32,20 @@ export class CurrentRidePassengerComponent implements OnInit, OnDestroy {
   
   showWrongWayModal: boolean = false;
   wrongWayReport: string = '';
+
+  showSosConfirmPopup = false;
+
+  notificationVisible = false;
+  notificationTitle = '';
+  notificationMessage = '';
+  notificationSuccess = true;
   
   constructor(
     private passengerCurrentRideService: PassengerCurrentRide,
+    private rideService: RideService,
     private cdr: ChangeDetectorRef
   ) {}
-  
+    
   ngOnInit(): void {
     this.startTrackingPoll();
   }
@@ -110,9 +122,51 @@ export class CurrentRidePassengerComponent implements OnInit, OnDestroy {
   }
 
   onActionButton(action: string): void {
-    if (action === 'wrong-way') this.showWrongWayModal = true;
-    if (action === 'sos') console.log('SOS triggered');
+    if (action === 'wrong-way') {
+      this.showWrongWayModal = true;
+    }
+    if (action === 'sos') {
+      this.showSosConfirmPopup = true;
+    }
   }
+
+  confirmSos(): void {
+    if (!this.rideData?.rideId) return;
+
+    const rideId = this.rideData.rideId;
+
+    this.rideService.triggerPanic(rideId).subscribe({
+      next: (response) => {
+        this.notificationTitle = 'SOS Activated';
+        this.notificationMessage = response.message;
+        this.notificationSuccess = true;
+        this.notificationVisible = true;
+
+        this.closeSosPopup();
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.notificationTitle = 'SOS Failed';
+        this.notificationMessage =
+          err?.error?.message ?? 'Unable to activate SOS.';
+        this.notificationSuccess = false;
+        this.notificationVisible = true;
+
+        this.closeSosPopup();
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  closeSosPopup(): void {
+    this.showSosConfirmPopup = false;
+  }
+
+  onNotificationClosed(): void {
+    this.notificationVisible = false;
+  }
+
+
 
   onCloseWrongWayModal(): void { this.showWrongWayModal = false; }
   

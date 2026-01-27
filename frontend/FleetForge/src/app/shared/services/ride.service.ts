@@ -7,6 +7,11 @@ export interface CancelRideResponse {
   message: string;
 }
 
+export interface PanicResponse {
+  success: boolean;
+  message: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -15,13 +20,17 @@ export class RideService {
 
   constructor(private http: HttpClient) {}
 
-  cancelRide(
-    rideId: number,
-    reason?: string
-  ): Observable<CancelRideResponse> {
+  cancelRide(rideId: number, reason?: string) {
     return this.http.post<CancelRideResponse>(
       `${this.apiUrl}/${rideId}/cancellations`,
       reason ? { reason } : {}
+    );
+  }
+
+  triggerPanic(rideId: number) {
+    return this.http.post<PanicResponse>(
+      `${this.apiUrl}/${rideId}/panic`,
+      {}
     );
   }
 }
