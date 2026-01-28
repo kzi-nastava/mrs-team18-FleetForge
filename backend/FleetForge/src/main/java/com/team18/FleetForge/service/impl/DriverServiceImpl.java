@@ -235,4 +235,24 @@ private Driver scoring(List<Driver>drivers,Ride ride){
         }
         return true;
     }
+
+    public Long checkDriverActivityProfile(List<DriverSession> sessions){
+        LocalDateTime nowMinus24h=LocalDateTime.now().minusHours(24);
+        LocalDateTime now=LocalDateTime.now();
+        Duration duration=Duration.ZERO;
+        for(DriverSession session:sessions){
+            LocalDateTime start = session.getStartedAt();
+            LocalDateTime end = session.getEndedAt() != null ? session.getEndedAt() : now;
+            if(end.isBefore(nowMinus24h)) {
+                continue;
+            }
+            if(start.isAfter(now)) {
+                continue;
+            }
+            LocalDateTime effectiveStart = start.isBefore(nowMinus24h) ? nowMinus24h : start;
+            LocalDateTime effectiveEnd = end.isAfter(now) ? now : end;
+            duration = duration.plus(Duration.between(effectiveStart, effectiveEnd));
+        }
+        return duration.toSeconds();
+    }
 }

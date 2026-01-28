@@ -1,4 +1,4 @@
-import { Component, ElementRef, Signal, ViewChild, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, Signal, ViewChild, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -10,6 +10,7 @@ import { RouterLink } from '@angular/router';
 import { DriverService } from '../service/driver-service';
 import { VehicleType } from '../../shared/models/vehicle.model';
 import { form } from '@angular/forms/signals';
+import { interval, Subscription, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-driver-profile',
@@ -24,9 +25,10 @@ import { form } from '@angular/forms/signals';
   encapsulation: ViewEncapsulation.None
 })
 export class DriverProfileComponent {
+  activity: number = 0;
   formData = new FormData();
   driverEmail: string = '';
-  constructor(private driverService: DriverService) { }
+  constructor(private driverService: DriverService,private cdr: ChangeDetectorRef) { }
 
 editDriver(): void {
   const file = this.formData.get('file') as File | null;
@@ -115,13 +117,23 @@ ngOnInit(): void {
       petFriendly: driverData.vehicle.petFriendly ?? false
     });
     this.imageUrl="http://localhost:8080"+ (driverData.profilePicture ?? 'blank_profile.webp');
+    this.driverService.getDriverActivty().subscribe(activityData => {
+    this.activity = activityData.activeSecondsLast24h ?? 0;
+    this.cdr.detectChanges();
+  });
+
+   
   } 
   
 );
 }
- 
-  // protected vehicleShow: Signal<User>;
-  // constructor(private vehicleService: UserService) {
-  //   this.vehicleShow=this.vehicleService.user
-  // }
+    get formattedActivity(): string {
+    const totalSeconds = Math.floor(this.activity);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    
+    return `${hours}h ${minutes}m ${seconds}s`;
+  }
+
 }
