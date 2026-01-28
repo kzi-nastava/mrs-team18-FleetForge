@@ -5,6 +5,7 @@ import com.team18.FleetForge.model.ValidationToken;
 import com.team18.FleetForge.model.users.User;
 import com.team18.FleetForge.service.AuthService;
 import com.team18.FleetForge.util.JwtTokenUtils;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -23,6 +24,7 @@ import java.util.Collections;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -44,7 +46,9 @@ public class AuthController {
      *  - role
      */
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO request) {
+    public ResponseEntity<LoginResponseDTO> login(
+            @Valid @RequestBody LoginRequestDTO request
+    ) {
 
         Authentication auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -83,7 +87,7 @@ public class AuthController {
             consumes = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<Void> requestPasswordReset(
-            @RequestBody ForgotPasswordRequestDTO request
+            @Valid @RequestBody ForgotPasswordRequestDTO request
     ) {
         authService.createPasswordReset(request.getEmail());
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
@@ -103,7 +107,7 @@ public class AuthController {
             consumes = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<Void> resetPassword(
-            @RequestBody ResetPasswordRequestDTO request
+           @Valid @RequestBody ResetPasswordRequestDTO request
     ) {
         boolean success = authService.resetPassword(
                 request.getToken(),
@@ -131,33 +135,19 @@ public class AuthController {
      *  - 201 CREATED on successful registration
      *  - 409 CONFLICT on already taken email
      */
-    @PostMapping(
-            value = "/register",
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
-    )
+    @PostMapping("/register")
     public ResponseEntity<?> register(
-            @RequestParam("email") String email,
-            @RequestParam("password") String password,
-            @RequestParam("firstName") String firstName,
-            @RequestParam("lastName") String lastName,
-            @RequestParam("address") String address,
-            @RequestParam("phoneNumber") String phoneNumber,
-            @RequestParam(value = "profilePicture", required = false) MultipartFile profilePicture
-    ) {
-        User existUser = authService.findByEmail(email);
+            @Valid @ModelAttribute RegisterRequestDTO request,
+            @RequestParam(value = "profilePicture", required = false)
+            MultipartFile profilePicture
+    ) throws IOException {
+
+        User existUser = authService.findByEmail(request.getEmail());
 
         if (existUser != null) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
 
-        RegisterRequestDTO request = RegisterRequestDTO.builder()
-                .email(email)
-                .password(password)
-                .firstName(firstName)
-                .lastName(lastName)
-                .address(address)
-                .phoneNumber(phoneNumber)
-                .build();
 
         try {
             authService.registerPassenger(request, profilePicture);
