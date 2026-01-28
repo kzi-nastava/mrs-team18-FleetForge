@@ -42,7 +42,7 @@ public class DataLoader implements CommandLineRunner {
 
         Vehicle vehicle1 = new Vehicle(null, "Toyota Camry", VehicleType.STANDARD,
                 "NS-123-AB", 4, false, false);
-        Vehicle vehicle2 = new Vehicle(null, "Mercedes S-Class", VehicleType.LUXURY,
+        Vehicle vehicle2 = new Vehicle(null, "Mercedes S-Class", VehicleType.STANDARD,
                 "NS-456-CD", 4, true, false);
 
         Driver driver1 = new Driver();
@@ -55,7 +55,7 @@ public class DataLoader implements CommandLineRunner {
         driver1.setProfilePicture("default.png");
         driver1.setVehicle(vehicle1);
         driver1.setActive(true);
-        driver1.setAvailable(true);
+        driver1.setAvailable(false);
         driver1.setCurrentLocation(new GeoPoint(45.2671, 19.8335));
         driver1.setRole(Role.ROLE_DRIVER);
         driver1.setActivated(true);
@@ -213,7 +213,7 @@ public class DataLoader implements CommandLineRunner {
                 LocalDateTime.now().minusDays(3).withHour(20).withMinute(0),
                 LocalDateTime.now().minusDays(3).withHour(20).withMinute(25),
                 6.0, 25.0, 960.0,
-                RideStatus.IN_PROGRESS, true, null, null
+                RideStatus.COMPLETED, true, null, null
         );
         ride6.setPanicActivatedAt(LocalDateTime.now().minusDays(3).withHour(20).withMinute(10));
         rideRepository.save(ride6);
@@ -240,16 +240,16 @@ public class DataLoader implements CommandLineRunner {
         );
         rideRepository.save(ride8);
 
-        Ride ride9 = createRide(
-                driver1, passenger3,
-                new GeoPoint(45.2590, 19.8350), "Futoška 18, Novi Sad",
-                new GeoPoint(45.2671, 19.8335), "Trg slobode",
-                LocalDateTime.now().plusDays(5).withHour(9).withMinute(0),
-                null,
-                4.8, 18.0, 760.0,
-                RideStatus.ACCEPTED, false, null, null
-        );
-        rideRepository.save(ride9);
+//        Ride ride9 = createRide(
+//                driver1, passenger3,
+//                new GeoPoint(45.2590, 19.8350), "Futoška 18, Novi Sad",
+//                new GeoPoint(45.2671, 19.8335), "Trg slobode",
+//                LocalDateTime.now().plusDays(5).withHour(9).withMinute(0),
+//                null,
+//                4.8, 18.0, 760.0,
+//                RideStatus.ACCEPTED, false, null, null
+//        );
+//        rideRepository.save(ride9);
 
 
         FavoriteRoute route=new FavoriteRoute();

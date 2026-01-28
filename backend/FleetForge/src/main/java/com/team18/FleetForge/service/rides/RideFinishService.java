@@ -44,9 +44,9 @@ public class RideFinishService {
         Ride ride = rideRepository.findById(request.getRideId())
                 .orElseThrow(() -> new RuntimeException("Ride not found with id: " + request.getRideId()));
 
-//        if (ride.getStatus() != RideStatus.IN_PROGRESS) {
-//            throw new RuntimeException("Cannot finish ride. Ride is not in progress. Current status: " + ride.getStatus());
-//        }
+        if (ride.getStatus() != RideStatus.IN_PROGRESS) {
+            throw new RuntimeException("Cannot finish ride. Ride is not in progress. Current status: " + ride.getStatus());
+        }
 
         ride.setStatus(RideStatus.COMPLETED);
         ride.setEndTime(LocalDateTime.now());
