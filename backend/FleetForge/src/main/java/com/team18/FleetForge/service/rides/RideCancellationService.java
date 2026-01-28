@@ -93,6 +93,8 @@ public class RideCancellationService {
         ride.setStatus(RideStatus.CANCELLED);
         ride.setCancelledAt(LocalDateTime.now());
         ride.setCancellationReason(reason);
+        ride.setTotalDistance((double) 0);
+        ride.setTotalCost((double) 0);
         rideRepository.save(ride);
     }
 
