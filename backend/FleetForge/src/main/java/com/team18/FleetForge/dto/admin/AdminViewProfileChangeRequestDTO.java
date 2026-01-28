@@ -1,14 +1,11 @@
 package com.team18.FleetForge.dto.admin;
 
-import com.team18.FleetForge.model.DriverProfileChangeRequest;
-import com.team18.FleetForge.model.enums.InformationChangeRequestStatus;
+import com.team18.FleetForge.model.users.DriverProfileChangeRequest;
 import com.team18.FleetForge.model.users.Driver;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor

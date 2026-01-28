@@ -2,14 +2,14 @@ package com.team18.FleetForge.service.impl;
 
 import com.team18.FleetForge.dto.driver.DriverCreateRequestDTO;
 import com.team18.FleetForge.model.GeoPoint;
-import com.team18.FleetForge.model.Vehicle;
+import com.team18.FleetForge.model.vecihles.Vehicle;
 import com.team18.FleetForge.model.enums.Role;
 import com.team18.FleetForge.model.users.Admin;
 import com.team18.FleetForge.model.users.Driver;
 import com.team18.FleetForge.model.users.Passenger;
 import com.team18.FleetForge.model.users.User;
-import com.team18.FleetForge.repository.UserRepository;
-import com.team18.FleetForge.service.UserService;
+import com.team18.FleetForge.repository.users.UserRepository;
+import com.team18.FleetForge.service.users.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

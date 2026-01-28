@@ -7,19 +7,24 @@ import com.team18.FleetForge.dto.admin.*;
 import com.team18.FleetForge.dto.ride.view.AdminRideHistoryItemDTO;
 import com.team18.FleetForge.dto.ride.view.RideDetailsDTO;
 import com.team18.FleetForge.dto.vehicle.VehicleChangeInformationResponseDTO;
-import com.team18.FleetForge.model.DriverProfileChangeRequest;
-import com.team18.FleetForge.model.GeoPoint;
+import com.team18.FleetForge.model.users.DriverProfileChangeRequest;
+import com.team18.FleetForge.model.ride.GeoPoint;
 import com.team18.FleetForge.model.users.Admin;
 import com.team18.FleetForge.model.users.Driver;
-import com.team18.FleetForge.model.Vehicle;
-import com.team18.FleetForge.model.VehicleInformationChangeRequest;
+import com.team18.FleetForge.model.vecihles.Vehicle;
+import com.team18.FleetForge.model.vecihles.VehicleInformationChangeRequest;
 import com.team18.FleetForge.model.enums.InformationChangeRequestStatus;
 import com.team18.FleetForge.service.*;
 import jakarta.validation.Valid;
+import com.team18.FleetForge.service.users.DriverProfileChangeRequestService;
+import com.team18.FleetForge.service.users.UserService;
+import com.team18.FleetForge.service.vehicles.VehicleInfoChangeReqService;
+import com.team18.FleetForge.service.vehicles.VehicleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -203,6 +208,7 @@ public class AdminController {
      *  - sortBy (any field)
      *  - direction (asc, desc)
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping(
             value = "/users/{userId}/rides",
             produces = MediaType.APPLICATION_JSON_VALUE
@@ -259,6 +265,7 @@ public class AdminController {
      * GET /api/admin/rides/{rideId}
      * Detailed ride view
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping(
             value = "/rides/{rideId}",
             produces = MediaType.APPLICATION_JSON_VALUE

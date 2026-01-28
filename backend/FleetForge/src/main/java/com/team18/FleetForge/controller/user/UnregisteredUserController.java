@@ -1,7 +1,7 @@
 package com.team18.FleetForge.controller.user;
 
 import com.team18.FleetForge.dto.vehicle.VehicleLocationDTO;
-import com.team18.FleetForge.service.VehicleService;
+import com.team18.FleetForge.service.vehicles.VehicleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

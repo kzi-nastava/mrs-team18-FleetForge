@@ -1,12 +1,11 @@
 package com.team18.FleetForge.service.impl;
 
-import com.team18.FleetForge.model.Vehicle;
-import com.team18.FleetForge.model.VehicleInformationChangeRequest;
+import com.team18.FleetForge.model.vecihles.VehicleInformationChangeRequest;
 import com.team18.FleetForge.model.enums.InformationChangeRequestStatus;
 import com.team18.FleetForge.model.users.Driver;
-import com.team18.FleetForge.repository.DriverRepository;
-import com.team18.FleetForge.repository.VehicleInfoChangeReqRepo;
-import com.team18.FleetForge.service.VehicleInfoChangeReqService;
+import com.team18.FleetForge.repository.users.DriverRepository;
+import com.team18.FleetForge.repository.vehicles.VehicleInfoChangeReqRepo;
+import com.team18.FleetForge.service.vehicles.VehicleInfoChangeReqService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

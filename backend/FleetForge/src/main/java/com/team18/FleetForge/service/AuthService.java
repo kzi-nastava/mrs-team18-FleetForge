@@ -1,13 +1,13 @@
 package com.team18.FleetForge.service;
 
 import com.team18.FleetForge.dto.auth.RegisterRequestDTO;
-import com.team18.FleetForge.model.ActivationToken;
+import com.team18.FleetForge.model.ValidationToken;
 import com.team18.FleetForge.model.enums.Role;
 import com.team18.FleetForge.model.users.Passenger;
 import com.team18.FleetForge.model.users.User;
-import com.team18.FleetForge.repository.ActivationTokenRepository;
-import com.team18.FleetForge.repository.PassengerRepository;
-import com.team18.FleetForge.repository.UserRepository;
+import com.team18.FleetForge.repository.ValidationTokenRepository;
+import com.team18.FleetForge.repository.users.PassengerRepository;
+import com.team18.FleetForge.repository.users.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,7 +26,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PassengerRepository passengerRepository;
     private final PasswordEncoder passwordEncoder;
-    private final ActivationTokenRepository activationTokenRepository;
+    private final ValidationTokenRepository validationTokenRepository;
     private final EmailService emailService;
     private final ProfilePictureService profilePictureService;
 
@@ -65,14 +65,14 @@ public class AuthService {
 
         String token = UUID.randomUUID().toString();
 
-        ActivationToken activationToken = ActivationToken.builder()
+        ValidationToken validationToken = ValidationToken.builder()
                 .token(token)
                 .user(user)
                 .expiresAt(LocalDateTime.now().plusHours(24))
                 .used(false)
                 .build();
 
-        activationTokenRepository.save(activationToken);
+        validationTokenRepository.save(validationToken);
 
         String link = frontendUrl + "/activate-account?token=" + token;
 
@@ -108,14 +108,14 @@ public class AuthService {
 
         String token = UUID.randomUUID().toString();
 
-        ActivationToken resetToken = ActivationToken.builder()
+        ValidationToken resetToken = ValidationToken.builder()
                 .token(token)
                 .user(user)
                 .expiresAt(LocalDateTime.now().plusHours(1))
                 .used(false)
                 .build();
 
-        activationTokenRepository.save(resetToken);
+        validationTokenRepository.save(resetToken);
 
         String link = frontendUrl + "/reset-password?token=" + token;
 
@@ -143,7 +143,7 @@ public class AuthService {
     }
 
     private Optional<User> validateAndGetUserFromToken(String token) {
-        Optional<ActivationToken> opt = activationTokenRepository.findByToken(token);
+        Optional<ValidationToken> opt = validationTokenRepository.findByToken(token);
 
         if (opt.isEmpty() ||
                 opt.get().isUsed() ||
@@ -155,15 +155,15 @@ public class AuthService {
     }
 
     private boolean markTokenAsUsed(String token) {
-        Optional<ActivationToken> tokenOpt = activationTokenRepository.findByToken(token);
+        Optional<ValidationToken> tokenOpt = validationTokenRepository.findByToken(token);
 
         if (tokenOpt.isEmpty()) {
             return false;
         }
 
-        ActivationToken activationToken = tokenOpt.get();
-        activationToken.setUsed(true);
-        activationTokenRepository.save(activationToken);
+        ValidationToken validationToken = tokenOpt.get();
+        validationToken.setUsed(true);
+        validationTokenRepository.save(validationToken);
 
         return true;
     }
@@ -172,7 +172,7 @@ public class AuthService {
         return userRepository.findByEmail(email).orElse(null);
     }
 
-    public Optional<ActivationToken> findByToken(String token) {
-        return activationTokenRepository.findByToken(token);
+    public Optional<ValidationToken> findByToken(String token) {
+        return validationTokenRepository.findByToken(token);
     }
 }

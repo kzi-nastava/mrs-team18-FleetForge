@@ -1,9 +1,9 @@
 package com.team18.FleetForge.service.impl;
 
-import com.team18.FleetForge.model.DriverSession;
+import com.team18.FleetForge.model.users.DriverSession;
 import com.team18.FleetForge.model.users.Driver;
-import com.team18.FleetForge.repository.DriverSessionRepo;
-import com.team18.FleetForge.service.DriverSessionService;
+import com.team18.FleetForge.repository.users.DriverSessionRepo;
+import com.team18.FleetForge.service.users.DriverSessionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
