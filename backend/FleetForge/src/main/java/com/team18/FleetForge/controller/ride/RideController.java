@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,6 +38,7 @@ public class RideController {
      *  - success (boolean)
      *  - message (String)
      */
+    @PreAuthorize("hasRole('DRIVER') or hasRole('PASSENGER')")
     @PostMapping(
             value = "/{rideId}/cancellations",
             consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -64,6 +66,7 @@ public class RideController {
      *  - success (boolean)
      *  - message (String)
      */
+    @PreAuthorize("hasRole('DRIVER') or hasRole('PASSENGER')")
     @PostMapping("/{rideId}/panic")
     public ResponseEntity<RidePanicResponseDTO> triggerPanic(
             @PathVariable Long rideId,

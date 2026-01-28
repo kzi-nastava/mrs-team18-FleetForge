@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -206,6 +207,7 @@ public class AdminController {
      *  - sortBy (any field)
      *  - direction (asc, desc)
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping(
             value = "/users/{userId}/rides",
             produces = MediaType.APPLICATION_JSON_VALUE
@@ -262,6 +264,7 @@ public class AdminController {
      * GET /api/admin/rides/{rideId}
      * Detailed ride view
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping(
             value = "/rides/{rideId}",
             produces = MediaType.APPLICATION_JSON_VALUE

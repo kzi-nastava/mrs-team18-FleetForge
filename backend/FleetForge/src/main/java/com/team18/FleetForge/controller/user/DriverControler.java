@@ -108,6 +108,7 @@ public class DriverControler {
      *  - 204 NO_CONTENT if changed
      *  - 409 CONFLICT if change is deferred
      */
+    @PreAuthorize("hasRole('DRIVER')")
     @PutMapping("/{id}/availability")
     public ResponseEntity<Void> changeAvailability(
             @PathVariable Long id,
@@ -123,6 +124,7 @@ public class DriverControler {
      *  - 204 NO_CONTENT if logout is allowed
      *  - 409 CONFLICT if logout conditions are not met
      */
+    @PreAuthorize("hasRole('DRIVER')")
     @PostMapping("/{id}/logout-requests")
     public ResponseEntity<Void> requestLogout(
             @PathVariable Long id
