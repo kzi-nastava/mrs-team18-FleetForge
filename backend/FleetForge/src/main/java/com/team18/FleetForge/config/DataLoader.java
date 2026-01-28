@@ -1,7 +1,7 @@
 package com.team18.FleetForge.config;
 
-import com.team18.FleetForge.model.GeoPoint;
-import com.team18.FleetForge.model.Vehicle;
+import com.team18.FleetForge.model.ride.GeoPoint;
+import com.team18.FleetForge.model.vecihles.Vehicle;
 import com.team18.FleetForge.model.enums.RideActor;
 import com.team18.FleetForge.model.enums.Role;
 import com.team18.FleetForge.model.enums.RideStatus;
@@ -11,7 +11,11 @@ import com.team18.FleetForge.model.ride.Ride;
 import com.team18.FleetForge.model.users.Admin;
 import com.team18.FleetForge.model.users.Driver;
 import com.team18.FleetForge.model.users.Passenger;
-import com.team18.FleetForge.repository.*;
+import com.team18.FleetForge.repository.rides.FavoriteRouteRepo;
+import com.team18.FleetForge.repository.rides.RideRepository;
+import com.team18.FleetForge.repository.users.DriverRepository;
+import com.team18.FleetForge.repository.users.PassengerRepository;
+import com.team18.FleetForge.repository.users.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;

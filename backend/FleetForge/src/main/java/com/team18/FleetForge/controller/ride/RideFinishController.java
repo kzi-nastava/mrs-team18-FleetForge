@@ -2,7 +2,7 @@ package com.team18.FleetForge.controller.ride;
 
 import com.team18.FleetForge.dto.ride.lifecycle.FinishRideRequestDTO;
 import com.team18.FleetForge.dto.ride.lifecycle.FinishRideResponseDTO;
-import com.team18.FleetForge.service.RideFinishService;
+import com.team18.FleetForge.service.rides.RideFinishService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

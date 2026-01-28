@@ -2,9 +2,8 @@ package com.team18.FleetForge.controller.user;
 
 
 import com.team18.FleetForge.model.users.User;
-import com.team18.FleetForge.service.AuthService;
 import com.team18.FleetForge.service.ProfilePictureService;
-import com.team18.FleetForge.service.UserService;
+import com.team18.FleetForge.service.users.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

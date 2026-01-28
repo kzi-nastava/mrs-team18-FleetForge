@@ -1,6 +1,6 @@
 package com.team18.FleetForge.service.impl;
 
-import com.team18.FleetForge.repository.UserRepository;
+import com.team18.FleetForge.repository.users.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

@@ -6,7 +6,7 @@ import com.team18.FleetForge.dto.ride.view.DriverLocationUpdateRequestDTO;
 import com.team18.FleetForge.dto.ride.view.DriverLocationUpdateResponseDTO;
 import com.team18.FleetForge.dto.ride.view.RideTrackingDTO;
 import com.team18.FleetForge.model.users.User;
-import com.team18.FleetForge.service.RideTrackingService;
+import com.team18.FleetForge.service.rides.RideTrackingService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

@@ -4,6 +4,7 @@ import com.team18.FleetForge.dto.ride.estimate.RideEstimateRequestDTO;
 import com.team18.FleetForge.dto.ride.estimate.RideEstimateResponseDTO;
 import com.team18.FleetForge.model.enums.VehicleType;
 import com.team18.FleetForge.service.PriceCalculationService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +29,7 @@ public class RideEstimateController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<RideEstimateResponseDTO> estimateRide(
-            @RequestBody RideEstimateRequestDTO request
+            @Valid @RequestBody RideEstimateRequestDTO request
     ) {
         double price = priceCalculationService.calculatePrice(
                 request.getDistanceKm(),

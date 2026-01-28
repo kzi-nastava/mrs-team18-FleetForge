@@ -1,6 +1,6 @@
 package com.team18.FleetForge.scheduler;
 
-import com.team18.FleetForge.service.DriverService;
+import com.team18.FleetForge.service.users.DriverService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;

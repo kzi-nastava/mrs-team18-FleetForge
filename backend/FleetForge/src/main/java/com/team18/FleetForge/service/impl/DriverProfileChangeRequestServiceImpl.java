@@ -1,12 +1,11 @@
 package com.team18.FleetForge.service.impl;
 
-import com.team18.FleetForge.model.DriverProfileChangeRequest;
+import com.team18.FleetForge.model.users.DriverProfileChangeRequest;
 import com.team18.FleetForge.model.enums.InformationChangeRequestStatus;
-import com.team18.FleetForge.repository.DriverProfileChangeRequestRepo;
-import com.team18.FleetForge.service.DriverProfileChangeRequestService;
+import com.team18.FleetForge.repository.users.DriverProfileChangeRequestRepo;
+import com.team18.FleetForge.service.users.DriverProfileChangeRequestService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 

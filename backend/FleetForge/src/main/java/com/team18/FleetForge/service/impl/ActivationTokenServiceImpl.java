@@ -1,8 +1,8 @@
 package com.team18.FleetForge.service.impl;
 
-import com.team18.FleetForge.model.ActivationToken;
+import com.team18.FleetForge.model.ValidationToken;
 import com.team18.FleetForge.model.users.Driver;
-import com.team18.FleetForge.repository.ActivationTokenRepository;
+import com.team18.FleetForge.repository.ValidationTokenRepository;
 import com.team18.FleetForge.service.ActivationTokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,21 +12,21 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class ActivationTokenServiceImpl implements ActivationTokenService {
-    private final ActivationTokenRepository activationTokenRepository;
+    private final ValidationTokenRepository validationTokenRepository;
     @Override
-    public ActivationToken createTokenPasswordSetDriver(Driver driver) {
+    public ValidationToken createTokenPasswordSetDriver(Driver driver) {
         String token = UUID.randomUUID().toString();
-        ActivationToken activationToken = new ActivationToken().builder()
+        ValidationToken validationToken = new ValidationToken().builder()
                 .token(token)
                 .user(driver)
                 .expiresAt(LocalDateTime.now().plusHours(24))
                 .used(false)
                 .build();
-        return activationToken;
+        return validationToken;
     }
 
     @Override
-    public void saveActivationToken(ActivationToken activationToken) {
-        activationTokenRepository.save(activationToken);
+    public void saveActivationToken(ValidationToken validationToken) {
+        validationTokenRepository.save(validationToken);
     }
 }

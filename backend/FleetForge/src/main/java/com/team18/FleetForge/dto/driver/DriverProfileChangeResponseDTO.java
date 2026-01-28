@@ -1,6 +1,6 @@
 package com.team18.FleetForge.dto.driver;
 
-import com.team18.FleetForge.model.DriverProfileChangeRequest;
+import com.team18.FleetForge.model.users.DriverProfileChangeRequest;
 import com.team18.FleetForge.model.enums.InformationChangeRequestStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;

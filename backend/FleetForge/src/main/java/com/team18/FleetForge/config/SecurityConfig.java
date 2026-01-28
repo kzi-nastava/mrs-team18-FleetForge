@@ -26,7 +26,7 @@ import static org.springframework.web.servlet.function.RequestPredicates.headers
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity
+@EnableMethodSecurity(prePostEnabled = true)
 @RequiredArgsConstructor
 public class SecurityConfig {
 

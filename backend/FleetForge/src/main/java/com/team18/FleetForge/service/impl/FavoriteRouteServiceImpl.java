@@ -1,7 +1,7 @@
 package com.team18.FleetForge.service.impl;
 
 import com.team18.FleetForge.model.ride.FavoriteRoute;
-import com.team18.FleetForge.repository.FavoriteRouteRepo;
+import com.team18.FleetForge.repository.rides.FavoriteRouteRepo;
 import com.team18.FleetForge.service.FavoriteRouteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

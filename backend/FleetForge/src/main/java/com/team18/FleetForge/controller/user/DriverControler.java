@@ -9,14 +9,19 @@ import com.team18.FleetForge.dto.vehicle.VehicleInformationChangeRequestDTO;
 import com.team18.FleetForge.dto.vehicle.VehicleInformationChangeResponseDTO;
 import com.team18.FleetForge.model.*;
 import com.team18.FleetForge.model.users.Driver;
+import com.team18.FleetForge.model.users.DriverProfileChangeRequest;
+import com.team18.FleetForge.model.users.DriverSession;
 import com.team18.FleetForge.model.users.User;
 import com.team18.FleetForge.model.enums.InformationChangeRequestStatus;
+import com.team18.FleetForge.model.vecihles.Vehicle;
+import com.team18.FleetForge.model.vecihles.VehicleInformationChangeRequest;
 import com.team18.FleetForge.service.*;
+import com.team18.FleetForge.service.rides.RideService;
+import com.team18.FleetForge.service.users.*;
+import com.team18.FleetForge.service.vehicles.VehicleInfoChangeReqService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -26,7 +31,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -89,7 +93,7 @@ public class DriverControler {
     @PostMapping
     public ResponseEntity<DriverCreateResponseDTO> createDriver(@RequestBody DriverCreateRequestDTO request) throws IOException {
         Driver driver=userService.createDriver(request);
-       ActivationToken token=activationTokenService.createTokenPasswordSetDriver(driver);
+       ValidationToken token=activationTokenService.createTokenPasswordSetDriver(driver);
         emailService.sendEmail("v.vitomirovic@gmail.com","Password set","http://localhost:4200/set-password?token="+token.getToken());
         activationTokenService.saveActivationToken(token);
         DriverCreateResponseDTO driverCreateResponseDTO = new DriverCreateResponseDTO(driver);
@@ -104,6 +108,7 @@ public class DriverControler {
      *  - 204 NO_CONTENT if changed
      *  - 409 CONFLICT if change is deferred
      */
+    @PreAuthorize("hasRole('DRIVER')")
     @PutMapping("/{id}/availability")
     public ResponseEntity<Void> changeAvailability(
             @PathVariable Long id,
@@ -119,6 +124,7 @@ public class DriverControler {
      *  - 204 NO_CONTENT if logout is allowed
      *  - 409 CONFLICT if logout conditions are not met
      */
+    @PreAuthorize("hasRole('DRIVER')")
     @PostMapping("/{id}/logout-requests")
     public ResponseEntity<Void> requestLogout(
             @PathVariable Long id
@@ -249,13 +255,13 @@ public class DriverControler {
     @PostMapping("/set-password")
     public ResponseEntity<SetPasswordResponseDTO> setPassword(@RequestBody SetPasswordRequestDTO request) {
 
-        Optional<ActivationToken> activationToken = authService.findByToken(request.getToken());
+        Optional<ValidationToken> activationToken = authService.findByToken(request.getToken());
         if(activationToken.isEmpty()){
             SetPasswordResponseDTO setPasswordResponseDTO = new SetPasswordResponseDTO();
             setPasswordResponseDTO.setSuccess(Boolean.FALSE);
             return ResponseEntity.ok(setPasswordResponseDTO);
         }
-        ActivationToken at=activationToken.get();
+        ValidationToken at=activationToken.get();
         Driver driver = (Driver) at.getUser();
 
         driver.setPassword(passwordEncoder.encode(request.getPassword()));
