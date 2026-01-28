@@ -1,7 +1,7 @@
 package com.team18.FleetForge.controller;
 
 import com.team18.FleetForge.dto.auth.*;
-import com.team18.FleetForge.model.ActivationToken;
+import com.team18.FleetForge.model.ValidationToken;
 import com.team18.FleetForge.model.users.User;
 import com.team18.FleetForge.service.AuthService;
 import com.team18.FleetForge.util.JwtTokenUtils;
@@ -214,14 +214,14 @@ public class AuthController {
 
     @GetMapping("/validate-token")
     public ResponseEntity<ValidateTokenResponseDTO> validateToken(@RequestParam String token) {
-        Optional<ActivationToken> activationToken = authService.findByToken(token);
+        Optional<ValidationToken> activationToken = authService.findByToken(token);
         if(activationToken.isEmpty()){
             ValidateTokenResponseDTO validateTokenResponseDTO = new ValidateTokenResponseDTO();
             validateTokenResponseDTO.setSuccess(Boolean.FALSE);
             validateTokenResponseDTO.setToken(token);
             return ResponseEntity.ok(validateTokenResponseDTO);
         }
-        ActivationToken at= activationToken.get();
+        ValidationToken at= activationToken.get();
         if(at.isUsed()||at.getExpiresAt().isBefore(LocalDateTime.now())){
             ValidateTokenResponseDTO validateTokenResponseDTO = new ValidateTokenResponseDTO();
             validateTokenResponseDTO.setSuccess(Boolean.FALSE);

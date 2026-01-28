@@ -10,12 +10,12 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "activation_tokens")
+@Table(name = "validation_tokens")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ActivationToken {
+public class ValidationToken {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,7 +24,7 @@ public class ActivationToken {
     @Column(nullable = false, unique = true)
     private String token;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 

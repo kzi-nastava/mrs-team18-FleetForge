@@ -56,7 +56,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 {
                   "error": "Invalid or expired token"
                 }
-            """);
+                """);
                 return;
             }
         }

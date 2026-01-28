@@ -14,9 +14,7 @@ import com.team18.FleetForge.model.enums.InformationChangeRequestStatus;
 import com.team18.FleetForge.service.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -26,7 +24,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -89,7 +86,7 @@ public class DriverControler {
     @PostMapping
     public ResponseEntity<DriverCreateResponseDTO> createDriver(@RequestBody DriverCreateRequestDTO request) throws IOException {
         Driver driver=userService.createDriver(request);
-       ActivationToken token=activationTokenService.createTokenPasswordSetDriver(driver);
+       ValidationToken token=activationTokenService.createTokenPasswordSetDriver(driver);
         emailService.sendEmail("v.vitomirovic@gmail.com","Password set","http://localhost:4200/set-password?token="+token.getToken());
         activationTokenService.saveActivationToken(token);
         DriverCreateResponseDTO driverCreateResponseDTO = new DriverCreateResponseDTO(driver);
@@ -249,13 +246,13 @@ public class DriverControler {
     @PostMapping("/set-password")
     public ResponseEntity<SetPasswordResponseDTO> setPassword(@RequestBody SetPasswordRequestDTO request) {
 
-        Optional<ActivationToken> activationToken = authService.findByToken(request.getToken());
+        Optional<ValidationToken> activationToken = authService.findByToken(request.getToken());
         if(activationToken.isEmpty()){
             SetPasswordResponseDTO setPasswordResponseDTO = new SetPasswordResponseDTO();
             setPasswordResponseDTO.setSuccess(Boolean.FALSE);
             return ResponseEntity.ok(setPasswordResponseDTO);
         }
-        ActivationToken at=activationToken.get();
+        ValidationToken at=activationToken.get();
         Driver driver = (Driver) at.getUser();
 
         driver.setPassword(passwordEncoder.encode(request.getPassword()));
