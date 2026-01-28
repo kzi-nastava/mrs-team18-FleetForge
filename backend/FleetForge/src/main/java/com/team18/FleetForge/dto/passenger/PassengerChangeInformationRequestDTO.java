@@ -19,6 +19,4 @@ public class PassengerChangeInformationRequestDTO {
     private String phoneNumber;
     @NotNull
     private String address;
-    @NotNull
-    private String profilePicture;
 }

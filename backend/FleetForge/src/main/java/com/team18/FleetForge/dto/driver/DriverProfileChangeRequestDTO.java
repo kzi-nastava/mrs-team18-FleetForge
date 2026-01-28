@@ -10,8 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class DriverProfileChangeRequestDTO {
     @NotNull
-    private Long driverId;
-    @NotNull
     private String newFirstName;
     @NotNull
     private String newLastName;

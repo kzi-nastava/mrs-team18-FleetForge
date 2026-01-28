@@ -13,6 +13,7 @@ import com.team18.FleetForge.model.users.User;
 import com.team18.FleetForge.model.enums.InformationChangeRequestStatus;
 import com.team18.FleetForge.service.*;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -87,7 +88,7 @@ public class DriverControler {
     }
 
     @PostMapping
-    public ResponseEntity<DriverCreateResponseDTO> createDriver(@RequestBody DriverCreateRequestDTO request) throws IOException {
+    public ResponseEntity<DriverCreateResponseDTO> createDriver(@Valid @RequestBody DriverCreateRequestDTO request) throws IOException {
         Driver driver=userService.createDriver(request);
        ActivationToken token=activationTokenService.createTokenPasswordSetDriver(driver);
         emailService.sendEmail("v.vitomirovic@gmail.com","Password set","http://localhost:4200/set-password?token="+token.getToken());
@@ -129,7 +130,7 @@ public class DriverControler {
 
     @Transactional
     @PostMapping("/update-request")
-    public ResponseEntity<DriverProfileChangeResponseDTO> createChangeRequest(@RequestBody DriverProfileChangeRequestDTO request) {
+    public ResponseEntity<DriverProfileChangeResponseDTO> createChangeRequest(@Valid @RequestBody DriverProfileChangeRequestDTO request) {
 
         Driver foundDriver =(Driver) userService.getUserById(userService.getCurrentDriver().getId());
 
@@ -167,7 +168,7 @@ public class DriverControler {
     }
 
     @PutMapping("/offline")
-    public ResponseEntity<?> stopSession(@RequestBody DriverSessionEndRequestDTO request) {
+    public ResponseEntity<?> stopSession(@Valid @RequestBody DriverSessionEndRequestDTO request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Driver driver = (Driver) authentication.getPrincipal();
         driver.setAvailable(false);
@@ -213,7 +214,7 @@ public class DriverControler {
     }
 
     @PostMapping("/update-request-vehicle")
-    public ResponseEntity<VehicleInformationChangeResponseDTO> createChangeRequest(@RequestBody VehicleInformationChangeRequestDTO request) {
+    public ResponseEntity<VehicleInformationChangeResponseDTO> createChangeRequest(@Valid @RequestBody VehicleInformationChangeRequestDTO request) {
 
         Driver foundDriver =(Driver) userService.getUserById(userService.getCurrentDriver().getId());
         Vehicle vehicle= foundDriver.getVehicle();
@@ -236,7 +237,7 @@ public class DriverControler {
     }
 
     @PutMapping("/password")
-    public ResponseEntity<?> passwordChange(@RequestBody DriverPasswordChangeRequestDTO request) {
+    public ResponseEntity<?> passwordChange(@Valid @RequestBody DriverPasswordChangeRequestDTO request) {
         Driver foundDriver = userService.getCurrentDriver();
 
         foundDriver.setPassword(passwordEncoder.encode(request.getNewPassword()));
@@ -247,7 +248,7 @@ public class DriverControler {
     }
 
     @PostMapping("/set-password")
-    public ResponseEntity<SetPasswordResponseDTO> setPassword(@RequestBody SetPasswordRequestDTO request) {
+    public ResponseEntity<SetPasswordResponseDTO> setPassword(@Valid @RequestBody SetPasswordRequestDTO request) {
 
         Optional<ActivationToken> activationToken = authService.findByToken(request.getToken());
         if(activationToken.isEmpty()){

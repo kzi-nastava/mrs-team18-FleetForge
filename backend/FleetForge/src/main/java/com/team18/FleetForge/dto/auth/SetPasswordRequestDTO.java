@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SetPasswordRequestDTO {
+    @NotNull
     private String token;
     @NotNull
     @Min(8)

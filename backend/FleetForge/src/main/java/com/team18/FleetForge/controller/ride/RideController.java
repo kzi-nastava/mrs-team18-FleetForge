@@ -9,6 +9,7 @@ import com.team18.FleetForge.model.ride.Ride;
 import com.team18.FleetForge.service.RideCancellationService;
 import com.team18.FleetForge.service.RidePanicService;
 import com.team18.FleetForge.service.RideService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -107,7 +108,7 @@ public class RideController {
 
 
     @PostMapping("/create")
-    public ResponseEntity<RideCreateResponseDTO> createRide(@RequestBody RideCreateRequestDTO request) {
+    public ResponseEntity<RideCreateResponseDTO> createRide(@Valid @RequestBody RideCreateRequestDTO request) {
         Ride ride=rideService.createRide(request);
         RideCreateResponseDTO response= new RideCreateResponseDTO();
         if(ride==null){
