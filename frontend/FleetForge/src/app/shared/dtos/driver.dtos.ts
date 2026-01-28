@@ -26,3 +26,7 @@ export interface PasswordSetResponseDTO{
 export interface DriverSessionResponseDTO{
     sessionId:number;
 }
+
+export interface DriverActivityResponseDTO{
+    activeSecondsLast24h:number;
+}

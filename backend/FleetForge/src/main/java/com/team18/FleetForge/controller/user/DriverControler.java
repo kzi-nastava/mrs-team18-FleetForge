@@ -52,6 +52,7 @@ public class DriverControler {
     private final DriverSessionService driverSessionService;
     private final DriverDashboardService driverDashboardService;
     private final DriverHistoryService driverHistoryService;
+    private final DriverService driverService;
 
 
     @GetMapping("/upcoming-rides")
@@ -187,37 +188,22 @@ public class DriverControler {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/{id}/active-hours")
-    public ResponseEntity<DriverActivityResponseDTO> getActiveHours(@PathVariable Long id) {
-
+    @GetMapping("/active-hours")
+    public ResponseEntity<DriverActivityResponseDTO> getActiveHours() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Driver driver = (Driver) authentication.getPrincipal();
         LocalDateTime last24Hours = LocalDateTime.now().minusHours(24);
 
 
-        List<DriverSession> sessions = new ArrayList<>();
-        DriverSession session = new DriverSession();
-        session.setStartedAt(LocalDateTime.of(2025, 12, 26, 14, 30, 0));
-        session.setEndedAt(LocalDateTime.of(2025, 12, 26, 19, 30, 0));
-        sessions.add(session);
-        // sessions = sessionRepository.findByDriverIdAndStartedAtAfter(id, last24Hours);
-
-        Long totalHours = calculateTotalHours(sessions);
+        List<DriverSession> sessions = driverSessionService.findAllDriverSessions(driver);
+        Long activity=driverService.checkDriverActivityProfile(sessions);
 
         DriverActivityResponseDTO response = new DriverActivityResponseDTO();
-        response.setDriverId(id);
-        response.setActiveMinutesLast24h(totalHours);
+        response.setActiveSecondsLast24h(activity);
 
         return ResponseEntity.ok(response);
     }
 
-    private Long calculateTotalHours(List<DriverSession> sessions) {
-        return sessions.stream()
-                .filter(s -> s.getEndedAt() != null)
-                .mapToLong(s -> {
-                    Duration duration = Duration.between(s.getStartedAt(), s.getEndedAt());
-                    return duration.toMinutes();
-                })
-                .sum();
-    }
 
     @PostMapping("/update-request-vehicle")
     public ResponseEntity<VehicleInformationChangeResponseDTO> createChangeRequest(@Valid @RequestBody VehicleInformationChangeRequestDTO request) {

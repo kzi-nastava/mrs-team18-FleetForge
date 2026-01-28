@@ -9,6 +9,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DriverActivityResponseDTO {
-    private Long driverId;
-    private long activeMinutesLast24h;
+    private Long activeSecondsLast24h;
 }
