@@ -1,7 +1,6 @@
 package com.team18.FleetForge.dto.ride.routes;
 
-import com.team18.FleetForge.model.GeoPoint;
-import com.team18.FleetForge.model.ride.WayPoint;
+import com.team18.FleetForge.model.ride.GeoPoint;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

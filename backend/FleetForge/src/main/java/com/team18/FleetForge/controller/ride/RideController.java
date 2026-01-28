@@ -3,12 +3,11 @@ package com.team18.FleetForge.controller.ride;
 import com.team18.FleetForge.dto.ride.lifecycle.*;
 
 import com.team18.FleetForge.dto.ride.panic.RidePanicResponseDTO;
-import com.team18.FleetForge.model.GeoPoint;
-import com.team18.FleetForge.model.enums.RideStatus;
+import com.team18.FleetForge.model.ride.GeoPoint;
 import com.team18.FleetForge.model.ride.Ride;
-import com.team18.FleetForge.service.RideCancellationService;
-import com.team18.FleetForge.service.RidePanicService;
-import com.team18.FleetForge.service.RideService;
+import com.team18.FleetForge.service.rides.RideCancellationService;
+import com.team18.FleetForge.service.rides.RidePanicService;
+import com.team18.FleetForge.service.rides.RideService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

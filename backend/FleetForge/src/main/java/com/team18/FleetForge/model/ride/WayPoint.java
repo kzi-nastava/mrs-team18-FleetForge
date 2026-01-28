@@ -1,6 +1,5 @@
 package com.team18.FleetForge.model.ride;
 
-import com.team18.FleetForge.model.GeoPoint;
 import jakarta.persistence.*;
 import lombok.*;
 

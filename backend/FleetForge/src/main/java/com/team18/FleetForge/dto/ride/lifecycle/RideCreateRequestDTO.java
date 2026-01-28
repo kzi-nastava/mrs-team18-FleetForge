@@ -2,15 +2,12 @@ package com.team18.FleetForge.dto.ride.lifecycle;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.team18.FleetForge.dto.ride.routes.WayPointDTO;
-import com.team18.FleetForge.model.GeoPoint;
 import com.team18.FleetForge.model.enums.VehicleType;
-import com.team18.FleetForge.model.ride.WayPoint;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
 
 

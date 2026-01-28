@@ -1,11 +1,11 @@
 package com.team18.FleetForge.service.impl;
 
 import com.team18.FleetForge.dto.vehicle.VehicleLocationDTO;
-import com.team18.FleetForge.model.Vehicle;
+import com.team18.FleetForge.model.vecihles.Vehicle;
 import com.team18.FleetForge.model.users.Driver;
-import com.team18.FleetForge.repository.DriverRepository;
-import com.team18.FleetForge.repository.VehicleRepo;
-import com.team18.FleetForge.service.VehicleService;
+import com.team18.FleetForge.repository.users.DriverRepository;
+import com.team18.FleetForge.repository.vehicles.VehicleRepo;
+import com.team18.FleetForge.service.vehicles.VehicleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

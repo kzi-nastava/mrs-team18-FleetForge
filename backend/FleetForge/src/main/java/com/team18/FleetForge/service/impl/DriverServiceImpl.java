@@ -1,14 +1,14 @@
 package com.team18.FleetForge.service.impl;
 
-import com.team18.FleetForge.model.DriverSession;
+import com.team18.FleetForge.model.users.DriverSession;
 import com.team18.FleetForge.model.enums.RideStatus;
 import com.team18.FleetForge.model.enums.VehicleType;
 import com.team18.FleetForge.model.ride.Ride;
 import com.team18.FleetForge.model.users.Driver;
-import com.team18.FleetForge.repository.DriverRepository;
-import com.team18.FleetForge.repository.DriverSessionRepo;
-import com.team18.FleetForge.repository.RideRepository;
-import com.team18.FleetForge.service.DriverService;
+import com.team18.FleetForge.repository.users.DriverRepository;
+import com.team18.FleetForge.repository.users.DriverSessionRepo;
+import com.team18.FleetForge.repository.rides.RideRepository;
+import com.team18.FleetForge.service.users.DriverService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

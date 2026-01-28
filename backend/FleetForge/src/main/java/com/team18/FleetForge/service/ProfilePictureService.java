@@ -1,7 +1,7 @@
 package com.team18.FleetForge.service;
 
 import com.team18.FleetForge.model.users.User;
-import com.team18.FleetForge.repository.UserRepository;
+import com.team18.FleetForge.repository.users.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

@@ -1,6 +1,6 @@
 package com.team18.FleetForge.dto.ride.reports;
 
-import com.team18.FleetForge.model.GeoPoint;
+import com.team18.FleetForge.model.ride.GeoPoint;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;

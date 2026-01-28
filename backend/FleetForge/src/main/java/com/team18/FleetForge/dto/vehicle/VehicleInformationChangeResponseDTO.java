@@ -1,8 +1,7 @@
 package com.team18.FleetForge.dto.vehicle;
 
 
-import com.team18.FleetForge.model.DriverProfileChangeRequest;
-import com.team18.FleetForge.model.VehicleInformationChangeRequest;
+import com.team18.FleetForge.model.vecihles.VehicleInformationChangeRequest;
 import com.team18.FleetForge.model.enums.InformationChangeRequestStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -3,7 +3,7 @@ package com.team18.FleetForge.controller.ride;
 import com.team18.FleetForge.dto.ride.review.RideReviewRequestDTO;
 import com.team18.FleetForge.dto.ride.review.RideReviewResponseDTO;
 import com.team18.FleetForge.model.users.User;
-import com.team18.FleetForge.service.RideReviewService;
+import com.team18.FleetForge.service.rides.RideReviewService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

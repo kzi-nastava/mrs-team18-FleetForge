@@ -1,6 +1,6 @@
 package com.team18.FleetForge.dto.driver;
 
-import com.team18.FleetForge.model.GeoPoint;
+import com.team18.FleetForge.model.ride.GeoPoint;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
