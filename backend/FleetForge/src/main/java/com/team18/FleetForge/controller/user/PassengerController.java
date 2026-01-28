@@ -10,8 +10,9 @@ import com.team18.FleetForge.model.ride.Ride;
 import com.team18.FleetForge.model.users.Passenger;
 import com.team18.FleetForge.model.users.User;
 import com.team18.FleetForge.service.FavoriteRouteService;
-import com.team18.FleetForge.service.rides.RideService;
-import com.team18.FleetForge.service.users.UserService;
+import com.team18.FleetForge.service.RideService;
+import com.team18.FleetForge.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,7 +44,7 @@ public class PassengerController {
     }
 
     @PutMapping
-    public ResponseEntity<PassengerChangeInformationResponseDTO> changeCurrentPassenger(@RequestBody PassengerChangeInformationRequestDTO passengerChangeInformationRequestDTO){
+    public ResponseEntity<PassengerChangeInformationResponseDTO> changeCurrentPassenger(@Valid @RequestBody PassengerChangeInformationRequestDTO passengerChangeInformationRequestDTO){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = (User) authentication.getPrincipal();
         Passenger currentPassenger =userService.getCurrentPassenger();
@@ -55,7 +56,6 @@ public class PassengerController {
         currentPassenger.setLastName(passengerChangeInformationRequestDTO.getLastName());
         currentPassenger.setAddress(passengerChangeInformationRequestDTO.getAddress());
         currentPassenger.setPhoneNumber(String.valueOf(passengerChangeInformationRequestDTO.getPhoneNumber()));
-        currentPassenger.setProfilePicture(passengerChangeInformationRequestDTO.getProfilePicture());
         userService.save(currentPassenger);
 
         PassengerChangeInformationResponseDTO passengerChanged = new PassengerChangeInformationResponseDTO(currentPassenger);
@@ -70,14 +70,13 @@ public class PassengerController {
     }
     @PutMapping("/{id}")
     public ResponseEntity<PassengerChangeInformationResponseDTO> changeUser
-            (@RequestBody PassengerChangeInformationRequestDTO passengerChangeInformationRequestDTO, @PathVariable Long id) {
+            (@Valid @RequestBody PassengerChangeInformationRequestDTO passengerChangeInformationRequestDTO, @PathVariable Long id) {
         Passenger foundPassenger =(Passenger) userService.getUserById(id);
         foundPassenger.setFirstName(passengerChangeInformationRequestDTO.getFirstName());
         foundPassenger.setLastName(passengerChangeInformationRequestDTO.getLastName());
         foundPassenger.setEmail(passengerChangeInformationRequestDTO.getEmail());
         foundPassenger.setAddress(passengerChangeInformationRequestDTO.getAddress());
         foundPassenger.setPhoneNumber(String.valueOf(passengerChangeInformationRequestDTO.getPhoneNumber()));
-        foundPassenger.setProfilePicture(passengerChangeInformationRequestDTO.getProfilePicture());
 
         userService.save(foundPassenger);
 
@@ -86,7 +85,7 @@ public class PassengerController {
     }
 
     @PutMapping("/password")
-    public ResponseEntity<?> passwordChange(@RequestBody PassengerPasswordChangeRequestDTO request){
+    public ResponseEntity<?> passwordChange(@Valid @RequestBody PassengerPasswordChangeRequestDTO request){
         Passenger passenger = userService.getCurrentPassenger();
         if(passenger == null){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

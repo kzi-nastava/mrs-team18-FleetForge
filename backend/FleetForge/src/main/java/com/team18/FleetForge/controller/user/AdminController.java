@@ -15,6 +15,7 @@ import com.team18.FleetForge.model.vecihles.Vehicle;
 import com.team18.FleetForge.model.vecihles.VehicleInformationChangeRequest;
 import com.team18.FleetForge.model.enums.InformationChangeRequestStatus;
 import com.team18.FleetForge.service.*;
+import jakarta.validation.Valid;
 import com.team18.FleetForge.service.users.DriverProfileChangeRequestService;
 import com.team18.FleetForge.service.users.UserService;
 import com.team18.FleetForge.service.vehicles.VehicleInfoChangeReqService;
@@ -55,7 +56,7 @@ public class AdminController {
     }
 
     @PutMapping
-    public ResponseEntity<AdminChangeInformationResponseDTO> changeCurrentAdmin(@RequestBody AdminChangeInformationRequestDTO adminChangeInformationRequestDTO) throws IOException {
+    public ResponseEntity<AdminChangeInformationResponseDTO> changeCurrentAdmin(@Valid @RequestBody AdminChangeInformationRequestDTO adminChangeInformationRequestDTO) throws IOException {
         Admin admin=userService.getCurrentAdmin();
         if(admin==null){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -80,7 +81,7 @@ public class AdminController {
     }
     @PutMapping("/{id}")
     public ResponseEntity<AdminChangeInformationResponseDTO> changeUser
-            (@RequestBody AdminChangeInformationRequestDTO adminChangeInformationRequestDTO, @PathVariable Long id) throws IOException {
+            (@Valid @RequestBody AdminChangeInformationRequestDTO adminChangeInformationRequestDTO, @PathVariable Long id) throws IOException {
         Admin admin=(Admin) userService.getUserById(id);
         if(admin==null){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -98,7 +99,7 @@ public class AdminController {
     @Transactional
     @PutMapping("/{requestId}/driver-info")
     public ResponseEntity<AdminDriverVehicleChangeStatusResponseDTO> driverInfoChange
-            (@PathVariable Long requestId,@RequestBody AdminDriverVehicleInfoChangeDTO adminDriverVehicleInfoChangeDTO) {
+            (@PathVariable Long requestId,@Valid @RequestBody AdminDriverVehicleInfoChangeDTO adminDriverVehicleInfoChangeDTO) {
             DriverProfileChangeRequest request=driverChangeRequestService.findById(requestId);
             request.setUpdatedAt(LocalDateTime.now());
             AdminDriverVehicleChangeStatusResponseDTO responseDTO=new AdminDriverVehicleChangeStatusResponseDTO();
@@ -146,7 +147,7 @@ public class AdminController {
 @Transactional
     @PutMapping("/{requestId}/vehicle-info")
     public ResponseEntity<AdminDriverVehicleChangeStatusResponseDTO> vehicleInfoChange
-            (@PathVariable Long requestId,@RequestBody  AdminDriverVehicleInfoChangeDTO adminDriverVehicleInfoChangeDTO) {
+            (@PathVariable Long requestId,@Valid @RequestBody  AdminDriverVehicleInfoChangeDTO adminDriverVehicleInfoChangeDTO) {
         VehicleInformationChangeRequest request=vehicleChangeService.findById(requestId);
         request.setUpdatedAt(LocalDateTime.now());
         AdminDriverVehicleChangeStatusResponseDTO responseDTO=new AdminDriverVehicleChangeStatusResponseDTO();
@@ -189,7 +190,7 @@ public class AdminController {
     }
 
     @PutMapping("/password")
-    public ResponseEntity<?> passwordChange(@RequestBody AdminPasswordChangeRequestDTO request){
+    public ResponseEntity<?> passwordChange(@Valid @RequestBody AdminPasswordChangeRequestDTO request){
        Admin admin=userService.getCurrentAdmin();
        if(admin==null){
            return new ResponseEntity<>(HttpStatus.NOT_FOUND);

@@ -88,7 +88,7 @@ editVehicle(): void {
     model: new FormControl('', Validators.required),
     type: new FormControl('', Validators.required),
     registrationNumber: new FormControl('',Validators.required),
-    space: new FormControl('',Validators.required),
+    space: new FormControl('',[Validators.required,Validators.min(1)]),
     babySeat: new FormControl(false),
     petFriendly: new FormControl(false)
   });

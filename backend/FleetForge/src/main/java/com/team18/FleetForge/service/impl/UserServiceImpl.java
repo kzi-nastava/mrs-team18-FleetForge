@@ -1,6 +1,7 @@
 package com.team18.FleetForge.service.impl;
 
 import com.team18.FleetForge.dto.driver.DriverCreateRequestDTO;
+import com.team18.FleetForge.model.GeoPoint;
 import com.team18.FleetForge.model.vecihles.Vehicle;
 import com.team18.FleetForge.model.enums.Role;
 import com.team18.FleetForge.model.users.Admin;
@@ -75,7 +76,8 @@ public class UserServiceImpl implements UserService {
         driverEntity.setEmail(driver.getEmail());
         driverEntity.setPhoneNumber(driver.getPhoneNumber());
         driverEntity.setAddress(driver.getAddress());
-        driverEntity.setAvailable(true);
+        driverEntity.setAvailable(false);
+        driverEntity.setCurrentLocation(new GeoPoint(45.2651,19.8452));
         driverEntity.setBlocked(false);
         driverEntity.setActive(false);
         driverEntity.setActivated(true);

@@ -5,6 +5,10 @@ import com.team18.FleetForge.dto.ride.lifecycle.*;
 import com.team18.FleetForge.dto.ride.panic.RidePanicResponseDTO;
 import com.team18.FleetForge.model.ride.GeoPoint;
 import com.team18.FleetForge.model.ride.Ride;
+import com.team18.FleetForge.service.RideCancellationService;
+import com.team18.FleetForge.service.RidePanicService;
+import com.team18.FleetForge.service.RideService;
+import jakarta.validation.Valid;
 import com.team18.FleetForge.service.rides.RideCancellationService;
 import com.team18.FleetForge.service.rides.RidePanicService;
 import com.team18.FleetForge.service.rides.RideService;
@@ -79,7 +83,7 @@ public class RideController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<RideCreateResponseDTO> createRide(@RequestBody RideCreateRequestDTO request) {
+    public ResponseEntity<RideCreateResponseDTO> createRide(@Valid @RequestBody RideCreateRequestDTO request) {
         Ride ride=rideService.createRide(request);
         RideCreateResponseDTO response= new RideCreateResponseDTO();
         if(ride==null){
