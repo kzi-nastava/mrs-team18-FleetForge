@@ -44,7 +44,7 @@ public class AdminController {
     private final VehicleService vehicleService;
     private final ProfilePictureService profilePictureService;
     private final PasswordEncoder passwordEncoder;
-
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<AdminGetResponseDTO> getCurrentAdmin(){
         Admin admin = userService.getCurrentAdmin();
@@ -54,7 +54,7 @@ public class AdminController {
         AdminGetResponseDTO response = new AdminGetResponseDTO(admin);
         return ResponseEntity.ok(response);
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping
     public ResponseEntity<AdminChangeInformationResponseDTO> changeCurrentAdmin(@Valid @RequestBody AdminChangeInformationRequestDTO adminChangeInformationRequestDTO) throws IOException {
         Admin admin=userService.getCurrentAdmin();
@@ -72,7 +72,6 @@ public class AdminController {
         return ResponseEntity.ok(adminChangeInformationResponseDTO);
 
     }
-
     @GetMapping("/{id}")
     public ResponseEntity<AdminGetResponseDTO> getAdmin(@PathVariable Long id) {
         Admin foundAdmin=(Admin) userService.getUserById(id);
@@ -128,7 +127,7 @@ public class AdminController {
     }
 
 
-
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/profile-change-requests")
     public ResponseEntity<List<AdminViewProfileChangeRequestDTO>> getPendingRequests() {
 
@@ -145,6 +144,7 @@ public class AdminController {
     }
 
 @Transactional
+@PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{requestId}/vehicle-info")
     public ResponseEntity<AdminDriverVehicleChangeStatusResponseDTO> vehicleInfoChange
             (@PathVariable Long requestId,@Valid @RequestBody  AdminDriverVehicleInfoChangeDTO adminDriverVehicleInfoChangeDTO) {
@@ -176,6 +176,7 @@ public class AdminController {
         return new ResponseEntity<>(responseDTO,HttpStatus.OK);
         }
     }
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/vehicle-change-requests")
     public ResponseEntity<List<VehicleChangeInformationResponseDTO>> getVehicleChangeRequests() {
         List<VehicleInformationChangeRequest> requests=vehicleChangeService.findAllPending();
@@ -188,7 +189,7 @@ public class AdminController {
         }
         return new ResponseEntity<>(responseDTOs, HttpStatus.OK);
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/password")
     public ResponseEntity<?> passwordChange(@Valid @RequestBody AdminPasswordChangeRequestDTO request){
        Admin admin=userService.getCurrentAdmin();

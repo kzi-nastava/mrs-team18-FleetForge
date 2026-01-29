@@ -6,6 +6,7 @@ import com.team18.FleetForge.service.rides.RideService;
 import com.team18.FleetForge.service.rides.RideStartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class RideStartController {
     private final RideStartService service;
     private final RideService rideService;
-
+    @PreAuthorize("hasRole('DRIVER')")
     @PutMapping("/{id}/start")
     public ResponseEntity<RideStartResponseDTO> startRide(@PathVariable Long id) {
         Ride ride= rideService.getRideById(id);

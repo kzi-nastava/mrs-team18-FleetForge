@@ -44,6 +44,4 @@ public class RegisterRequestDTO {
             message = "Phone number must be in right format"
     )
     private String phoneNumber;
-
-    private String profilePicture;
 }

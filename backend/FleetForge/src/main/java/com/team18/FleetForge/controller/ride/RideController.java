@@ -81,7 +81,7 @@ public class RideController {
                 .status(response.isSuccess() ? HttpStatus.OK : HttpStatus.BAD_REQUEST)
                 .body(response);
     }
-
+    @PreAuthorize("hasRole('PASSENGER')")
     @PostMapping("/create")
     public ResponseEntity<RideCreateResponseDTO> createRide(@Valid @RequestBody RideCreateRequestDTO request) {
         Ride ride=rideService.createRide(request);
