@@ -16,6 +16,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -32,7 +33,7 @@ public class PassengerController {
     private final PasswordEncoder passwordEncoder;
     private final RideService rideService;
     private final FavoriteRouteService favoriteRouteService;
-
+    @PreAuthorize("hasRole('PASSENGER')")
     @GetMapping
     public ResponseEntity<PassengerGetResponseDTO> getCurrentPassenger() {
         Passenger passenger = userService.getCurrentPassenger();
@@ -42,7 +43,7 @@ public class PassengerController {
         PassengerGetResponseDTO response = new PassengerGetResponseDTO(passenger);
         return ResponseEntity.ok(response);
     }
-
+    @PreAuthorize("hasRole('PASSENGER')")
     @PutMapping
     public ResponseEntity<PassengerChangeInformationResponseDTO> changeCurrentPassenger(@Valid @RequestBody PassengerChangeInformationRequestDTO passengerChangeInformationRequestDTO){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -83,7 +84,7 @@ public class PassengerController {
         PassengerChangeInformationResponseDTO passengerChanged = new PassengerChangeInformationResponseDTO(foundPassenger);
         return new ResponseEntity<>(passengerChanged, HttpStatus.OK);
     }
-
+    @PreAuthorize("hasRole('PASSENGER')")
     @PutMapping("/password")
     public ResponseEntity<?> passwordChange(@Valid @RequestBody PassengerPasswordChangeRequestDTO request){
         Passenger passenger = userService.getCurrentPassenger();
@@ -94,7 +95,7 @@ public class PassengerController {
         userService.save(passenger);
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
+    @PreAuthorize("hasRole('PASSENGER')")
     @GetMapping("/favorites")
     public ResponseEntity<List<FavoriteRouteGetResponseDTO>> getFavouriteRoutes() {
         Authentication  authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -113,7 +114,7 @@ public class PassengerController {
         }
         return new ResponseEntity<>(responseDTOList, HttpStatus.OK);
     }
-
+    @PreAuthorize("hasRole('PASSENGER')")
     @PostMapping("/favorites/{routeName}/{rideId}")
     public ResponseEntity<?> addFavoriteRoute(@PathVariable Long rideId, @PathVariable String routeName) {
         Authentication  authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -126,7 +127,7 @@ public class PassengerController {
         favoriteRouteService.save(route);
         return new ResponseEntity<>( HttpStatus.OK);
     }
-
+    @PreAuthorize("hasRole('PASSENGER')")
     @DeleteMapping("/favorites/{id}")
     public ResponseEntity<?> deleteFavoriteRoute(@PathVariable Long id) {
         FavoriteRoute route= favoriteRouteService.findById(id);

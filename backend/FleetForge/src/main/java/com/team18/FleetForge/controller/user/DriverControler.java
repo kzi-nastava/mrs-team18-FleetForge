@@ -72,7 +72,7 @@ public class DriverControler {
         return ResponseEntity.ok(dailyStats);
     }
 
-
+    @PreAuthorize("hasRole('DRIVER')")
     @GetMapping
     public ResponseEntity<DriverGetResponseDTO> getCurrentDriver(){
         Driver driver=userService.getCurrentDriver();
@@ -82,6 +82,7 @@ public class DriverControler {
         ResponseEntity<DriverGetResponseDTO> responseEntity = new ResponseEntity<>(new DriverGetResponseDTO(driver), HttpStatus.OK);
         return responseEntity;
     }
+    @PreAuthorize("hasRole('DRIVER')")
     @GetMapping("/{id}")
     public ResponseEntity<DriverGetResponseDTO> getDriver(@PathVariable Long id) {
         Driver foundDriver = (Driver) userService.getUserById(id);
@@ -91,7 +92,7 @@ public class DriverControler {
         DriverGetResponseDTO driverGetResponseDTO = new DriverGetResponseDTO(foundDriver);
         return new ResponseEntity<>(driverGetResponseDTO, HttpStatus.OK);
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<DriverCreateResponseDTO> createDriver(@Valid @RequestBody DriverCreateRequestDTO request) throws IOException {
         Driver driver=userService.createDriver(request);
@@ -136,6 +137,7 @@ public class DriverControler {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('DRIVER')")
     @PostMapping("/update-request")
     public ResponseEntity<DriverProfileChangeResponseDTO> createChangeRequest(@Valid @RequestBody DriverProfileChangeRequestDTO request) {
 
@@ -156,7 +158,7 @@ public class DriverControler {
         DriverProfileChangeResponseDTO driverProfileChangeResponseDTO = new DriverProfileChangeResponseDTO(changeRequest);
         return new ResponseEntity<>(driverProfileChangeResponseDTO, HttpStatus.CREATED);
     }
-
+    @PreAuthorize("hasRole('DRIVER')")
     @PostMapping("/online")
     public ResponseEntity<DriverSessionResponseDTO> startSession() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -173,7 +175,7 @@ public class DriverControler {
         response.setSessionId(newSession.getId());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
+    @PreAuthorize("hasRole('DRIVER')")
     @PutMapping("/offline")
     public ResponseEntity<?> stopSession(@Valid @RequestBody DriverSessionEndRequestDTO request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -187,7 +189,7 @@ public class DriverControler {
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
+    @PreAuthorize("hasRole('DRIVER')")
     @GetMapping("/active-hours")
     public ResponseEntity<DriverActivityResponseDTO> getActiveHours() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -204,7 +206,7 @@ public class DriverControler {
         return ResponseEntity.ok(response);
     }
 
-
+    @PreAuthorize("hasRole('DRIVER')")
     @PostMapping("/update-request-vehicle")
     public ResponseEntity<VehicleInformationChangeResponseDTO> createChangeRequest(@Valid @RequestBody VehicleInformationChangeRequestDTO request) {
 
@@ -227,7 +229,7 @@ public class DriverControler {
         VehicleInformationChangeResponseDTO vehicleInformationChangeResponseDTO = new VehicleInformationChangeResponseDTO(vehicleInformationChangeRequest);
         return new ResponseEntity<>(vehicleInformationChangeResponseDTO, HttpStatus.CREATED);
     }
-
+    @PreAuthorize("hasRole('DRIVER')")
     @PutMapping("/password")
     public ResponseEntity<?> passwordChange(@Valid @RequestBody DriverPasswordChangeRequestDTO request) {
         Driver foundDriver = userService.getCurrentDriver();
