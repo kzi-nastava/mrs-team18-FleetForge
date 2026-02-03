@@ -1,4 +1,4 @@
-package com.ognjen.fleetforge.utils;
+package com.ognjen.fleetforge.auth;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -23,6 +23,13 @@ public class AuthManager {
     public static synchronized AuthManager getInstance(Context context) {
         if (instance == null) {
             instance = new AuthManager(context);
+        }
+        return instance;
+    }
+
+    public static AuthManager getInstance() {
+        if (instance == null) {
+            throw new RuntimeException("AuthManager must be initialized in Application class first!");
         }
         return instance;
     }

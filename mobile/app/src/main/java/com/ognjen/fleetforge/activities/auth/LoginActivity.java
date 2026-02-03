@@ -14,7 +14,7 @@ import com.ognjen.fleetforge.api.RetrofitClient;
 import com.ognjen.fleetforge.dtos.LoginRequestDTO;
 import com.ognjen.fleetforge.dtos.LoginResponseDTO;
 import com.ognjen.fleetforge.model.UserRole;
-import com.ognjen.fleetforge.utils.AuthManager;
+import com.ognjen.fleetforge.auth.AuthManager;
 
 import retrofit2.Call;
 import retrofit2.Callback;

@@ -14,7 +14,7 @@ import com.ognjen.fleetforge.R;
 import com.ognjen.fleetforge.activities.MainActivity;
 import com.ognjen.fleetforge.activities.auth.LoginActivity;
 import com.ognjen.fleetforge.model.UserRole;
-import com.ognjen.fleetforge.utils.AuthManager;
+import com.ognjen.fleetforge.auth.AuthManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 

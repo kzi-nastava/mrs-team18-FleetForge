@@ -14,7 +14,7 @@ import com.ognjen.fleetforge.fragments.PlaceholderFragment;
 import com.ognjen.fleetforge.R;
 import com.ognjen.fleetforge.fragments.unregistered.UnregisteredFragment;
 import com.ognjen.fleetforge.model.UserRole;
-import com.ognjen.fleetforge.utils.AuthManager;
+import com.ognjen.fleetforge.auth.AuthManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.ognjen.fleetforge.fragments.driver.DriverProfile;
 import com.ognjen.fleetforge.fragments.passenger.PassengerProfile;

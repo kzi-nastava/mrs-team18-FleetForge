@@ -8,7 +8,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +19,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.ognjen.fleetforge.BuildConfig;
 import com.ognjen.fleetforge.fragments.common.PasswordChangeProfile;
 import com.ognjen.fleetforge.R;
-import com.ognjen.fleetforge.utils.AuthManager;
+import com.ognjen.fleetforge.auth.AuthManager;
 import com.ognjen.fleetforge.activities.MainActivity;
 
 /**
