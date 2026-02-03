@@ -52,7 +52,7 @@ public class DataLoader implements CommandLineRunner {
         driver1.setLastName("Doe");
         driver1.setPhoneNumber("+381641234567");
         driver1.setAddress("Bulevar oslobođenja 10, Novi Sad");
-        driver1.setProfilePicture("http://localhost:8080/uploads/pfp/default.png");
+        driver1.setProfilePicture("/uploads/pfp/default.png");
         driver1.setVehicle(vehicle1);
         driver1.setActive(true);
         driver1.setAvailable(false);
@@ -68,7 +68,7 @@ public class DataLoader implements CommandLineRunner {
         driver2.setLastName("Smith");
         driver2.setPhoneNumber("+381649876543");
         driver2.setAddress("Zmaj Jovina 5, Novi Sad");
-        driver2.setProfilePicture("http://localhost:8080/uploads/pfp/default.png");
+        driver2.setProfilePicture("/uploads/pfp/default.png");
         driver2.setVehicle(vehicle2);
         driver2.setActive(true);
         driver2.setAvailable(true);
@@ -87,7 +87,7 @@ public class DataLoader implements CommandLineRunner {
         passenger1.setLastName("Marković");
         passenger1.setPhoneNumber("+381641111111");
         passenger1.setAddress("Narodnih heroja 15, Novi Sad");
-        passenger1.setProfilePicture("http://localhost:8080/uploads/pfp/default.png");
+        passenger1.setProfilePicture("/uploads/pfp/default.png");
         passenger1.setRole(Role.ROLE_PASSENGER);
         passenger1.setActivated(true);
         passenger1.setBlocked(false);
@@ -99,7 +99,7 @@ public class DataLoader implements CommandLineRunner {
         passenger2.setLastName("Anić");
         passenger2.setPhoneNumber("+381642222222");
         passenger2.setAddress("Dunavska 10, Novi Sad");
-        passenger2.setProfilePicture("http://localhost:8080/uploads/pfp/default.png");
+        passenger2.setProfilePicture("/uploads/pfp/default.png");
         passenger2.setRole(Role.ROLE_PASSENGER);
         passenger2.setActivated(true);
         passenger2.setBlocked(false);
@@ -111,7 +111,7 @@ public class DataLoader implements CommandLineRunner {
         passenger3.setLastName("Jovanović");
         passenger3.setPhoneNumber("+381643333333");
         passenger3.setAddress("Tolstojeva 5, Novi Sad");
-        passenger3.setProfilePicture("http://localhost:8080/uploads/pfp/default.png");
+        passenger3.setProfilePicture("/uploads/pfp/default.png");
         passenger3.setRole(Role.ROLE_PASSENGER);
         passenger3.setActivated(true);
         passenger3.setBlocked(false);
@@ -123,7 +123,7 @@ public class DataLoader implements CommandLineRunner {
         passenger4.setLastName("Petrović");
         passenger4.setPhoneNumber("+381644444444");
         passenger4.setAddress("Modene 20, Novi Sad");
-        passenger4.setProfilePicture("http://localhost:8080/uploads/pfp/default.png");
+        passenger4.setProfilePicture("/uploads/pfp/default.png");
         passenger4.setRole(Role.ROLE_PASSENGER);
         passenger4.setActivated(true);
         passenger4.setBlocked(false);

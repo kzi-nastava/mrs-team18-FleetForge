@@ -3,13 +3,21 @@ package com.ognjen.fleetforge.fragments.passenger;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.bumptech.glide.Glide;
+import com.google.android.material.imageview.ShapeableImageView;
+import com.google.android.material.textfield.TextInputEditText;
+import com.ognjen.fleetforge.BuildConfig;
 import com.ognjen.fleetforge.fragments.common.PasswordChangeProfile;
 import com.ognjen.fleetforge.R;
 import com.ognjen.fleetforge.utils.AuthManager;
@@ -22,34 +30,23 @@ import com.ognjen.fleetforge.activities.MainActivity;
  */
 public class PassengerProfile extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private static final String BaseUrl="http://"+ BuildConfig.IP_ADDR+":8080";
     private AuthManager authManager;
+    private PassengerProfileViewModel passengerProfileViewModel;
+    private ShapeableImageView profilePic;
+    private TextInputEditText firstName;
+    private TextInputEditText lastName;
+    private TextInputEditText email;
+    private TextInputEditText phoneNumber;
+    private TextInputEditText address;
 
     public PassengerProfile() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment PassengerProfile.
-     */
-    // TODO: Rename and change types and number of parameters
     public static PassengerProfile newInstance(String param1, String param2) {
         PassengerProfile fragment = new PassengerProfile();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -57,10 +54,7 @@ public class PassengerProfile extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+
     }
 
     @Override
@@ -86,7 +80,32 @@ public class PassengerProfile extends Fragment {
         });
         authManager = AuthManager.getInstance(requireContext());
 
-
+        profilePic=view.findViewById(R.id.profileImage);
+        firstName=view.findViewById(R.id.firstName);
+        lastName=view.findViewById(R.id.lastName);
+        email=view.findViewById(R.id.email);
+        phoneNumber=view.findViewById(R.id.phoneNumber);
+        address=view.findViewById(R.id.address);
         return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        passengerProfileViewModel=new ViewModelProvider(this).get(PassengerProfileViewModel.class);
+        passengerProfileViewModel.getPassengerProfile().observe(getViewLifecycleOwner(),passenger->{
+            if(passenger!=null){
+                String imgUrl=BaseUrl+passenger.getProfilePicture();
+                Glide.with(requireContext())
+                        .load(imgUrl)
+                        .into(profilePic);
+                firstName.setText(passenger.getFirstName());
+                lastName.setText(passenger.getLastName());
+                email.setText(passenger.getEmail());
+                phoneNumber.setText(passenger.getPhoneNumber());
+                address.setText(passenger.getAddress());
+            }
+        });
+
     }
 }
