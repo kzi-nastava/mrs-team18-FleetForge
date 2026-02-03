@@ -1,6 +1,11 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
 }
+
+val localProperties = Properties()
+localProperties.load(project.rootProject.file("local.properties").inputStream())
 
 android {
     namespace = "com.ognjen.fleetforge"
@@ -14,6 +19,8 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String","MAPBOX_API_KEY", localProperties["MAPBOX_API_KEY"] as String)
     }
 
     buildTypes {
@@ -30,7 +37,8 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
     buildFeatures {
-        viewBinding=true
+        viewBinding = true
+        buildConfig = true  // needed for BuildConfig.MAPBOX_API_KEY to work
     }
 }
 
@@ -50,10 +58,13 @@ dependencies {
     implementation("androidx.navigation:navigation-fragment:2.7.5")
     implementation("androidx.navigation:navigation-ui:2.7.5")
 
+    implementation("com.mapbox.maps:android:11.18.1")
+
     // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
-    implementation ("com.github.bumptech.glide:glide:4.16.0"    )
-    annotationProcessor ("com.github.bumptech.glide:compiler:4.16.0")
+
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
 }
