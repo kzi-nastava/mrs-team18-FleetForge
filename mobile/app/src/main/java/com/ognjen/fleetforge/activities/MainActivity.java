@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import com.ognjen.fleetforge.activities.auth.LoginActivity;
 import com.ognjen.fleetforge.fragments.account_changes.DriverChangesFragment;
 import com.ognjen.fleetforge.fragments.driver.DriverHistoryFragment;
 import com.ognjen.fleetforge.fragments.PlaceholderFragment;
@@ -140,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void redirectToLogin() {
-        Intent intent = new Intent(MainActivity.this, MockLoginActivity.class);
+        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
         startActivity(intent);
     }
 

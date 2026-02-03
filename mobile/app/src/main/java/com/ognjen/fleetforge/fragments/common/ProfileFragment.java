@@ -12,7 +12,7 @@ import androidx.fragment.app.Fragment;
 
 import com.ognjen.fleetforge.R;
 import com.ognjen.fleetforge.activities.MainActivity;
-import com.ognjen.fleetforge.activities.MockLoginActivity;
+import com.ognjen.fleetforge.activities.auth.LoginActivity;
 import com.ognjen.fleetforge.model.UserRole;
 import com.ognjen.fleetforge.utils.AuthManager;
 import com.google.android.material.button.MaterialButton;
@@ -88,7 +88,7 @@ public class ProfileFragment extends Fragment {
 
     private void handleLogin() {
         // Navigate to login screen
-        Intent intent = new Intent(getActivity(), MockLoginActivity.class);
+        Intent intent = new Intent(getActivity(), LoginActivity.class);
         startActivity(intent);
     }
 }
