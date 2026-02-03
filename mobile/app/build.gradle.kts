@@ -7,6 +7,13 @@ plugins {
 val localProperties = Properties()
 localProperties.load(project.rootProject.file("local.properties").inputStream())
 
+fun getIpAddress(): String {
+    val properties = Properties()
+    properties.load(project.rootProject.file("local.properties").inputStream())
+    return properties.getProperty("ip_addr") ?: ""
+}
+
+
 android {
     namespace = "com.ognjen.fleetforge"
     compileSdk = 36
@@ -20,7 +27,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField("String","MAPBOX_API_KEY", localProperties["MAPBOX_API_KEY"] as String)
+        buildConfigField ("String", "IP_ADDR", "\"" + getIpAddress() + "\"")
     }
 
     buildTypes {
@@ -38,11 +45,16 @@ android {
     }
     buildFeatures {
         viewBinding = true
-        buildConfig = true  // needed for BuildConfig.MAPBOX_API_KEY to work
+        buildConfig = true
     }
 }
 
 dependencies {
+    implementation("com.google.code.gson:gson:2.12.1")
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
@@ -58,7 +70,7 @@ dependencies {
     implementation("androidx.navigation:navigation-fragment:2.7.5")
     implementation("androidx.navigation:navigation-ui:2.7.5")
 
-    implementation("com.mapbox.maps:android:11.18.1")
+    implementation("org.osmdroid:osmdroid-android:6.1.18")
 
     // Testing
     testImplementation(libs.junit)
