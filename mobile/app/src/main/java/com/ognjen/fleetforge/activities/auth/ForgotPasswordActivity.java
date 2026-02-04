@@ -26,7 +26,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forgot_password);
 
-        authService = RetrofitClient.getInstance().getLoginService();
+        authService = RetrofitClient.getInstance().getAuthService();
 
         initViews();
         setupListeners();

@@ -10,7 +10,6 @@ import androidx.fragment.app.Fragment;
 import com.ognjen.fleetforge.fragments.admin.AdminProfile;
 import com.ognjen.fleetforge.fragments.admin.DriverChangesFragment;
 import com.ognjen.fleetforge.activities.auth.LoginActivity;
-import com.ognjen.fleetforge.fragments.account_changes.DriverChangesFragment;
 import com.ognjen.fleetforge.fragments.driver.DriverHistoryFragment;
 import com.ognjen.fleetforge.fragments.PlaceholderFragment;
 import com.ognjen.fleetforge.R;

@@ -108,7 +108,7 @@ public class LoginActivity extends AppCompatActivity {
         LoginRequestDTO loginRequest = new LoginRequestDTO(email, password);
 
         Log.d(TAG, "LoginActivity: Making API call to login endpoint");
-        RetrofitClient.getInstance().getLoginService().login(loginRequest)
+        RetrofitClient.getInstance().getAuthService().login(loginRequest)
                 .enqueue(new Callback<LoginResponseDTO>() {
                     @Override
                     public void onResponse(Call<LoginResponseDTO> call, Response<LoginResponseDTO> response) {

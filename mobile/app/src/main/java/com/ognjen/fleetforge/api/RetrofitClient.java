@@ -23,7 +23,7 @@ public class RetrofitClient {
         AuthInterceptor authInterceptor = new AuthInterceptor(AuthManager.getInstance());
 
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .addInterceptor(loggingInterceptor)
+                .addInterceptor(authInterceptor)
                 .connectTimeout(30, TimeUnit.SECONDS)
                 .build();
 
@@ -61,9 +61,8 @@ public class RetrofitClient {
     public AdminService getAdminService(){
         return retrofit.create(AdminService.class);
     }
-}
 
-    public AuthService getLoginService() {
+    public AuthService getAuthService() {
         return retrofitWithoutAuth.create(AuthService.class);
     }
 }

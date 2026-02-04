@@ -29,7 +29,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reset_password);
 
-        authService = RetrofitClient.getInstance().getLoginService();
+        authService = RetrofitClient.getInstance().getAuthService();
 
         Intent intent = getIntent();
         if (Intent.ACTION_VIEW.equals(intent.getAction())) {
