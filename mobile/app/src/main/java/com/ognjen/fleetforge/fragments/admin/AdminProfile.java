@@ -22,7 +22,7 @@ import com.ognjen.fleetforge.BuildConfig;
 import com.ognjen.fleetforge.R;
 import com.ognjen.fleetforge.activities.MainActivity;
 import com.ognjen.fleetforge.fragments.common.PasswordChangeProfile;
-import com.ognjen.fleetforge.utils.AuthManager;
+import com.ognjen.fleetforge.auth.AuthManager;
 
 import java.io.IOException;
 
