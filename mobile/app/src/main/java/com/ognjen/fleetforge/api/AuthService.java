@@ -5,6 +5,7 @@ import com.ognjen.fleetforge.dtos.LoginResponseDTO;
 import com.ognjen.fleetforge.dtos.PasswordResetRequestDTO;
 import com.ognjen.fleetforge.dtos.ResetPasswordRequestDTO;
 
+import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -33,7 +34,8 @@ public interface AuthService {
             @Part("firstName") RequestBody firstName,
             @Part("lastName") RequestBody lastName,
             @Part("phoneNumber") RequestBody phone,
-            @Part("address") RequestBody address
+            @Part("address") RequestBody address,
+            @Part MultipartBody.Part profilePicture
     );
 
     @GET("api/auth/activations")
