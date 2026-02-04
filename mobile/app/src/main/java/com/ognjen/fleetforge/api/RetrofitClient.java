@@ -56,7 +56,15 @@ public class RetrofitClient {
     public PassengerService getPassengerService() {
         return retrofit.create(PassengerService.class);
     }
+    public DriverService getDriverService(){
+        return retrofit.create(DriverService.class);
+    }
 
+
+    public UnregisteredService getUnregisteredService(){
+        return retrofit.create(UnregisteredService.class);
+    }
+;
     public AuthService getLoginService() {
         return retrofitWithoutAuth.create(AuthService.class);
     }

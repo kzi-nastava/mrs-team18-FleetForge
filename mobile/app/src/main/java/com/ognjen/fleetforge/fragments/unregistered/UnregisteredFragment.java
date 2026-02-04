@@ -1,7 +1,6 @@
 package com.ognjen.fleetforge.fragments.unregistered;
 
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,9 +15,9 @@ import org.osmdroid.config.Configuration;
 import org.osmdroid.views.MapView;
 
 import com.ognjen.fleetforge.R;
+import com.ognjen.fleetforge.api.RetrofitClient;
 import com.ognjen.fleetforge.model.VehicleLocation;
 import com.ognjen.fleetforge.utils.MapManager;
-import com.ognjen.fleetforge.utils.RetrofitClient;
 
 import java.util.List;
 
@@ -58,7 +57,7 @@ public class UnregisteredFragment extends Fragment {
         Log.d(TAG, "Loading vehicles from backend...");
 
         RetrofitClient.getInstance()
-                .getUnregisteredApiService()
+                .getUnregisteredService()
                 .getActiveVehicles()
                 .enqueue(new Callback<List<VehicleLocation>>() {
                     @Override

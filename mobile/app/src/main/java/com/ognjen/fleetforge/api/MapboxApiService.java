@@ -1,4 +1,4 @@
-package com.ognjen.fleetforge.service;
+package com.ognjen.fleetforge.api;
 
 import com.ognjen.fleetforge.model.mapbox.MapboxDirectionsResponse;
 
@@ -20,7 +20,7 @@ public interface MapboxApiService {
      *
      * Example: /directions/v5/mapbox/driving/-73.989,40.733;-74.005,40.717
      */
-    @GET("directions/v5/driving/{coordinates}")
+    @GET("directions/v5/mapbox/driving/{coordinates}")
     Call<MapboxDirectionsResponse> getDirections(
             @Path(value = "coordinates", encoded = true) String coordinates,
             @Query("geometries") String geometries,

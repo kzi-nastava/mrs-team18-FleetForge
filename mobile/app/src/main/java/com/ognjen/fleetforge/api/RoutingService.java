@@ -1,4 +1,4 @@
-package com.ognjen.fleetforge.service;
+package com.ognjen.fleetforge.api;
 
 import android.util.Log;
 
@@ -77,6 +77,8 @@ public class RoutingService {
         );
 
         Response<MapboxDirectionsResponse> response = call.execute();
+
+        Log.d(TAG, "Response" + response.body()+ response);
 
         if (!response.isSuccessful() || response.body() == null) {
             throw new IOException("Mapbox API error: " + response.code() + " " + response.message());

@@ -1,4 +1,4 @@
-package com.ognjen.fleetforge.service;
+package com.ognjen.fleetforge.api;
 
 import com.ognjen.fleetforge.dtos.driver.DriverLocationUpdateRequestDTO;
 import com.ognjen.fleetforge.dtos.driver.DriverLocationUpdateResponseDTO;
@@ -9,7 +9,7 @@ import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 
-public interface DriverApiService {
+public interface DriverService {
 
     @GET("api/rides/active-tracking")
     Call<RideTrackingDTO> getActiveRideTracking();
