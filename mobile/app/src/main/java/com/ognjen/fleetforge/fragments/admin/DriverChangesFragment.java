@@ -1,22 +1,26 @@
-package com.ognjen.fleetforge.fragments.account_changes;
+package com.ognjen.fleetforge.fragments.admin;
 
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.ognjen.fleetforge.R;
 import com.ognjen.fleetforge.adapters.DriverChangesListAdapter;
 import com.ognjen.fleetforge.adapters.VehicleChangesListAdapter;
 import com.ognjen.fleetforge.databinding.FragmentDriverChangesBinding;
+import com.ognjen.fleetforge.dtos.admin.AdminViewDriverChangesResponseDTO;
+import com.ognjen.fleetforge.dtos.admin.AdminViewVehicleChangesResponseDTO;
 import com.ognjen.fleetforge.enums.VehicleType;
+import com.ognjen.fleetforge.fragments.driver.DriverProfileViewModel;
 import com.ognjen.fleetforge.model.DriverProfileChangeRequest;
 import com.ognjen.fleetforge.model.VehicleInformationChangeRequest;
 
@@ -40,6 +44,8 @@ public class DriverChangesFragment extends Fragment {
     private ArrayList<DriverProfileChangeRequest> driverChanges=new ArrayList<>();
     private ArrayList<VehicleInformationChangeRequest> vehicleChanges=new ArrayList<>();
 
+    private DriverChangesViewModel viewModel;
+
     public DriverChangesFragment() {
         // Required empty public constructor
     }
@@ -55,10 +61,7 @@ public class DriverChangesFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+        viewModel=new ViewModelProvider(this).get(DriverChangesViewModel.class);
     }
 
     @Override
@@ -73,6 +76,7 @@ public class DriverChangesFragment extends Fragment {
         initVehicleChanges();
 
         driverAdapter = new DriverChangesListAdapter(getActivity(), driverChanges);
+        vehicleAdapter = new VehicleChangesListAdapter(getActivity(), vehicleChanges);
         listView.setAdapter(driverAdapter);
 
         switchView.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -85,34 +89,116 @@ public class DriverChangesFragment extends Fragment {
                 listView.setAdapter(driverAdapter);
             }
         });
+        driverAdapter.setOnActionListener(new DriverChangesListAdapter.OnActionListener() {
+            @Override
+            public void onAccept(DriverProfileChangeRequest request, int position) {
+                handleDriverAccept(request, position);
+            }
 
+            @Override
+            public void onReject(DriverProfileChangeRequest request, int position) {
+                handleDriverReject(request, position);
+            }
+        });
+
+        vehicleAdapter.setOnActionListener(new VehicleChangesListAdapter.OnActionListener() {
+            @Override
+            public void onAccept(VehicleInformationChangeRequest request, int position) {
+                handleVehicleAccept(request,position);
+            }
+
+            @Override
+            public void onReject(VehicleInformationChangeRequest request, int position) {
+                handleVehicleReject(request,position);
+            }
+        });
         return view;
     }
-    private void initDriverChanges(){
-        if(!driverChanges.isEmpty()) {
-            driverChanges.clear();
-        }
-        DriverProfileChangeRequest d1=new DriverProfileChangeRequest(false,"Miroslav","Antic",
-                "miroslav@gmail.com","3542354325","adresa1","android.resource://com.ognjen.fleetforge/" + R.drawable.blank_profile__1_,
-                "Nikola","Antic","miroslav@gmail.com","3542354325","adresa1","android.resource://com.ognjen.fleetforge/" + R.drawable.blank_profile__1_);
-        DriverProfileChangeRequest d2=new DriverProfileChangeRequest(false,"Milica","Petrovic",
-                "miroslav@gmail.com","3542354325","adresa1","android.resource://com.ognjen.fleetforge/" + R.drawable.blank_profile__1_,
-                "Nikolina","Petrovic","miroslav@gmail.com","3542354325","adresa1","android.resource://com.ognjen.fleetforge/" + R.drawable.blank_profile__1_);
+    private void handleDriverAccept(DriverProfileChangeRequest request, int position) {
+        viewModel.driverInfoChange(true,request.getRequestId()).observe(getViewLifecycleOwner(),response->{
+            Toast.makeText(getContext(),response.getStatus()+" "+response.getId(),Toast.LENGTH_SHORT).show();
+        });
+        driverChanges.remove(position);
+        driverAdapter.notifyDataSetChanged();
+    }
+    private void handleDriverReject(DriverProfileChangeRequest request, int position) {
 
-        driverChanges.add(d1);
-        driverChanges.add(d2);
+        viewModel.vehicleInfoChange(false,request.getRequestId()).observe(getViewLifecycleOwner(),response->{
+            Toast.makeText(getContext(),response.getStatus()+" "+response.getId(),Toast.LENGTH_SHORT).show();
+        });
+        driverChanges.remove(position);
+        driverAdapter.notifyDataSetChanged();
+    }
+    private void handleVehicleAccept(VehicleInformationChangeRequest request,int position){
+        viewModel.vehicleInfoChange(true, request.getRequestId()).observe(getViewLifecycleOwner(),response->{
+            Toast.makeText(getContext(),response.getStatus()+" "+response.getId(),Toast.LENGTH_SHORT).show();
+        });
+        vehicleChanges.remove(position);
+        vehicleAdapter.notifyDataSetChanged();
+    }
+    private void handleVehicleReject(VehicleInformationChangeRequest request, int position){
+        viewModel.vehicleInfoChange(false,request.getRequestId()).observe(getViewLifecycleOwner(),response->{
+            Toast.makeText(getContext(),response.getStatus()+" "+response.getId(),Toast.LENGTH_SHORT).show();
+        });
+        vehicleChanges.remove(position);
+        vehicleAdapter.notifyDataSetChanged();
+    }
+    private void initDriverChanges(){
+
+        viewModel.getDriversChanges().observe(getViewLifecycleOwner(),responses->{
+            if(responses!=null){
+                driverChanges.clear();
+                for(AdminViewDriverChangesResponseDTO response: responses) {
+                    DriverProfileChangeRequest changes = new DriverProfileChangeRequest();
+                    changes.setExpanded(false);
+                    changes.setRequestId(response.getRequestId());
+                    changes.setDriverId(response.getDriverId());
+                    changes.setOldFirstName(response.getFirstName());
+                    changes.setOldLastName(response.getLastName());
+                    changes.setOldEmail(response.getEmail());
+                    changes.setOldPhoneNumber(response.getPhoneNumber());
+                    changes.setOldAddress(response.getAddress());
+
+                    changes.setNewFirstName(response.getNewFirstName());
+                    changes.setNewLastName(response.getNewLastName());
+                    changes.setNewAddress(response.getNewAddress());
+                    changes.setNewPhoneNumber(response.getNewPhoneNumber());
+                    changes.setNewEmail(response.getNewEmail());
+
+                    driverChanges.add(changes);
+                }
+                driverAdapter.notifyDataSetChanged();
+            }
+        });
     }
     private void initVehicleChanges(){
-        if(!vehicleChanges.isEmpty()) {
-            vehicleChanges.clear();
-        }
-        VehicleInformationChangeRequest v1= new VehicleInformationChangeRequest(false,"Petar","Petrovic","Toyota",
-                VehicleType.VAN,"VS-233-GG",4,true,false,"Opel",
-                VehicleType.VAN,"VS-233-GG",4,true,false);
-        VehicleInformationChangeRequest v2= new VehicleInformationChangeRequest(false,"Milica","Milic","Toyota",
-                VehicleType.VAN,"VS-233-GG",4,true,false,"Opel",
-                VehicleType.VAN,"VS-233-GG",4,true,false);
-        vehicleChanges.add(v1);
-        vehicleChanges.add(v2);
+        viewModel.getVehiclesChanges().observe(getViewLifecycleOwner(),responses->{
+            if(responses!=null){
+                vehicleChanges.clear();
+                for(AdminViewVehicleChangesResponseDTO response: responses){
+                    VehicleInformationChangeRequest changes= new VehicleInformationChangeRequest();
+                    changes.setExpanded(false);
+                    changes.setFirstName(response.getFirstName());
+                    changes.setLastName(response.getLastName());
+                    changes.setRequestId(response.getRequestId());
+                    changes.setVehicleId(response.getVehicleId());
+                    changes.setOldModel(response.getModel());
+                    changes.setOldType(response.getType());
+                    changes.setOldRegistrationNumber(response.getRegistrationNumber());
+                    changes.setOldSpace(response.getSpace());
+                    changes.setOldBabySeat(response.isBabySeat());
+                    changes.setOldPetFriendly(response.isPetFriendly());
+
+                    changes.setNewModel(response.getNewModel());
+                    changes.setNewType(response.getNewType());
+                    changes.setNewRegistrationNumber(response.getNewRegistrationNumber());
+                    changes.setNewSpace(response.getNewSpace());
+                    changes.setNewBabySeat(response.isNewBabySeat());
+                    changes.setNewPetFriendly(response.isNewPetFriendly());
+                    vehicleChanges.add(changes);
+                }
+                vehicleAdapter.notifyDataSetChanged();
+            }
+        });
     }
 }

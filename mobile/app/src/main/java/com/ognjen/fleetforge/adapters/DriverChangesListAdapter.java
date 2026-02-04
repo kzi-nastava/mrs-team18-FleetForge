@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -22,10 +23,17 @@ import java.util.ArrayList;
 
 public class DriverChangesListAdapter extends ArrayAdapter<DriverProfileChangeRequest> {
     private ArrayList<DriverProfileChangeRequest> profileChanges;
-
+    private OnActionListener listener;
+    public interface OnActionListener {
+        void onAccept(DriverProfileChangeRequest request, int position);
+        void onReject(DriverProfileChangeRequest request, int position);
+    }
     public DriverChangesListAdapter(Context context, ArrayList<DriverProfileChangeRequest> profileChanges){
         super(context, R.layout.driver_change_info_card);
         this.profileChanges=profileChanges;
+    }
+    public void setOnActionListener(OnActionListener listener) {
+        this.listener = listener;
     }
 
     @Override
@@ -53,8 +61,6 @@ public class DriverChangesListAdapter extends ArrayAdapter<DriverProfileChangeRe
         }
         TextView showMoreInfo= convertView.findViewById(R.id.showMoreInfo);
         TextView driverName=convertView.findViewById(R.id.driverNameCard);
-        ShapeableImageView oldProfileImage=convertView.findViewById(R.id.oldProfileImage);
-        ShapeableImageView newProfileImage=convertView.findViewById(R.id.newProfileImage);
         TextView oldFirstName=convertView.findViewById(R.id.oldFirstName);
         TextView newFirstName=convertView.findViewById(R.id.newFirstName);
         TextView oldLastName=convertView.findViewById(R.id.oldLastName);
@@ -65,15 +71,25 @@ public class DriverChangesListAdapter extends ArrayAdapter<DriverProfileChangeRe
         TextView newAddress=convertView.findViewById(R.id.newAddress);
         TextView oldNumber=convertView.findViewById(R.id.oldNumber);
         TextView newNumber=convertView.findViewById(R.id.newNumber);
+        Button acceptBtn=convertView.findViewById(R.id.changeBtn);
+        Button rejectBtn= convertView.findViewById(R.id.cancelBtn);
+
+        acceptBtn.setOnClickListener(v -> {
+            if(listener!=null){
+                listener.onAccept(dPC,position);
+            }
+        });
+
+        rejectBtn.setOnClickListener(v -> {
+            if(listener!=null){
+                listener.onReject(dPC,position);
+            }
+        });
 
         LinearLayout moreInfoItems=convertView.findViewById(R.id.moreInfoItems);
 
         if(dPC!=null){
             driverName.setText(dPC.getOldFirstName()+" "+dPC.getOldLastName());
-            Uri oldImageUri= Uri.parse(dPC.getOldProfilePicture());
-            Glide.with(getContext()).load(oldImageUri).into(oldProfileImage);
-            Uri newImageUri=Uri.parse(dPC.getNewProfilePicture());
-            Glide.with(getContext()).load(newImageUri).into(newProfileImage);
             oldFirstName.setText(dPC.getOldFirstName());
             newFirstName.setText(dPC.getNewFirstName());
             oldLastName.setText(dPC.getOldLastName());

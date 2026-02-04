@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -22,6 +23,14 @@ import java.util.ArrayList;
 
 public class VehicleChangesListAdapter extends ArrayAdapter<VehicleInformationChangeRequest> {
     private ArrayList<VehicleInformationChangeRequest> vehicleChanges;
+    private VehicleChangesListAdapter.OnActionListener listener;
+    public interface OnActionListener {
+        void onAccept(VehicleInformationChangeRequest request, int position);
+        void onReject(VehicleInformationChangeRequest request, int position);
+    }
+    public void setOnActionListener(VehicleChangesListAdapter.OnActionListener listener) {
+        this.listener = listener;
+    }
     public VehicleChangesListAdapter(@NonNull Context context, ArrayList<VehicleInformationChangeRequest> changes) {
         super(context, R.layout.vehicle_change_info_card);
         this.vehicleChanges=changes;
@@ -95,6 +104,21 @@ public class VehicleChangesListAdapter extends ArrayAdapter<VehicleInformationCh
                 notifyDataSetChanged();
             });
         }
+
+        Button change=convertView.findViewById(R.id.changeBtn);
+        Button cancel=convertView.findViewById(R.id.cancelBtn);
+
+        change.setOnClickListener(v -> {
+            if(listener!=null){
+                listener.onAccept(vICR,position);
+            }
+        });
+
+        cancel.setOnClickListener(v -> {
+            if(listener!=null){
+                listener.onReject(vICR,position);
+            }
+        });
         return convertView;
     }
 }

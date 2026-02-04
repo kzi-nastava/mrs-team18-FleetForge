@@ -9,6 +9,25 @@ import com.ognjen.fleetforge.enums.VehicleType;
 
 public class VehicleInformationChangeRequest implements Parcelable {
 
+    private Long vehicleId;
+    private Long requestId;
+
+    public Long getVehicleId() {
+        return vehicleId;
+    }
+
+    public void setVehicleId(Long vehicleId) {
+        this.vehicleId = vehicleId;
+    }
+
+    public Long getRequestId() {
+        return requestId;
+    }
+
+    public void setRequestId(Long requestId) {
+        this.requestId = requestId;
+    }
+
     private String firstName;
     private boolean isExpanded;
     public boolean isExpanded() {
@@ -133,23 +152,6 @@ public class VehicleInformationChangeRequest implements Parcelable {
 
     private String lastName;
 
-    public VehicleInformationChangeRequest(boolean isExpanded,String firstName, String lastName, String oldModel, VehicleType oldType, String oldRegistrationNumber, int oldSpace, boolean oldBabySeat, boolean oldPetFriendly, String newModel, VehicleType newType, String newRegistrationNumber, int newSpace, boolean newBabySeat, boolean newPetFriendly) {
-        this.isExpanded=isExpanded;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.oldModel = oldModel;
-        this.oldType = oldType;
-        this.oldRegistrationNumber = oldRegistrationNumber;
-        this.oldSpace = oldSpace;
-        this.oldBabySeat = oldBabySeat;
-        this.oldPetFriendly = oldPetFriendly;
-        this.newModel = newModel;
-        this.newType = newType;
-        this.newRegistrationNumber = newRegistrationNumber;
-        this.newSpace = newSpace;
-        this.newBabySeat = newBabySeat;
-        this.newPetFriendly = newPetFriendly;
-    }
 
     private String oldModel;
     private VehicleType oldType;
@@ -171,6 +173,9 @@ public class VehicleInformationChangeRequest implements Parcelable {
 
     @Override
     public void writeToParcel(@NonNull Parcel dest, int flags) {
+        dest.writeBoolean(isExpanded);
+        dest.writeLong(requestId);
+        dest.writeLong(vehicleId);
         dest.writeString(oldModel);
         dest.writeString(oldType.toString());
         dest.writeString(oldRegistrationNumber);
