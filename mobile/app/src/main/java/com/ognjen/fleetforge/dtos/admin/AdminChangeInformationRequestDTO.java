@@ -1,12 +1,11 @@
-package com.ognjen.fleetforge.dtos;
+package com.ognjen.fleetforge.dtos.admin;
 
-public class PassengerGetResponseDTO {
+public class AdminChangeInformationRequestDTO {
     private  String firstName;
     private String lastName;
     private String email;
     private String phoneNumber;
     private String address;
-    private String profilePicture;
 
     public String getFirstName() {
         return firstName;
@@ -46,13 +45,5 @@ public class PassengerGetResponseDTO {
 
     public void setAddress(String address) {
         this.address = address;
-    }
-
-    public String getProfilePicture() {
-        return profilePicture;
-    }
-
-    public void setProfilePicture(String profilePicture) {
-        this.profilePicture = profilePicture;
     }
 }
