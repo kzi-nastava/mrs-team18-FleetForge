@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.android.application)
 }
 
+
 fun getIpAddress(): String {
     val properties = Properties()
     val localPropertiesFile = rootProject.file("local.properties")
@@ -44,12 +45,17 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
     buildFeatures {
-        viewBinding=true
-        buildConfig=true
+        viewBinding = true
+        buildConfig = true
     }
 }
 
 dependencies {
+    implementation("com.google.code.gson:gson:2.12.1")
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
@@ -64,6 +70,8 @@ dependencies {
     // Navigation Component (for bottom nav)
     implementation("androidx.navigation:navigation-fragment:2.7.5")
     implementation("androidx.navigation:navigation-ui:2.7.5")
+
+    implementation("org.osmdroid:osmdroid-android:6.1.18")
 
     // Testing
     testImplementation(libs.junit)
