@@ -1,18 +1,19 @@
 import java.util.Properties
+import java.io.FileInputStream
 
 plugins {
     alias(libs.plugins.android.application)
 }
 
-val localProperties = Properties()
-localProperties.load(project.rootProject.file("local.properties").inputStream())
 
 fun getIpAddress(): String {
     val properties = Properties()
-    properties.load(project.rootProject.file("local.properties").inputStream())
-    return properties.getProperty("ip_addr") ?: ""
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        properties.load(FileInputStream(localPropertiesFile))
+    }
+    return properties.getProperty("ip_addr", "192.168.0.159")
 }
-
 
 android {
     namespace = "com.ognjen.fleetforge"
@@ -24,10 +25,10 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
-
+        buildConfigField("String","IP_ADDR","\""+getIpAddress()+"\"")
+        manifestPlaceholders["ip_addr"] = getIpAddress()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
-        buildConfigField ("String", "IP_ADDR", "\"" + getIpAddress() + "\"")
+        multiDexEnabled=true
     }
 
     buildTypes {
@@ -76,7 +77,11 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+    implementation ("com.github.bumptech.glide:glide:4.16.0"    )
+    annotationProcessor ("com.github.bumptech.glide:compiler:4.16.0")
 
-    implementation("com.github.bumptech.glide:glide:4.16.0")
-    annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
+    implementation("com.google.code.gson:gson:2.8.7")
+    implementation("com.squareup.retrofit2:retrofit:2.3.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.3.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:3.12.1")
 }

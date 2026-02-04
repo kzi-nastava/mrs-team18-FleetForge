@@ -7,13 +7,14 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import com.ognjen.fleetforge.activities.auth.LoginActivity;
 import com.ognjen.fleetforge.fragments.account_changes.DriverChangesFragment;
 import com.ognjen.fleetforge.fragments.driver.DriverHistoryFragment;
 import com.ognjen.fleetforge.fragments.PlaceholderFragment;
 import com.ognjen.fleetforge.R;
 import com.ognjen.fleetforge.fragments.unregistered.UnregisteredFragment;
 import com.ognjen.fleetforge.model.UserRole;
-import com.ognjen.fleetforge.utils.AuthManager;
+import com.ognjen.fleetforge.auth.AuthManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.ognjen.fleetforge.fragments.driver.DriverProfile;
 import com.ognjen.fleetforge.fragments.passenger.PassengerProfile;
@@ -146,6 +147,11 @@ public class MainActivity extends AppCompatActivity {
                 .commit();
     }
 
+    private void redirectToLogin() {
+        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+        startActivity(intent);
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -156,8 +162,4 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void redirectToLogin() {
-        Intent intent = new Intent(MainActivity.this, MockLoginActivity.class);
-        startActivity(intent);
-    }
 }

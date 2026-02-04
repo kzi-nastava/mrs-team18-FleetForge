@@ -13,7 +13,7 @@ import com.ognjen.fleetforge.R;
 import com.ognjen.fleetforge.fragments.driver.DriverProfile;
 import com.ognjen.fleetforge.fragments.passenger.PassengerProfile;
 import com.ognjen.fleetforge.model.UserRole;
-import com.ognjen.fleetforge.utils.AuthManager;
+import com.ognjen.fleetforge.auth.AuthManager;
 
 /**
  * A simple {@link Fragment} subclass.

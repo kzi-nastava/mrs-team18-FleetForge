@@ -16,7 +16,7 @@ import android.widget.Button;
 
 import com.ognjen.fleetforge.fragments.common.PasswordChangeProfile;
 import com.ognjen.fleetforge.R;
-import com.ognjen.fleetforge.utils.AuthManager;
+import com.ognjen.fleetforge.auth.AuthManager;
 import com.ognjen.fleetforge.activities.MainActivity;
 /**
  * A simple {@link Fragment} subclass.
