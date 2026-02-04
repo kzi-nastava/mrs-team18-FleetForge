@@ -6,21 +6,6 @@ import android.os.Parcelable;
 import androidx.annotation.NonNull;
 
 public class DriverProfileChangeRequest implements Parcelable{
-    protected DriverProfileChangeRequest(Parcel in){
-        isExtended=in.readBoolean();
-        newFirstName=in.readString();
-        oldFirstName=in.readString();
-        newLastName=in.readString();
-        oldLastName=in.readString();
-        oldEmail=in.readString();
-        newEmail=in.readString();
-        newPhoneNumber=in.readString();
-        oldPhoneNumber=in.readString();
-        oldAddress=in.readString();
-        newAddress=in.readString();
-        oldProfilePicture=in.readString();
-        newProfilePicture=in.readString();
-    }
 
     private boolean isExtended;
 
@@ -31,19 +16,35 @@ public class DriverProfileChangeRequest implements Parcelable{
     public void setExpanded(boolean extended) {
         isExtended = extended;
     }
+    private Long requestId;
+    private Long driverId;
+
+    public Long getRequestId() {
+        return requestId;
+    }
+
+    public void setRequestId(Long requestId) {
+        this.requestId = requestId;
+    }
+
+    public Long getDriverId() {
+        return driverId;
+    }
+
+    public void setDriverId(Long driverId) {
+        this.driverId = driverId;
+    }
 
     private String newFirstName;
     private String newLastName;
     private String newEmail;
     private String newPhoneNumber;
     private String newAddress;
-    private String newProfilePicture;
     private String oldFirstName;
     private String oldLastName;
     private String oldEmail;
     private String oldPhoneNumber;
     private String oldAddress;
-    private String oldProfilePicture;
 
     public String getOldFirstName() {
         return oldFirstName;
@@ -85,13 +86,8 @@ public class DriverProfileChangeRequest implements Parcelable{
         this.oldAddress = oldAddress;
     }
 
-    public String getOldProfilePicture() {
-        return oldProfilePicture;
-    }
 
-    public void setOldProfilePicture(String oldProfilePicture) {
-        this.oldProfilePicture = oldProfilePicture;
-    }
+
 
     public String getNewFirstName(){
         return newFirstName;
@@ -112,27 +108,9 @@ public class DriverProfileChangeRequest implements Parcelable{
         return newAddress;
     }
 
-    public String getNewProfilePicture() {
-        return newProfilePicture;
-    }
 
-    public DriverProfileChangeRequest(boolean isExtended,String newFirstName, String newLastName, String newEmail
-    , String newPhoneNumber, String newAddress, String newProfilePicture, String oldFirstName, String oldLastName, String oldEmail,
-                                      String oldPhoneNumber, String oldAddress, String oldProfilePicture){
-        this.isExtended=isExtended;
-        this.newFirstName=newFirstName;
-        this.newLastName=newLastName;
-        this.newEmail=newEmail;
-        this.newPhoneNumber=newPhoneNumber;
-        this.newAddress=newAddress;
-        this.newProfilePicture=newProfilePicture;
-        this.oldFirstName=oldFirstName;
-        this.oldLastName=oldLastName;
-        this.oldEmail=oldEmail;
-        this.oldPhoneNumber=oldPhoneNumber;
-        this.oldAddress=oldAddress;
-        this.oldProfilePicture=oldProfilePicture;
-    }
+
+
 
     public void setNewFirstName(String newFirstName) {
         this.newFirstName = newFirstName;
@@ -154,9 +132,7 @@ public class DriverProfileChangeRequest implements Parcelable{
         this.newAddress = newAddress;
     }
 
-    public void setNewProfilePicture(String newProfilePicture) {
-        this.newProfilePicture = newProfilePicture;
-    }
+
 
 
     @Override
@@ -167,6 +143,8 @@ public class DriverProfileChangeRequest implements Parcelable{
     @Override
     public void writeToParcel(@NonNull Parcel dest, int flags) {
         dest.writeBoolean(isExtended);
+        dest.writeLong(requestId);
+        dest.writeLong(driverId);
         dest.writeString(newFirstName);
         dest.writeString(oldFirstName);
         dest.writeString(newLastName);
@@ -177,7 +155,5 @@ public class DriverProfileChangeRequest implements Parcelable{
         dest.writeString(oldPhoneNumber);
         dest.writeString(oldAddress);
         dest.writeString(newAddress);
-        dest.writeString(oldProfilePicture);
-        dest.writeString(newProfilePicture);
     }
 }

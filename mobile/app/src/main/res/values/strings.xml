@@ -40,4 +40,9 @@
     <string name="become_a_fleetforge_user">Become a FleetForge User</string>
     <string name="step_1_of_3">Step 1 of 3</string>
     <string name="phone_number">Phone Number</string>
+    <string-array name="vehicle_types">
+        <item>Van</item>
+        <item>Luxury</item>
+        <item>Standard</item>
+    </string-array>
 </resources>

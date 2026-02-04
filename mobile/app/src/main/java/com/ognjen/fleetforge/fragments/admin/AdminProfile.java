@@ -1,4 +1,4 @@
-package com.ognjen.fleetforge.fragments.passenger;
+package com.ognjen.fleetforge.fragments.admin;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -6,8 +6,6 @@ import android.os.Bundle;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -21,23 +19,23 @@ import com.bumptech.glide.Glide;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.ognjen.fleetforge.BuildConfig;
-import com.ognjen.fleetforge.fragments.common.PasswordChangeProfile;
 import com.ognjen.fleetforge.R;
-import com.ognjen.fleetforge.auth.AuthManager;
 import com.ognjen.fleetforge.activities.MainActivity;
+import com.ognjen.fleetforge.fragments.common.PasswordChangeProfile;
+import com.ognjen.fleetforge.utils.AuthManager;
 
 import java.io.IOException;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link PassengerProfile#newInstance} factory method to
+ * Use the {@link AdminProfile#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class PassengerProfile extends Fragment {
+public class AdminProfile extends Fragment {
 
     private static final String BaseUrl="http://"+ BuildConfig.IP_ADDR+":8080";
     private AuthManager authManager;
-    private PassengerProfileViewModel passengerProfileViewModel;
+    private AdminProfileViewModel adminProfileViewModel;
     private ShapeableImageView profilePic;
     private TextInputEditText firstName;
     private TextInputEditText lastName;
@@ -50,17 +48,19 @@ public class PassengerProfile extends Fragment {
                     new ActivityResultContracts.GetContent(),
                     uri -> {
                         if (uri != null) {
-                            passengerProfileViewModel.setSelectedImageUri(uri);
+                            adminProfileViewModel.setSelectedImageUri(uri);
                             profilePic.setImageURI(uri);
                         }
                     });
 
-    public PassengerProfile() {
+
+    public AdminProfile() {
         // Required empty public constructor
     }
 
-    public static PassengerProfile newInstance(String param1, String param2) {
-        PassengerProfile fragment = new PassengerProfile();
+
+    public static AdminProfile newInstance(String param1, String param2) {
+        AdminProfile fragment = new AdminProfile();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
@@ -69,17 +69,16 @@ public class PassengerProfile extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        passengerProfileViewModel=new ViewModelProvider(this).get(PassengerProfileViewModel.class);
+        adminProfileViewModel=new ViewModelProvider(this).get(AdminProfileViewModel.class);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_passenger_profile, container, false);
+        View view = inflater.inflate(R.layout.fragment_admin_profile, container, false);
         Button logout=view.findViewById(R.id.btn_logout);
         logout.setOnClickListener(v -> {authManager.logout();
 
-            // Restart MainActivity to show unregistered state
             Intent intent = new Intent(getActivity(), MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
@@ -107,64 +106,55 @@ public class PassengerProfile extends Fragment {
             imagePicker.launch("image/*");
         });
 
-        return view;
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        passengerProfileViewModel.getPassengerProfile().observe(getViewLifecycleOwner(),passenger->{
-            if(passenger!=null){
-                String imgUrl=BaseUrl+passenger.getProfilePicture();
+        adminProfileViewModel.getAdminProfile().observe(getViewLifecycleOwner(),admin->{
+            if(admin!=null){
+                String imgUrl=BaseUrl+admin.getProfilePicture();
                 Glide.with(requireContext())
                         .load(imgUrl)
                         .into(profilePic);
-                firstName.setText(passenger.getFirstName());
-                lastName.setText(passenger.getLastName());
-                email.setText(passenger.getEmail());
-                phoneNumber.setText(passenger.getPhoneNumber());
-                address.setText(passenger.getAddress());
+                firstName.setText(admin.getFirstName());
+                lastName.setText(admin.getLastName());
+                email.setText(admin.getEmail());
+                phoneNumber.setText(admin.getPhoneNumber());
+                address.setText(admin.getAddress());
             }
         });
-        passengerProfileViewModel.getSelectedImageUri()
+        adminProfileViewModel.getSelectedImageUri()
                 .observe(getViewLifecycleOwner(), uri -> {
                     if (uri != null) {
                         profilePic.setImageURI(uri);
                     }
                 });
         changeBtn.setOnClickListener(v -> {
-            Uri uri=passengerProfileViewModel.getSelectedImageUri().getValue();
+            Uri uri=adminProfileViewModel.getSelectedImageUri().getValue();
             if(uri!=null) {
                 try {
-                    passengerProfileViewModel.uploadProfilePicture(getContext(), passengerProfileViewModel.getSelectedImageUri().getValue()).observe(
-                            getViewLifecycleOwner(),response->{
+                    adminProfileViewModel.uploadProfilePicture(getContext(), adminProfileViewModel.getSelectedImageUri().getValue())
+                            .observe(getViewLifecycleOwner(),response->{
                                 if(response==true){
-                                    passengerProfileViewModel.changeCurrentPassenger(firstName.getText().toString()
-                                    ,lastName.getText().toString(), email.getText().toString(),phoneNumber.getText().toString(),
+                                    adminProfileViewModel.changeCurrentAdmin(firstName.getText().toString()
+                                            ,lastName.getText().toString(), email.getText().toString(),phoneNumber.getText().toString(),
                                             address.getText().toString()).observe(getViewLifecycleOwner(),response2->{
-                                        if(response2!=null) {
-                                            firstName.setText(response2.getFirstName());
-                                            lastName.setText(response2.getLastName());
-                                            address.setText(response2.getAddress());
-                                            phoneNumber.setText(response2.getPhoneNumber());
-                                            email.setText(response2.getEmail());
-                                            String imgUrl = BaseUrl + response2.getProfilePicture();
-                                            Glide.with(requireContext())
-                                                    .load(imgUrl)
-                                                    .into(profilePic);
-                                            Toast.makeText(getContext(),"Information changed!", Toast.LENGTH_SHORT).show();
-                                        }
-
+                                                if(response2!=null) {
+                                                    firstName.setText(response2.getFirstName());
+                                                    lastName.setText(response2.getLastName());
+                                                    address.setText(response2.getAddress());
+                                                    phoneNumber.setText(response2.getPhoneNumber());
+                                                    email.setText(response2.getEmail());
+                                                    String imgUrl = BaseUrl + response2.getProfilePicture();
+                                                    Glide.with(requireContext())
+                                                            .load(imgUrl)
+                                                            .into(profilePic);
+                                                    Toast.makeText(getContext(),"Information changed!", Toast.LENGTH_SHORT).show();
+                                                }
                                     });
                                 }
-                            }
-                    );
+                            });
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             }
         });
-
+        return view;
     }
 }
