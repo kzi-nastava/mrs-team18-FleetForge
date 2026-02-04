@@ -11,8 +11,9 @@ fun getIpAddress(): String {
     if (localPropertiesFile.exists()) {
         properties.load(FileInputStream(localPropertiesFile))
     }
-    return properties.getProperty("ip_addr", "http://10.0.2.2:8080/")
+    return properties.getProperty("ip_addr", "192.168.0.159")
 }
+
 android {
     namespace = "com.ognjen.fleetforge"
     compileSdk = 36
@@ -24,6 +25,7 @@ android {
         versionCode = 1
         versionName = "1.0"
         buildConfigField("String","IP_ADDR","\""+getIpAddress()+"\"")
+        manifestPlaceholders["ip_addr"] = getIpAddress()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled=true
     }

@@ -17,9 +17,19 @@
         <activity
             android:name=".activities.auth.RegistrationActivity"
             android:exported="false" />
-        <activity
-            android:name=".activities.auth.ResetPasswordActivity"
-            android:exported="false" />
+        <activity android:name=".activities.auth.ResetPasswordActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="http" />
+                <data android:host="${ip_addr}" />
+                <data android:port="4200" />
+                <data android:pathPrefix="/reset-password" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".activities.auth.ForgotPasswordActivity"
             android:exported="false" />
