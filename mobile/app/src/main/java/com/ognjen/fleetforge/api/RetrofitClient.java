@@ -21,24 +21,7 @@ public class RetrofitClient {
     private RetrofitClient() {
         HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
         loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-        Interceptor authInterceptor = new Interceptor() {
-            @NonNull
-            @Override
-            public okhttp3.Response intercept(@NonNull Chain chain) throws IOException {
-                Request originalRequest = chain.request();
-
-                String token = "eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJGbGVldEZvcmdlQXBwIiwic3ViIjoicGFzc2VuZ2VyMUB0ZXN0LmNvbSIsImlhdCI6MTc3MDE0NzgyOSwiZXhwIjoxNzcwMTQ5NjI5LCJyb2xlcyI6IlJPTEVfUEFTU0VOR0VSIn0.i8lTbih-v7UobUbWFcJy5i7fHNnsrqxkakwSUFIQWMk1bJg9sFojF1Kr1qRwOK0jylV-od8nEhdCf1zXapaI_g";
-
-
-                Request newRequest = originalRequest.newBuilder()
-                        .header("Authorization", "Bearer " + token)
-                        .build();
-
-                return chain.proceed(newRequest);
-            }
-        };
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .addInterceptor(authInterceptor)
                 .addInterceptor(loggingInterceptor)
                 .connectTimeout(30, TimeUnit.SECONDS)
                 .readTimeout(30, TimeUnit.SECONDS)
@@ -60,5 +43,11 @@ public class RetrofitClient {
 
     public PassengerService getPassengerService(){
         return retrofit.create(PassengerService.class);
+    }
+    public DriverService getDriverService(){
+        return retrofit.create(DriverService.class);
+    }
+    public AdminService getAdminService(){
+        return retrofit.create(AdminService.class);
     }
 }
