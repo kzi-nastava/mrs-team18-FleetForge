@@ -8,9 +8,11 @@ import com.ognjen.fleetforge.dtos.ResetPasswordRequestDTO;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.GET;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
+import retrofit2.http.Query;
 
 public interface AuthService {
 
@@ -33,4 +35,7 @@ public interface AuthService {
             @Part("phoneNumber") RequestBody phone,
             @Part("address") RequestBody address
     );
+
+    @GET("api/auth/activations")
+    Call<Void> activateAccount(@Query("token") String token);
 }
