@@ -14,8 +14,10 @@ public class AuthManager {
 
     private static AuthManager instance;
     private final SharedPreferences sharedPreferences;
+    private final Context context;
 
     private AuthManager(Context context) {
+        this.context = context.getApplicationContext();
         sharedPreferences = context.getApplicationContext()
                 .getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
     }
@@ -32,6 +34,10 @@ public class AuthManager {
             throw new RuntimeException("AuthManager must be initialized in Application class first!");
         }
         return instance;
+    }
+
+    public Context getContext() {
+        return context;
     }
 
     public void login(UserRole role, String name, String email) {
