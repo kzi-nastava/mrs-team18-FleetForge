@@ -19,6 +19,8 @@ import androidx.fragment.app.Fragment;
 
 import com.ognjen.fleetforge.BuildConfig;
 import com.ognjen.fleetforge.R;
+import com.ognjen.fleetforge.dtos.driver.DriverLocationUpdateRequestDTO;
+import com.ognjen.fleetforge.dtos.driver.DriverLocationUpdateResponseDTO;
 import com.ognjen.fleetforge.dtos.ride.RideTrackingDTO;
 import com.ognjen.fleetforge.dtos.ride.WaypointDTO;
 import com.ognjen.fleetforge.model.CalculatedRoute;
@@ -27,6 +29,7 @@ import com.ognjen.fleetforge.api.DriverService;
 import com.ognjen.fleetforge.api.RoutingService;
 import com.ognjen.fleetforge.api.RetrofitClient;
 import com.ognjen.fleetforge.utils.MapManager;
+import com.ognjen.fleetforge.utils.RouteSimulator;
 
 import org.osmdroid.config.Configuration;
 import org.osmdroid.views.MapView;
@@ -39,7 +42,6 @@ import java.util.Locale;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
 
 public class CurrentRideDriver extends Fragment {
 
@@ -68,8 +70,14 @@ public class CurrentRideDriver extends Fragment {
 
     private RideTrackingDTO currentRide;
     private CalculatedRoute calculatedRoute;
-
     private View infoCard;
+
+    private RouteSimulator routeSimulator;
+    private Handler simulationHandler;
+    private Runnable simulationRunnable;
+    private static final int SIMULATION_INTERVAL_MS = 2000; // 2 seconds
+    private static final int SIMULATION_STEP_SIZE = 5; // Skip 5 coordinates per update
+    private static final double WAYPOINT_THRESHOLD = 0.0005; // ~50 meters
 
     @Nullable
     @Override
@@ -88,7 +96,6 @@ public class CurrentRideDriver extends Fragment {
 
         fetchActiveRide();
     }
-
 
     private void initializeViews(View view) {
         Log.d(TAG, "Step 1: Initializing views");
@@ -124,16 +131,15 @@ public class CurrentRideDriver extends Fragment {
         mapManager.centerOnDefault();
     }
 
-
     private void initializeServices() {
         Log.d(TAG, "Step 1: Initializing services");
         driverApiService = RetrofitClient.getInstance().getDriverService();
         routingService = new RoutingService(MAPBOX_API_KEY);
+        simulationHandler = new Handler(Looper.getMainLooper());
     }
 
     private void fetchActiveRide() {
         Log.d(TAG, "Step 2: Fetching active ride");
-
 
         Call<RideTrackingDTO> call = driverApiService.getActiveRideTracking();
         call.enqueue(new Callback<RideTrackingDTO>() {
@@ -145,7 +151,6 @@ public class CurrentRideDriver extends Fragment {
                     Log.d(TAG, "Active ride found: " + currentRide.getRideId());
 
                     displayRideData();
-
                     calculateAndDisplayRoute();
 
                 } else if (response.code() == 404) {
@@ -163,13 +168,10 @@ public class CurrentRideDriver extends Fragment {
     }
 
     private void displayRideData() {
-
         if (currentRide == null) return;
 
         displayPassengerInfo();
-
         displayRouteInfo();
-
         configureButtons();
     }
 
@@ -238,16 +240,18 @@ public class CurrentRideDriver extends Fragment {
                 new Handler(Looper.getMainLooper()).post(() -> {
                     displayRouteOnMap();
                     updateDistanceAndTime();
+
+                    initializeAndStartSimulation();
                 });
 
             } catch (IOException e) {
-
                 new Handler(Looper.getMainLooper()).post(() -> {
                     showError("Failed to calculate route: " + e.getMessage());
                 });
             }
         }).start();
     }
+
     private List<GeoPoint> buildWaypointList() {
         List<GeoPoint> waypoints = new ArrayList<>();
 
@@ -261,7 +265,6 @@ public class CurrentRideDriver extends Fragment {
         if ("ACCEPTED".equals(status)) {
             waypoints.add(currentLocation);
             waypoints.add(currentRide.getRoute().getStartLocation());
-
 
         } else if ("IN_PROGRESS".equals(status)) {
             waypoints.add(currentLocation);
@@ -342,6 +345,7 @@ public class CurrentRideDriver extends Fragment {
                 }
             }
         }
+
         GeoPoint current = currentRide.getCurrentLocation();
         mapManager.addMarker(
                 current.getLatitude(),
@@ -357,13 +361,185 @@ public class CurrentRideDriver extends Fragment {
         Log.d(TAG, "Step 6: Updating distance and time");
 
         if (calculatedRoute == null) return;
+
         String distance = String.format(Locale.getDefault(), "%.1f km",
                 calculatedRoute.getDistanceKm());
         distanceText.setText(distance);
+
         String time = calculatedRoute.getEstimatedMinutes() + " min";
         timeText.setText(time);
 
         Log.d(TAG, "UI updated: " + distance + ", " + time);
+    }
+
+    private void initializeAndStartSimulation() {
+        if (calculatedRoute == null || calculatedRoute.getCoordinates().isEmpty()) {
+            Log.e(TAG, "Cannot start simulation: no route coordinates");
+            return;
+        }
+        routeSimulator = new RouteSimulator(
+                calculatedRoute.getCoordinates(),
+                SIMULATION_STEP_SIZE
+        );
+        startSimulation();
+    }
+
+    private void startSimulation() {
+        Log.d(TAG, "Step 8: Starting live simulation");
+
+        simulationRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (routeSimulator == null || routeSimulator.isComplete()) {
+                    Log.d(TAG, "Simulation complete - arrived at destination");
+                    onSimulationComplete();
+                    return;
+                }
+
+                GeoPoint nextPoint = routeSimulator.getNextCoordinate();
+
+                if (nextPoint != null) {
+                    currentRide.setCurrentLocation(nextPoint);
+                    updateDriverMarkerOnMap(nextPoint);
+                    sendLocationUpdateToBackend(nextPoint);
+                    checkWaypointCompletion(nextPoint);
+                    updateRemainingDistanceAndTime();
+
+                    simulationHandler.postDelayed(this, SIMULATION_INTERVAL_MS);
+                }
+            }
+        };
+
+        simulationHandler.post(simulationRunnable);
+    }
+
+    private void updateDriverMarkerOnMap(GeoPoint newLocation) {
+        mapManager.clearAll();
+
+        List<org.osmdroid.util.GeoPoint> osmPoints = new ArrayList<>();
+        for (GeoPoint point : calculatedRoute.getCoordinates()) {
+            osmPoints.add(new org.osmdroid.util.GeoPoint(
+                    point.getLatitude(),
+                    point.getLongitude()
+            ));
+        }
+        mapManager.drawRoute(osmPoints, 0xFFFF9900);
+
+        String status = currentRide.getStatus();
+
+        if ("ACCEPTED".equals(status)) {
+            GeoPoint start = currentRide.getRoute().getStartLocation();
+            mapManager.addMarker(
+                    start.getLatitude(),
+                    start.getLongitude(),
+                    "Pickup Location",
+                    R.drawable.ic_map_point
+            );
+        } else if ("IN_PROGRESS".equals(status)) {
+            GeoPoint end = currentRide.getRoute().getEndLocation();
+            mapManager.addMarker(
+                    end.getLatitude(),
+                    end.getLongitude(),
+                    "Destination",
+                    R.drawable.ic_map_point
+            );
+
+            if (currentRide.getRoute().getWaypoints() != null) {
+                for (WaypointDTO wp : currentRide.getRoute().getWaypoints()) {
+                    if (!wp.getIsCompleted()) {
+                        mapManager.addMarker(
+                                wp.getLocation().getLatitude(),
+                                wp.getLocation().getLongitude(),
+                                "Stop " + wp.getOrder(),
+                                R.drawable.ic_map_point
+                        );
+                    }
+                }
+            }
+        }
+
+        mapManager.addMarker(
+                newLocation.getLatitude(),
+                newLocation.getLongitude(),
+                "Your Location",
+                R.drawable.ic_current_taxi
+        );
+    }
+
+    private void updateRemainingDistanceAndTime() {
+        String status = currentRide.getStatus();
+        List<GeoPoint> remainingRoute = new ArrayList<>();
+        remainingRoute.add(routeSimulator.getCurrentCoordinate());
+
+        if ("ACCEPTED".equals(status)) {
+            remainingRoute.add(currentRide.getRoute().getStartLocation());
+
+        } else if ("IN_PROGRESS".equals(status)) {
+            if (currentRide.getRoute().getWaypoints() != null) {
+                for (WaypointDTO wp : currentRide.getRoute().getWaypoints()) {
+                    if (!wp.getIsCompleted()) {
+                        remainingRoute.add(wp.getLocation());
+                    }
+                }
+            }
+            remainingRoute.add(currentRide.getRoute().getEndLocation());
+        }
+
+        new Thread(() -> {
+            try {
+                CalculatedRoute remaining = routingService.calculateRoute(remainingRoute);
+
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    distanceText.setText(String.format(Locale.getDefault(), "%.1f km", remaining.getDistanceKm()));
+                    timeText.setText(remaining.getEstimatedMinutes() + " min");
+                });
+            } catch (IOException e) {
+                Log.e(TAG, "Failed to recalculate route", e);
+            }
+        }).start();
+    }
+
+    private void sendLocationUpdateToBackend(GeoPoint location) {
+        DriverLocationUpdateRequestDTO request = new DriverLocationUpdateRequestDTO(location);
+
+        Call<DriverLocationUpdateResponseDTO> call = driverApiService.updateDriverLocation(request);
+        call.enqueue(new Callback<DriverLocationUpdateResponseDTO>() {
+            @Override
+            public void onResponse(Call<DriverLocationUpdateResponseDTO> call,
+                                   Response<DriverLocationUpdateResponseDTO> response) {
+                if (response.isSuccessful()) {
+                    Log.d(TAG, "Location updated: " + location.getLatitude() + ", " + location.getLongitude());
+                } else {
+                    Log.w(TAG, "Failed to update location: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<DriverLocationUpdateResponseDTO> call, Throwable t) {
+                Log.e(TAG, "Error updating location", t);
+            }
+        });
+    }
+
+    private void checkWaypointCompletion(GeoPoint currentLocation) {
+        if (currentRide.getRoute().getWaypoints() == null) return;
+
+        for (WaypointDTO wp : currentRide.getRoute().getWaypoints()) {
+            if (!wp.getIsCompleted() && routeSimulator.isNearPoint(wp.getLocation(), WAYPOINT_THRESHOLD)) {
+                wp.setIsCompleted(true);
+                Log.d(TAG, "Waypoint " + wp.getOrder() + " completed");
+            }
+        }
+    }
+    private void onSimulationComplete() {
+        Toast.makeText(requireContext(), "Arrived at destination!", Toast.LENGTH_SHORT).show();
+    }
+
+    private void stopSimulation() {
+        if (simulationHandler != null && simulationRunnable != null) {
+            simulationHandler.removeCallbacks(simulationRunnable);
+            Log.d(TAG, "Simulation stopped");
+        }
     }
 
     private void showNoRideMessage() {
@@ -377,15 +553,12 @@ public class CurrentRideDriver extends Fragment {
 
 
     private void onPrimaryActionClick() {
-        // TODO: Implement in next phase (Start Ride / Finish Ride)
         Toast.makeText(requireContext(), "Primary action clicked", Toast.LENGTH_SHORT).show();
     }
 
     private void onSecondaryActionClick() {
-        // TODO: Implement in next phase (Cancel / SOS)
         Toast.makeText(requireContext(), "Secondary action clicked", Toast.LENGTH_SHORT).show();
     }
-
 
     @Override
     public void onResume() {
@@ -401,11 +574,13 @@ public class CurrentRideDriver extends Fragment {
         if (mapView != null) {
             mapView.onPause();
         }
+        stopSimulation();
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        stopSimulation();
         if (mapManager != null) {
             mapManager.clearAll();
         }
