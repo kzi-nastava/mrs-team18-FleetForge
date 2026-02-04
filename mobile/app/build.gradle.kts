@@ -26,6 +26,8 @@ android {
         versionCode = 1
         versionName = "1.0"
         buildConfigField("String","IP_ADDR","\""+getIpAddress()+"\"")
+        buildConfigField("String", "MAPBOX_API_KEY", "\"${project.findProperty("MAPBOX_API_KEY") ?: ""}\"")
+
         manifestPlaceholders["ip_addr"] = getIpAddress()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled=true

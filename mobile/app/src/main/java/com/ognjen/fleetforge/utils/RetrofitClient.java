@@ -1,5 +1,6 @@
 package com.ognjen.fleetforge.utils;
 
+import com.ognjen.fleetforge.service.DriverApiService;
 import com.ognjen.fleetforge.service.UnregisteredApiService;
 
 import java.util.concurrent.TimeUnit;
@@ -50,7 +51,7 @@ public class RetrofitClient {
 //        return retrofit.create(AdminApiService.class);
 //    }
 //
-//    public DriverApiService getDriverApiService() {
-//        return retrofit.create(DriverApiService.class);
-//    }
+    public DriverApiService getDriverApiService() {
+        return retrofit.create(DriverApiService.class);
+    }
 }
