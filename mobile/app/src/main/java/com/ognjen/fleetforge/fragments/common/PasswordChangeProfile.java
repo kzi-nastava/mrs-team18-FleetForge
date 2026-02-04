@@ -18,7 +18,7 @@ import com.ognjen.fleetforge.fragments.admin.DriverChangesViewModel;
 import com.ognjen.fleetforge.fragments.driver.DriverProfile;
 import com.ognjen.fleetforge.fragments.passenger.PassengerProfile;
 import com.ognjen.fleetforge.model.UserRole;
-import com.ognjen.fleetforge.utils.AuthManager;
+import com.ognjen.fleetforge.auth.AuthManager;
 
 import java.util.Objects;
 

@@ -30,7 +30,7 @@ import com.ognjen.fleetforge.BuildConfig;
 import com.ognjen.fleetforge.enums.VehicleType;
 import com.ognjen.fleetforge.fragments.common.PasswordChangeProfile;
 import com.ognjen.fleetforge.R;
-import com.ognjen.fleetforge.utils.AuthManager;
+import com.ognjen.fleetforge.auth.AuthManager;
 import com.ognjen.fleetforge.activities.MainActivity;
 
 import java.io.IOException;

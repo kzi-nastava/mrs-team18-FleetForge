@@ -117,7 +117,7 @@ public class DataLoader implements CommandLineRunner {
         passenger3.setBlocked(false);
 
         Passenger passenger4 = new Passenger();
-        passenger4.setEmail("passenger4@test.com");
+        passenger4.setEmail("ognjenvujovic04@gmail.com");
         passenger4.setPassword(passwordEncoder.encode("123"));
         passenger4.setFirstName("Petar");
         passenger4.setLastName("Petrović");
