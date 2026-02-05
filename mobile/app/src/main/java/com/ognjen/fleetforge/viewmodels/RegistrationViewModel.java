@@ -37,7 +37,7 @@ public class RegistrationViewModel extends AndroidViewModel {
 
     public RegistrationViewModel(@NonNull Application application) {
         super(application);
-        this.authService = RetrofitClient.getInstance().getLoginService();
+        this.authService = RetrofitClient.getInstance().getAuthService();
     }
 
     public LiveData<String> getSuccessMessage() { return successMessage; }
