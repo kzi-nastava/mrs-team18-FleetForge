@@ -66,7 +66,8 @@ public class RetrofitClient {
         return retrofit.create(UnregisteredService.class);
     }
 
-    public AuthService getLoginService() {
+
+    public AuthService getAuthService() {
         return retrofitWithoutAuth.create(AuthService.class);
     }
 }
