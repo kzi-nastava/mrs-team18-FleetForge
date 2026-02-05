@@ -22,6 +22,7 @@ import com.team18.FleetForge.service.vehicles.VehicleInfoChangeReqService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -54,6 +55,7 @@ public class DriverControler {
     private final DriverHistoryService driverHistoryService;
     private final DriverService driverService;
 
+    private String ipAddress="172.16.175.60";
 
     @GetMapping("/upcoming-rides")
     @PreAuthorize("hasRole('DRIVER')")
@@ -97,7 +99,7 @@ public class DriverControler {
     public ResponseEntity<DriverCreateResponseDTO> createDriver(@Valid @RequestBody DriverCreateRequestDTO request) throws IOException {
         Driver driver=userService.createDriver(request);
        ValidationToken token=activationTokenService.createTokenPasswordSetDriver(driver);
-        emailService.sendEmail("v.vitomirovic@gmail.com","Password set","http://localhost:4200/set-password?token="+token.getToken());
+        emailService.sendEmail("v.vitomirovic@gmail.com","Password set","http://"+ipAddress+":4200/set-password?token="+token.getToken());
         activationTokenService.saveActivationToken(token);
         DriverCreateResponseDTO driverCreateResponseDTO = new DriverCreateResponseDTO(driver);
         return new ResponseEntity<>(driverCreateResponseDTO, HttpStatus.CREATED);
