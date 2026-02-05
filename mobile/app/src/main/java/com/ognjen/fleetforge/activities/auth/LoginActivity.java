@@ -49,6 +49,50 @@ public class LoginActivity extends AppCompatActivity {
 
         initViews();
         setupListeners();
+        handleIntent(getIntent());
+    }
+
+    private void handleIntent(Intent intent) {
+        if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+            android.net.Uri data = intent.getData();
+            if (data != null) {
+                String token = data.getQueryParameter("token");
+                if (token != null) {
+                    performActivation(token);
+                }
+            }
+        }
+    }
+
+    private void performActivation(String token) {
+        // Show a loading dialog if you want
+        Log.d(TAG, "Activating account with token: " + token);
+
+        // Call your Retrofit service (ensure you add activateAccount to your API interface)
+        RetrofitClient.getInstance().getLoginService().activateAccount(token)
+                .enqueue(new Callback<Void>() { // Use Void if response body is empty
+                    @Override
+                    public void onResponse(Call<Void> call, Response<Void> response) {
+                        if (response.isSuccessful()) {
+                            showSuccessDialog("Account Activated", "Your account is now active. You can log in.");
+                        } else {
+                            Toast.makeText(LoginActivity.this, "Activation failed: Token invalid or expired", Toast.LENGTH_LONG).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<Void> call, Throwable t) {
+                        Toast.makeText(LoginActivity.this, "Network error during activation", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void showSuccessDialog(String title, String message) {
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("OK", null)
+                .show();
     }
 
     private void initViews() {
@@ -108,7 +152,7 @@ public class LoginActivity extends AppCompatActivity {
         LoginRequestDTO loginRequest = new LoginRequestDTO(email, password);
 
         Log.d(TAG, "LoginActivity: Making API call to login endpoint");
-        RetrofitClient.getInstance().getLoginService().login(loginRequest)
+        RetrofitClient.getInstance().getAuthService().login(loginRequest)
                 .enqueue(new Callback<LoginResponseDTO>() {
                     @Override
                     public void onResponse(Call<LoginResponseDTO> call, Response<LoginResponseDTO> response) {

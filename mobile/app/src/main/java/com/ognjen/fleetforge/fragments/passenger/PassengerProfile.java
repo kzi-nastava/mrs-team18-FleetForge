@@ -1,8 +1,11 @@
 package com.ognjen.fleetforge.fragments.passenger;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -12,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.imageview.ShapeableImageView;
@@ -21,6 +25,8 @@ import com.ognjen.fleetforge.fragments.common.PasswordChangeProfile;
 import com.ognjen.fleetforge.R;
 import com.ognjen.fleetforge.auth.AuthManager;
 import com.ognjen.fleetforge.activities.MainActivity;
+
+import java.io.IOException;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -38,6 +44,16 @@ public class PassengerProfile extends Fragment {
     private TextInputEditText email;
     private TextInputEditText phoneNumber;
     private TextInputEditText address;
+    private Button changeBtn;
+    private ActivityResultLauncher<String> imagePicker =
+            registerForActivityResult(
+                    new ActivityResultContracts.GetContent(),
+                    uri -> {
+                        if (uri != null) {
+                            passengerProfileViewModel.setSelectedImageUri(uri);
+                            profilePic.setImageURI(uri);
+                        }
+                    });
 
     public PassengerProfile() {
         // Required empty public constructor
@@ -53,7 +69,7 @@ public class PassengerProfile extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        passengerProfileViewModel=new ViewModelProvider(this).get(PassengerProfileViewModel.class);
     }
 
     @Override
@@ -85,13 +101,19 @@ public class PassengerProfile extends Fragment {
         email=view.findViewById(R.id.email);
         phoneNumber=view.findViewById(R.id.phoneNumber);
         address=view.findViewById(R.id.address);
+        changeBtn=view.findViewById(R.id.changeBtn);
+
+        profilePic.setOnClickListener(v->{
+            imagePicker.launch("image/*");
+        });
+
         return view;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        passengerProfileViewModel=new ViewModelProvider(this).get(PassengerProfileViewModel.class);
+
         passengerProfileViewModel.getPassengerProfile().observe(getViewLifecycleOwner(),passenger->{
             if(passenger!=null){
                 String imgUrl=BaseUrl+passenger.getProfilePicture();
@@ -103,6 +125,44 @@ public class PassengerProfile extends Fragment {
                 email.setText(passenger.getEmail());
                 phoneNumber.setText(passenger.getPhoneNumber());
                 address.setText(passenger.getAddress());
+            }
+        });
+        passengerProfileViewModel.getSelectedImageUri()
+                .observe(getViewLifecycleOwner(), uri -> {
+                    if (uri != null) {
+                        profilePic.setImageURI(uri);
+                    }
+                });
+        changeBtn.setOnClickListener(v -> {
+            Uri uri=passengerProfileViewModel.getSelectedImageUri().getValue();
+            if(uri!=null) {
+                try {
+                    passengerProfileViewModel.uploadProfilePicture(getContext(), passengerProfileViewModel.getSelectedImageUri().getValue()).observe(
+                            getViewLifecycleOwner(),response->{
+                                if(response==true){
+                                    passengerProfileViewModel.changeCurrentPassenger(firstName.getText().toString()
+                                    ,lastName.getText().toString(), email.getText().toString(),phoneNumber.getText().toString(),
+                                            address.getText().toString()).observe(getViewLifecycleOwner(),response2->{
+                                        if(response2!=null) {
+                                            firstName.setText(response2.getFirstName());
+                                            lastName.setText(response2.getLastName());
+                                            address.setText(response2.getAddress());
+                                            phoneNumber.setText(response2.getPhoneNumber());
+                                            email.setText(response2.getEmail());
+                                            String imgUrl = BaseUrl + response2.getProfilePicture();
+                                            Glide.with(requireContext())
+                                                    .load(imgUrl)
+                                                    .into(profilePic);
+                                            Toast.makeText(getContext(),"Information changed!", Toast.LENGTH_SHORT).show();
+                                        }
+
+                                    });
+                                }
+                            }
+                    );
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 

@@ -7,8 +7,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import com.ognjen.fleetforge.fragments.admin.AdminProfile;
+import com.ognjen.fleetforge.fragments.admin.DriverChangesFragment;
 import com.ognjen.fleetforge.activities.auth.LoginActivity;
-import com.ognjen.fleetforge.fragments.account_changes.DriverChangesFragment;
 import com.ognjen.fleetforge.fragments.driver.CurrentRideDriver;
 import com.ognjen.fleetforge.fragments.driver.DriverHistoryFragment;
 import com.ognjen.fleetforge.fragments.PlaceholderFragment;
@@ -98,8 +99,10 @@ public class MainActivity extends AppCompatActivity {
         } else if (itemId == R.id.nav_profile) {
             if (currentRole == UserRole.DRIVER) {
                 return new DriverProfile();
-            } else {
+            }else if(currentRole==UserRole.PASSENGER){
                 return new PassengerProfile();
+            }else{
+                return new AdminProfile();
             }
         } else if (itemId == R.id.nav_home) {
             return PlaceholderFragment.newInstance("Home");

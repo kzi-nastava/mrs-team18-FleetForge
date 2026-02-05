@@ -3,17 +3,24 @@ package com.ognjen.fleetforge.fragments.common;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
+import com.google.android.material.textfield.TextInputEditText;
 import com.ognjen.fleetforge.R;
+import com.ognjen.fleetforge.fragments.admin.AdminProfile;
+import com.ognjen.fleetforge.fragments.admin.DriverChangesViewModel;
 import com.ognjen.fleetforge.fragments.driver.DriverProfile;
 import com.ognjen.fleetforge.fragments.passenger.PassengerProfile;
 import com.ognjen.fleetforge.model.UserRole;
 import com.ognjen.fleetforge.auth.AuthManager;
+
+import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -21,6 +28,8 @@ import com.ognjen.fleetforge.auth.AuthManager;
  * create an instance of this fragment.
  */
 public class PasswordChangeProfile extends Fragment {
+
+    private PasswordChangeViewModel viewModel;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -60,6 +69,7 @@ public class PasswordChangeProfile extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        viewModel=new ViewModelProvider(this).get(PasswordChangeViewModel.class);
     }
 
     @Override
@@ -70,9 +80,11 @@ public class PasswordChangeProfile extends Fragment {
        authManager=AuthManager.getInstance(requireActivity());
        cancel.setOnClickListener(v -> {
 //           requireActivity().getSupportFragmentManager().popBackStack();
-           Fragment fr;
+           Fragment fr = null;
            if(authManager.getCurrentRole()== UserRole.DRIVER){
                fr=new DriverProfile();
+           }else if(authManager.getCurrentRole()==UserRole.ADMIN){
+               //todo
            }
            else{
                fr=new PassengerProfile();
@@ -81,6 +93,37 @@ public class PasswordChangeProfile extends Fragment {
                    .beginTransaction()
                    .replace(R.id.fragment_container, fr)
                    .commit();
+       });
+       TextInputEditText newPassword= view.findViewById(R.id.newPassword);
+       TextInputEditText confirmPassword=view.findViewById(R.id.confirmNewPassword);
+
+       Button reset= view.findViewById(R.id.changeBtn);
+       reset.setOnClickListener(v -> {
+           if(!Objects.requireNonNull(newPassword.getText()).toString().equals(Objects.requireNonNull(confirmPassword.getText()).toString())||newPassword.getText().toString().length()<8){
+               Toast.makeText(getContext(),"Passwords do not match or password is too short try again",Toast.LENGTH_SHORT).show();
+           }else {
+               viewModel.changePassword(newPassword.getText().toString(),authManager.getCurrentRole()).observe(getViewLifecycleOwner(),response->{
+                   if(response==true){
+                       Toast.makeText(getContext(),"Passwords changed",Toast.LENGTH_SHORT).show();
+                       Fragment fr = null;
+                       if(authManager.getCurrentRole()== UserRole.DRIVER){
+                           fr=new DriverProfile();
+                       }else if(authManager.getCurrentRole()==UserRole.ADMIN){
+                           fr=new AdminProfile();
+                       }
+                       else{
+                           fr=new PassengerProfile();
+                       }
+                       requireActivity().getSupportFragmentManager()
+                               .beginTransaction()
+                               .replace(R.id.fragment_container, fr)
+                               .commit();
+
+                   }else{
+                       Toast.makeText(getContext(),"Passwords was not changed, error",Toast.LENGTH_SHORT).show();
+                   }
+               });
+           }
        });
        return view;
     }

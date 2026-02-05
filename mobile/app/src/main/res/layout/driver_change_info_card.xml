@@ -43,23 +43,7 @@ android:background="@drawable/driver_profile_info_bg"
     android:orientation="vertical"
     android:layout_marginRight="100dp"
     >
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/oldProfileImage"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_marginTop="32dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:foreground="?attr/selectableItemBackgroundBorderless"
-        android:scaleType="centerCrop"
-        android:layout_gravity="center"
-        android:src="@drawable/blank_profile__1_"
 
-
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/userSection"
-        app:shapeAppearanceOverlay="@style/CircleImageStyle" />
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -115,23 +99,7 @@ android:background="@drawable/driver_profile_info_bg"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:orientation="vertical">
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/newProfileImage"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_marginTop="32dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?attr/selectableItemBackgroundBorderless"
-            android:scaleType="centerCrop"
-            android:layout_gravity="center"
-            android:src="@drawable/blank_profile__1_"
 
-
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/userSection"
-            app:shapeAppearanceOverlay="@style/CircleImageStyle" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
