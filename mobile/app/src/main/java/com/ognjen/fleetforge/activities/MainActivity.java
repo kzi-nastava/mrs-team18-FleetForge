@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment;
 import com.ognjen.fleetforge.fragments.admin.AdminProfile;
 import com.ognjen.fleetforge.fragments.admin.DriverChangesFragment;
 import com.ognjen.fleetforge.activities.auth.LoginActivity;
+import com.ognjen.fleetforge.fragments.admin.RegisterDriver;
 import com.ognjen.fleetforge.fragments.driver.DriverHistoryFragment;
 import com.ognjen.fleetforge.fragments.PlaceholderFragment;
 import com.ognjen.fleetforge.R;
@@ -118,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
         } else if (itemId == R.id.nav_current_ride) {
             return PlaceholderFragment.newInstance("Current Ride");
         } else if (itemId == R.id.nav_register_driver) {
-            return PlaceholderFragment.newInstance("Register Driver");
+            return new RegisterDriver();
         } else if (itemId == R.id.nav_block_users) {
             return PlaceholderFragment.newInstance("Block Users");
         } else if (itemId == R.id.nav_profile_changes) {

@@ -69,7 +69,7 @@ public class LoginActivity extends AppCompatActivity {
         Log.d(TAG, "Activating account with token: " + token);
 
         // Call your Retrofit service (ensure you add activateAccount to your API interface)
-        RetrofitClient.getInstance().getLoginService().activateAccount(token)
+        RetrofitClient.getInstance().getAuthService().activateAccount(token)
                 .enqueue(new Callback<Void>() { // Use Void if response body is empty
                     @Override
                     public void onResponse(Call<Void> call, Response<Void> response) {
