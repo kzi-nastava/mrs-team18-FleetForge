@@ -5,6 +5,7 @@ import com.team18.FleetForge.dto.passenger.PassengerChangeInformationResponseDTO
 import com.team18.FleetForge.dto.passenger.PassengerGetResponseDTO;
 import com.team18.FleetForge.dto.passenger.PassengerPasswordChangeRequestDTO;
 import com.team18.FleetForge.dto.ride.routes.FavoriteRouteGetResponseDTO;
+import com.team18.FleetForge.dto.ride.view.RideDetailsDTO;
 import com.team18.FleetForge.model.ride.FavoriteRoute;
 import com.team18.FleetForge.model.ride.Ride;
 import com.team18.FleetForge.model.users.Passenger;
@@ -15,6 +16,7 @@ import com.team18.FleetForge.service.users.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -22,6 +24,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -133,5 +136,43 @@ public class PassengerController {
         FavoriteRoute route= favoriteRouteService.findById(id);
         favoriteRouteService.delete(route);
         return new ResponseEntity<>( HttpStatus.OK);
+    }
+
+    /**
+     * GET /api/passenger/rides
+     * Get passengers ride history
+     * Query params:
+     *  - from, to (date range)
+     *  - sortBy (any field)
+     *  - direction (asc, desc)
+     */
+    @PreAuthorize("hasRole('PASSENGER')")
+    @GetMapping(
+            value = "/rides",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<Object> getUserRides(
+            @RequestParam(required = false) LocalDateTime from,
+            @RequestParam(required = false) LocalDateTime to,
+            @RequestParam(defaultValue = "startTime") String sortBy,
+            @RequestParam(defaultValue = "desc") String direction
+    ){
+
+        return new ResponseEntity<>(null, HttpStatus.OK);
+    }
+
+    /**
+     * GET /api/passenger/rides/{rideId}
+     * Detailed ride view
+     */
+    @PreAuthorize("hasRole('PASSENGER')")
+    @GetMapping(
+            value = "/rides/{rideId}",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<RideDetailsDTO> getRideDetailsById(
+            @PathVariable Long rideId
+    ) {
+        return new ResponseEntity<>(null, HttpStatus.OK);
     }
 }
