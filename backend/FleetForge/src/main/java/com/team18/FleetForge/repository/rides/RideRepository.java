@@ -1,9 +1,12 @@
 package com.team18.FleetForge.repository.rides;
 
+import com.team18.FleetForge.dto.ride.PassengerRideHistoryDto;
 import com.team18.FleetForge.model.enums.RideStatus;
 import com.team18.FleetForge.model.ride.Ride;
 import com.team18.FleetForge.model.users.Driver;
 import lombok.NonNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -12,6 +15,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RideRepository extends JpaRepository<Ride, Long> {
@@ -70,6 +74,54 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
             RideStatus status,
             LocalDateTime startTime,
             LocalDateTime endTime
+    );
+
+    @Query("""
+    select r from Ride r
+    left join fetch r.driver d
+    left join fetch r.wayPoints wp
+    where r.id = :rideId
+      and (
+           r.passenger.id = :passengerId
+           or exists (
+               select lp.id from r.linkedPassengers lp
+               where lp.id = :passengerId
+           )
+      )
+""")
+    Optional<Ride> findPassengerRideWithDetails(
+            @Param("passengerId") Long passengerId,
+            @Param("rideId") Long rideId
+    );
+
+
+    @Query("""
+    SELECT new com.team18.FleetForge.dto.ride.PassengerRideHistoryDto(
+         r.id,
+         r.startTime,
+         r.endTime,
+         r.startLocation,
+         r.endLocation,
+         rr.vehicleRating,
+         rr.driverRating
+     )
+    FROM Ride r
+    LEFT JOIN RideReview rr ON rr.ride.id = r.id
+    WHERE 
+        r.status = 'COMPLETED'
+        AND (r.passenger.id = :passengerId
+            OR :passengerId IN (
+                SELECT lp.id FROM r.linkedPassengers lp
+            )
+        )
+        AND (:from IS NULL OR r.startTime >= :from)
+        AND (:to IS NULL OR r.startTime <= :to)
+""")
+    Page<PassengerRideHistoryDto> findPassengerRideHistory(
+            @Param("passengerId") Long passengerId,
+            @Param("from") LocalDateTime from,
+            @Param("to") LocalDateTime to,
+            Pageable pageable
     );
 
 

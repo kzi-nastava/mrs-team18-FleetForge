@@ -1,11 +1,15 @@
 package com.team18.FleetForge.service.rides;
 
 import com.team18.FleetForge.dto.driver.DriverRideHistoryDTO;
+import com.team18.FleetForge.dto.ride.PassengerRideHistoryDto;
 import com.team18.FleetForge.dto.ride.lifecycle.RideCreateRequestDTO;
+import com.team18.FleetForge.dto.ride.view.PassengerRideDetailsDTO;
 import com.team18.FleetForge.dto.ride.view.RideDetailsDTO;
 import com.team18.FleetForge.model.ride.Ride;
+import org.springframework.data.domain.Page;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface RideService {
@@ -23,4 +27,16 @@ public interface RideService {
     Ride createRide(RideCreateRequestDTO rideCreateRequestDTO);
 
     Ride getRideById(Long rideId);
+
+    PassengerRideDetailsDTO getPassengerRideDetails(Long passengerId, Long rideId);
+
+    Page<PassengerRideHistoryDto> getPassengerRideHistory(
+            Long passengerId,
+            LocalDateTime from,
+            LocalDateTime to,
+            String sortBy,
+            String direction,
+            int page,
+            int size
+    );
 }

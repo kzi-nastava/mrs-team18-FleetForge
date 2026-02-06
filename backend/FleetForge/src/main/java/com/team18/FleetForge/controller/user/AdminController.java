@@ -4,7 +4,7 @@ package com.team18.FleetForge.controller.user;
 import com.team18.FleetForge.dto.RouteDTO;
 import com.team18.FleetForge.dto.UserSummaryDTO;
 import com.team18.FleetForge.dto.admin.*;
-import com.team18.FleetForge.dto.ride.view.AdminRideHistoryItemDTO;
+import com.team18.FleetForge.dto.ride.view.AdminRideHistoryDTO;
 import com.team18.FleetForge.dto.ride.view.RideDetailsDTO;
 import com.team18.FleetForge.dto.vehicle.VehicleChangeInformationResponseDTO;
 import com.team18.FleetForge.model.users.DriverProfileChangeRequest;
@@ -214,15 +214,15 @@ public class AdminController {
             value = "/users/{userId}/rides",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<List<AdminRideHistoryItemDTO>> getUserRides(
+    public ResponseEntity<List<AdminRideHistoryDTO>> getUserRides(
             @PathVariable Long userId,
             @RequestParam(required = false) LocalDateTime from,
             @RequestParam(required = false) LocalDateTime to,
             @RequestParam(defaultValue = "startTime") String sortBy,
             @RequestParam(defaultValue = "desc") String direction
     ){
-        List<AdminRideHistoryItemDTO> history = List.of(
-                AdminRideHistoryItemDTO.builder()
+        List<AdminRideHistoryDTO> history = List.of(
+                AdminRideHistoryDTO.builder()
                         .rideId(1L)
                         .startTime(LocalDateTime.now().minusDays(1))
                         .endTime(LocalDateTime.now().minusDays(1).plusMinutes(18))
@@ -240,7 +240,7 @@ public class AdminController {
                                 .build())
                         .build(),
 
-                AdminRideHistoryItemDTO.builder()
+                AdminRideHistoryDTO.builder()
                         .rideId(2L)
                         .startTime(LocalDateTime.now().minusHours(2))
                         .endTime(LocalDateTime.now().minusHours(1))

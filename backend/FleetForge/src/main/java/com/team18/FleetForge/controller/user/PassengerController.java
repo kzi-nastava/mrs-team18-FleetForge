@@ -4,7 +4,10 @@ import com.team18.FleetForge.dto.passenger.PassengerChangeInformationRequestDTO;
 import com.team18.FleetForge.dto.passenger.PassengerChangeInformationResponseDTO;
 import com.team18.FleetForge.dto.passenger.PassengerGetResponseDTO;
 import com.team18.FleetForge.dto.passenger.PassengerPasswordChangeRequestDTO;
+import com.team18.FleetForge.dto.ride.PassengerRideHistoryDto;
 import com.team18.FleetForge.dto.ride.routes.FavoriteRouteGetResponseDTO;
+import com.team18.FleetForge.dto.ride.view.PassengerRideDetailsDTO;
+import com.team18.FleetForge.dto.ride.view.RideDetailsDTO;
 import com.team18.FleetForge.model.ride.FavoriteRoute;
 import com.team18.FleetForge.model.ride.Ride;
 import com.team18.FleetForge.model.users.Passenger;
@@ -14,14 +17,18 @@ import com.team18.FleetForge.service.rides.RideService;
 import com.team18.FleetForge.service.users.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -134,4 +141,60 @@ public class PassengerController {
         favoriteRouteService.delete(route);
         return new ResponseEntity<>( HttpStatus.OK);
     }
+
+    /**
+     * GET /api/passenger/rides
+     * Get passengers ride history
+     * Query params:
+     *  - from, to (date range)
+     *  - sortBy (any field)
+     *  - direction (asc, desc)
+     *  - page
+     *  - size
+     */
+    @PreAuthorize("hasRole('PASSENGER')")
+    @GetMapping(
+            value = "/rides",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<Page<PassengerRideHistoryDto>> getPassengerRideHistory(
+            @AuthenticationPrincipal User user,
+            @RequestParam(required = false) LocalDateTime from,
+            @RequestParam(required = false) LocalDateTime to,
+            @RequestParam(defaultValue = "startTime") String sortBy,
+            @RequestParam(defaultValue = "desc") String direction,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(
+                rideService.getPassengerRideHistory(
+                        user.getId(),
+                        from,
+                        to,
+                        sortBy,
+                        direction,
+                        page,
+                        size
+                )
+        );
+    }
+
+    /**
+     * GET /api/passenger/rides/{rideId}
+     * Detailed ride view for passenger
+     */
+    @PreAuthorize("hasRole('PASSENGER')")
+    @GetMapping(
+            value = "/rides/{rideId}",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<PassengerRideDetailsDTO> getRideDetailsById(
+            @AuthenticationPrincipal User user,
+            @PathVariable Long rideId
+    ) {
+        return ResponseEntity.ok(
+                rideService.getPassengerRideDetails(user.getId(), rideId)
+        );
+    }
+
 }
