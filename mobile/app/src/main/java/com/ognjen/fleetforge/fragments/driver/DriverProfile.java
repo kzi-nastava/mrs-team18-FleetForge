@@ -53,25 +53,7 @@ public class DriverProfile extends Fragment {
     private TextInputEditText phoneNumber;
     private TextInputEditText address;
     private ShapeableImageView profilePic;
-    private ActivityResultLauncher<String> imagePicker =
-            registerForActivityResult(
-                    new ActivityResultContracts.GetContent(),
-                    uri -> {
-                        if (uri != null) {
-                            profilePic.setImageURI(uri);
-                            try {
-                                driverProfileViewModel.uploadProfilePicture(getContext(),uri).observe(getViewLifecycleOwner(),response->{
-                                    if(response.booleanValue()==true){
-                                        Toast.makeText(getContext(), "Picture uploaded",Toast.LENGTH_SHORT).show();
-                                    }else{
-                                        Toast.makeText(getContext(), "Picture was not uploaded",Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
-                        }
-                    });
+    private ActivityResultLauncher<String> imagePicker;
     private TextInputEditText model;
     private TextInputEditText registration;
     private MaterialAutoCompleteTextView dropDown;
@@ -104,6 +86,24 @@ public class DriverProfile extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         driverProfileViewModel=new ViewModelProvider(this).get(DriverProfileViewModel.class);
+        imagePicker =registerForActivityResult(
+                new ActivityResultContracts.GetContent(),
+                uri -> {
+                    if (uri != null) {
+                        profilePic.setImageURI(uri);
+                        try {
+                            driverProfileViewModel.uploadProfilePicture(getContext(),uri).observe(getViewLifecycleOwner(),response->{
+                                if(response.booleanValue()==true){
+                                    Toast.makeText(getContext(), "Picture uploaded",Toast.LENGTH_SHORT).show();
+                                }else{
+                                    Toast.makeText(getContext(), "Picture was not uploaded",Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                });
     }
 
     @Override

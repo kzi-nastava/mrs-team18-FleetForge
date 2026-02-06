@@ -9,6 +9,8 @@ import androidx.lifecycle.MutableLiveData;
 import com.ognjen.fleetforge.api.DriverService;
 import com.ognjen.fleetforge.api.RetrofitClient;
 import com.ognjen.fleetforge.dtos.common.PasswordChangeRequestDTO;
+import com.ognjen.fleetforge.dtos.driver.DriverCreateRequestDTO;
+import com.ognjen.fleetforge.dtos.driver.DriverCreateResponseDTO;
 import com.ognjen.fleetforge.dtos.driver.DriverGetResponseDTO;
 import com.ognjen.fleetforge.dtos.driver.DriverProfileChangeRequestDTO;
 import com.ognjen.fleetforge.dtos.driver.DriverProfileChangeResponseDTO;
@@ -115,12 +117,17 @@ public class DriverRepo {
                     if(response.isSuccessful()){
                         result.setValue(true);
                     }else{
+                        try {
+                            android.util.Log.e("API_ERROR", "Error body: " + response.errorBody().string());
+                        } catch (Exception e) { e.printStackTrace(); }
                         result.setValue(false);
                     }
                 }
 
                 @Override
                 public void onFailure(Call<Void> call, Throwable t) {
+
+                    android.util.Log.e("API_FAILURE", "Došlo je do greške: ", t);
                     result.setValue(false);
                 }
             });
@@ -150,5 +157,74 @@ public class DriverRepo {
             }
         });
         return data;
+    }
+
+    public LiveData<DriverCreateResponseDTO> createDriver(DriverCreateRequestDTO request){
+        MutableLiveData<DriverCreateResponseDTO> data= new MutableLiveData<>();
+
+        service.createDriver(request).enqueue(new Callback<DriverCreateResponseDTO>() {
+            @Override
+            public void onResponse(Call<DriverCreateResponseDTO> call, Response<DriverCreateResponseDTO> response) {
+                if(response.isSuccessful()){
+                    data.setValue(response.body());
+                }
+                else{
+                    try {
+                        android.util.Log.e("API_ERROR", "Error body: " + response.errorBody().string());
+                    } catch (Exception e) { e.printStackTrace(); }
+                    data.setValue(null);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<DriverCreateResponseDTO> call, Throwable throwable) {
+                android.util.Log.e("API_FAILURE", "Došlo je do greške: ", throwable);
+                data.setValue(null);
+            }
+        });
+        return data;
+    }
+
+
+    public LiveData<Boolean> uploadProfilePicById(Context context, Uri imageUri,Long driverId) throws IOException {
+        MutableLiveData<Boolean> result= new MutableLiveData<Boolean>();
+        MultipartBody.Part imagePart=null;
+        try {
+            File file = FileUtil.getFileFromUri(context, imageUri);
+            String mimeType = context.getContentResolver().getType(imageUri);
+            if (mimeType == null){
+                result.setValue(false);
+                return result;
+            }
+            RequestBody requestBody = RequestBody.create(MediaType.parse(mimeType), file);
+            imagePart = MultipartBody.Part.createFormData("file", file.getName(), requestBody);
+
+
+            service.uploadProfilePictureById(driverId,imagePart).enqueue(new Callback<Boolean>() {
+                @Override
+                public void onResponse(Call<Boolean> call, Response<Boolean> response) {
+                    if(response.isSuccessful()){
+                        result.setValue(true);
+                    }else{
+                        try {
+                            android.util.Log.e("API_ERROR", "Error body: " + response.errorBody().string());
+                        } catch (Exception e) { e.printStackTrace(); }
+                        result.setValue(false);
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Boolean> call, Throwable t) {
+
+                    android.util.Log.e("API_FAILURE", "Doslo je do greske: ", t);
+                    result.setValue(false);
+                }
+            });
+        }
+        catch (IOException e){
+            e.printStackTrace();
+            result.setValue(null);
+        }
+        return result;
     }
 }

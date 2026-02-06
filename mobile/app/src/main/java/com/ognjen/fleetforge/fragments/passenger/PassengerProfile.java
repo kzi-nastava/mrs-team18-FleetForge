@@ -45,15 +45,7 @@ public class PassengerProfile extends Fragment {
     private TextInputEditText phoneNumber;
     private TextInputEditText address;
     private Button changeBtn;
-    private ActivityResultLauncher<String> imagePicker =
-            registerForActivityResult(
-                    new ActivityResultContracts.GetContent(),
-                    uri -> {
-                        if (uri != null) {
-                            passengerProfileViewModel.setSelectedImageUri(uri);
-                            profilePic.setImageURI(uri);
-                        }
-                    });
+    private ActivityResultLauncher<String> imagePicker;
 
     public PassengerProfile() {
         // Required empty public constructor
@@ -70,6 +62,15 @@ public class PassengerProfile extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         passengerProfileViewModel=new ViewModelProvider(this).get(PassengerProfileViewModel.class);
+        imagePicker =
+                registerForActivityResult(
+                        new ActivityResultContracts.GetContent(),
+                        uri -> {
+                            if (uri != null) {
+                                passengerProfileViewModel.setSelectedImageUri(uri);
+                                profilePic.setImageURI(uri);
+                            }
+                        });
     }
 
     @Override

@@ -43,15 +43,7 @@ public class AdminProfile extends Fragment {
     private TextInputEditText phoneNumber;
     private TextInputEditText address;
     private Button changeBtn;
-    private ActivityResultLauncher<String> imagePicker =
-            registerForActivityResult(
-                    new ActivityResultContracts.GetContent(),
-                    uri -> {
-                        if (uri != null) {
-                            adminProfileViewModel.setSelectedImageUri(uri);
-                            profilePic.setImageURI(uri);
-                        }
-                    });
+    private ActivityResultLauncher<String> imagePicker;
 
 
     public AdminProfile() {
@@ -70,6 +62,15 @@ public class AdminProfile extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         adminProfileViewModel=new ViewModelProvider(this).get(AdminProfileViewModel.class);
+        imagePicker =
+                registerForActivityResult(
+                        new ActivityResultContracts.GetContent(),
+                        uri -> {
+                            if (uri != null) {
+                                adminProfileViewModel.setSelectedImageUri(uri);
+                                profilePic.setImageURI(uri);
+                            }
+                        });
     }
 
     @Override
