@@ -15,6 +15,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RideRepository extends JpaRepository<Ride, Long> {
@@ -74,6 +75,25 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
             LocalDateTime startTime,
             LocalDateTime endTime
     );
+
+    @Query("""
+    select r from Ride r
+    left join fetch r.driver d
+    left join fetch r.wayPoints wp
+    where r.id = :rideId
+      and (
+           r.passenger.id = :passengerId
+           or exists (
+               select lp.id from r.linkedPassengers lp
+               where lp.id = :passengerId
+           )
+      )
+""")
+    Optional<Ride> findPassengerRideWithDetails(
+            @Param("passengerId") Long passengerId,
+            @Param("rideId") Long rideId
+    );
+
 
     @Query("""
     SELECT new com.team18.FleetForge.dto.ride.PassengerRideHistoryDto(

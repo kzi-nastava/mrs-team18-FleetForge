@@ -1,21 +1,26 @@
 package com.team18.FleetForge.service.impl;
 
 import com.team18.FleetForge.dto.RouteDTO;
+import com.team18.FleetForge.dto.driver.DriverInfoDTO;
 import com.team18.FleetForge.dto.driver.DriverRideHistoryDTO;
 import com.team18.FleetForge.dto.ride.lifecycle.RideCreateRequestDTO;
+import com.team18.FleetForge.dto.ride.reports.InconsistencyReportResponseDTO;
 import com.team18.FleetForge.dto.ride.routes.WayPointDTO;
+import com.team18.FleetForge.dto.ride.view.PassengerRideDetailsDTO;
 import com.team18.FleetForge.dto.ride.view.RideDetailsDTO;
-import com.team18.FleetForge.model.ride.Ride;
-import com.team18.FleetForge.model.ride.WayPoint;
+import com.team18.FleetForge.model.ride.*;
 import com.team18.FleetForge.model.users.Driver;
 import com.team18.FleetForge.model.users.Passenger;
 import com.team18.FleetForge.model.enums.RideStatus;
 import com.team18.FleetForge.model.users.User;
+import com.team18.FleetForge.repository.rides.InconsistencyReportRepository;
+import com.team18.FleetForge.repository.rides.RideLocationRepository;
 import com.team18.FleetForge.repository.rides.RideRepository;
 import com.team18.FleetForge.repository.users.UserRepository;
 import com.team18.FleetForge.service.users.DriverService;
 import com.team18.FleetForge.service.PriceCalculationService;
 import com.team18.FleetForge.service.rides.RideService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -45,6 +50,8 @@ public class RideServiceImpl implements RideService {
     private final UserRepository userRepository;
     private final DriverService driverService;
     private final PriceCalculationService priceCalculationService;
+    private final RideLocationRepository rideLocationRepository;
+    private final InconsistencyReportRepository inconsistencyReportRepository;
 
     @Override
     public List<DriverRideHistoryDTO> getDriverRideHistory(Long driverId, LocalDate startDate) {
@@ -254,6 +261,80 @@ public class RideServiceImpl implements RideService {
     public Ride getRideById(Long rideId) {
         return rideRepository.getRideById(rideId);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PassengerRideDetailsDTO getPassengerRideDetails(Long passengerId, Long rideId) {
+
+        Ride ride = rideRepository
+                .findPassengerRideWithDetails(passengerId, rideId)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Ride not found or access denied")
+                );
+
+        List<RideLocation> locations =
+                rideLocationRepository.findByRideAndRecordedAtAfterOrderByRecordedAtAsc(
+                        ride,
+                        ride.getStartTime()
+                );
+
+        List<InconsistencyReport> reports =
+                inconsistencyReportRepository.findByRideId(rideId);
+
+        return PassengerRideDetailsDTO.builder()
+                .id(ride.getId())
+                .startAddress(ride.getStartAddress())
+                .endAddress(ride.getEndAddress())
+                .startLocation(ride.getStartLocation())
+                .endLocation(ride.getEndLocation())
+                .wayPoints(
+                        ride.getWayPoints().stream()
+                                .map(WayPoint::getLocation)
+                                .toList()
+                )
+                .startTime(ride.getStartTime())
+                .endTime(ride.getEndTime())
+                .totalDistance(ride.getTotalDistance())
+                .estimatedDuration(ride.getEstimatedDuration())
+                .totalCost(ride.getTotalCost())
+                .status(ride.getStatus())
+                .vehicleType(ride.getVehicleType())
+                .petFriendly(ride.isPetFriendly())
+                .babySeat(ride.isBabySeat())
+                .driver(
+                        DriverInfoDTO.builder()
+                                .id(ride.getDriver().getId())
+                                .firstName(ride.getDriver().getFirstName())
+                                .lastName(ride.getDriver().getLastName())
+                                .phoneNumber(ride.getDriver().getPhoneNumber())
+                                .profileImage(ride.getDriver().getProfilePicture())
+                                .build()
+                )
+                // real tracked route as GeoPoints
+                .realRoute(
+                        locations.stream()
+                                .map(loc -> new GeoPoint(
+                                        loc.getLatitude(),
+                                        loc.getLongitude()
+                                ))
+                                .toList()
+                )
+                .hasInconsistencies(!reports.isEmpty())
+                .inconsistencies(
+                        reports.stream()
+                                .map(r -> InconsistencyReportResponseDTO.builder()
+                                        .reportId(r.getId())
+                                        .message(r.getDescription())
+                                        .reportedAt(r.getReportedAt())
+                                        .build()
+                                )
+                                .toList()
+                )
+                .build();
+    }
+
+
+
 
     @Override
     public Page<PassengerRideHistoryDto> getPassengerRideHistory(

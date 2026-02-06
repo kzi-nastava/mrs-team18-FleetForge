@@ -6,6 +6,7 @@ import com.team18.FleetForge.dto.passenger.PassengerGetResponseDTO;
 import com.team18.FleetForge.dto.passenger.PassengerPasswordChangeRequestDTO;
 import com.team18.FleetForge.dto.ride.PassengerRideHistoryDto;
 import com.team18.FleetForge.dto.ride.routes.FavoriteRouteGetResponseDTO;
+import com.team18.FleetForge.dto.ride.view.PassengerRideDetailsDTO;
 import com.team18.FleetForge.dto.ride.view.RideDetailsDTO;
 import com.team18.FleetForge.model.ride.FavoriteRoute;
 import com.team18.FleetForge.model.ride.Ride;
@@ -180,16 +181,20 @@ public class PassengerController {
 
     /**
      * GET /api/passenger/rides/{rideId}
-     * Detailed ride view
+     * Detailed ride view for passenger
      */
     @PreAuthorize("hasRole('PASSENGER')")
     @GetMapping(
             value = "/rides/{rideId}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<RideDetailsDTO> getRideDetailsById(
+    public ResponseEntity<PassengerRideDetailsDTO> getRideDetailsById(
+            @AuthenticationPrincipal User user,
             @PathVariable Long rideId
     ) {
-        return new ResponseEntity<>(null, HttpStatus.OK);
+        return ResponseEntity.ok(
+                rideService.getPassengerRideDetails(user.getId(), rideId)
+        );
     }
+
 }
