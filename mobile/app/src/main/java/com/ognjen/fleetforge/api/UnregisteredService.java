@@ -1,4 +1,4 @@
-package com.ognjen.fleetforge.service;
+package com.ognjen.fleetforge.api;
 
 import java.util.List;
 
@@ -7,7 +7,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Headers;
 import com.ognjen.fleetforge.model.VehicleLocation;
 
-public interface UnregisteredApiService {
+public interface UnregisteredService {
 
     @Headers({
             "User-Agent: Mobile-Android",

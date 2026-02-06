@@ -8,6 +8,9 @@ import com.ognjen.fleetforge.dtos.driver.DriverProfileChangeResponseDTO;
 import com.ognjen.fleetforge.dtos.common.PasswordChangeRequestDTO;
 import com.ognjen.fleetforge.dtos.vehicle.VehicleInformationChangeRequestDTO;
 import com.ognjen.fleetforge.dtos.vehicle.VehicleInformationChangeResponseDTO;
+import com.ognjen.fleetforge.dtos.driver.DriverLocationUpdateRequestDTO;
+import com.ognjen.fleetforge.dtos.driver.DriverLocationUpdateResponseDTO;
+import com.ognjen.fleetforge.dtos.ride.RideTrackingDTO;
 
 import okhttp3.MultipartBody;
 import retrofit2.Call;
@@ -42,4 +45,11 @@ public interface DriverService {
     @Multipart
     @POST("/api/users/upload-profile-picture/{id}")
     Call<Boolean> uploadProfilePictureById(@Path("id") Long id,@Part MultipartBody.Part file);
+    @GET("api/rides/active-tracking")
+    Call<RideTrackingDTO> getActiveRideTracking();
+
+    @POST("api/rides/driver-location-update")
+    Call<DriverLocationUpdateResponseDTO> updateDriverLocation(
+            @Body DriverLocationUpdateRequestDTO request
+    );
 }

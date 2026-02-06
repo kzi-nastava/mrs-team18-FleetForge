@@ -15,6 +15,16 @@ fun getIpAddress(): String {
     return properties.getProperty("ip_addr", "192.168.0.159")
 }
 
+fun getMapboxApiKey(): String {
+    val properties = Properties()
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        properties.load(FileInputStream(localPropertiesFile))
+    }
+    return properties.getProperty("MAPBOX_API_KEY", "")
+}
+
+
 android {
     namespace = "com.ognjen.fleetforge"
     compileSdk = 36
@@ -26,6 +36,9 @@ android {
         versionCode = 1
         versionName = "1.0"
         buildConfigField("String","IP_ADDR","\""+getIpAddress()+"\"")
+        buildConfigField("String", "MAPBOX_API_KEY", "\"${getMapboxApiKey()}\"")
+
+
         manifestPlaceholders["ip_addr"] = getIpAddress()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled=true
