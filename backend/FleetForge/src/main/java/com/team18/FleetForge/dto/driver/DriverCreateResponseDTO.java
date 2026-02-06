@@ -6,11 +6,16 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.parameters.P;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class DriverCreateResponseDTO {
     @NotNull
-    private Driver driver;
+    private Long driverId;
+
+    public DriverCreateResponseDTO(Driver driver){
+        driverId=driver.getId();
+    }
 }

@@ -101,8 +101,8 @@ public class DriverControler {
        ValidationToken token=activationTokenService.createTokenPasswordSetDriver(driver);
         emailService.sendEmail("v.vitomirovic@gmail.com","Password set","http://"+ipAddress+":4200/set-password?token="+token.getToken());
         activationTokenService.saveActivationToken(token);
-        DriverCreateResponseDTO driverCreateResponseDTO = new DriverCreateResponseDTO(driver);
-        return new ResponseEntity<>(driverCreateResponseDTO, HttpStatus.CREATED);
+        DriverCreateResponseDTO response= new DriverCreateResponseDTO(driver);
+        return new ResponseEntity<>(response,HttpStatus.CREATED);
     }
 
     /**
