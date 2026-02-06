@@ -24,6 +24,7 @@ import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.ognjen.fleetforge.BuildConfig;
 import com.ognjen.fleetforge.R;
+import com.ognjen.fleetforge.enums.VehicleType;
 
 import java.io.IOException;
 
@@ -32,15 +33,7 @@ public class RegisterDriver extends Fragment {
     RegisterDriverViewModel viewModel;
     private static final String BaseUrl="http://"+ BuildConfig.IP_ADDR+":8080";
     private ShapeableImageView profilePic;
-    private ActivityResultLauncher<String> imagePicker =
-            registerForActivityResult(
-                    new ActivityResultContracts.GetContent(),
-                    uri -> {
-                        if (uri != null) {
-                            profilePic.setImageURI(uri);
-
-                        }
-                    });
+    private ActivityResultLauncher<String> imagePicker;
     private TextInputEditText firstName;
     private TextInputEditText lastName;
     private TextInputEditText email;
@@ -74,6 +67,15 @@ public class RegisterDriver extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         viewModel= new ViewModelProvider(this).get(RegisterDriverViewModel.class);
+        imagePicker =
+                registerForActivityResult(
+                        new ActivityResultContracts.GetContent(),
+                        uri -> {
+                            if (uri != null) {
+                                profilePic.setImageURI(uri);
+                                viewModel.setSelectedImageUri(uri);
+                            }
+                        });
     }
 
     @Override
@@ -120,18 +122,63 @@ public class RegisterDriver extends Fragment {
         );
         vehicleType.setAdapter(adapter);
 
+
+        create=view.findViewById(R.id.createBtn);
+        create.setOnClickListener(v -> {
+            if(checkSecondPartValid()){
+                try {
+                    viewModel.createDriver(firstName.getText().toString()
+                    ,lastName.getText().toString(),email.getText().toString(),phoneNumber.getText().toString()
+                    ,address.getText().toString(), model.getText().toString(),VehicleType.valueOf(vehicleType.getText().toString().toUpperCase())
+                    ,licencePlate.getText().toString(),Integer.valueOf(passengers.getText().toString()),babySeat.isChecked(),petFriendly.isChecked())
+                            .observe(getViewLifecycleOwner(),response->{
+                                    try {
+                                        viewModel.uploadProfilePictureById(getContext(),viewModel.getSelectedImageUri().getValue(),response.getDriverId()).observe(getViewLifecycleOwner(),response2->{
+                                            if(response2.booleanValue()) {
+                                                back.performClick();
+                                                firstName.setText("");
+                                                lastName.setText("");
+                                                email.setText("");
+                                                phoneNumber.setText("");
+                                                address.setText("");
+                                                model.setText("");
+                                                vehicleType.setText("", false);
+                                                licencePlate.setText("");
+                                                passengers.setText("");
+                                                babySeat.setChecked(false);
+                                                petFriendly.setChecked(false);
+                                                profilePic.setImageResource(R.drawable.blank_profile__1_);
+                                                Toast.makeText(getContext(), "Driver created.", Toast.LENGTH_SHORT).show();
+                                            }else{
+                                                Toast.makeText(getContext(), "Error", Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                                    } catch (IOException e) {
+                                        throw new RuntimeException(e);
+                                    }
+
+
+                            });
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
        return view;
     }
 
     private boolean checkFirstPartValid(){
-        if(!firstName.getText().toString().isEmpty()
-        &&!lastName.getText().toString().isEmpty()
-        &&!email.getText().toString().isEmpty()
-        &&!phoneNumber.getText().toString().isEmpty()
-        &&!address.getText().toString().isEmpty()){
-            return true;
-        }
-        return false;
+        return !firstName.getText().toString().isEmpty()
+                && !lastName.getText().toString().isEmpty()
+                && !email.getText().toString().isEmpty()
+                && !phoneNumber.getText().toString().isEmpty()
+                && !address.getText().toString().isEmpty();
+    }
+    private boolean checkSecondPartValid(){
+        return !model.getText().toString().isEmpty()
+                && !vehicleType.getText().toString().isEmpty()
+                && !licencePlate.getText().toString().isEmpty()
+                && !passengers.getText().toString().isEmpty();
     }
     private boolean isEmailValid(TextInputEditText email) {
         String emailText = email.getText().toString().trim();

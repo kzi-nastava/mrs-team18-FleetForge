@@ -1,5 +1,7 @@
 package com.ognjen.fleetforge.api;
 
+import com.ognjen.fleetforge.dtos.driver.DriverCreateRequestDTO;
+import com.ognjen.fleetforge.dtos.driver.DriverCreateResponseDTO;
 import com.ognjen.fleetforge.dtos.driver.DriverGetResponseDTO;
 import com.ognjen.fleetforge.dtos.driver.DriverProfileChangeRequestDTO;
 import com.ognjen.fleetforge.dtos.driver.DriverProfileChangeResponseDTO;
@@ -18,6 +20,7 @@ import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Part;
+import retrofit2.http.Path;
 
 public interface DriverService {
 
@@ -37,6 +40,11 @@ public interface DriverService {
     @PUT("/api/drivers/password")
     Call<Void> changePassword(@Body PasswordChangeRequestDTO request);
 
+    @POST("/api/drivers")
+    Call<DriverCreateResponseDTO> createDriver(@Body DriverCreateRequestDTO request);
+    @Multipart
+    @POST("/api/users/upload-profile-picture/{id}")
+    Call<Boolean> uploadProfilePictureById(@Path("id") Long id,@Part MultipartBody.Part file);
     @GET("api/rides/active-tracking")
     Call<RideTrackingDTO> getActiveRideTracking();
 
