@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Builder
-public class AdminRideHistoryItemDTO {
+public class AdminRideHistoryDTO {
     private Long rideId;
 
     private LocalDateTime startTime;

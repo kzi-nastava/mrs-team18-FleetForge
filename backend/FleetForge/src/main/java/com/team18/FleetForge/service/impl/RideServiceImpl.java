@@ -18,10 +18,15 @@ import com.team18.FleetForge.service.PriceCalculationService;
 import com.team18.FleetForge.service.rides.RideService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.team18.FleetForge.dto.ride.PassengerRideHistoryDto;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -249,5 +254,36 @@ public class RideServiceImpl implements RideService {
     public Ride getRideById(Long rideId) {
         return rideRepository.getRideById(rideId);
     }
+
+    @Override
+    public Page<PassengerRideHistoryDto> getPassengerRideHistory(
+            Long passengerId,
+            LocalDateTime from,
+            LocalDateTime to,
+            String sortBy,
+            String direction,
+            int page,
+            int size
+    ) {
+        //todo remove later
+        log.info(
+                "Fetching completed ride history for passenger {} from {} to {}, page {}, size {}",
+                passengerId, from, to, page, size
+        );
+
+        Sort sort = direction.equalsIgnoreCase("asc")
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        return rideRepository.findPassengerRideHistory(
+                passengerId,
+                from,
+                to,
+                pageable
+        );
+    }
+
 
 }
