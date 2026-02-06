@@ -11,6 +11,10 @@ import com.team18.FleetForge.model.ride.Ride;
 import com.team18.FleetForge.model.users.Admin;
 import com.team18.FleetForge.model.users.Driver;
 import com.team18.FleetForge.model.users.Passenger;
+import com.team18.FleetForge.model.chat.Chat;
+import com.team18.FleetForge.model.chat.ChatMessage;
+import com.team18.FleetForge.repository.chat.ChatMessageRepository;
+import com.team18.FleetForge.repository.chat.ChatRepository;
 import com.team18.FleetForge.repository.rides.FavoriteRouteRepo;
 import com.team18.FleetForge.repository.rides.RideRepository;
 import com.team18.FleetForge.repository.users.DriverRepository;
@@ -35,6 +39,8 @@ public class DataLoader implements CommandLineRunner {
     private final RideRepository rideRepository;
     private final PasswordEncoder passwordEncoder;
     private final FavoriteRouteRepo favoriteRouteRepo;
+    private final ChatRepository chatRepository;
+    private final ChatMessageRepository chatMessageRepository;
 
     @Override
     public void run(String... args) {
@@ -257,6 +263,80 @@ public class DataLoader implements CommandLineRunner {
         route.setPassenger(passenger1);
         route.setName("Home-work");
         favoriteRouteRepo.save(route);
+
+
+        Chat chat1 = Chat.builder()
+                .user(passenger1)
+                .createdAt(LocalDateTime.now().minusDays(2))
+                .lastMessageAt(LocalDateTime.now().minusHours(1))
+                .build();
+        chat1 = chatRepository.save(chat1);
+
+        ChatMessage msg1_1 = ChatMessage.builder()
+                .chat(chat1)
+                .sender(passenger1)
+                .content("Hello, I have a question about my recent ride.")
+                .sentAt(LocalDateTime.now().minusHours(2))
+                .isRead(true)
+                .readAt(LocalDateTime.now().minusHours(2).plusMinutes(5))
+                .build();
+        chatMessageRepository.save(msg1_1);
+
+        ChatMessage msg1_2 = ChatMessage.builder()
+                .chat(chat1)
+                .sender(admin)
+                .content("Hello John! I'd be happy to help. What's your question?")
+                .sentAt(LocalDateTime.now().minusHours(2).plusMinutes(6))
+                .isRead(true)
+                .readAt(LocalDateTime.now().minusHours(2).plusMinutes(10))
+                .build();
+        chatMessageRepository.save(msg1_2);
+
+        ChatMessage msg1_3 = ChatMessage.builder()
+                .chat(chat1)
+                .sender(passenger1)
+                .content("I was charged twice for the same ride yesterday.")
+                .sentAt(LocalDateTime.now().minusHours(1).minusMinutes(30))
+                .isRead(true)
+                .readAt(LocalDateTime.now().minusHours(1).minusMinutes(25))
+                .build();
+        chatMessageRepository.save(msg1_3);
+
+        ChatMessage msg1_4 = ChatMessage.builder()
+                .chat(chat1)
+                .sender(admin)
+                .content("I apologize for that. Let me check your transaction history and I'll resolve this immediately.")
+                .sentAt(LocalDateTime.now().minusHours(1))
+                .isRead(false) // Unread by passenger
+                .build();
+        chatMessageRepository.save(msg1_4);
+
+        Chat chat2 = Chat.builder()
+                .user(driver1)
+                .createdAt(LocalDateTime.now().minusDays(1))
+                .lastMessageAt(LocalDateTime.now().minusMinutes(30))
+                .build();
+        chat2 = chatRepository.save(chat2);
+
+        ChatMessage msg2_1 = ChatMessage.builder()
+                .chat(chat2)
+                .sender(driver1)
+                .content("Hi, I need help updating my vehicle information.")
+                .sentAt(LocalDateTime.now().minusHours(1))
+                .isRead(true)
+                .readAt(LocalDateTime.now().minusMinutes(55))
+                .build();
+        chatMessageRepository.save(msg2_1);
+
+        ChatMessage msg2_2 = ChatMessage.builder()
+                .chat(chat2)
+                .sender(admin)
+                .content("Sure! What would you like to update?")
+                .sentAt(LocalDateTime.now().minusMinutes(50))
+                .isRead(true)
+                .readAt(LocalDateTime.now().minusMinutes(45))
+                .build();
+        chatMessageRepository.save(msg2_2);
 
     }
 
