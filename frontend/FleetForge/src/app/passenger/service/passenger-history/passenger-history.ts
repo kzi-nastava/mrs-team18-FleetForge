@@ -6,6 +6,16 @@ export interface PassengerRideResponse {
   content: PassengerRideDTO[];
 }
 
+export interface PageResponse<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  number: number;
+  size: number;
+  first: boolean;
+  last: boolean;
+}
+
 type RideStatus = 'COMPLETED' | 'CANCELLED' | 'IN_PROGRESS';
 
 export interface PassengerRideDTO {
@@ -28,8 +38,19 @@ export class PassengerHistory {
 
   constructor(private http: HttpClient) {}
 
-  getPassengerRides(): Observable<PassengerRideResponse> {
-    return this.http.get<PassengerRideResponse>(`${this.apiUrl}/rides`);
+  getPassengerRides(
+    page: number,
+    size: number
+  ): Observable<PageResponse<PassengerRideDTO>> {
+    return this.http.get<PageResponse<PassengerRideDTO>>(
+      `${this.apiUrl}/rides`,
+      {
+        params: {
+          page,
+          size,
+        },
+      }
+    );
   }
 
   addFavoriteRoute(name: string, rideId: number) {

@@ -54,34 +54,73 @@ export class PassengerHistoryComponent {
     comment: '',
   };
 
+  currentPage = signal(0);
+  pageSize = signal(5);
+  totalPages = signal(0);
+  isLoading = signal(false);
+
   protected rides: WritableSignal<Ride[]> = signal<Ride[]>([]);
 
   ngOnInit(): void {
-    this.passengerHistory.getPassengerRides().subscribe({
-      next: (response) => {
-        const mappedRides: Ride[] = response.content.map(r => ({
-          id: r.rideId,
-          pickupAddress: r.startAddress,
-          dropoffAddress: r.endAddress,
-          startDate: r.startTime,
-          endDate: r.endTime,
-          status: r.status,
-          driverRating: r.driverRating ?? undefined,
-          vehicleRating: r.vehicleRating ?? undefined,
-        }));
+  this.loadRides();
 
-        this.rides.set(mappedRides);
-      },
-      error: (err) => console.error('Failed to load passenger rides', err),
-    });
+  this.passengerFavorite.getFavoriteRoutes().subscribe(routes => {
+    const newFavs = new Set<number>();
+    routes.forEach(route => newFavs.add(route.rideId));
+    this.favRoutes.set(routes);
+    this.favRideIds.set(newFavs);
+  });
+}
 
-    // favorites logic stays untouched
-    this.passengerFavorite.getFavoriteRoutes().subscribe(routes => {
-      const newFavs = new Set<number>();
-      routes.forEach(route => newFavs.add(route.rideId));
-      this.favRoutes.set(routes);
-      this.favRideIds.set(newFavs);
-    });
+
+  loadRides(): void {
+    this.isLoading.set(true);
+
+    this.passengerHistory
+      .getPassengerRides(this.currentPage(), this.pageSize())
+      .subscribe({
+        next: (response) => {
+          const mappedRides: Ride[] = response.content.map(r => ({
+            id: r.rideId,
+            pickupAddress: r.startAddress,
+            dropoffAddress: r.endAddress,
+            startDate: r.startTime,
+            endDate: r.endTime,
+            status: r.status,
+            driverRating: r.driverRating ?? undefined,
+            vehicleRating: r.vehicleRating ?? undefined,
+          }));
+
+          this.rides.set(mappedRides);
+          this.totalPages.set(response.totalPages);
+          this.isLoading.set(false);
+        },
+        error: (err) => {
+          console.error('Failed to load passenger rides', err);
+          this.isLoading.set(false);
+        },
+      });
+  }
+
+  nextPage(): void {
+    if (this.currentPage() < this.totalPages() - 1) {
+      this.currentPage.update(p => p + 1);
+      this.loadRides();
+    }
+  }
+
+  prevPage(): void {
+    if (this.currentPage() > 0) {
+      this.currentPage.update(p => p - 1);
+      this.loadRides();
+    }
+  }
+
+  goToPage(page: number): void {
+    if (page >= 0 && page < this.totalPages()) {
+      this.currentPage.set(page);
+      this.loadRides();
+    }
   }
 
   get displayedRides(): Ride[] {

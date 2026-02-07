@@ -75,6 +75,20 @@
 				</tbody>
 			</table>
 		</div>
+		<div class="pagination">
+			<button (click)="prevPage()" [disabled]="currentPage() === 0 || isLoading()">
+				Previous
+			</button>
+
+			<span>
+				Page {{ currentPage() + 1 }} of {{ totalPages() }}
+			</span>
+
+			<button (click)="nextPage()" [disabled]="currentPage() >= totalPages() - 1 || isLoading()">
+				Next
+			</button>
+		</div>
+
 	</div>
 
 	<!-- Rating modal -->
