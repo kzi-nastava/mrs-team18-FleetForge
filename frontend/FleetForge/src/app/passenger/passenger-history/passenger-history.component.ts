@@ -8,14 +8,12 @@ import { RideRatingModalComponent, RatingFormData } from '../../shared/popups/ri
 import { RideReviewService } from '../service/passenger-ride-review/ride-review.service';
 
 interface Ride {
-  name: string;
   id: number;
   pickupAddress: string;
   dropoffAddress: string;
-  rideDate: string;
-  totalCost: number;
+  startDate: string;
+  endDate: string | null;
   cancellationStatus: string;
-  panicActivation: boolean;
   driverRating?: number; // 1-5 when rated
   vehicleRating?: number; // 1-5 when rated
   ratingComment?: string;
@@ -54,91 +52,47 @@ export class PassengerHistoryComponent {
     comment: '',
   };
 
-  protected rides: WritableSignal<Ride[]> = signal<Ride[]>([
-    {
-      name: 'Petar Petrovic',
-      id: 1,
-      pickupAddress: 'Kneza Milosa 3',
-      dropoffAddress: 'Kajmakcalska 5',
-      rideDate: this.buildRideDate(2),
-      totalCost: 1500.0,
-      cancellationStatus: 'Not cancelled',
-      panicActivation: false,
-      driverRating: 4,
-      vehicleRating: 5,
-      ratingComment: 'Great driving and clean car.',
-    },
-    {
-      name: 'Petar Petrovic',
-      id: 2,
-      pickupAddress: 'Despota Stefana 4',
-      dropoffAddress: 'Sekspiova 2',
-      rideDate: this.buildRideDate(1),
-      totalCost: 2500.0,
-      cancellationStatus: 'By passenger',
-      panicActivation: false,
-    },
-    {
-      name: 'Petar Petrovic',
-      id: 3,
-      pickupAddress: 'Kozacinskog 1',
-      dropoffAddress: 'Staljinova 10',
-      rideDate: this.buildRideDate(6),
-      totalCost: 450.0,
-      cancellationStatus: 'By driver',
-      panicActivation: false,
-    },
-    {
-      name: 'Petar Petrovic',
-      id: 4,
-      pickupAddress: 'Mekinjeva 28',
-      dropoffAddress: 'Mise Dimitrijevica 32',
-      rideDate: this.buildRideDate(10),
-      totalCost: 552.0,
-      cancellationStatus: 'By passenger',
-      panicActivation: true,
-      driverRating: 5,
-      vehicleRating: 4,
-      ratingComment: 'Driver was courteous.',
-    },
+  protected rides: WritableSignal<Ride[]> = signal<Ride[]>([]);
 
-  ]);
   ngOnInit(): void {
+    this.passengerHistory.getPassengerRides().subscribe({
+      next: (response) => {
+        const mappedRides: Ride[] = response.content.map(r => ({
+          id: r.rideId,
+          pickupAddress: `${r.startLocation.latitude}, ${r.startLocation.longitude}`,
+          dropoffAddress: `${r.endLocation.latitude}, ${r.endLocation.longitude}`,
+          startDate: r.startTime,
+          endDate: r.endTime,
+          cancellationStatus: r.endTime ? 'Completed' : 'In progress',
+          driverRating: r.driverRating ?? undefined,
+          vehicleRating: r.vehicleRating ?? undefined,
+        }));
+
+        this.rides.set(mappedRides);
+      },
+      error: (err) => console.error('Failed to load passenger rides', err),
+    });
+
+    // favorites logic stays untouched
     this.passengerFavorite.getFavoriteRoutes().subscribe(routes => {
       const newFavs = new Set<number>();
-    routes.forEach((route) => newFavs.add(route.rideId));
-    this.favRoutes.set(routes);
-  
-    this.favRideIds.update(() => newFavs);
-    }
-    
-    );
+      routes.forEach(route => newFavs.add(route.rideId));
+      this.favRoutes.set(routes);
+      this.favRideIds.set(newFavs);
+    });
   }
-  get displayedRides(): Ride[] {
-    const q = this.searchQuery.trim().toLowerCase();
-    if (!q) return this.rides();
 
-    return this.rides().filter((ride) =>
-      [
-        ride.name,
-        ride.id,
-        ride.pickupAddress,
-        ride.dropoffAddress,
-        new Date(ride.rideDate).toDateString(),
-        ride.cancellationStatus,
-      ]
-        .join(' ')
-        .toLowerCase()
-        .includes(q)
-    );
+  get displayedRides(): Ride[] {
+    return this.rides();
   }
+
 
   getRatingState(ride: Ride): 'rated' | 'expired' | 'pending' {
     if (ride.driverRating !== undefined && ride.driverRating > 0) {
       return 'rated';
     }
 
-    const rideTime = new Date(ride.rideDate).getTime();
+    const rideTime = new Date(ride.startDate).getTime();
     if (Number.isNaN(rideTime)) {
       return 'expired';
     }

@@ -12,35 +12,22 @@
 			<table class="rides-table">
 				<thead>
 					<tr>
-						<th>Name</th>
 						<th>Pick up address</th>
 						<th>Drop off address</th>
-						<th>Ride date</th>
-						<th>Total Cost</th>
-						<th>Cancellation Status</th>
-						<th>Panic Activation</th>
+						<th>Start time</th>
+						<th>End time</th>
 						<th>Rate</th>
-						<th>Details</th>
 						<th>Favorite</th>
+						<th>Details</th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr *ngFor="let ride of displayedRides">
-						<td>
-							<div class="passenger-info">
-								<div class="passenger-name">{{ ride.name }}</div>
-								<div class="ride-id">{{ ride.id }}</div>
-							</div>
-						</td>
 						<td>{{ ride.pickupAddress }}</td>
 						<td>{{ ride.dropoffAddress }}</td>
-						<td>{{ ride.rideDate | date: 'd MMM, y' }}</td>
-						<td>{{ ride.totalCost.toFixed(2) }}</td>
-						<td>{{ ride.cancellationStatus }}</td>
-						<td class="panic-cell">
-							<span class="panic-icon" [class.panic-active]="ride.panicActivation">
-								{{ ride.panicActivation ? '✓' : '✕' }}
-							</span>
+						<td>{{ ride.startDate | date: 'd MMM, y HH:mm' }}</td>
+						<td>
+						{{ ride.endDate ? (ride.endDate | date: 'd MMM, y HH:mm') : '—' }}
 						</td>
 						<td class="action-cell">
 							<ng-container [ngSwitch]="getRatingState(ride)">
@@ -58,12 +45,7 @@
 									Rate
 								</button>
 							</ng-container>
-						</td>
-						<td class="action-cell">
-							<button type="button" class="action-btn details" (click)="onDetails(ride)">
-								Details
-							</button>
-						</td>
+						</td>						
 						<td class="action-cell">
 							<button
 								type="button"
@@ -73,6 +55,10 @@
 								title="Favorite"
 							>
 								♥
+							</button>
+						</td>
+						<td class="action-cell">
+							<button class="details-btn">View details
 							</button>
 						</td>
 					</tr>
