@@ -6,12 +6,15 @@ export interface PassengerRideResponse {
   content: PassengerRideDTO[];
 }
 
+type RideStatus = 'COMPLETED' | 'CANCELLED' | 'IN_PROGRESS';
+
 export interface PassengerRideDTO {
   rideId: number;
   startAddress: string;
   endAddress: string;
   startTime: string;
   endTime: string | null;
+  status: RideStatus;
   startLocation: { latitude: number; longitude: number };
   endLocation: { latitude: number; longitude: number };
   vehicleRating: number | null;

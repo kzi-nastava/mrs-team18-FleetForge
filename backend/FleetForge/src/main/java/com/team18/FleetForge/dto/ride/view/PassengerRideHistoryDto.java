@@ -1,5 +1,6 @@
 package com.team18.FleetForge.dto.ride.view;
 
+import com.team18.FleetForge.model.enums.RideStatus;
 import com.team18.FleetForge.model.ride.GeoPoint;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,6 +18,7 @@ public class PassengerRideHistoryDto {
     private String endAddress;
     private Integer vehicleRating;
     private Integer driverRating;
+    private RideStatus status;
 
     public Double getAverageReview() {
         if (vehicleRating == null || driverRating == null) return null;

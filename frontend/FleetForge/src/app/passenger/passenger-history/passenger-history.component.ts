@@ -7,13 +7,15 @@ import { RideFavoriteRoutesDTO } from '../../shared/dtos/ride.dtos';
 import { RideRatingModalComponent, RatingFormData } from '../../shared/popups/ride-rating-modal/ride-rating-modal.component';
 import { RideReviewService } from '../service/passenger-ride-review/ride-review.service';
 
+type RideStatus = 'COMPLETED' | 'CANCELLED' | 'IN_PROGRESS';
+
 interface Ride {
   id: number;
   pickupAddress: string;
   dropoffAddress: string;
   startDate: string;
   endDate: string | null;
-  cancellationStatus: string;
+  status: RideStatus;
   driverRating?: number; // 1-5 when rated
   vehicleRating?: number; // 1-5 when rated
   ratingComment?: string;
@@ -63,7 +65,7 @@ export class PassengerHistoryComponent {
           dropoffAddress: r.endAddress,
           startDate: r.startTime,
           endDate: r.endTime,
-          cancellationStatus: r.endTime ? 'Completed' : 'In progress',
+          status: r.status,
           driverRating: r.driverRating ?? undefined,
           vehicleRating: r.vehicleRating ?? undefined,
         }));
@@ -87,7 +89,11 @@ export class PassengerHistoryComponent {
   }
 
 
-  getRatingState(ride: Ride): 'rated' | 'expired' | 'pending' {
+  getRatingState(ride: Ride): 'rated' | 'expired' | 'pending' | 'cancelled' {
+    if (ride.status === 'CANCELLED') {
+      return 'cancelled';
+    }
+
     if (ride.driverRating !== undefined && ride.driverRating > 0) {
       return 'rated';
     }

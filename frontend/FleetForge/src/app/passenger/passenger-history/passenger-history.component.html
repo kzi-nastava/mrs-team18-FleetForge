@@ -2,7 +2,7 @@
 
 	<div class="header-section">
 		<h2 class="dashboard-title">Ride history</h2>
-		
+
 	</div>
 
 	<div class="rides-section">
@@ -16,6 +16,7 @@
 						<th>Drop off address</th>
 						<th>Start time</th>
 						<th>End time</th>
+						<th>Status</th>
 						<th>Rate</th>
 						<th>Favorite</th>
 						<th>Details</th>
@@ -27,33 +28,42 @@
 						<td>{{ ride.dropoffAddress }}</td>
 						<td>{{ ride.startDate | date: 'd MMM, y HH:mm' }}</td>
 						<td>
-						{{ ride.endDate ? (ride.endDate | date: 'd MMM, y HH:mm') : '—' }}
+							{{ ride.endDate ? (ride.endDate | date: 'd MMM, y HH:mm') : '—' }}
+						</td>
+						<td>
+							<span class="status" [class.completed]="ride.status === 'COMPLETED'"
+								[class.cancelled]="ride.status === 'CANCELLED'">
+								{{ ride.status }}
+							</span>
 						</td>
 						<td class="action-cell">
 							<ng-container [ngSwitch]="getRatingState(ride)">
+
 								<div *ngSwitchCase="'rated'" class="stars">
-									<span
-										*ngFor="let filled of getStarArray(ride.driverRating || 0)"
-										class="star"
-										[class.filled]="filled"
-									>
+									<span *ngFor="let filled of getStarArray(ride.driverRating || 0)" class="star"
+										[class.filled]="filled">
 										★
 									</span>
 								</div>
-								<div *ngSwitchCase="'expired'" class="rating-expired">Rating closed</div>
-								<button *ngSwitchCase="'pending'" type="button" class="action-btn rate" (click)="openRating(ride)">
+
+								<div *ngSwitchCase="'expired'" class="rating-expired">
+									Rating closed
+								</div>
+
+								<div *ngSwitchCase="'cancelled'" class="rating-expired cancelled">
+									Ride cancelled
+								</div>
+
+								<button *ngSwitchCase="'pending'" type="button" class="action-btn rate"
+									(click)="openRating(ride)">
 									Rate
 								</button>
+
 							</ng-container>
-						</td>						
+						</td>
 						<td class="action-cell">
-							<button
-								type="button"
-								class="icon-btn"
-								[ngClass]="{ favorited: isFavorite(ride) }"
-								(click)="onFavoriteClick(ride)"
-								title="Favorite"
-							>
+							<button type="button" class="icon-btn" [ngClass]="{ favorited: isFavorite(ride) }"
+								(click)="onFavoriteClick(ride)" title="Favorite">
 								♥
 							</button>
 						</td>
@@ -68,16 +78,10 @@
 	</div>
 
 	<!-- Rating modal -->
-	<app-ride-rating-modal
-		[isOpen]="isRatingModalOpen"
-		[pickupAddress]="selectedRide?.pickupAddress || ''"
-		[dropoffAddress]="selectedRide?.dropoffAddress || ''"
-		[formData]="ratingForm"
-		[isLoading]="isRatingLoading"
-		[showFinishedMessage]="false"
-		(closed)="closeRatingModal()"
-		(submitted)="submitRating($event)"
-	></app-ride-rating-modal>
+	<app-ride-rating-modal [isOpen]="isRatingModalOpen" [pickupAddress]="selectedRide?.pickupAddress || ''"
+		[dropoffAddress]="selectedRide?.dropoffAddress || ''" [formData]="ratingForm" [isLoading]="isRatingLoading"
+		[showFinishedMessage]="false" (closed)="closeRatingModal()"
+		(submitted)="submitRating($event)"></app-ride-rating-modal>
 
 	<!-- Favorite route name modal -->
 	<div class="favorite-modal-backdrop" *ngIf="isFavoriteModalOpen">
@@ -89,36 +93,22 @@
 						{{ favoriteRide?.pickupAddress }} → {{ favoriteRide?.dropoffAddress }}
 					</p>
 				</div>
-				<button
-					type="button"
-					class="icon-btn close-btn"
-					(click)="closeFavoriteModal()"
-					aria-label="Close favorite route dialog"
-				>
+				<button type="button" class="icon-btn close-btn" (click)="closeFavoriteModal()"
+					aria-label="Close favorite route dialog">
 					✕
 				</button>
 			</div>
 
 			<div class="favorite-modal__content">
 				<label class="field-label" for="favoriteRouteName">Favorite route name</label>
-				<input
-					id="favoriteRouteName"
-					type="text"
-					class="favorite-name-input"
-					placeholder="e.g. Home → Work"
-					[(ngModel)]="favoriteRouteName"
-					autocomplete="off"
-				/>
+				<input id="favoriteRouteName" type="text" class="favorite-name-input" placeholder="e.g. Home → Work"
+					[(ngModel)]="favoriteRouteName" autocomplete="off" />
 			</div>
 
 			<div class="favorite-modal__actions">
 				<button type="button" class="modal-btn ghost" (click)="closeFavoriteModal()">Cancel</button>
-				<button
-					type="button"
-					class="modal-btn primary"
-					[disabled]="!favoriteRouteName.trim()"
-					(click)="saveFavoriteRoute()"
-				>
+				<button type="button" class="modal-btn primary" [disabled]="!favoriteRouteName.trim()"
+					(click)="saveFavoriteRoute()">
 					Save
 				</button>
 			</div>

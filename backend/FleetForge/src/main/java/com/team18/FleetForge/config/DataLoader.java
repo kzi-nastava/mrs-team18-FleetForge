@@ -257,6 +257,138 @@ public class DataLoader implements CommandLineRunner {
 //        );
 //        rideRepository.save(ride9);
 
+        Ride ride10 = createRide(
+                driver2, passenger4,
+                new GeoPoint(45.2623, 19.8315), "Bulevar Cara Lazara 15, Novi Sad",
+                new GeoPoint(45.2480, 19.8520), "Štrand, Novi Sad",
+                LocalDateTime.now().minusDays(10).withHour(12).withMinute(30),
+                LocalDateTime.now().minusDays(10).withHour(12).withMinute(55),
+                4.2, 18.0, 720.0,
+                RideStatus.COMPLETED, false, null, null
+        );
+        rideRepository.save(ride10);
+
+        Ride ride11 = createRide(
+                driver1, passenger4,
+                new GeoPoint(45.2720, 19.8470), "Bulevar Mihajla Pupina 10, Novi Sad",
+                new GeoPoint(45.2630, 19.8410), "Delta City, Novi Sad",
+                LocalDateTime.now().minusDays(8).withHour(19).withMinute(15),
+                null,
+                3.8, 15.0, 680.0,
+                RideStatus.CANCELLED, false, RideActor.DRIVER,
+                "Vehicle breakdown"
+        );
+        ride11.setCancelledAt(LocalDateTime.now().minusDays(8).withHour(19).withMinute(10));
+        rideRepository.save(ride11);
+
+        Ride ride12 = createRide(
+                driver2, passenger4,
+                new GeoPoint(45.2555, 19.8380), "Kisacka 25, Novi Sad",
+                new GeoPoint(45.2680, 19.8600), "Telep, Novi Sad",
+                LocalDateTime.now().minusDays(7).withHour(8).withMinute(45),
+                LocalDateTime.now().minusDays(7).withHour(9).withMinute(15),
+                5.7, 22.0, 890.0,
+                RideStatus.COMPLETED, true, null, null
+        );
+        ride12.setPanicActivatedAt(LocalDateTime.now().minusDays(7).withHour(9).withMinute(5));
+        rideRepository.save(ride12);
+
+        Ride ride13 = createRide(
+                driver1, passenger4,
+                new GeoPoint(45.2640, 19.8550), "Liman 1, Novi Sad",
+                new GeoPoint(45.2570, 19.8320), "Grbavica, Novi Sad",
+                LocalDateTime.now().minusDays(6).withHour(17).withMinute(30),
+                LocalDateTime.now().minusDays(6).withHour(18).withMinute(5),
+                6.8, 28.0, 1050.0,
+                RideStatus.COMPLETED, false, null, null
+        );
+        rideRepository.save(ride13);
+
+        Ride ride14 = createRide(
+                driver2, passenger4,
+                new GeoPoint(45.2500, 19.8450), "Petrovaradin, Novi Sad",
+                new GeoPoint(45.2700, 19.8350), "Centar, Novi Sad",
+                LocalDateTime.now().minusDays(4).withHour(14).withMinute(0),
+                null,
+                7.2, 30.0, 1150.0,
+                RideStatus.CANCELLED, false, RideActor.PASSENGER,
+                "Found alternative transportation"
+        );
+        ride14.setCancelledAt(LocalDateTime.now().minusDays(4).withHour(13).withMinute(45));
+        rideRepository.save(ride14);
+
+        Ride ride15 = createRide(
+                driver1, passenger4,
+                new GeoPoint(45.2590, 19.8270), "Detelinara, Novi Sad",
+                new GeoPoint(45.2730, 19.8420), "Vojvodanska 10, Novi Sad",
+                LocalDateTime.now().minusDays(3).withHour(10).withMinute(0),
+                LocalDateTime.now().minusDays(3).withHour(10).withMinute(35),
+                8.5, 32.0, 1250.0,
+                RideStatus.COMPLETED, false, null, null
+        );
+        rideRepository.save(ride15);
+
+        Ride ride16 = createRide(
+                driver2, passenger4,
+                new GeoPoint(45.2675, 19.8370), "Trg slobode 5, Novi Sad",
+                new GeoPoint(45.2530, 19.8570), "Petrovaradinska tvrdjava",
+                LocalDateTime.now().minusDays(2).withHour(21).withMinute(0),
+                LocalDateTime.now().minusDays(2).withHour(21).withMinute(40),
+                5.5, 24.0, 950.0,
+                RideStatus.COMPLETED, true, null, null
+        );
+        ride16.setPanicActivatedAt(LocalDateTime.now().minusDays(2).withHour(21).withMinute(25));
+        rideRepository.save(ride16);
+
+        Ride ride17 = createRide(
+                driver1, passenger4,
+                new GeoPoint(45.2610, 19.8430), "Futoski put 30, Novi Sad",
+                new GeoPoint(45.2490, 19.8310), "Satelit, Novi Sad",
+                LocalDateTime.now().minusDays(1).withHour(7).withMinute(30),
+                null,
+                4.0, 16.0, 650.0,
+                RideStatus.CANCELLED, false, RideActor.DRIVER,
+                "Emergency situation"
+        );
+        ride17.setCancelledAt(LocalDateTime.now().minusDays(1).withHour(7).withMinute(20));
+        rideRepository.save(ride17);
+
+        Ride ride18 = createRide(
+                driver2, passenger4,
+                new GeoPoint(45.2560, 19.8520), "Klisa, Novi Sad",
+                new GeoPoint(45.2690, 19.8280), "Podbara, Novi Sad",
+                LocalDateTime.now().minusHours(6).withMinute(0),
+                LocalDateTime.now().minusHours(5).withMinute(25),
+                9.0, 35.0, 1350.0,
+                RideStatus.COMPLETED, false, null, null
+        );
+        rideRepository.save(ride18);
+
+        Ride ride19 = createRide(
+                driver1, passenger4,
+                new GeoPoint(45.2630, 19.8490), "Bulevar oslobođenja 80, Novi Sad",
+                new GeoPoint(45.2540, 19.8390), "Mise Dimitrijevica 12, Novi Sad",
+                LocalDateTime.now().minusHours(3).withMinute(0),
+                null,
+                3.5, 14.0, 580.0,
+                RideStatus.CANCELLED, false, RideActor.PASSENGER,
+                "Plans changed unexpectedly"
+        );
+        ride19.setCancelledAt(LocalDateTime.now().minusHours(3).withMinute(30));
+        rideRepository.save(ride19);
+
+        Ride ride20 = createRide(
+                driver2, passenger4,
+                new GeoPoint(45.2580, 19.8620), "Sajam, Novi Sad",
+                new GeoPoint(45.2470, 19.8250), "Novo Naselje, Novi Sad",
+                LocalDateTime.now().minusHours(12).withMinute(0),
+                LocalDateTime.now().minusHours(11).withMinute(20),
+                10.5, 40.0, 1550.0,
+                RideStatus.COMPLETED, false, null, null
+        );
+        ride20.setLinkedPassengers(new ArrayList<>(List.of(passenger1, passenger2)));
+        rideRepository.save(ride20);
+
 
         FavoriteRoute route=new FavoriteRoute();
         route.setRide(ride1);

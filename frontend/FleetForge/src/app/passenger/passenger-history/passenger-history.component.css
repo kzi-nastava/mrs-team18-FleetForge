@@ -336,3 +336,12 @@
   background: var(--color-primary);
   color: white;
 }
+
+.status.completed {
+  color: var(--color-green);
+}
+
+.status.cancelled {
+  color: var(--color-red);
+  font-weight: 600;
+}

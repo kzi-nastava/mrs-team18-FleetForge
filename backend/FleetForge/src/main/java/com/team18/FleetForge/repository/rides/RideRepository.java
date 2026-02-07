@@ -103,7 +103,8 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
          r.startAddress,
          r.endAddress,
          rr.vehicleRating,
-         rr.driverRating
+         rr.driverRating,
+         r.status
      )
     FROM Ride r
     LEFT JOIN r.review rr
