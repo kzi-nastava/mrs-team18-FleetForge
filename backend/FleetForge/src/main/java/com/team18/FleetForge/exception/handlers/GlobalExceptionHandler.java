@@ -1,5 +1,6 @@
-package com.team18.FleetForge.exception;
+package com.team18.FleetForge.exception.handlers;
 
+import com.team18.FleetForge.exception.ride.RideNotFoundException;
 import jakarta.persistence.EntityNotFoundException;
 import org.hibernate.query.sqm.PathElementException;
 import org.springframework.http.HttpStatus;

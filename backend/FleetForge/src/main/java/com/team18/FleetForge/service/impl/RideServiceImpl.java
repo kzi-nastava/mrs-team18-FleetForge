@@ -8,7 +8,7 @@ import com.team18.FleetForge.dto.ride.reports.InconsistencyReportResponseDTO;
 import com.team18.FleetForge.dto.ride.routes.WayPointDTO;
 import com.team18.FleetForge.dto.ride.view.PassengerRideDetailsDTO;
 import com.team18.FleetForge.dto.ride.view.RideDetailsDTO;
-import com.team18.FleetForge.exception.RideNotFoundException;
+import com.team18.FleetForge.exception.ride.RideNotFoundException;
 import com.team18.FleetForge.model.ride.*;
 import com.team18.FleetForge.model.users.Driver;
 import com.team18.FleetForge.model.users.Passenger;
