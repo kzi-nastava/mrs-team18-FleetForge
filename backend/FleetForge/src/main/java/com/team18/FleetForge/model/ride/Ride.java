@@ -112,6 +112,7 @@ public class Ride {
 
     @Column(name = "pet_friendly")
     private boolean isPetFriendly;
+
     @Column(name = "baby_seat")
     private boolean isBabySeat;
 }

@@ -1,6 +1,6 @@
 package com.team18.FleetForge.repository.rides;
 
-import com.team18.FleetForge.dto.ride.PassengerRideHistoryDto;
+import com.team18.FleetForge.dto.ride.view.PassengerRideHistoryDto;
 import com.team18.FleetForge.model.enums.RideStatus;
 import com.team18.FleetForge.model.ride.Ride;
 import com.team18.FleetForge.model.users.Driver;
@@ -96,7 +96,7 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
 
 
     @Query("""
-    SELECT new com.team18.FleetForge.dto.ride.PassengerRideHistoryDto(
+    SELECT new com.team18.FleetForge.dto.ride.view.PassengerRideHistoryDto(
          r.id,
          r.startTime,
          r.endTime,
@@ -107,8 +107,8 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
      )
     FROM Ride r
     LEFT JOIN RideReview rr ON rr.ride.id = r.id
-    WHERE 
-        r.status = 'COMPLETED'
+    WHERE
+        r.status IN ('COMPLETED', 'CANCELLED')
         AND (r.passenger.id = :passengerId
             OR :passengerId IN (
                 SELECT lp.id FROM r.linkedPassengers lp

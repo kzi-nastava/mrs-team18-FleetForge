@@ -31,7 +31,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.team18.FleetForge.dto.ride.PassengerRideHistoryDto;
+import com.team18.FleetForge.dto.ride.view.PassengerRideHistoryDto;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

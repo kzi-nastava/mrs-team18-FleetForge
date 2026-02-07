@@ -1,7 +1,7 @@
 package com.team18.FleetForge.service.rides;
 
 import com.team18.FleetForge.dto.driver.DriverRideHistoryDTO;
-import com.team18.FleetForge.dto.ride.PassengerRideHistoryDto;
+import com.team18.FleetForge.dto.ride.view.PassengerRideHistoryDto;
 import com.team18.FleetForge.dto.ride.lifecycle.RideCreateRequestDTO;
 import com.team18.FleetForge.dto.ride.view.PassengerRideDetailsDTO;
 import com.team18.FleetForge.dto.ride.view.RideDetailsDTO;
