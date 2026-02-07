@@ -48,56 +48,97 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr *ngFor="let ride of displayedRides">
-						<td>{{ ride.pickupAddress }}</td>
-						<td>{{ ride.dropoffAddress }}</td>
-						<td>{{ ride.startDate | date: 'd MMM, y HH:mm' }}</td>
-						<td>
-							{{ ride.endDate ? (ride.endDate | date: 'd MMM, y HH:mm') : '—' }}
-						</td>
-						<td>
-							<span class="status" [class.completed]="ride.status === 'COMPLETED'"
-								[class.cancelled]="ride.status === 'CANCELLED'">
-								{{ ride.status }}
-							</span>
-						</td>
-						<td class="action-cell">
-							<ng-container [ngSwitch]="getRatingState(ride)">
-
-								<div *ngSwitchCase="'rated'" class="stars">
-									<span *ngFor="let filled of getStarArray(ride.driverRating || 0)" class="star"
-										[class.filled]="filled">
-										★
-									</span>
-								</div>
-
-								<div *ngSwitchCase="'expired'" class="rating-expired">
-									Rating closed
-								</div>
-
-								<div *ngSwitchCase="'cancelled'" class="rating-expired cancelled">
-									Ride cancelled
-								</div>
-
-								<button *ngSwitchCase="'pending'" type="button" class="action-btn rate"
-									(click)="openRating(ride)">
-									Rate
+					<ng-container *ngFor="let ride of displayedRides">
+						<!-- Main ride row -->
+						<tr>
+							<td>{{ ride.pickupAddress }}</td>
+							<td>{{ ride.dropoffAddress }}</td>
+							<td>{{ ride.startDate | date: 'd MMM, y HH:mm' }}</td>
+							<td>{{ ride.endDate ? (ride.endDate | date: 'd MMM, y HH:mm') : '—' }}</td>
+							<td>
+								<span class="status" [class.completed]="ride.status === 'COMPLETED'"
+									[class.cancelled]="ride.status === 'CANCELLED'">
+									{{ ride.status }}
+								</span>
+							</td>
+							<td class="action-cell">
+								<ng-container [ngSwitch]="getRatingState(ride)">
+									<div *ngSwitchCase="'rated'" class="stars">
+										<span *ngFor="let filled of getStarArray(ride.driverRating || 0)" class="star"
+											[class.filled]="filled">
+											★
+										</span>
+									</div>
+									<div *ngSwitchCase="'expired'" class="rating-expired">Rating closed</div>
+									<div *ngSwitchCase="'cancelled'" class="rating-expired cancelled">Ride cancelled
+									</div>
+									<button *ngSwitchCase="'pending'" type="button" class="action-btn rate"
+										(click)="openRating(ride)">
+										Rate
+									</button>
+								</ng-container>
+							</td>
+							<td class="action-cell">
+								<button type="button" class="icon-btn" [ngClass]="{ favorited: isFavorite(ride) }"
+									(click)="onFavoriteClick(ride)" title="Favorite">
+									♥
 								</button>
+							</td>
+							<td class="action-cell">
+								<button class="details-btn" (click)="toggleDetails(ride)">
+									{{ isExpanded(ride) ? 'Hide details' : 'View details' }}
+								</button>
+							</td>
+						</tr>
 
-							</ng-container>
-						</td>
-						<td class="action-cell">
-							<button type="button" class="icon-btn" [ngClass]="{ favorited: isFavorite(ride) }"
-								(click)="onFavoriteClick(ride)" title="Favorite">
-								♥
-							</button>
-						</td>
-						<td class="action-cell">
-							<button class="details-btn">View details
-							</button>
-						</td>
-					</tr>
+						<!-- Details row -->
+						<tr *ngIf="isExpanded(ride)" class="details-row">
+							<td colspan="8">
+								<ng-container *ngIf="!detailsLoading().has(ride.id); else loading">
+									<div class="detail-layout" *ngIf="getDetails(ride.id) as details">
+										<div class="detail-grid">
+											<div class="detail-card">
+												<div class="detail-label">Driver</div>
+												<div class="detail-value">{{ details.driver.firstName }} {{
+													details.driver.lastName }}</div>
+												<div class="detail-label">Phone</div>
+												<div class="detail-value">{{ details.driver.phoneNumber }}</div>
+											</div>
+
+											<div class="detail-card">
+												<div class="detail-label">Distance</div>
+												<div class="detail-value">{{ details.totalDistance }} km</div>
+												<div class="detail-label">Duration</div>
+												<div class="detail-value">{{ details.estimatedDuration }} min</div>
+											</div>
+
+											<div class="detail-card">
+												<div class="detail-label">Total cost</div>
+												<div class="detail-value">{{ details.totalCost | number:'1.0-0' }} RSD
+												</div>
+												<div class="detail-label">Vehicle</div>
+												<div class="detail-value">{{ details.vehicleType }}</div>
+											</div>
+
+											<div class="detail-card">
+												<div class="detail-label">Options</div>
+												<div class="detail-value">
+													🚼 Baby seat: {{ details.babySeat ? 'Yes' : 'No' }}<br />
+													🐶 Pet friendly: {{ details.petFriendly ? 'Yes' : 'No' }}
+												</div>
+											</div>
+										</div>
+									</div>
+								</ng-container>
+
+								<ng-template #loading>
+									<div class="muted-text">Loading details…</div>
+								</ng-template>
+							</td>
+						</tr>
+					</ng-container>
 				</tbody>
+
 			</table>
 		</div>
 		<div class="pagination">

@@ -1,7 +1,7 @@
 import { Component, signal, WritableSignal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { PassengerHistory } from '../service/passenger-history/passenger-history';
+import { PassengerHistory, PassengerRideDetailsDto } from '../service/passenger-history/passenger-history';
 import { PassengerFavorite } from '../service/passenger-favorite/passenger-favorite';
 import { RideFavoriteRoutesDTO } from '../../shared/dtos/ride.dtos';
 import { RideRatingModalComponent, RatingFormData } from '../../shared/popups/ride-rating-modal/ride-rating-modal.component';
@@ -62,19 +62,67 @@ export class PassengerHistoryComponent {
   sortBy = signal<string>('startTime');
   sortDirection = signal<'asc' | 'desc'>('desc');
 
+  expandedRideId: number | null = null;
+  rideDetails = signal<Record<number, PassengerRideDetailsDto>>({});
+  detailsLoading = signal<Set<number>>(new Set());
+
+
   protected rides: WritableSignal<Ride[]> = signal<Ride[]>([]);
 
   ngOnInit(): void {
-  this.loadRides();
+    this.loadRides();
 
-  this.passengerFavorite.getFavoriteRoutes().subscribe(routes => {
-    const newFavs = new Set<number>();
-    routes.forEach(route => newFavs.add(route.rideId));
-    this.favRoutes.set(routes);
-    this.favRideIds.set(newFavs);
-  });
-}
+    this.passengerFavorite.getFavoriteRoutes().subscribe(routes => {
+      const newFavs = new Set<number>();
+      routes.forEach(route => newFavs.add(route.rideId));
+      this.favRoutes.set(routes);
+      this.favRideIds.set(newFavs);
+    });
+  }
 
+  toggleDetails(ride: Ride): void {
+    if (this.expandedRideId === ride.id) {
+      this.expandedRideId = null;
+      return;
+    }
+
+    this.expandedRideId = ride.id;
+
+    if (this.rideDetails()[ride.id]) {
+      return;
+    }
+
+    this.detailsLoading.update(s => new Set(s).add(ride.id));
+
+    this.passengerHistory.getRideDetails(ride.id).subscribe({
+      next: details => {
+        this.rideDetails.update(prev => ({
+          ...prev,
+          [ride.id]: details,
+        }));
+        this.detailsLoading.update(s => {
+          const next = new Set(s);
+          next.delete(ride.id);
+          return next;
+        });
+      },
+      error: () => {
+        this.detailsLoading.update(s => {
+          const next = new Set(s);
+          next.delete(ride.id);
+          return next;
+        });
+      }
+    });
+  }
+
+  isExpanded(ride: Ride): boolean {
+    return this.expandedRideId === ride.id;
+  }
+
+  getDetails(rideId: number) {
+    return this.rideDetails()[rideId];
+  }
 
   loadRides(): void {
     this.isLoading.set(true);

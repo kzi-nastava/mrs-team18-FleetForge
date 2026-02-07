@@ -32,6 +32,29 @@ export interface PassengerRideHistoryDto {
   averageReview: number | null;
 }
 
+export interface PassengerRideDetailsDto {
+  id: number;
+  startAddress: string;
+  endAddress: string;
+  startLocation: { latitude: number; longitude: number };
+  endLocation: { latitude: number; longitude: number };
+  wayPoints: { latitude: number; longitude: number }[];
+  startTime: string;
+  endTime: string;
+  totalDistance: number;
+  estimatedDuration: number;
+  totalCost: number;
+  status: string;
+  vehicleType: string;
+  petFriendly: boolean;
+  babySeat: boolean;
+  driver: {
+    firstName: string;
+    lastName: string;
+    phoneNumber: string;
+  };
+}
+
 @Injectable({ providedIn: 'root' })
   export class PassengerHistory {
     private apiUrl = 'http://localhost:8080/api/passenger';
@@ -54,6 +77,12 @@ export interface PassengerRideHistoryDto {
           direction,
         },
       }
+    );
+  }
+
+  getRideDetails(rideId: number) {
+    return this.http.get<PassengerRideDetailsDto>(
+      `${this.apiUrl}/rides/${rideId}`
     );
   }
 
