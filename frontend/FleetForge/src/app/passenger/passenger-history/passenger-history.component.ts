@@ -59,6 +59,9 @@ export class PassengerHistoryComponent {
   totalPages = signal(0);
   isLoading = signal(false);
 
+  sortBy = signal<string>('startTime');
+  sortDirection = signal<'asc' | 'desc'>('desc');
+
   protected rides: WritableSignal<Ride[]> = signal<Ride[]>([]);
 
   ngOnInit(): void {
@@ -77,7 +80,12 @@ export class PassengerHistoryComponent {
     this.isLoading.set(true);
 
     this.passengerHistory
-      .getPassengerRides(this.currentPage(), this.pageSize())
+      .getPassengerRides(
+        this.currentPage(),
+        this.pageSize(),
+        this.sortBy(),
+        this.sortDirection()
+      )
       .subscribe({
         next: (response) => {
           const mappedRides: Ride[] = response.content.map(r => ({
@@ -95,12 +103,29 @@ export class PassengerHistoryComponent {
           this.totalPages.set(response.totalPages);
           this.isLoading.set(false);
         },
-        error: (err) => {
-          console.error('Failed to load passenger rides', err);
-          this.isLoading.set(false);
-        },
+        error: () => this.isLoading.set(false),
       });
   }
+
+  onSort(column: string): void {
+    if (this.sortBy() === column) {
+      this.sortDirection.set(
+        this.sortDirection() === 'asc' ? 'desc' : 'asc'
+      );
+    } else {
+      this.sortBy.set(column);
+      this.sortDirection.set('desc');
+    }
+
+    this.currentPage.set(0);
+
+    this.loadRides();
+  }
+
+  isSortedBy(column: string): boolean {
+    return this.sortBy() === column;
+  }
+
 
   nextPage(): void {
     if (this.currentPage() < this.totalPages() - 1) {

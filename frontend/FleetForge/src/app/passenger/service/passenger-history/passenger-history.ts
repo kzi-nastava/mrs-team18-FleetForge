@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 export interface PassengerRideResponse {
-  content: PassengerRideDTO[];
+  content: PassengerRideHistoryDto[];
 }
 
 export interface PageResponse<T> {
@@ -18,7 +18,7 @@ export interface PageResponse<T> {
 
 type RideStatus = 'COMPLETED' | 'CANCELLED' | 'IN_PROGRESS';
 
-export interface PassengerRideDTO {
+export interface PassengerRideHistoryDto {
   rideId: number;
   startAddress: string;
   endAddress: string;
@@ -33,25 +33,30 @@ export interface PassengerRideDTO {
 }
 
 @Injectable({ providedIn: 'root' })
-export class PassengerHistory {
-  private apiUrl = 'http://localhost:8080/api/passenger';
+  export class PassengerHistory {
+    private apiUrl = 'http://localhost:8080/api/passenger';
 
-  constructor(private http: HttpClient) {}
+    constructor(private http: HttpClient) {}
 
-  getPassengerRides(
+    getPassengerRides(
     page: number,
-    size: number
-  ): Observable<PageResponse<PassengerRideDTO>> {
-    return this.http.get<PageResponse<PassengerRideDTO>>(
+    size: number,
+    sortBy: string,
+    direction: 'asc' | 'desc'
+  ) {
+    return this.http.get<PageResponse<PassengerRideHistoryDto>>(
       `${this.apiUrl}/rides`,
       {
         params: {
           page,
           size,
+          sortBy,
+          direction,
         },
       }
     );
   }
+
 
   addFavoriteRoute(name: string, rideId: number) {
     return this.http.post<void>(`${this.apiUrl}/favorites/${name}/${rideId}`, {});

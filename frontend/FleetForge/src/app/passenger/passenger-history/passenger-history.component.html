@@ -12,11 +12,36 @@
 			<table class="rides-table">
 				<thead>
 					<tr>
-						<th>Pick up address</th>
-						<th>Drop off address</th>
-						<th>Start time</th>
-						<th>End time</th>
-						<th>Status</th>
+						<th (click)="onSort('startAddress')">
+							Start address
+							<span *ngIf="isSortedBy('startAddress')" class="sort-icon">
+								{{ sortDirection() === 'asc' ? '▲' : '▼' }}
+							</span>
+						</th>
+						<th (click)="onSort('endAddress')">
+							End address
+							<span *ngIf="isSortedBy('endAddress')" class="sort-icon">
+								{{ sortDirection() === 'asc' ? '▲' : '▼' }}
+							</span>
+						</th>
+						<th (click)="onSort('startTime')">
+							Start time
+							<span *ngIf="isSortedBy('startTime')" class="sort-icon">
+								{{ sortDirection() === 'asc' ? '▲' : '▼' }}
+							</span>
+						</th>
+						<th (click)="onSort('endTime')">
+							End time
+							<span *ngIf="isSortedBy('endTime')" class="sort-icon">
+								{{ sortDirection() === 'asc' ? '▲' : '▼' }}
+							</span>
+						</th>
+						<th (click)="onSort('status')">
+							Status
+							<span *ngIf="isSortedBy('status')" class="sort-icon">
+								{{ sortDirection() === 'asc' ? '▲' : '▼' }}
+							</span>
+						</th>
 						<th>Rate</th>
 						<th>Favorite</th>
 						<th>Details</th>
