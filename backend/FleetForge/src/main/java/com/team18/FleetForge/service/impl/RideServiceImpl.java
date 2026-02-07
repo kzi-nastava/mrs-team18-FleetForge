@@ -334,8 +334,6 @@ public class RideServiceImpl implements RideService {
     }
 
 
-
-
     @Override
     public Page<PassengerRideHistoryDto> getPassengerRideHistory(
             Long passengerId,
@@ -346,16 +344,22 @@ public class RideServiceImpl implements RideService {
             int page,
             int size
     ) {
-        //todo remove later
-        log.info(
-                "Fetching completed ride history for passenger {} from {} to {}, page {}, size {}",
-                passengerId, from, to, page, size
-        );
+        log.info("Fetching ride history for passenger {}, sorted by {}", passengerId, sortBy);
 
-        Sort sort = direction.equalsIgnoreCase("asc")
-                ? Sort.by(sortBy).ascending()
-                : Sort.by(sortBy).descending();
+        String resolvedSortBy;
+        if (sortBy.startsWith("review.")) {
+            resolvedSortBy = sortBy.replace("review.", "rr.");
+        } else if (sortBy.equals("vehicleRating") || sortBy.equals("driverRating")) {
+            resolvedSortBy = "rr." + sortBy;
+        } else {
+            resolvedSortBy = "r." + sortBy;
+        }
 
+        Sort.Direction sortDirection = direction.equalsIgnoreCase("asc")
+                ? Sort.Direction.ASC
+                : Sort.Direction.DESC;
+
+        Sort sort = Sort.by(new Sort.Order(sortDirection, resolvedSortBy).nullsLast());
         Pageable pageable = PageRequest.of(page, size, sort);
 
         return rideRepository.findPassengerRideHistory(

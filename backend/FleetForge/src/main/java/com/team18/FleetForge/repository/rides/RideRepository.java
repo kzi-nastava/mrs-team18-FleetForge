@@ -106,7 +106,7 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
          rr.driverRating
      )
     FROM Ride r
-    LEFT JOIN RideReview rr ON rr.ride.id = r.id
+    LEFT JOIN r.review rr
     WHERE
         r.status IN ('COMPLETED', 'CANCELLED')
         AND (r.passenger.id = :passengerId
@@ -116,7 +116,7 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
         )
         AND (:from IS NULL OR r.startTime >= :from)
         AND (:to IS NULL OR r.startTime <= :to)
-""")
+    """)
     Page<PassengerRideHistoryDto> findPassengerRideHistory(
             @Param("passengerId") Long passengerId,
             @Param("from") LocalDateTime from,

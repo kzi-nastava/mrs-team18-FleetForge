@@ -115,4 +115,7 @@ public class Ride {
 
     @Column(name = "baby_seat")
     private boolean isBabySeat;
+
+    @OneToOne(mappedBy = "ride")
+    private RideReview review;
 }
