@@ -13,8 +13,8 @@ public class PassengerRideHistoryDto {
     private Long rideId;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
-    private GeoPoint startLocation;
-    private GeoPoint endLocation;
+    private String startAddress;
+    private String endAddress;
     private Integer vehicleRating;
     private Integer driverRating;
 

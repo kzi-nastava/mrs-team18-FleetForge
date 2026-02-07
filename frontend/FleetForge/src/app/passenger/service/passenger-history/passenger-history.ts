@@ -8,6 +8,8 @@ export interface PassengerRideResponse {
 
 export interface PassengerRideDTO {
   rideId: number;
+  startAddress: string;
+  endAddress: string;
   startTime: string;
   endTime: string | null;
   startLocation: { latitude: number; longitude: number };

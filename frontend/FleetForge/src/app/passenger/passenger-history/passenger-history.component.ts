@@ -59,8 +59,8 @@ export class PassengerHistoryComponent {
       next: (response) => {
         const mappedRides: Ride[] = response.content.map(r => ({
           id: r.rideId,
-          pickupAddress: `${r.startLocation.latitude}, ${r.startLocation.longitude}`,
-          dropoffAddress: `${r.endLocation.latitude}, ${r.endLocation.longitude}`,
+          pickupAddress: r.startAddress,
+          dropoffAddress: r.endAddress,
           startDate: r.startTime,
           endDate: r.endTime,
           cancellationStatus: r.endTime ? 'Completed' : 'In progress',

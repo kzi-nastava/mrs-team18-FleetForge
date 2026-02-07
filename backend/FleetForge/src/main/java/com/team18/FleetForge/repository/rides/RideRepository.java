@@ -100,8 +100,8 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
          r.id,
          r.startTime,
          r.endTime,
-         r.startLocation,
-         r.endLocation,
+         r.startAddress,
+         r.endAddress,
          rr.vehicleRating,
          rr.driverRating
      )
