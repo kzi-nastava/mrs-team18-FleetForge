@@ -8,6 +8,7 @@ import com.team18.FleetForge.dto.ride.reports.InconsistencyReportResponseDTO;
 import com.team18.FleetForge.dto.ride.routes.WayPointDTO;
 import com.team18.FleetForge.dto.ride.view.PassengerRideDetailsDTO;
 import com.team18.FleetForge.dto.ride.view.RideDetailsDTO;
+import com.team18.FleetForge.exception.RideNotFoundException;
 import com.team18.FleetForge.model.ride.*;
 import com.team18.FleetForge.model.users.Driver;
 import com.team18.FleetForge.model.users.Passenger;
@@ -20,7 +21,6 @@ import com.team18.FleetForge.repository.users.UserRepository;
 import com.team18.FleetForge.service.users.DriverService;
 import com.team18.FleetForge.service.PriceCalculationService;
 import com.team18.FleetForge.service.rides.RideService;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -89,7 +89,7 @@ public class RideServiceImpl implements RideService {
         log.info("Fetching ride details for ride ID: {}", rideId);
 
         Ride ride = rideRepository.findById(rideId)
-                .orElseThrow(() -> new RuntimeException("Ride not found with ID: " + rideId));
+                .orElseThrow(() -> new RideNotFoundException("Ride not found with ID: " + rideId));
 
         return mapToRideDetailsDTO(ride);
     }
@@ -269,7 +269,7 @@ public class RideServiceImpl implements RideService {
         Ride ride = rideRepository
                 .findPassengerRideWithDetails(passengerId, rideId)
                 .orElseThrow(() ->
-                        new EntityNotFoundException("Ride not found or access denied")
+                        new RideNotFoundException("Ride not found or access denied")
                 );
 
         List<RideLocation> locations =
