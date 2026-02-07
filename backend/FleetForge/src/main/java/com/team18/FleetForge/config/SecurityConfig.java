@@ -66,6 +66,11 @@ public class SecurityConfig {
                         // Guest endpoints
                         .requestMatchers("/api/ride-estimates").permitAll()
 
+                        .requestMatchers("/ws/**").permitAll()
+                        .requestMatchers("/app/**").permitAll()
+                        .requestMatchers("/topic/**").permitAll()
+                        .requestMatchers("/queue/**").permitAll()
+
                         .anyRequest().authenticated()
                 )
                 .headers(headers -> headers
