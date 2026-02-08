@@ -35,7 +35,7 @@ public class RideCreateRequestDTO {
     private boolean babySeat;
     @NotNull
     private boolean petFriendly;
-    @NotNull
+    @NotNull    
     private String startAddress;
     @NotNull
     private String endAddress;

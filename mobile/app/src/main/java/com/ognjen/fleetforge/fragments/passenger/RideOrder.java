@@ -42,7 +42,9 @@ import com.google.android.material.timepicker.TimeFormat;
 import com.ognjen.fleetforge.BuildConfig;
 import com.ognjen.fleetforge.R;
 import com.ognjen.fleetforge.dtos.photon.PhotonResponse;
+import com.ognjen.fleetforge.dtos.ride.WaypointRideCreateDTO;
 import com.ognjen.fleetforge.model.CalculatedRoute;
+import com.ognjen.fleetforge.model.VehicleType;
 import com.ognjen.fleetforge.utils.MapManager;
 
 import org.osmdroid.views.MapView;
@@ -53,6 +55,8 @@ import org.osmdroid.util.GeoPoint;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -224,6 +228,79 @@ public class RideOrder extends Fragment {
                 throw new RuntimeException(e);
             }
         });
+
+        orderBtn.setOnClickListener(v -> {
+            if(canOrder()){
+                ArrayList<WaypointRideCreateDTO> coordinates= new ArrayList<>();
+                WaypointRideCreateDTO startWaypoint= new WaypointRideCreateDTO();
+                Marker startMarker= (Marker) startLocation.getTag();
+                String startAddress= startMarker.getTitle();
+                com.ognjen.fleetforge.model.GeoPoint startPoint= new com.ognjen.fleetforge.model.GeoPoint(startMarker.getPosition().getLatitude(),startMarker.getPosition().getLongitude());
+                startWaypoint.setAddress(startAddress);
+                startWaypoint.setLocation(startPoint);
+                startWaypoint.setOrderIndex(0);
+                coordinates.add(startWaypoint);
+
+                for(int i=0;i<waypointsContainer.getChildCount();i++){
+                    View viewLayout= waypointsContainer.getChildAt(i);
+                    if (viewLayout instanceof TextInputLayout) {
+                        EditText et = ((TextInputLayout) viewLayout).getEditText();
+                        if(et.getTag()!=null) {
+                            WaypointRideCreateDTO waypoint= new WaypointRideCreateDTO();
+                            Marker waypointMarker= (Marker) et.getTag();
+                            String waypointAddress= waypointMarker.getTitle();
+                            com.ognjen.fleetforge.model.GeoPoint waypointGeoPoint= new com.ognjen.fleetforge.model.GeoPoint(waypointMarker.getPosition().getLatitude(),waypointMarker.getPosition().getLongitude());
+                            waypoint.setAddress(waypointAddress);
+                            waypoint.setLocation(waypointGeoPoint);
+                            waypoint.setOrderIndex(i+1);
+                            coordinates.add(waypoint);
+                        }
+                    }
+                }
+
+                WaypointRideCreateDTO endWaypoint= new WaypointRideCreateDTO();
+                Marker endMarker= (Marker) endLocation.getTag();
+                String endAddress= endMarker.getTitle();
+                com.ognjen.fleetforge.model.GeoPoint endPoint= new com.ognjen.fleetforge.model.GeoPoint(endMarker.getPosition().getLatitude(),endMarker.getPosition().getLongitude());
+                endWaypoint.setAddress(endAddress);
+                endWaypoint.setLocation(endPoint);
+                endWaypoint.setOrderIndex(waypointsContainer.getChildCount());
+                coordinates.add(endWaypoint);
+
+                DateTimeFormatter format= DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
+                LocalDateTime startTime= LocalDateTime.now();
+                if(!now.isChecked()){
+                    startTime=LocalDateTime.parse(dateTime.getText().toString(),format);
+                }
+                ArrayList<String> passengerEmails= new ArrayList<>();
+                for(int i=0;i<passengersContainer.getChildCount();i++){
+                    View viewLayout= passengersContainer.getChildAt(i);
+                    if (viewLayout instanceof TextInputLayout) {
+                        EditText et = ((TextInputLayout) viewLayout).getEditText();
+                        if(!et.getText().toString().equals("")){
+                            passengerEmails.add(et.getText().toString());
+                        }
+                    }
+                }
+
+                viewModel.createRide(coordinates,Integer.valueOf(passengerNum.getText().toString())
+                , startTime,now.isChecked(),passengerEmails, com.ognjen.fleetforge.enums.VehicleType.valueOf(vehicleType.getText().toString().toUpperCase())
+                ,babySeat.isChecked(),petFriendly.isChecked(),startAddress,endAddress,viewModel.getRouteData().getValue().getDistanceKm()
+                ,viewModel.getRouteData().getValue().getEstimatedMinutes()).observe(getViewLifecycleOwner(),response->{
+                    if(response.isCreated()){
+                        Toast.makeText(getContext(),"Ride ordered successfully!", Toast.LENGTH_SHORT).show();
+                        resetForm();
+                    }else{
+                        Toast.makeText(getContext(),"Ride order failed, there is no available drivers", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+
+            }else{
+                Toast.makeText(getContext(),"Form is not valid. Check if all text fields are filled and if all waypoints are selected from dropdown list.",
+                        Toast.LENGTH_LONG).show();
+            }
+        });
         return view;
     }
     private void setupAutocomplete(MaterialAutoCompleteTextView field) {
@@ -275,6 +352,8 @@ public class RideOrder extends Fragment {
         editText.setLayoutParams(editTextParams);
         editText.setInputType(InputType.TYPE_CLASS_TEXT);
         editText.setId(View.generateViewId());
+        int padding16dp = (int) dpToPx(16, metrics);
+        editText.setPadding(padding16dp, padding16dp, padding16dp, padding16dp);
         setupAutocomplete(editText);
         editText.setOnItemClickListener((parent, view1, position, id) -> {
             PhotonResponse.Feature selected = (PhotonResponse.Feature) parent.getItemAtPosition(position);
@@ -358,7 +437,8 @@ public class RideOrder extends Fragment {
         editText.setLayoutParams(editTextParams);
         editText.setInputType(InputType.TYPE_CLASS_TEXT);
         editText.setId(View.generateViewId());
-
+        int padding16dp = (int) dpToPx(16, metrics);
+        editText.setPadding(padding16dp, padding16dp, padding16dp, padding16dp);
         fieldLayout.addView(editText);
 
         fieldLayout.setEndIconOnClickListener(v -> {
@@ -421,7 +501,7 @@ public class RideOrder extends Fragment {
                     return;
                 }
 
-                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.getDefault());
                 dateTime.setText(sdf.format(selectedDateTime.getTime()));
             });
 
@@ -478,5 +558,88 @@ public class RideOrder extends Fragment {
             addresses.add(endpoint);
             viewModel.drawRoute(addresses);
         }
+    }
+
+    private boolean canOrder(){
+        boolean allWaypointFieldsHaveTags=true;
+        for(int i=0;i<waypointsContainer.getChildCount();i++){
+            View view= waypointsContainer.getChildAt(i);
+            if (view instanceof TextInputLayout) {
+                EditText et = ((TextInputLayout) view).getEditText();
+                if(et.getTag()==null) {
+                    allWaypointFieldsHaveTags=false;
+                    break;
+                }
+            }
+        }
+        if(!allWaypointFieldsHaveTags){
+            return false;
+        }
+        if(startLocation.getTag()!=null
+                &&endLocation.getTag()!=null
+        && !passengerNum.getText().toString().equals("")
+        && (!dateTime.getText().toString().equals("")||now.isChecked())
+        && !vehicleType.getText().toString().equals("")){
+            return true;
+        }
+        return false;
+    }
+    private void resetForm(){
+        startLocation.setText("");
+        endLocation.setText("");
+        vehicleType.setText("",false);
+        clearAllPassengers();
+        clearAllWaypoints();
+        passengerNum.setText("");
+        dateTime.setText("");
+        dateTime.setEnabled(true);
+        now.setChecked(false);
+        babySeat.setChecked(false);
+        petFriendly.setChecked(false);
+
+    }
+
+    private void clearAllWaypoints() {
+        List<View> waypointsToRemove = new ArrayList<>();
+
+        for (int i = 0; i < waypointsContainer.getChildCount(); i++) {
+            View view = waypointsContainer.getChildAt(i);
+            if (view instanceof TextInputLayout && view.getId() != R.id.add_waypoint_btn) {
+                waypointsToRemove.add(view);
+            }
+        }
+
+        for (View view : waypointsToRemove) {
+            TextInputLayout til = (TextInputLayout) view;
+            EditText et = til.getEditText();
+            if (et != null && et.getTag() instanceof Marker) {
+                mapManager.removeMarker((Marker) et.getTag());
+            }
+
+            waypointsContainer.removeView(til);
+        }
+
+        waypointCounter = 0;
+        updateWaypointHints();
+        mapManager.clearRoute();
+        try {
+            drawRoute();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    private void clearAllPassengers() {
+        List<View> passengersToRemove = new ArrayList<>();
+        for (int i = 0; i < passengersContainer.getChildCount(); i++) {
+            View view = passengersContainer.getChildAt(i);
+            if (view instanceof TextInputLayout && view.getId() != R.id.add_passenger_btn) {
+                passengersToRemove.add(view);
+            }
+        }
+        for (View view : passengersToRemove) {
+            passengersContainer.removeView(view);
+        }
+        passengerCounter = 0;
+        updatePassengerHints();
     }
 }
