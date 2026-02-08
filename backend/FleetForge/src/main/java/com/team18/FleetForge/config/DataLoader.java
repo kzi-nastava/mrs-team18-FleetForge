@@ -140,7 +140,7 @@ public class DataLoader implements CommandLineRunner {
         passenger4 = passengerRepository.save(passenger4);
 
         Admin admin = new Admin();
-        admin.setEmail("admin@gmail.com");
+        admin.setEmail("admin@test.com");
         admin.setPassword(passwordEncoder.encode("123"));
         admin.setFirstName("System");
         admin.setLastName("Admin");

@@ -1,13 +1,14 @@
 package com.team18.FleetForge.service.impl;
 
 import com.team18.FleetForge.dto.RouteDTO;
+import com.team18.FleetForge.dto.UserSummaryDTO;
 import com.team18.FleetForge.dto.driver.DriverInfoDTO;
 import com.team18.FleetForge.dto.driver.DriverRideHistoryDTO;
 import com.team18.FleetForge.dto.ride.lifecycle.RideCreateRequestDTO;
 import com.team18.FleetForge.dto.ride.reports.InconsistencyReportResponseDTO;
+import com.team18.FleetForge.dto.ride.review.RideRatingDTO;
 import com.team18.FleetForge.dto.ride.routes.WayPointDTO;
-import com.team18.FleetForge.dto.ride.view.PassengerRideDetailsDTO;
-import com.team18.FleetForge.dto.ride.view.RideDetailsDTO;
+import com.team18.FleetForge.dto.ride.view.*;
 import com.team18.FleetForge.exception.ride.RideNotFoundException;
 import com.team18.FleetForge.model.ride.*;
 import com.team18.FleetForge.model.users.Driver;
@@ -31,7 +32,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.team18.FleetForge.dto.ride.view.PassengerRideHistoryDto;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -370,5 +370,117 @@ public class RideServiceImpl implements RideService {
         );
     }
 
+    @Override
+    public Page<AdminRideHistoryDTO> getAdminRideHistory(
+            Long userId,
+            String email,
+            LocalDateTime from,
+            LocalDateTime to,
+            String sortBy,
+            String direction,
+            int page,
+            int size
+    ) {
+        if (userId == null && email == null) {
+            throw new IllegalArgumentException("userId or email must be provided");
+        }
+
+        Sort.Direction sortDirection = direction.equalsIgnoreCase("asc")
+                ? Sort.Direction.ASC
+                : Sort.Direction.DESC;
+
+        Sort sort = Sort.by(new Sort.Order(sortDirection, "r." + sortBy).nullsLast());
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        return rideRepository.findAdminRideHistory(
+                userId,
+                email,
+                from,
+                to,
+                pageable
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public AdminRideDetailsDTO getAdminRideDetails(Long rideId) {
+
+        Ride ride = rideRepository.findRideWithDetails(rideId)
+                .orElseThrow(() -> new RideNotFoundException("Ride not found"));
+
+        List<RideLocation> locations = rideLocationRepository
+                .findByRideAndRecordedAtAfterOrderByRecordedAtAsc(ride, ride.getStartTime());
+
+        List<InconsistencyReport> reports = inconsistencyReportRepository.findByRideId(rideId);
+
+        UserSummaryDTO mainPassenger = UserSummaryDTO.builder()
+                .id(ride.getPassenger().getId())
+                .firstName(ride.getPassenger().getFirstName())
+                .lastName(ride.getPassenger().getLastName())
+                .build();
+
+        List<UserSummaryDTO> linkedPassengers = ride.getLinkedPassengers().stream()
+                .map(p -> UserSummaryDTO.builder()
+                        .id(p.getId())
+                        .firstName(p.getFirstName())
+                        .lastName(p.getLastName())
+                        .build()
+                ).toList();
+
+        RideRatingDTO ratings = null;
+        if (ride.getReview() != null) {
+            ratings = RideRatingDTO.builder()
+                    .driverRating(ride.getReview().getDriverRating())
+                    .vehicleRating(ride.getReview().getVehicleRating())
+                    .build();
+        }
+
+        return AdminRideDetailsDTO.builder()
+                .id(ride.getId())
+                .startAddress(ride.getStartAddress())
+                .endAddress(ride.getEndAddress())
+                .startLocation(ride.getStartLocation())
+                .endLocation(ride.getEndLocation())
+                .wayPoints(ride.getWayPoints().stream()
+                        .map(WayPoint::getLocation)
+                        .toList()
+                )
+                .startTime(ride.getStartTime())
+                .endTime(ride.getEndTime())
+                .totalDistance(ride.getTotalDistance())
+                .estimatedDuration(ride.getEstimatedDuration())
+                .totalCost(ride.getTotalCost())
+                .status(ride.getStatus())
+                .vehicleType(ride.getVehicleType())
+                .petFriendly(ride.isPetFriendly())
+                .babySeat(ride.isBabySeat())
+                .driver(DriverInfoDTO.builder()
+                        .id(ride.getDriver().getId())
+                        .firstName(ride.getDriver().getFirstName())
+                        .lastName(ride.getDriver().getLastName())
+                        .phoneNumber(ride.getDriver().getPhoneNumber())
+                        .profileImage(ride.getDriver().getProfilePicture())
+                        .build()
+                )
+                .mainPassenger(mainPassenger)
+                .linkedPassengers(linkedPassengers)
+                .cancelledBy(ride.getCancelledBy() != null ? ride.getCancelledBy().name() : null)
+                .cancellationReason(ride.getCancellationReason())
+                .ratings(ratings)
+                .realRoute(locations.stream()
+                        .map(loc -> new GeoPoint(loc.getLatitude(), loc.getLongitude()))
+                        .toList()
+                )
+                .hasInconsistencies(!reports.isEmpty())
+                .inconsistencies(reports.stream()
+                        .map(r -> InconsistencyReportResponseDTO.builder()
+                                .reportId(r.getId())
+                                .message(r.getDescription())
+                                .reportedAt(r.getReportedAt())
+                                .build()
+                        )
+                        .toList()
+                )
+                .build();
+    }
 
 }
