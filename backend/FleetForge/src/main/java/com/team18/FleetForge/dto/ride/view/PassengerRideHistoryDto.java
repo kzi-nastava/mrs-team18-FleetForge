@@ -1,4 +1,4 @@
-package com.team18.FleetForge.dto.ride;
+package com.team18.FleetForge.dto.ride.view;
 
 import com.team18.FleetForge.model.ride.GeoPoint;
 import lombok.AllArgsConstructor;

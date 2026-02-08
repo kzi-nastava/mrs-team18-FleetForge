@@ -1,4 +1,4 @@
-package com.team18.FleetForge.exception;
+package com.team18.FleetForge.exception.handlers;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;

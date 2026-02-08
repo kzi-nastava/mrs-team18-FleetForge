@@ -8,6 +8,7 @@ import com.team18.FleetForge.dto.ride.reports.InconsistencyReportResponseDTO;
 import com.team18.FleetForge.dto.ride.routes.WayPointDTO;
 import com.team18.FleetForge.dto.ride.view.PassengerRideDetailsDTO;
 import com.team18.FleetForge.dto.ride.view.RideDetailsDTO;
+import com.team18.FleetForge.exception.ride.RideNotFoundException;
 import com.team18.FleetForge.model.ride.*;
 import com.team18.FleetForge.model.users.Driver;
 import com.team18.FleetForge.model.users.Passenger;
@@ -20,7 +21,6 @@ import com.team18.FleetForge.repository.users.UserRepository;
 import com.team18.FleetForge.service.users.DriverService;
 import com.team18.FleetForge.service.PriceCalculationService;
 import com.team18.FleetForge.service.rides.RideService;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -31,7 +31,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.team18.FleetForge.dto.ride.PassengerRideHistoryDto;
+import com.team18.FleetForge.dto.ride.view.PassengerRideHistoryDto;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -89,7 +89,7 @@ public class RideServiceImpl implements RideService {
         log.info("Fetching ride details for ride ID: {}", rideId);
 
         Ride ride = rideRepository.findById(rideId)
-                .orElseThrow(() -> new RuntimeException("Ride not found with ID: " + rideId));
+                .orElseThrow(() -> new RideNotFoundException("Ride not found with ID: " + rideId));
 
         return mapToRideDetailsDTO(ride);
     }
@@ -269,7 +269,7 @@ public class RideServiceImpl implements RideService {
         Ride ride = rideRepository
                 .findPassengerRideWithDetails(passengerId, rideId)
                 .orElseThrow(() ->
-                        new EntityNotFoundException("Ride not found or access denied")
+                        new RideNotFoundException("Ride not found or access denied")
                 );
 
         List<RideLocation> locations =
@@ -334,8 +334,6 @@ public class RideServiceImpl implements RideService {
     }
 
 
-
-
     @Override
     public Page<PassengerRideHistoryDto> getPassengerRideHistory(
             Long passengerId,
@@ -346,16 +344,22 @@ public class RideServiceImpl implements RideService {
             int page,
             int size
     ) {
-        //todo remove later
-        log.info(
-                "Fetching completed ride history for passenger {} from {} to {}, page {}, size {}",
-                passengerId, from, to, page, size
-        );
+        log.info("Fetching ride history for passenger {}, sorted by {}", passengerId, sortBy);
 
-        Sort sort = direction.equalsIgnoreCase("asc")
-                ? Sort.by(sortBy).ascending()
-                : Sort.by(sortBy).descending();
+        String resolvedSortBy;
+        if (sortBy.startsWith("review.")) {
+            resolvedSortBy = sortBy.replace("review.", "rr.");
+        } else if (sortBy.equals("vehicleRating") || sortBy.equals("driverRating")) {
+            resolvedSortBy = "rr." + sortBy;
+        } else {
+            resolvedSortBy = "r." + sortBy;
+        }
 
+        Sort.Direction sortDirection = direction.equalsIgnoreCase("asc")
+                ? Sort.Direction.ASC
+                : Sort.Direction.DESC;
+
+        Sort sort = Sort.by(new Sort.Order(sortDirection, resolvedSortBy).nullsLast());
         Pageable pageable = PageRequest.of(page, size, sort);
 
         return rideRepository.findPassengerRideHistory(
