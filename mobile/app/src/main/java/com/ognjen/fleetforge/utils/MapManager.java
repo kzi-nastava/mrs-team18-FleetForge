@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MapManager {
+    private Polyline currentRoute;
     private static final String TAG = "MapManager";
     private final MapView mapView;
     private final Context context;
@@ -81,16 +82,17 @@ public class MapManager {
     }
 
     public void drawRoute(List<GeoPoint> routePoints, int color) {
+        clearRoute();
         if (routePoints == null || routePoints.isEmpty()) {
             return;
         }
 
-        Polyline routeLine = new Polyline();
-        routeLine.setPoints(routePoints);
-        routeLine.setColor(color);
-        routeLine.setWidth(10f);
+        currentRoute = new Polyline();
+        currentRoute.setPoints(routePoints);
+        currentRoute.setColor(color);
+        currentRoute.setWidth(10f);
 
-        mapView.getOverlays().add(routeLine);
+        mapView.getOverlays().add(currentRoute);
         mapView.invalidate();
 
         Log.d(TAG, "Drew route with " + routePoints.size() + " points");
@@ -124,5 +126,11 @@ public class MapManager {
         mapView.getOverlays().remove(marker);
         mapView.invalidate();
     }
-
+    public void clearRoute() {
+        if (currentRoute != null) {
+            mapView.getOverlays().remove(currentRoute);
+            currentRoute = null;
+            mapView.invalidate();
+        }
+    }
 }
