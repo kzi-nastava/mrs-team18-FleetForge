@@ -12,6 +12,8 @@ import com.team18.FleetForge.dto.ride.view.*;
 import com.team18.FleetForge.exception.common.InvalidSortFieldException;
 import com.team18.FleetForge.exception.common.UserIdentifierRequiredException;
 import com.team18.FleetForge.exception.ride.RideNotFoundException;
+import com.team18.FleetForge.exception.user.InvalidUserRoleException;
+import com.team18.FleetForge.model.enums.Role;
 import com.team18.FleetForge.model.ride.*;
 import com.team18.FleetForge.model.users.Driver;
 import com.team18.FleetForge.model.users.Passenger;
@@ -24,6 +26,7 @@ import com.team18.FleetForge.repository.users.UserRepository;
 import com.team18.FleetForge.service.users.DriverService;
 import com.team18.FleetForge.service.PriceCalculationService;
 import com.team18.FleetForge.service.rides.RideService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -404,11 +407,13 @@ public class RideServiceImpl implements RideService {
             throw new InvalidSortFieldException(sortBy);
         }
 
+        validateNonAdminUser(userId, email);
+
         Sort.Direction sortDirection = direction.equalsIgnoreCase("asc")
                 ? Sort.Direction.ASC
                 : Sort.Direction.DESC;
 
-        Sort sort = Sort.by(new Sort.Order(sortDirection, "r." + sortBy).nullsLast());
+        Sort sort = Sort.by(new Sort.Order(sortDirection, sortBy).nullsLast());
         Pageable pageable = PageRequest.of(page, size, sort);
 
         return rideRepository.findAdminRideHistory(
@@ -418,6 +423,33 @@ public class RideServiceImpl implements RideService {
                 to,
                 pageable
         );
+    }
+
+    private void validateNonAdminUser(Long userId, String email) {
+
+        User user;
+
+        if (userId != null) {
+            user = userRepository.findById(userId)
+                    .orElseThrow(() ->
+                            new EntityNotFoundException(
+                                    "User with id " + userId + " does not exist"
+                            )
+                    );
+        } else {
+            user = userRepository.findByEmail(email)
+                    .orElseThrow(() ->
+                            new EntityNotFoundException(
+                                    "User with email " + email + " does not exist"
+                            )
+                    );
+        }
+
+        if (user.getRole() == Role.ROLE_ADMIN) {
+            throw new InvalidUserRoleException(
+                    "Admins cannot be queried for ride history"
+            );
+        }
     }
 
     @Transactional(readOnly = true)
