@@ -1,0 +1,15 @@
+<div class="live-chat-page">
+  <div class="page-header">
+    <h1>Live Chat</h1>
+    <p>Connect with support in real time.</p>
+  </div>
+
+  <app-chat-window
+    [title]="'Live support'"
+    [subtitle]="'Admin is online'"
+    [isOnline]="true"
+    [messages]="messages"
+    [currentUserId]="currentUserId"
+    (sendMessage)="handleSend($event)"
+  ></app-chat-window>
+</div>

@@ -1,0 +1,48 @@
+<div class="live-chat-page">
+  <div class="page-header">
+    <h1>Live Chat</h1>
+    <p>Manage active conversations with passengers and drivers.</p>
+  </div>
+
+  <div class="chat-layout">
+    <section class="conversation-panel">
+      <div class="panel-title">Conversations</div>
+      <div class="conversation-list">
+        @for (chat of chats; track chat.id) {
+          <button
+            class="conversation-item"
+            [class.active]="chat.id === selectedChatId"
+            (click)="selectChat(chat.id)"
+            type="button"
+          >
+            <div class="conversation-avatar">{{ getInitial(chat.userName) }}</div>
+            <div class="conversation-meta">
+              <div class="conversation-name">
+                {{ chat.userName }}
+                <span class="conversation-role">{{ chat.userRole }}</span>
+              </div>
+              <div class="conversation-preview">{{ chat.lastMessageContent }}</div>
+            </div>
+            <div class="conversation-info">
+              <div class="conversation-time">{{ formatTime(chat.lastMessageAt) }}</div>
+              @if (chat.unreadCount > 0) {
+                <div class="conversation-badge">{{ chat.unreadCount }}</div>
+              }
+            </div>
+          </button>
+        }
+      </div>
+    </section>
+
+    <section class="chat-panel">
+      <app-chat-window
+        [title]="selectedChat.userName"
+        [subtitle]="selectedChat.userRole + ' is online'"
+        [isOnline]="true"
+        [messages]="selectedMessages"
+        [currentUserId]="currentUserId"
+        (sendMessage)="handleSend($event)"
+      ></app-chat-window>
+    </section>
+  </div>
+</div>
