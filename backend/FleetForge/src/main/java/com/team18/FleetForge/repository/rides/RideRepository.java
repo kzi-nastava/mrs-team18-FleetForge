@@ -46,6 +46,17 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
             @Param("endDateTime") LocalDateTime endDateTime
     );
 
+    @Query("""
+        SELECT r FROM Ride r
+        LEFT JOIN FETCH r.driver
+        LEFT JOIN FETCH r.passenger
+        LEFT JOIN FETCH r.linkedPassengers
+        LEFT JOIN FETCH r.review
+        WHERE r.id = :rideId
+    """)
+    Optional<Ride> findRideWithDetails(@Param("rideId") Long rideId);
+
+
     // Find active rides (ACCEPTED, IN_PROGRESS) for a specific driver.
     @Query("SELECT r FROM Ride r WHERE r.driver.id = :driverId " +
             "AND r.status IN ('ACCEPTED', 'IN_PROGRESS') " +

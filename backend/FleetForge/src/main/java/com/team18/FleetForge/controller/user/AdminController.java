@@ -2,10 +2,9 @@ package com.team18.FleetForge.controller.user;
 
 
 import com.team18.FleetForge.dto.RouteDTO;
-import com.team18.FleetForge.dto.UserSummaryDTO;
 import com.team18.FleetForge.dto.admin.*;
+import com.team18.FleetForge.dto.ride.view.AdminRideDetailsDTO;
 import com.team18.FleetForge.dto.ride.view.AdminRideHistoryDTO;
-import com.team18.FleetForge.dto.ride.view.RideDetailsDTO;
 import com.team18.FleetForge.dto.vehicle.VehicleChangeInformationResponseDTO;
 import com.team18.FleetForge.model.users.DriverProfileChangeRequest;
 import com.team18.FleetForge.model.ride.GeoPoint;
@@ -14,7 +13,6 @@ import com.team18.FleetForge.model.users.Driver;
 import com.team18.FleetForge.model.vecihles.Vehicle;
 import com.team18.FleetForge.model.vecihles.VehicleInformationChangeRequest;
 import com.team18.FleetForge.model.enums.InformationChangeRequestStatus;
-import com.team18.FleetForge.service.*;
 import com.team18.FleetForge.service.rides.RideService;
 import jakarta.validation.Valid;
 import com.team18.FleetForge.service.users.DriverProfileChangeRequestService;
@@ -251,28 +249,14 @@ public class AdminController {
             value = "/rides/{rideId}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<RideDetailsDTO> getRideDetailsById(
+    public ResponseEntity<AdminRideDetailsDTO> getRideDetailsById(
             @PathVariable Long rideId
     ) {
-        RideDetailsDTO response = RideDetailsDTO.builder()
-                .rideId(rideId)
-                .route(RouteDTO.builder()
-                        .geometry(List.of(
-                                new GeoPoint(45.2671, 19.8335),
-                                new GeoPoint(45.2685, 19.8400),
-                                new GeoPoint(45.2700, 19.8500)
-                        ))
-                        .distanceMeters(5100)
-                        .durationSeconds(890)
-                        .build())
-                .cancelled(false)
-                .cancelledBy(null)
-                .price(820.0)
-                .panicTriggered(false)
-                .build();
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity.ok(
+                rideService.getAdminRideDetails(rideId)
+        );
     }
+
 }
 
 
