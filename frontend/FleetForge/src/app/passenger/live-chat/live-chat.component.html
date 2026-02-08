@@ -1,0 +1,21 @@
+<div class="live-chat-page">
+  <div class="page-header">
+    <h1>Live Chat</h1>
+    <p>Connect with support in real time.</p>
+  </div>
+
+  @if (isLoading) {
+    <div class="loading-state">Loading chat...</div>
+  } @else if (errorMessage) {
+    <div class="error-state">{{ errorMessage }}</div>
+  } @else if (chatId) {
+    <app-chat-window
+      [title]="'Live support'"
+      [subtitle]="'Admin is online'"
+      [isOnline]="true"
+      [messages]="messages"
+      [currentUserId]="currentUserId"
+      (sendMessage)="handleSend($event)"
+    ></app-chat-window>
+  }
+</div>

@@ -1,0 +1,38 @@
+.live-chat-page {
+  padding: 32px;
+  background: var(--color-background-gray);
+  min-height: calc(100vh - 80px);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.page-header h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.page-header p {
+  margin: 6px 0 0;
+  color: var(--color-text-gray);
+}
+
+.loading-state,
+.error-state {
+  padding: 32px;
+  border-radius: 12px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.loading-state {
+  background: var(--color-background-white);
+  color: var(--color-text-gray);
+}
+
+.error-state {
+  background: #ffebee;
+  color: var(--color-error);
+}

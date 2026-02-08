@@ -114,4 +114,18 @@ public class ChatRestController {
         Chat chat = chatService.getChatById(userId);
         return ResponseEntity.ok(Map.of("chatId", chat.getId()));
     }
+
+    /**
+     * GET /api/chats/userId
+     * Get the current user's ID.
+     *
+     * Returns: { "userId": 1 }
+     */
+    @GetMapping("/userId")
+    @PreAuthorize("hasAnyRole('PASSENGER', 'DRIVER', 'ADMIN')")
+    public ResponseEntity<Map<String, Long>> getUserId(Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        return ResponseEntity.ok(Map.of("userId", user.getId()));
+    }
+
 }
