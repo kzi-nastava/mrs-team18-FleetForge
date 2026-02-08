@@ -1,11 +1,19 @@
 package com.ognjen.fleetforge.api;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializer;
 import com.ognjen.fleetforge.BuildConfig;
 import com.ognjen.fleetforge.auth.AuthInterceptor;
 import com.ognjen.fleetforge.auth.AuthManager;
@@ -27,10 +35,20 @@ public class RetrofitClient {
                 .connectTimeout(30, TimeUnit.SECONDS)
                 .build();
 
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(LocalDateTime.class, (JsonSerializer<LocalDateTime>) (src, typeOfSrc, context) -> {
+
+                    return new JsonPrimitive(src.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS")));
+                })
+                .registerTypeAdapter(LocalDateTime.class, (JsonDeserializer<LocalDateTime>) (json, typeOfT, context) -> {
+
+                    return LocalDateTime.parse(json.getAsString(), DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS"));
+                })
+                .create();
         retrofit = new Retrofit.Builder()
                 .baseUrl(BaseUrl)
                 .client(okHttpClient)
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
 
         // Logic for Public APIs (without JWT)
@@ -66,6 +84,9 @@ public class RetrofitClient {
         return retrofit.create(UnregisteredService.class);
     }
 
+    public RideService getRideService(){
+        return retrofit.create(RideService.class);
+    }
 
     public AuthService getAuthService() {
         return retrofitWithoutAuth.create(AuthService.class);
