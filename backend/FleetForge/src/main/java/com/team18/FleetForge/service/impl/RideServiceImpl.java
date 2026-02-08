@@ -9,7 +9,11 @@ import com.team18.FleetForge.dto.ride.reports.InconsistencyReportResponseDTO;
 import com.team18.FleetForge.dto.ride.review.RideRatingDTO;
 import com.team18.FleetForge.dto.ride.routes.WayPointDTO;
 import com.team18.FleetForge.dto.ride.view.*;
+import com.team18.FleetForge.exception.common.InvalidSortFieldException;
+import com.team18.FleetForge.exception.common.UserIdentifierRequiredException;
 import com.team18.FleetForge.exception.ride.RideNotFoundException;
+import com.team18.FleetForge.exception.user.InvalidUserRoleException;
+import com.team18.FleetForge.model.enums.Role;
 import com.team18.FleetForge.model.ride.*;
 import com.team18.FleetForge.model.users.Driver;
 import com.team18.FleetForge.model.users.Passenger;
@@ -22,6 +26,7 @@ import com.team18.FleetForge.repository.users.UserRepository;
 import com.team18.FleetForge.service.users.DriverService;
 import com.team18.FleetForge.service.PriceCalculationService;
 import com.team18.FleetForge.service.rides.RideService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -38,6 +43,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -52,6 +58,16 @@ public class RideServiceImpl implements RideService {
     private final PriceCalculationService priceCalculationService;
     private final RideLocationRepository rideLocationRepository;
     private final InconsistencyReportRepository inconsistencyReportRepository;
+
+    private static final Set<String> ALLOWED_SORT_FIELDS = Set.of(
+            "startTime",
+            "endTime",
+            "price",
+            "status",
+            "startAddress",
+            "endAddress"
+    );
+
 
     @Override
     public List<DriverRideHistoryDTO> getDriverRideHistory(Long driverId, LocalDate startDate) {
@@ -344,7 +360,9 @@ public class RideServiceImpl implements RideService {
             int page,
             int size
     ) {
-        log.info("Fetching ride history for passenger {}, sorted by {}", passengerId, sortBy);
+        if (!ALLOWED_SORT_FIELDS.contains(sortBy)) {
+            throw new InvalidSortFieldException(sortBy);
+        }
 
         String resolvedSortBy;
         if (sortBy.startsWith("review.")) {
@@ -382,14 +400,20 @@ public class RideServiceImpl implements RideService {
             int size
     ) {
         if (userId == null && email == null) {
-            throw new IllegalArgumentException("userId or email must be provided");
+            throw new UserIdentifierRequiredException();
         }
+
+        if (!ALLOWED_SORT_FIELDS.contains(sortBy)) {
+            throw new InvalidSortFieldException(sortBy);
+        }
+
+        validateNonAdminUser(userId, email);
 
         Sort.Direction sortDirection = direction.equalsIgnoreCase("asc")
                 ? Sort.Direction.ASC
                 : Sort.Direction.DESC;
 
-        Sort sort = Sort.by(new Sort.Order(sortDirection, "r." + sortBy).nullsLast());
+        Sort sort = Sort.by(new Sort.Order(sortDirection, sortBy).nullsLast());
         Pageable pageable = PageRequest.of(page, size, sort);
 
         return rideRepository.findAdminRideHistory(
@@ -399,6 +423,33 @@ public class RideServiceImpl implements RideService {
                 to,
                 pageable
         );
+    }
+
+    private void validateNonAdminUser(Long userId, String email) {
+
+        User user;
+
+        if (userId != null) {
+            user = userRepository.findById(userId)
+                    .orElseThrow(() ->
+                            new EntityNotFoundException(
+                                    "User with id " + userId + " does not exist"
+                            )
+                    );
+        } else {
+            user = userRepository.findByEmail(email)
+                    .orElseThrow(() ->
+                            new EntityNotFoundException(
+                                    "User with email " + email + " does not exist"
+                            )
+                    );
+        }
+
+        if (user.getRole() == Role.ROLE_ADMIN) {
+            throw new InvalidUserRoleException(
+                    "Admins cannot be queried for ride history"
+            );
+        }
     }
 
     @Transactional(readOnly = true)
