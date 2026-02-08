@@ -9,6 +9,7 @@ import com.team18.FleetForge.dto.ride.reports.InconsistencyReportResponseDTO;
 import com.team18.FleetForge.dto.ride.review.RideRatingDTO;
 import com.team18.FleetForge.dto.ride.routes.WayPointDTO;
 import com.team18.FleetForge.dto.ride.view.*;
+import com.team18.FleetForge.exception.common.InvalidSortFieldException;
 import com.team18.FleetForge.exception.common.UserIdentifierRequiredException;
 import com.team18.FleetForge.exception.ride.RideNotFoundException;
 import com.team18.FleetForge.model.ride.*;
@@ -39,6 +40,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -53,6 +55,16 @@ public class RideServiceImpl implements RideService {
     private final PriceCalculationService priceCalculationService;
     private final RideLocationRepository rideLocationRepository;
     private final InconsistencyReportRepository inconsistencyReportRepository;
+
+    private static final Set<String> ALLOWED_SORT_FIELDS = Set.of(
+            "startTime",
+            "endTime",
+            "price",
+            "status",
+            "startAddress",
+            "endAddress"
+    );
+
 
     @Override
     public List<DriverRideHistoryDTO> getDriverRideHistory(Long driverId, LocalDate startDate) {
@@ -345,7 +357,9 @@ public class RideServiceImpl implements RideService {
             int page,
             int size
     ) {
-        log.info("Fetching ride history for passenger {}, sorted by {}", passengerId, sortBy);
+        if (!ALLOWED_SORT_FIELDS.contains(sortBy)) {
+            throw new InvalidSortFieldException(sortBy);
+        }
 
         String resolvedSortBy;
         if (sortBy.startsWith("review.")) {
@@ -384,6 +398,10 @@ public class RideServiceImpl implements RideService {
     ) {
         if (userId == null && email == null) {
             throw new UserIdentifierRequiredException();
+        }
+
+        if (!ALLOWED_SORT_FIELDS.contains(sortBy)) {
+            throw new InvalidSortFieldException(sortBy);
         }
 
         Sort.Direction sortDirection = direction.equalsIgnoreCase("asc")
