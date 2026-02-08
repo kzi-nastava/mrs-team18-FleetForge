@@ -18,3 +18,21 @@
   margin: 6px 0 0;
   color: var(--color-text-gray);
 }
+
+.loading-state,
+.error-state {
+  padding: 32px;
+  border-radius: 12px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.loading-state {
+  background: var(--color-background-white);
+  color: var(--color-text-gray);
+}
+
+.error-state {
+  background: #ffebee;
+  color: var(--color-error);
+}

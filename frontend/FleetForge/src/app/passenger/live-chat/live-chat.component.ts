@@ -1,7 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ChatWindowComponent } from '../../shared/chat/chat-window/chat-window.component';
-import { ChatMessageResponseDTO, ChatResponseDTO } from '../../shared/dtos/chat.dtos';
+import { ChatMessageResponseDTO } from '../../shared/dtos/chat.dtos';
+import { ChatRestService } from '../../shared/services/chat-rest.service';
+import { ChatWebSocketService } from '../../shared/services/chat-websocket.service';
+import { Subject } from 'rxjs';
+import { takeUntil, switchMap, tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-passenger-live-chat',
@@ -10,72 +14,95 @@ import { ChatMessageResponseDTO, ChatResponseDTO } from '../../shared/dtos/chat.
   templateUrl: './live-chat.component.html',
   styleUrl: './live-chat.component.css'
 })
-export class PassengerLiveChatComponent {
-  currentUserId = 101;
+export class PassengerLiveChatComponent implements OnInit, OnDestroy {
+  chatId: number | null = null;
+  messages: ChatMessageResponseDTO[] = [];
+  currentUserId = 0;
+  isLoading = true;
+  errorMessage = '';
+  private destroy$ = new Subject<void>();
 
-  chat: ChatResponseDTO = {
-    id: 1,
-    userId: 999,
-    userName: 'FleetForge Admin',
-    userRole: 'ADMIN',
-    userProfilePicture: null,
-    createdAt: new Date().toISOString(),
-    lastMessageAt: new Date().toISOString(),
-    unreadCount: 0,
-    lastMessageContent: 'Welcome to live support.'
-  };
+  constructor(
+    private chatRestService: ChatRestService,
+    private chatWebSocketService: ChatWebSocketService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
-  messages: ChatMessageResponseDTO[] = [
-    {
-      id: 1,
-      chatId: 1,
-      senderId: 999,
-      senderName: 'FleetForge Admin',
-      senderRole: 'ADMIN',
-      content: 'Hello! How can we help you today?',
-      sentAt: new Date(Date.now() - 1000 * 60 * 6).toISOString(),
-      isRead: true,
-      readAt: new Date(Date.now() - 1000 * 60 * 5).toISOString()
-    },
-    {
-      id: 2,
-      chatId: 1,
-      senderId: 101,
-      senderName: 'Passenger',
-      senderRole: 'PASSENGER',
-      content: 'I have a question about my last ride.',
-      sentAt: new Date(Date.now() - 1000 * 60 * 4).toISOString(),
-      isRead: true,
-      readAt: new Date(Date.now() - 1000 * 60 * 3).toISOString()
-    },
-    {
-      id: 3,
-      chatId: 1,
-      senderId: 999,
-      senderName: 'FleetForge Admin',
-      senderRole: 'ADMIN',
-      content: 'Sure. Can you share the ride date and time?',
-      sentAt: new Date(Date.now() - 1000 * 60 * 2).toISOString(),
-      isRead: true,
-      readAt: new Date(Date.now() - 1000 * 60).toISOString()
+  ngOnInit(): void {
+    this.initializeChat();
+  }
+
+  private async initializeChat(): Promise<void> {
+    try {
+
+      const userIdResponse = await this.chatRestService.getUserId().toPromise();
+      this.currentUserId = userIdResponse?.userId ?? 0;
+
+      await this.chatWebSocketService.connect();
+
+      const chatResponse = await this.chatRestService
+        .getMyChatId()
+        .toPromise();
+
+      if (!chatResponse) {
+        this.errorMessage = 'Failed to initialize chat';
+        this.isLoading = false;
+        return;
+      }
+
+      this.chatId = chatResponse.chatId;
+
+
+      const history = await this.chatRestService
+        .getChatHistory(this.chatId)
+        .toPromise();
+
+      if (history) {
+        this.messages = history;
+      }
+
+
+      await this.chatRestService.markChatAsRead(this.chatId).toPromise();
+
+      this.chatWebSocketService
+        .subscribeToMessages()
+        .pipe(takeUntil(this.destroy$))
+        .subscribe((message: ChatMessageResponseDTO) => {
+          this.messages = [...this.messages, message];
+          this.cdr.markForCheck();
+        });
+
+      console.log('✅ Chat initialized successfully');
+      this.isLoading = false;
+      this.cdr.markForCheck();
+    } catch (error) {
+      console.error('Failed to initialize chat:', error);
+      this.errorMessage =
+        error instanceof Error ? error.message : 'Connection failed';
+      this.isLoading = false;
+      this.cdr.markForCheck();
+
     }
-  ];
+  }
 
   handleSend(content: string): void {
-    const newMessage: ChatMessageResponseDTO = {
-      id: this.messages.length + 1,
-      chatId: this.chat.id,
-      senderId: this.currentUserId,
-      senderName: 'Passenger',
-      senderRole: 'PASSENGER',
-      content,
-      sentAt: new Date().toISOString(),
-      isRead: false,
-      readAt: null
-    };
+    if (!this.chatId) return;
+    this.chatWebSocketService.sendMessage(this.chatId, content);
+    
+    // Refetch messages after sending
+    setTimeout(() => {
+      this.chatRestService.getChatHistory(this.chatId!).toPromise().then((history) => {
+        if (history) {
+          this.messages = history;
+          this.cdr.markForCheck();
+        }
+      });
+    }, 500);
+  }
 
-    this.messages = [...this.messages, newMessage];
-    this.chat.lastMessageAt = newMessage.sentAt;
-    this.chat.lastMessageContent = newMessage.content;
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+    this.chatWebSocketService.disconnect();
   }
 }
