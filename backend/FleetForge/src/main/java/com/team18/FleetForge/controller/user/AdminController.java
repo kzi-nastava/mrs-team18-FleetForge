@@ -15,12 +15,14 @@ import com.team18.FleetForge.model.vecihles.Vehicle;
 import com.team18.FleetForge.model.vecihles.VehicleInformationChangeRequest;
 import com.team18.FleetForge.model.enums.InformationChangeRequestStatus;
 import com.team18.FleetForge.service.*;
+import com.team18.FleetForge.service.rides.RideService;
 import jakarta.validation.Valid;
 import com.team18.FleetForge.service.users.DriverProfileChangeRequestService;
 import com.team18.FleetForge.service.users.UserService;
 import com.team18.FleetForge.service.vehicles.VehicleInfoChangeReqService;
 import com.team18.FleetForge.service.vehicles.VehicleService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -42,8 +44,10 @@ public class AdminController {
     private final DriverProfileChangeRequestService driverChangeRequestService;
     private final VehicleInfoChangeReqService vehicleChangeService;
     private final VehicleService vehicleService;
-    private final ProfilePictureService profilePictureService;
+    private final RideService rideService;
     private final PasswordEncoder passwordEncoder;
+
+
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<AdminGetResponseDTO> getCurrentAdmin(){
@@ -202,7 +206,7 @@ public class AdminController {
     }
 
     /**
-     * GET /api/admin/users/{userId}/rides
+     * GET /api/admin/rides
      * Get ride history for a specific user (passenger or driver)
      * Query params:
      *  - from, to (date range)
@@ -211,56 +215,32 @@ public class AdminController {
      */
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping(
-            value = "/users/{userId}/rides",
+            value = "/rides",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<List<AdminRideHistoryDTO>> getUserRides(
-            @PathVariable Long userId,
+    public ResponseEntity<Page<AdminRideHistoryDTO>> getUserRideHistory(
+            @RequestParam(required = false) Long userId,
+            @RequestParam(required = false) String email,
             @RequestParam(required = false) LocalDateTime from,
             @RequestParam(required = false) LocalDateTime to,
             @RequestParam(defaultValue = "startTime") String sortBy,
-            @RequestParam(defaultValue = "desc") String direction
-    ){
-        List<AdminRideHistoryDTO> history = List.of(
-                AdminRideHistoryDTO.builder()
-                        .rideId(1L)
-                        .startTime(LocalDateTime.now().minusDays(1))
-                        .endTime(LocalDateTime.now().minusDays(1).plusMinutes(18))
-                        .startAddress("Bulevar Oslobodjenja 1")
-                        .destinationAddress("Zmaj Jovina 12")
-                        .driver(UserSummaryDTO.builder()
-                                .id(10L)
-                                .firstName("Marko")
-                                .lastName("Markovic")
-                                .build())
-                        .passenger(UserSummaryDTO.builder()
-                                .id(20L)
-                                .firstName("Petar")
-                                .lastName("Petrovic")
-                                .build())
-                        .build(),
-
-                AdminRideHistoryDTO.builder()
-                        .rideId(2L)
-                        .startTime(LocalDateTime.now().minusHours(2))
-                        .endTime(LocalDateTime.now().minusHours(1))
-                        .startAddress("Futoška 10")
-                        .destinationAddress("Dunavska 5")
-                        .driver(UserSummaryDTO.builder()
-                                .id(11L)
-                                .firstName("Jovan")
-                                .lastName("Jovanovic")
-                                .build())
-                        .passenger(UserSummaryDTO.builder()
-                                .id(21L)
-                                .firstName("Ana")
-                                .lastName("Anic")
-                                .build())
-                        .build()
+            @RequestParam(defaultValue = "desc") String direction,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Page<AdminRideHistoryDTO> rides = rideService.getAdminRideHistory(
+                userId,
+                email,
+                from,
+                to,
+                sortBy,
+                direction,
+                page,
+                size
         );
-
-        return new ResponseEntity<>(history, HttpStatus.OK);
+        return ResponseEntity.ok(rides);
     }
+
 
     /**
      * GET /api/admin/rides/{rideId}

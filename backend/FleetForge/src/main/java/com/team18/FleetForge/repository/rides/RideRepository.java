@@ -1,5 +1,6 @@
 package com.team18.FleetForge.repository.rides;
 
+import com.team18.FleetForge.dto.ride.view.AdminRideHistoryDTO;
 import com.team18.FleetForge.dto.ride.view.PassengerRideHistoryDto;
 import com.team18.FleetForge.model.enums.RideStatus;
 import com.team18.FleetForge.model.ride.Ride;
@@ -125,6 +126,46 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
             Pageable pageable
     );
 
+    @Query("""
+        SELECT new com.team18.FleetForge.dto.ride.view.AdminRideHistoryDTO(
+            r.id,
+            r.startTime,
+            r.endTime,
+            r.startAddress,
+            r.endAddress,
+            r.panicActivated,
+            r.status
+        )
+        FROM Ride r
+        WHERE
+            r.status IN ('COMPLETED', 'CANCELLED')
+            AND (
+                (:userId IS NOT NULL AND (
+                    r.passenger.id = :userId
+                    OR r.driver.id = :userId
+                    OR :userId IN (
+                        SELECT lp.id FROM r.linkedPassengers lp
+                    )
+                ))
+                OR
+                (:email IS NOT NULL AND (
+                    r.passenger.email = :email
+                    OR r.driver.email = :email
+                    OR :email IN (
+                        SELECT lp.email FROM r.linkedPassengers lp
+                    )
+                ))
+            )
+            AND (:from IS NULL OR r.startTime >= :from)
+            AND (:to IS NULL OR r.startTime <= :to)
+    """)
+    Page<AdminRideHistoryDTO> findAdminRideHistory(
+            @Param("userId") Long userId,
+            @Param("email") String email,
+            @Param("from") LocalDateTime from,
+            @Param("to") LocalDateTime to,
+            Pageable pageable
+    );
 
     @NonNull
     List<Ride> findAllByStatus(RideStatus status);

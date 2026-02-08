@@ -1,6 +1,7 @@
 package com.team18.FleetForge.service.rides;
 
 import com.team18.FleetForge.dto.driver.DriverRideHistoryDTO;
+import com.team18.FleetForge.dto.ride.view.AdminRideHistoryDTO;
 import com.team18.FleetForge.dto.ride.view.PassengerRideHistoryDto;
 import com.team18.FleetForge.dto.ride.lifecycle.RideCreateRequestDTO;
 import com.team18.FleetForge.dto.ride.view.PassengerRideDetailsDTO;
@@ -32,6 +33,17 @@ public interface RideService {
 
     Page<PassengerRideHistoryDto> getPassengerRideHistory(
             Long passengerId,
+            LocalDateTime from,
+            LocalDateTime to,
+            String sortBy,
+            String direction,
+            int page,
+            int size
+    );
+
+    Page<AdminRideHistoryDTO> getAdminRideHistory(
+            Long userId,
+            String email,
             LocalDateTime from,
             LocalDateTime to,
             String sortBy,

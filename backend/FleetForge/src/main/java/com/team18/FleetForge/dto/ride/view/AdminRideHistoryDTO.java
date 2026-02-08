@@ -1,23 +1,20 @@
 package com.team18.FleetForge.dto.ride.view;
 
-import com.team18.FleetForge.dto.UserSummaryDTO;
-import lombok.Builder;
-import lombok.Data;
+import com.team18.FleetForge.model.enums.RideStatus;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 
-@Data
-@Builder
+@Getter
+@AllArgsConstructor
 public class AdminRideHistoryDTO {
-    private Long rideId;
 
+    private Long rideId;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
-
     private String startAddress;
     private String destinationAddress;
-
-    private UserSummaryDTO driver;
-    private UserSummaryDTO passenger;
-
+    private boolean panicActivated;
+    private RideStatus status;
 }

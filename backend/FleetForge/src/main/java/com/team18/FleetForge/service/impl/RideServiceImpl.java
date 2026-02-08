@@ -6,6 +6,7 @@ import com.team18.FleetForge.dto.driver.DriverRideHistoryDTO;
 import com.team18.FleetForge.dto.ride.lifecycle.RideCreateRequestDTO;
 import com.team18.FleetForge.dto.ride.reports.InconsistencyReportResponseDTO;
 import com.team18.FleetForge.dto.ride.routes.WayPointDTO;
+import com.team18.FleetForge.dto.ride.view.AdminRideHistoryDTO;
 import com.team18.FleetForge.dto.ride.view.PassengerRideDetailsDTO;
 import com.team18.FleetForge.dto.ride.view.RideDetailsDTO;
 import com.team18.FleetForge.exception.ride.RideNotFoundException;
@@ -370,5 +371,34 @@ public class RideServiceImpl implements RideService {
         );
     }
 
+    @Override
+    public Page<AdminRideHistoryDTO> getAdminRideHistory(
+            Long userId,
+            String email,
+            LocalDateTime from,
+            LocalDateTime to,
+            String sortBy,
+            String direction,
+            int page,
+            int size
+    ) {
+        if (userId == null && email == null) {
+            throw new IllegalArgumentException("userId or email must be provided");
+        }
 
+        Sort.Direction sortDirection = direction.equalsIgnoreCase("asc")
+                ? Sort.Direction.ASC
+                : Sort.Direction.DESC;
+
+        Sort sort = Sort.by(new Sort.Order(sortDirection, "r." + sortBy).nullsLast());
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        return rideRepository.findAdminRideHistory(
+                userId,
+                email,
+                from,
+                to,
+                pageable
+        );
+    }
 }
