@@ -64,7 +64,7 @@
 							<td class="action-cell">
 								<ng-container [ngSwitch]="getRatingState(ride)">
 									<div *ngSwitchCase="'rated'" class="stars">
-										<span *ngFor="let filled of getStarArray(ride.driverRating || 0)" class="star"
+										<span *ngFor="let filled of getStarArray(ride.averageReview || 0)" class="star"
 											[class.filled]="filled">
 											★
 										</span>
@@ -96,6 +96,14 @@
 							<td colspan="8">
 								<ng-container *ngIf="!detailsLoading().has(ride.id); else loading">
 									<div class="detail-layout" *ngIf="getDetails(ride.id) as details">
+
+										<!-- Map Preview -->
+										<div class="map-preview">
+											<div class="map-header">Route</div>
+											<app-map class="mini-map" [staticRoute]="getStaticRoute(details)"></app-map>
+										</div>
+
+										<!-- Other Ride Details -->
 										<div class="detail-grid">
 											<div class="detail-card">
 												<div class="detail-label">Driver</div>
@@ -121,10 +129,27 @@
 											</div>
 
 											<div class="detail-card">
-												<div class="detail-label">Options</div>
-												<div class="detail-value">
-													🚼 Baby seat: {{ details.babySeat ? 'Yes' : 'No' }}<br />
-													🐶 Pet friendly: {{ details.petFriendly ? 'Yes' : 'No' }}
+												<div class="detail-label">Ratings</div>
+												<div class="detail-value rating-breakdown">
+													<div class="rating-item">
+														<span>Driver:</span>
+														<span class="stars-mini">
+															<span
+																*ngFor="let filled of getStarArray(ride.driverRating || 0)"
+																class="star" [class.filled]="filled">★</span>
+														</span>
+													</div>
+													<div class="rating-item">
+														<span>Vehicle:</span>
+														<span class="stars-mini">
+															<span
+																*ngFor="let filled of getStarArray(ride.vehicleRating || 0)"
+																class="star" [class.filled]="filled">★</span>
+														</span>
+													</div>
+													<div class="comment-box" *ngIf="ride.ratingComment">
+														<small><i>"{{ ride.ratingComment }}"</i></small>
+													</div>
 												</div>
 											</div>
 										</div>
@@ -136,6 +161,7 @@
 								</ng-template>
 							</td>
 						</tr>
+
 					</ng-container>
 				</tbody>
 

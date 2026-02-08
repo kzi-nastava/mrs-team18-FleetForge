@@ -6,6 +6,7 @@ import { PassengerFavorite } from '../service/passenger-favorite/passenger-favor
 import { RideFavoriteRoutesDTO } from '../../shared/dtos/ride.dtos';
 import { RideRatingModalComponent, RatingFormData } from '../../shared/popups/ride-rating-modal/ride-rating-modal.component';
 import { RideReviewService } from '../service/passenger-ride-review/ride-review.service';
+import { MapComponent } from '../../shared/map/map';
 
 type RideStatus = 'COMPLETED' | 'CANCELLED' | 'IN_PROGRESS';
 
@@ -16,15 +17,16 @@ interface Ride {
   startDate: string;
   endDate: string | null;
   status: RideStatus;
-  driverRating?: number; // 1-5 when rated
-  vehicleRating?: number; // 1-5 when rated
+  driverRating?: number;
+  vehicleRating?: number;
+  averageReview?: number;
   ratingComment?: string;
 }
 
 @Component({
   selector: 'app-passenger-history',
   standalone: true,
-  imports: [CommonModule, FormsModule, RideRatingModalComponent],
+  imports: [CommonModule, FormsModule, RideRatingModalComponent, MapComponent],
   templateUrl: './passenger-history.component.html',
   styleUrls: ['./passenger-history.component.css'],
 })
@@ -116,6 +118,15 @@ export class PassengerHistoryComponent {
     });
   }
 
+  getStaticRoute(details: PassengerRideDetailsDto) {
+    return {
+      pickup: [details.startLocation.latitude, details.startLocation.longitude] as [number, number],
+      dropoff: [details.endLocation.latitude, details.endLocation.longitude] as [number, number],
+      waypoints: details.wayPoints.map(p => [p.latitude, p.longitude] as [number, number])
+    };
+  }
+
+
   isExpanded(ride: Ride): boolean {
     return this.expandedRideId === ride.id;
   }
@@ -145,6 +156,7 @@ export class PassengerHistoryComponent {
             status: r.status,
             driverRating: r.driverRating ?? undefined,
             vehicleRating: r.vehicleRating ?? undefined,
+            averageReview: r.averageReview ?? undefined,
           }));
 
           this.rides.set(mappedRides);

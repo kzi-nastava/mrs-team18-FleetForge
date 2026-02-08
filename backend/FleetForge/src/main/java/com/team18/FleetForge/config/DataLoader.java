@@ -178,7 +178,7 @@ public class DataLoader implements CommandLineRunner {
         rideRepository.save(ride2);
 
         Ride ride3 = createRide(
-                driver1, passenger2,
+                driver1, passenger4,
                 new GeoPoint(45.2731, 19.8535), "Trg slobode 1, Novi Sad",
                 new GeoPoint(45.2470, 19.8454), "Spens, Novi Sad",
                 LocalDateTime.now().plusMinutes(7),
