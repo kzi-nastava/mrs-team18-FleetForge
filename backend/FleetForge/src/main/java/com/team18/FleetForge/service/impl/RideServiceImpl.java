@@ -9,6 +9,7 @@ import com.team18.FleetForge.dto.ride.reports.InconsistencyReportResponseDTO;
 import com.team18.FleetForge.dto.ride.review.RideRatingDTO;
 import com.team18.FleetForge.dto.ride.routes.WayPointDTO;
 import com.team18.FleetForge.dto.ride.view.*;
+import com.team18.FleetForge.exception.common.UserIdentifierRequiredException;
 import com.team18.FleetForge.exception.ride.RideNotFoundException;
 import com.team18.FleetForge.model.ride.*;
 import com.team18.FleetForge.model.users.Driver;
@@ -382,7 +383,7 @@ public class RideServiceImpl implements RideService {
             int size
     ) {
         if (userId == null && email == null) {
-            throw new IllegalArgumentException("userId or email must be provided");
+            throw new UserIdentifierRequiredException();
         }
 
         Sort.Direction sortDirection = direction.equalsIgnoreCase("asc")

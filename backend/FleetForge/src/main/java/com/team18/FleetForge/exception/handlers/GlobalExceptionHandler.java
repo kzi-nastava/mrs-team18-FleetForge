@@ -1,5 +1,6 @@
 package com.team18.FleetForge.exception.handlers;
 
+import com.team18.FleetForge.exception.common.UserIdentifierRequiredException;
 import com.team18.FleetForge.exception.ride.RideNotFoundException;
 import jakarta.persistence.EntityNotFoundException;
 import org.hibernate.query.sqm.PathElementException;
@@ -10,6 +11,15 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(UserIdentifierRequiredException.class)
+    public ResponseEntity<String> handleUserIdentifierRequired(
+            UserIdentifierRequiredException ex) {
+
+        return ResponseEntity
+                .badRequest()
+                .body(ex.getMessage());
+    }
 
     @ExceptionHandler(RideNotFoundException.class)
     public ResponseEntity<String> handleRideNotFound(RideNotFoundException ex) {
