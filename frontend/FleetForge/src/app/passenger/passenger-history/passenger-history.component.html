@@ -2,7 +2,7 @@
 
 	<div class="header-section">
 		<h2 class="dashboard-title">Ride history</h2>
-		
+
 	</div>
 
 	<div class="rides-section">
@@ -12,86 +12,187 @@
 			<table class="rides-table">
 				<thead>
 					<tr>
-						<th>Name</th>
-						<th>Pick up address</th>
-						<th>Drop off address</th>
-						<th>Ride date</th>
-						<th>Total Cost</th>
-						<th>Cancellation Status</th>
-						<th>Panic Activation</th>
+						<th (click)="onSort('startAddress')">
+							Start address
+							<span *ngIf="isSortedBy('startAddress')" class="sort-icon">
+								{{ sortDirection() === 'asc' ? '▲' : '▼' }}
+							</span>
+						</th>
+						<th (click)="onSort('endAddress')">
+							End address
+							<span *ngIf="isSortedBy('endAddress')" class="sort-icon">
+								{{ sortDirection() === 'asc' ? '▲' : '▼' }}
+							</span>
+						</th>
+						<th (click)="onSort('startTime')">
+							Start time
+							<span *ngIf="isSortedBy('startTime')" class="sort-icon">
+								{{ sortDirection() === 'asc' ? '▲' : '▼' }}
+							</span>
+						</th>
+						<th (click)="onSort('endTime')">
+							End time
+							<span *ngIf="isSortedBy('endTime')" class="sort-icon">
+								{{ sortDirection() === 'asc' ? '▲' : '▼' }}
+							</span>
+						</th>
+						<th (click)="onSort('status')">
+							Status
+							<span *ngIf="isSortedBy('status')" class="sort-icon">
+								{{ sortDirection() === 'asc' ? '▲' : '▼' }}
+							</span>
+						</th>
 						<th>Rate</th>
-						<th>Details</th>
 						<th>Favorite</th>
+						<th>Details</th>
 					</tr>
 				</thead>
 				<tbody>
-					<tr *ngFor="let ride of displayedRides">
-						<td>
-							<div class="passenger-info">
-								<div class="passenger-name">{{ ride.name }}</div>
-								<div class="ride-id">{{ ride.id }}</div>
-							</div>
-						</td>
-						<td>{{ ride.pickupAddress }}</td>
-						<td>{{ ride.dropoffAddress }}</td>
-						<td>{{ ride.rideDate | date: 'd MMM, y' }}</td>
-						<td>{{ ride.totalCost.toFixed(2) }}</td>
-						<td>{{ ride.cancellationStatus }}</td>
-						<td class="panic-cell">
-							<span class="panic-icon" [class.panic-active]="ride.panicActivation">
-								{{ ride.panicActivation ? '✓' : '✕' }}
-							</span>
-						</td>
-						<td class="action-cell">
-							<ng-container [ngSwitch]="getRatingState(ride)">
-								<div *ngSwitchCase="'rated'" class="stars">
-									<span
-										*ngFor="let filled of getStarArray(ride.driverRating || 0)"
-										class="star"
-										[class.filled]="filled"
-									>
-										★
-									</span>
-								</div>
-								<div *ngSwitchCase="'expired'" class="rating-expired">Rating closed</div>
-								<button *ngSwitchCase="'pending'" type="button" class="action-btn rate" (click)="openRating(ride)">
-									Rate
+					<ng-container *ngFor="let ride of displayedRides">
+						<!-- Main ride row -->
+						<tr>
+							<td>{{ ride.pickupAddress }}</td>
+							<td>{{ ride.dropoffAddress }}</td>
+							<td>{{ ride.startDate | date: 'd MMM, y HH:mm' }}</td>
+							<td>{{ ride.endDate ? (ride.endDate | date: 'd MMM, y HH:mm') : '—' }}</td>
+							<td>
+								<span class="status" [class.completed]="ride.status === 'COMPLETED'"
+									[class.cancelled]="ride.status === 'CANCELLED'">
+									{{ ride.status }}
+								</span>
+							</td>
+							<td class="action-cell">
+								<ng-container [ngSwitch]="getRatingState(ride)">
+									<div *ngSwitchCase="'rated'" class="stars">
+										<span *ngFor="let filled of getStarArray(ride.averageReview || 0)" class="star"
+											[class.filled]="filled">
+											★
+										</span>
+									</div>
+									<div *ngSwitchCase="'expired'" class="rating-expired">Rating closed</div>
+									<div *ngSwitchCase="'cancelled'" class="rating-expired cancelled">Ride cancelled
+									</div>
+									<button *ngSwitchCase="'pending'" type="button" class="action-btn rate"
+										(click)="openRating(ride)">
+										Rate
+									</button>
+								</ng-container>
+							</td>
+							<td class="action-cell">
+								<button type="button" class="icon-btn" [ngClass]="{ favorited: isFavorite(ride) }"
+									(click)="onFavoriteClick(ride)" title="Favorite">
+									♥
 								</button>
-							</ng-container>
-						</td>
-						<td class="action-cell">
-							<button type="button" class="action-btn details" (click)="onDetails(ride)">
-								Details
-							</button>
-						</td>
-						<td class="action-cell">
-							<button
-								type="button"
-								class="icon-btn"
-								[ngClass]="{ favorited: isFavorite(ride) }"
-								(click)="onFavoriteClick(ride)"
-								title="Favorite"
-							>
-								♥
-							</button>
-						</td>
-					</tr>
+							</td>
+							<td class="action-cell">
+								<button class="details-btn" (click)="toggleDetails(ride)">
+									{{ isExpanded(ride) ? 'Hide details' : 'View details' }}
+								</button>
+							</td>
+						</tr>
+
+						<!-- Details row -->
+						<tr *ngIf="isExpanded(ride)" class="details-row">
+							<td colspan="8">
+								<ng-container *ngIf="!detailsLoading().has(ride.id); else loading">
+									<div class="detail-layout" *ngIf="getDetails(ride.id) as details">
+
+										<!-- Map Preview -->
+										<div class="map-preview">
+											<div class="map-header">Route</div>
+											<app-map class="mini-map" [staticRoute]="getStaticRoute(details)"></app-map>
+										</div>
+										
+										<!-- Other Ride Details -->
+										<div class="details-content-column">
+											<div class="detail-grid">
+												<div class="detail-card">
+													<div class="detail-label">Driver</div>
+													<div class="detail-value">{{ details.driver.firstName }} {{
+														details.driver.lastName }}</div>
+													<div class="detail-label">Phone</div>
+													<div class="detail-value">{{ details.driver.phoneNumber }}</div>
+												</div>
+
+												<div class="detail-card">
+													<div class="detail-label">Distance</div>
+													<div class="detail-value">{{ details.totalDistance }} km</div>
+													<div class="detail-label">Duration</div>
+													<div class="detail-value">{{ details.estimatedDuration }} min</div>
+												</div>
+
+												<div class="detail-card">
+													<div class="detail-label">Total cost</div>
+													<div class="detail-value">{{ details.totalCost | number:'1.0-0' }}
+														RSD</div>
+													<div class="detail-label">Vehicle</div>
+													<div class="detail-value">{{ details.vehicleType }}</div>
+												</div>
+
+												<div class="detail-card">
+													<div class="detail-label">Ratings</div>
+													<div class="detail-value rating-breakdown">
+														<div class="rating-item">
+															<span>Driver:</span>
+															<span class="stars-mini">
+																<span
+																	*ngFor="let filled of getStarArray(ride.driverRating || 0)"
+																	class="star" [class.filled]="filled">★</span>
+															</span>
+														</div>
+														<div class="rating-item">
+															<span>Vehicle:</span>
+															<span class="stars-mini">
+																<span
+																	*ngFor="let filled of getStarArray(ride.vehicleRating || 0)"
+																	class="star" [class.filled]="filled">★</span>
+															</span>
+														</div>
+													</div>
+												</div>
+											</div>
+
+											<div class="action-footer">
+												<button type="button" class="btn-order" (click)="rideAgain(ride)">
+													Ride Again
+												</button>
+											</div>
+										</div>
+									</div>
+								</ng-container>
+
+								<ng-template #loading>
+									<div class="muted-text">Loading details…</div>
+								</ng-template>
+							</td>
+						</tr>
+
+					</ng-container>
 				</tbody>
+
 			</table>
 		</div>
+		<div class="pagination">
+			<button (click)="prevPage()" [disabled]="currentPage() === 0 || isLoading()">
+				Previous
+			</button>
+
+			<span>
+				Page {{ currentPage() + 1 }} of {{ totalPages() }}
+			</span>
+
+			<button (click)="nextPage()" [disabled]="currentPage() >= totalPages() - 1 || isLoading()">
+				Next
+			</button>
+		</div>
+
 	</div>
 
 	<!-- Rating modal -->
-	<app-ride-rating-modal
-		[isOpen]="isRatingModalOpen"
-		[pickupAddress]="selectedRide?.pickupAddress || ''"
-		[dropoffAddress]="selectedRide?.dropoffAddress || ''"
-		[formData]="ratingForm"
-		[isLoading]="isRatingLoading"
-		[showFinishedMessage]="false"
-		(closed)="closeRatingModal()"
-		(submitted)="submitRating($event)"
-	></app-ride-rating-modal>
+	<app-ride-rating-modal [isOpen]="isRatingModalOpen" [pickupAddress]="selectedRide?.pickupAddress || ''"
+		[dropoffAddress]="selectedRide?.dropoffAddress || ''" [formData]="ratingForm" [isLoading]="isRatingLoading"
+		[showFinishedMessage]="false" (closed)="closeRatingModal()"
+		(submitted)="submitRating($event)"></app-ride-rating-modal>
 
 	<!-- Favorite route name modal -->
 	<div class="favorite-modal-backdrop" *ngIf="isFavoriteModalOpen">
@@ -103,36 +204,22 @@
 						{{ favoriteRide?.pickupAddress }} → {{ favoriteRide?.dropoffAddress }}
 					</p>
 				</div>
-				<button
-					type="button"
-					class="icon-btn close-btn"
-					(click)="closeFavoriteModal()"
-					aria-label="Close favorite route dialog"
-				>
+				<button type="button" class="icon-btn close-btn" (click)="closeFavoriteModal()"
+					aria-label="Close favorite route dialog">
 					✕
 				</button>
 			</div>
 
 			<div class="favorite-modal__content">
 				<label class="field-label" for="favoriteRouteName">Favorite route name</label>
-				<input
-					id="favoriteRouteName"
-					type="text"
-					class="favorite-name-input"
-					placeholder="e.g. Home → Work"
-					[(ngModel)]="favoriteRouteName"
-					autocomplete="off"
-				/>
+				<input id="favoriteRouteName" type="text" class="favorite-name-input" placeholder="e.g. Home → Work"
+					[(ngModel)]="favoriteRouteName" autocomplete="off" />
 			</div>
 
 			<div class="favorite-modal__actions">
 				<button type="button" class="modal-btn ghost" (click)="closeFavoriteModal()">Cancel</button>
-				<button
-					type="button"
-					class="modal-btn primary"
-					[disabled]="!favoriteRouteName.trim()"
-					(click)="saveFavoriteRoute()"
-				>
+				<button type="button" class="modal-btn primary" [disabled]="!favoriteRouteName.trim()"
+					(click)="saveFavoriteRoute()">
 					Save
 				</button>
 			</div>

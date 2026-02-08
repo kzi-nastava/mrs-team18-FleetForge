@@ -2,18 +2,96 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-@Injectable({
-  providedIn: 'root',
-})
-export class PassengerHistory {
-  private apiUrl = 'http://localhost:8080/api/passenger/';
+export interface PassengerRideResponse {
+  content: PassengerRideHistoryDto[];
+}
 
-  constructor(private http: HttpClient) { }
+export interface PageResponse<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  number: number;
+  size: number;
+  first: boolean;
+  last: boolean;
+}
 
-  addFavoriteRoute(name:string, rideId:number) {
-    return this.http.post<void>(this.apiUrl + `favorites/${name}/${rideId}`,{});
+type RideStatus = 'COMPLETED' | 'CANCELLED' | 'IN_PROGRESS';
+
+export interface PassengerRideHistoryDto {
+  rideId: number;
+  startAddress: string;
+  endAddress: string;
+  startTime: string;
+  endTime: string | null;
+  status: RideStatus;
+  startLocation: { latitude: number; longitude: number };
+  endLocation: { latitude: number; longitude: number };
+  vehicleRating: number | null;
+  driverRating: number | null;
+  averageReview: number | null;
+}
+
+export interface PassengerRideDetailsDto {
+  id: number;
+  startAddress: string;
+  endAddress: string;
+  startLocation: { latitude: number; longitude: number };
+  endLocation: { latitude: number; longitude: number };
+  wayPoints: { latitude: number; longitude: number }[];
+  startTime: string;
+  endTime: string;
+  totalDistance: number;
+  estimatedDuration: number;
+  totalCost: number;
+  status: string;
+  vehicleType: string;
+  petFriendly: boolean;
+  babySeat: boolean;
+  driver: {
+    firstName: string;
+    lastName: string;
+    phoneNumber: string;
+  };
+}
+
+@Injectable({ providedIn: 'root' })
+  export class PassengerHistory {
+    private apiUrl = 'http://localhost:8080/api/passenger';
+
+    constructor(private http: HttpClient) {}
+
+    getPassengerRides(
+    page: number,
+    size: number,
+    sortBy: string,
+    direction: 'asc' | 'desc'
+  ) {
+    return this.http.get<PageResponse<PassengerRideHistoryDto>>(
+      `${this.apiUrl}/rides`,
+      {
+        params: {
+          page,
+          size,
+          sortBy,
+          direction,
+        },
+      }
+    );
   }
-   deleteFavoriteRoute(routeId:number):Observable<void> {
-      return this.http.delete<void>(this.apiUrl + `favorites/${routeId}`);
-    }
+
+  getRideDetails(rideId: number) {
+    return this.http.get<PassengerRideDetailsDto>(
+      `${this.apiUrl}/rides/${rideId}`
+    );
+  }
+
+
+  addFavoriteRoute(name: string, rideId: number) {
+    return this.http.post<void>(`${this.apiUrl}/favorites/${name}/${rideId}`, {});
+  }
+
+  deleteFavoriteRoute(routeId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/favorites/${routeId}`);
+  }
 }

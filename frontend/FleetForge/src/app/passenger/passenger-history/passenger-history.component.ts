@@ -1,30 +1,33 @@
 import { Component, signal, WritableSignal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { PassengerHistory } from '../service/passenger-history/passenger-history';
+import { PassengerHistory, PassengerRideDetailsDto } from '../service/passenger-history/passenger-history';
 import { PassengerFavorite } from '../service/passenger-favorite/passenger-favorite';
 import { RideFavoriteRoutesDTO } from '../../shared/dtos/ride.dtos';
 import { RideRatingModalComponent, RatingFormData } from '../../shared/popups/ride-rating-modal/ride-rating-modal.component';
 import { RideReviewService } from '../service/passenger-ride-review/ride-review.service';
+import { MapComponent } from '../../shared/map/map';
+import { Router } from '@angular/router';
+
+type RideStatus = 'COMPLETED' | 'CANCELLED' | 'IN_PROGRESS';
 
 interface Ride {
-  name: string;
   id: number;
   pickupAddress: string;
   dropoffAddress: string;
-  rideDate: string;
-  totalCost: number;
-  cancellationStatus: string;
-  panicActivation: boolean;
-  driverRating?: number; // 1-5 when rated
-  vehicleRating?: number; // 1-5 when rated
+  startDate: string;
+  endDate: string | null;
+  status: RideStatus;
+  driverRating?: number;
+  vehicleRating?: number;
+  averageReview?: number;
   ratingComment?: string;
 }
 
 @Component({
   selector: 'app-passenger-history',
   standalone: true,
-  imports: [CommonModule, FormsModule, RideRatingModalComponent],
+  imports: [CommonModule, FormsModule, RideRatingModalComponent, MapComponent],
   templateUrl: './passenger-history.component.html',
   styleUrls: ['./passenger-history.component.css'],
 })
@@ -39,7 +42,8 @@ export class PassengerHistoryComponent {
   constructor(
     private passengerHistory: PassengerHistory,
     private passengerFavorite: PassengerFavorite,
-    private rideReviewService: RideReviewService
+    private rideReviewService: RideReviewService,
+    private router: Router
   ) {}
   isRatingModalOpen = false;
   selectedRide: Ride | null = null;
@@ -54,91 +58,196 @@ export class PassengerHistoryComponent {
     comment: '',
   };
 
-  protected rides: WritableSignal<Ride[]> = signal<Ride[]>([
-    {
-      name: 'Petar Petrovic',
-      id: 1,
-      pickupAddress: 'Kneza Milosa 3',
-      dropoffAddress: 'Kajmakcalska 5',
-      rideDate: this.buildRideDate(2),
-      totalCost: 1500.0,
-      cancellationStatus: 'Not cancelled',
-      panicActivation: false,
-      driverRating: 4,
-      vehicleRating: 5,
-      ratingComment: 'Great driving and clean car.',
-    },
-    {
-      name: 'Petar Petrovic',
-      id: 2,
-      pickupAddress: 'Despota Stefana 4',
-      dropoffAddress: 'Sekspiova 2',
-      rideDate: this.buildRideDate(1),
-      totalCost: 2500.0,
-      cancellationStatus: 'By passenger',
-      panicActivation: false,
-    },
-    {
-      name: 'Petar Petrovic',
-      id: 3,
-      pickupAddress: 'Kozacinskog 1',
-      dropoffAddress: 'Staljinova 10',
-      rideDate: this.buildRideDate(6),
-      totalCost: 450.0,
-      cancellationStatus: 'By driver',
-      panicActivation: false,
-    },
-    {
-      name: 'Petar Petrovic',
-      id: 4,
-      pickupAddress: 'Mekinjeva 28',
-      dropoffAddress: 'Mise Dimitrijevica 32',
-      rideDate: this.buildRideDate(10),
-      totalCost: 552.0,
-      cancellationStatus: 'By passenger',
-      panicActivation: true,
-      driverRating: 5,
-      vehicleRating: 4,
-      ratingComment: 'Driver was courteous.',
-    },
+  currentPage = signal(0);
+  pageSize = signal(5);
+  totalPages = signal(0);
+  isLoading = signal(false);
 
-  ]);
+  sortBy = signal<string>('startTime');
+  sortDirection = signal<'asc' | 'desc'>('desc');
+
+  expandedRideId: number | null = null;
+  rideDetails = signal<Record<number, PassengerRideDetailsDto>>({});
+  detailsLoading = signal<Set<number>>(new Set());
+
+
+  protected rides: WritableSignal<Ride[]> = signal<Ride[]>([]);
+
   ngOnInit(): void {
+    this.loadRides();
+
     this.passengerFavorite.getFavoriteRoutes().subscribe(routes => {
       const newFavs = new Set<number>();
-    routes.forEach((route) => newFavs.add(route.rideId));
-    this.favRoutes.set(routes);
-  
-    this.favRideIds.update(() => newFavs);
+      routes.forEach(route => newFavs.add(route.rideId));
+      this.favRoutes.set(routes);
+      this.favRideIds.set(newFavs);
+    });
+  }
+
+  toggleDetails(ride: Ride): void {
+    if (this.expandedRideId === ride.id) {
+      this.expandedRideId = null;
+      return;
     }
-    
-    );
+
+    this.expandedRideId = ride.id;
+
+    if (this.rideDetails()[ride.id]) {
+      return;
+    }
+
+    this.detailsLoading.update(s => new Set(s).add(ride.id));
+
+    this.passengerHistory.getRideDetails(ride.id).subscribe({
+      next: details => {
+        this.rideDetails.update(prev => ({
+          ...prev,
+          [ride.id]: details,
+        }));
+        this.detailsLoading.update(s => {
+          const next = new Set(s);
+          next.delete(ride.id);
+          return next;
+        });
+      },
+      error: () => {
+        this.detailsLoading.update(s => {
+          const next = new Set(s);
+          next.delete(ride.id);
+          return next;
+        });
+      }
+    });
   }
+
+  rideAgain(ride: Ride): void {
+    const details = this.getDetails(ride.id);
+    if (!details) return;
+
+    const favoriteRoute: RideFavoriteRoutesDTO = {
+      id: -1,
+      rideId: ride.id,
+      startAddress: details.startAddress,
+      endAddress: details.endAddress,
+      name: `Ride from ${ride.pickupAddress}`,
+      // Map history waypoints to the expected WayPointDTO format
+      waypoints: details.wayPoints.map(wp => ({
+        location: { latitude: wp.latitude, longitude: wp.longitude },
+        address: "",
+        orderIndex: details.wayPoints.indexOf(wp) + 1
+      }))
+    };
+
+    this.router.navigate(['/passenger/passenger-home'], { 
+      state: { favoriteRoute: favoriteRoute } 
+    });
+  }
+
+  getStaticRoute(details: PassengerRideDetailsDto) {
+    return {
+      pickup: [details.startLocation.latitude, details.startLocation.longitude] as [number, number],
+      dropoff: [details.endLocation.latitude, details.endLocation.longitude] as [number, number],
+      waypoints: details.wayPoints.map(p => [p.latitude, p.longitude] as [number, number])
+    };
+  }
+
+
+  isExpanded(ride: Ride): boolean {
+    return this.expandedRideId === ride.id;
+  }
+
+  getDetails(rideId: number) {
+    return this.rideDetails()[rideId];
+  }
+
+  loadRides(): void {
+    this.isLoading.set(true);
+
+    this.passengerHistory
+      .getPassengerRides(
+        this.currentPage(),
+        this.pageSize(),
+        this.sortBy(),
+        this.sortDirection()
+      )
+      .subscribe({
+        next: (response) => {
+          const mappedRides: Ride[] = response.content.map(r => ({
+            id: r.rideId,
+            pickupAddress: r.startAddress,
+            dropoffAddress: r.endAddress,
+            startDate: r.startTime,
+            endDate: r.endTime,
+            status: r.status,
+            driverRating: r.driverRating ?? undefined,
+            vehicleRating: r.vehicleRating ?? undefined,
+            averageReview: r.averageReview ?? undefined,
+          }));
+
+          this.rides.set(mappedRides);
+          this.totalPages.set(response.totalPages);
+          this.isLoading.set(false);
+        },
+        error: () => this.isLoading.set(false),
+      });
+  }
+
+  onSort(column: string): void {
+    if (this.sortBy() === column) {
+      this.sortDirection.set(
+        this.sortDirection() === 'asc' ? 'desc' : 'asc'
+      );
+    } else {
+      this.sortBy.set(column);
+      this.sortDirection.set('desc');
+    }
+
+    this.currentPage.set(0);
+
+    this.loadRides();
+  }
+
+  isSortedBy(column: string): boolean {
+    return this.sortBy() === column;
+  }
+
+
+  nextPage(): void {
+    if (this.currentPage() < this.totalPages() - 1) {
+      this.currentPage.update(p => p + 1);
+      this.loadRides();
+    }
+  }
+
+  prevPage(): void {
+    if (this.currentPage() > 0) {
+      this.currentPage.update(p => p - 1);
+      this.loadRides();
+    }
+  }
+
+  goToPage(page: number): void {
+    if (page >= 0 && page < this.totalPages()) {
+      this.currentPage.set(page);
+      this.loadRides();
+    }
+  }
+
   get displayedRides(): Ride[] {
-    const q = this.searchQuery.trim().toLowerCase();
-    if (!q) return this.rides();
-
-    return this.rides().filter((ride) =>
-      [
-        ride.name,
-        ride.id,
-        ride.pickupAddress,
-        ride.dropoffAddress,
-        new Date(ride.rideDate).toDateString(),
-        ride.cancellationStatus,
-      ]
-        .join(' ')
-        .toLowerCase()
-        .includes(q)
-    );
+    return this.rides();
   }
 
-  getRatingState(ride: Ride): 'rated' | 'expired' | 'pending' {
+
+  getRatingState(ride: Ride): 'rated' | 'expired' | 'pending' | 'cancelled' {
+    if (ride.status === 'CANCELLED') {
+      return 'cancelled';
+    }
+
     if (ride.driverRating !== undefined && ride.driverRating > 0) {
       return 'rated';
     }
 
-    const rideTime = new Date(ride.rideDate).getTime();
+    const rideTime = new Date(ride.startDate).getTime();
     if (Number.isNaN(rideTime)) {
       return 'expired';
     }
