@@ -6,6 +6,8 @@
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  height: 600px;
+  max-height: 80vh;
   min-height: 520px;
 }
 
@@ -63,6 +65,7 @@
 
 .chat-body {
   flex: 1;
+  min-height: 0;
   padding: 24px;
   background: #fafafa;
   overflow-y: auto;
