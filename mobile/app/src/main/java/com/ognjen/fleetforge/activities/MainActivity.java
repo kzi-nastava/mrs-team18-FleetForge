@@ -15,6 +15,7 @@ import com.ognjen.fleetforge.fragments.admin.RegisterDriver;
 import com.ognjen.fleetforge.fragments.driver.DriverHistoryFragment;
 import com.ognjen.fleetforge.fragments.PlaceholderFragment;
 import com.ognjen.fleetforge.R;
+import com.ognjen.fleetforge.fragments.passenger.RideOrder;
 import com.ognjen.fleetforge.fragments.unregistered.UnregisteredFragment;
 import com.ognjen.fleetforge.model.UserRole;
 import com.ognjen.fleetforge.auth.AuthManager;
@@ -106,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
                 return new AdminProfile();
             }
         } else if (itemId == R.id.nav_home) {
-            return PlaceholderFragment.newInstance("Home");
+            return new RideOrder();
         } else if (itemId == R.id.nav_dashboard) {
             return PlaceholderFragment.newInstance("Dashboard");
         } else if (itemId == R.id.nav_history_user) {

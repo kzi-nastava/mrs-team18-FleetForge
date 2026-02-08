@@ -1,0 +1,191 @@
+<androidx.coordinatorlayout.widget.CoordinatorLayout android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <org.osmdroid.views.MapView
+        android:id="@+id/map_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:id="@+id/bottom_sheet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@android:color/white"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+        app:behavior_peekHeight="100dp"
+        android:padding="16dp">
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Start Location"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                android:id="@+id/start_location"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:paddingStart="16dp"  android:paddingEnd="16dp"    android:paddingTop="16dp"
+                android:paddingBottom="16dp"/>
+        </com.google.android.material.textfield.TextInputLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/waypointsContainer"
+            android:orientation="vertical"
+            android:layout_marginTop="8dp">
+
+
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/add_waypoint_btn"
+            android:layout_marginTop="8dp"
+            android:text="+ Add Waypoint"/>
+
+        </LinearLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:hint="End Destination"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                android:id="@+id/end_destination"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:paddingStart="16dp"  android:paddingEnd="16dp"    android:paddingTop="16dp"
+                android:paddingBottom="16dp"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:hint="Passenger number"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/passengerNum"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:textSize="18sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/passengersContainer"
+                android:orientation="vertical"
+                android:layout_marginTop="8dp">
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/add_passenger_btn"
+                android:layout_marginTop="8dp"
+                android:text="+ Add Passenger"/>
+            </LinearLayout>
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:layout_gravity="center"
+    >
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/dateTimeIL"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginTop="8dp"
+            android:hint="Date and time"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/dateTime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="datetime"
+                android:textSize="18sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/now"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Now"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+</LinearLayout>
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/vehicleTypeIL"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:boxCornerRadiusTopStart="4dp"
+            app:boxCornerRadiusTopEnd="4dp"
+            app:boxCornerRadiusBottomStart="4dp"
+            app:boxCornerRadiusBottomEnd="4dp"
+            app:endIconMode="dropdown_menu"
+            app:layout_constraintTop_toBottomOf="@id/dateTimeIL"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                android:id="@+id/vehicleTypeSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:hint="Vehicle type"
+                android:inputType="none"
+                android:paddingStart="16dp"  android:paddingEnd="16dp"    android:paddingTop="16dp"
+                android:paddingBottom="16dp"/>
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/babySeatCB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Is baby seat available"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/vehicleTypeIL" />
+
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/petFriendlyCB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Is pet friendly"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/babySeatCB" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Order"
+            android:id="@+id/orderBtn"
+            android:layout_gravity="center"
+            android:layout_marginTop="16dp"
+            />
+        </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+    </LinearLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
