@@ -1,0 +1,48 @@
+<div class="chat-card">
+  <header class="chat-header">
+    <div class="chat-header-left">
+      <img class="chat-logo" src="logo.png" alt="FleetForge logo" />
+      <div class="chat-header-text">
+        <div class="chat-title">{{ title }}</div>
+        <div class="chat-subtitle">{{ subtitle }}</div>
+      </div>
+    </div>
+    <div class="chat-status">
+      <span class="status-dot" [class.online]="isOnline"></span>
+      <span class="status-text">{{ isOnline ? 'Online' : 'Offline' }}</span>
+    </div>
+  </header>
+
+  <div class="chat-body" #messagesContainer>
+    @if (!messages.length) {
+      <div class="chat-empty">No messages yet.</div>
+    }
+
+    @for (message of messages; track trackByMessageId($index, message)) {
+      <div class="chat-row" [class.own]="isOwn(message)">
+        <div class="chat-avatar" [class.own]="isOwn(message)">
+          {{ getInitial(message.senderName) }}
+        </div>
+        <div class="chat-message">
+          <div class="chat-bubble" [class.own]="isOwn(message)">
+            {{ message.content }}
+          </div>
+          <div class="chat-time" [class.own]="isOwn(message)">
+            {{ formatTime(message.sentAt) }}
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <form class="chat-composer" (submit)="onSend($event)">
+    <input
+      type="text"
+      [placeholder]="placeholder"
+      [(ngModel)]="draft"
+      name="draft"
+      autocomplete="off"
+    />
+    <button class="send-btn" type="submit">Send</button>
+  </form>
+</div>
