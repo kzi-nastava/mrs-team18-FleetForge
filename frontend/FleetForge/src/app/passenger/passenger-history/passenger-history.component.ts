@@ -7,6 +7,7 @@ import { RideFavoriteRoutesDTO } from '../../shared/dtos/ride.dtos';
 import { RideRatingModalComponent, RatingFormData } from '../../shared/popups/ride-rating-modal/ride-rating-modal.component';
 import { RideReviewService } from '../service/passenger-ride-review/ride-review.service';
 import { MapComponent } from '../../shared/map/map';
+import { Router } from '@angular/router';
 
 type RideStatus = 'COMPLETED' | 'CANCELLED' | 'IN_PROGRESS';
 
@@ -41,7 +42,8 @@ export class PassengerHistoryComponent {
   constructor(
     private passengerHistory: PassengerHistory,
     private passengerFavorite: PassengerFavorite,
-    private rideReviewService: RideReviewService
+    private rideReviewService: RideReviewService,
+    private router: Router
   ) {}
   isRatingModalOpen = false;
   selectedRide: Ride | null = null;
@@ -115,6 +117,29 @@ export class PassengerHistoryComponent {
           return next;
         });
       }
+    });
+  }
+
+  rideAgain(ride: Ride): void {
+    const details = this.getDetails(ride.id);
+    if (!details) return;
+
+    const favoriteRoute: RideFavoriteRoutesDTO = {
+      id: -1,
+      rideId: ride.id,
+      startAddress: details.startAddress,
+      endAddress: details.endAddress,
+      name: `Ride from ${ride.pickupAddress}`,
+      // Map history waypoints to the expected WayPointDTO format
+      waypoints: details.wayPoints.map(wp => ({
+        location: { latitude: wp.latitude, longitude: wp.longitude },
+        address: "",
+        orderIndex: details.wayPoints.indexOf(wp) + 1
+      }))
+    };
+
+    this.router.navigate(['/passenger/passenger-home'], { 
+      state: { favoriteRoute: favoriteRoute } 
     });
   }
 

@@ -102,55 +102,60 @@
 											<div class="map-header">Route</div>
 											<app-map class="mini-map" [staticRoute]="getStaticRoute(details)"></app-map>
 										</div>
-
+										
 										<!-- Other Ride Details -->
-										<div class="detail-grid">
-											<div class="detail-card">
-												<div class="detail-label">Driver</div>
-												<div class="detail-value">{{ details.driver.firstName }} {{
-													details.driver.lastName }}</div>
-												<div class="detail-label">Phone</div>
-												<div class="detail-value">{{ details.driver.phoneNumber }}</div>
-											</div>
-
-											<div class="detail-card">
-												<div class="detail-label">Distance</div>
-												<div class="detail-value">{{ details.totalDistance }} km</div>
-												<div class="detail-label">Duration</div>
-												<div class="detail-value">{{ details.estimatedDuration }} min</div>
-											</div>
-
-											<div class="detail-card">
-												<div class="detail-label">Total cost</div>
-												<div class="detail-value">{{ details.totalCost | number:'1.0-0' }} RSD
+										<div class="details-content-column">
+											<div class="detail-grid">
+												<div class="detail-card">
+													<div class="detail-label">Driver</div>
+													<div class="detail-value">{{ details.driver.firstName }} {{
+														details.driver.lastName }}</div>
+													<div class="detail-label">Phone</div>
+													<div class="detail-value">{{ details.driver.phoneNumber }}</div>
 												</div>
-												<div class="detail-label">Vehicle</div>
-												<div class="detail-value">{{ details.vehicleType }}</div>
-											</div>
 
-											<div class="detail-card">
-												<div class="detail-label">Ratings</div>
-												<div class="detail-value rating-breakdown">
-													<div class="rating-item">
-														<span>Driver:</span>
-														<span class="stars-mini">
-															<span
-																*ngFor="let filled of getStarArray(ride.driverRating || 0)"
-																class="star" [class.filled]="filled">★</span>
-														</span>
-													</div>
-													<div class="rating-item">
-														<span>Vehicle:</span>
-														<span class="stars-mini">
-															<span
-																*ngFor="let filled of getStarArray(ride.vehicleRating || 0)"
-																class="star" [class.filled]="filled">★</span>
-														</span>
-													</div>
-													<div class="comment-box" *ngIf="ride.ratingComment">
-														<small><i>"{{ ride.ratingComment }}"</i></small>
+												<div class="detail-card">
+													<div class="detail-label">Distance</div>
+													<div class="detail-value">{{ details.totalDistance }} km</div>
+													<div class="detail-label">Duration</div>
+													<div class="detail-value">{{ details.estimatedDuration }} min</div>
+												</div>
+
+												<div class="detail-card">
+													<div class="detail-label">Total cost</div>
+													<div class="detail-value">{{ details.totalCost | number:'1.0-0' }}
+														RSD</div>
+													<div class="detail-label">Vehicle</div>
+													<div class="detail-value">{{ details.vehicleType }}</div>
+												</div>
+
+												<div class="detail-card">
+													<div class="detail-label">Ratings</div>
+													<div class="detail-value rating-breakdown">
+														<div class="rating-item">
+															<span>Driver:</span>
+															<span class="stars-mini">
+																<span
+																	*ngFor="let filled of getStarArray(ride.driverRating || 0)"
+																	class="star" [class.filled]="filled">★</span>
+															</span>
+														</div>
+														<div class="rating-item">
+															<span>Vehicle:</span>
+															<span class="stars-mini">
+																<span
+																	*ngFor="let filled of getStarArray(ride.vehicleRating || 0)"
+																	class="star" [class.filled]="filled">★</span>
+															</span>
+														</div>
 													</div>
 												</div>
+											</div>
+
+											<div class="action-footer">
+												<button type="button" class="btn-order" (click)="rideAgain(ride)">
+													Ride Again
+												</button>
 											</div>
 										</div>
 									</div>
