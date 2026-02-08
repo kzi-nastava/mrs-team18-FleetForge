@@ -412,21 +412,19 @@ public class RideServiceImpl implements RideService {
 
         List<InconsistencyReport> reports = inconsistencyReportRepository.findByRideId(rideId);
 
-        List<UserSummaryDTO> passengers = new ArrayList<>();
-        passengers.add(UserSummaryDTO.builder()
+        UserSummaryDTO mainPassenger = UserSummaryDTO.builder()
                 .id(ride.getPassenger().getId())
                 .firstName(ride.getPassenger().getFirstName())
                 .lastName(ride.getPassenger().getLastName())
-                .build()
-        );
-        passengers.addAll(ride.getLinkedPassengers().stream()
+                .build();
+
+        List<UserSummaryDTO> linkedPassengers = ride.getLinkedPassengers().stream()
                 .map(p -> UserSummaryDTO.builder()
                         .id(p.getId())
                         .firstName(p.getFirstName())
                         .lastName(p.getLastName())
                         .build()
-                ).toList()
-        );
+                ).toList();
 
         RideRatingDTO ratings = null;
         if (ride.getReview() != null) {
@@ -463,7 +461,8 @@ public class RideServiceImpl implements RideService {
                         .profileImage(ride.getDriver().getProfilePicture())
                         .build()
                 )
-                .passengers(passengers)
+                .mainPassenger(mainPassenger)
+                .linkedPassengers(linkedPassengers)
                 .cancelledBy(ride.getCancelledBy() != null ? ride.getCancelledBy().name() : null)
                 .cancellationReason(ride.getCancellationReason())
                 .ratings(ratings)

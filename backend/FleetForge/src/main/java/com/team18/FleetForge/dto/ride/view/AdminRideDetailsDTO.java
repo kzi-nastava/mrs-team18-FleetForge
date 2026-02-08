@@ -10,7 +10,6 @@ import com.team18.FleetForge.model.ride.GeoPoint;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -36,12 +35,13 @@ public class AdminRideDetailsDTO {
 
     private DriverInfoDTO driver;
 
-    private List<UserSummaryDTO> passengers; // main + linked
+    private UserSummaryDTO mainPassenger; // main
+    private List<UserSummaryDTO> linkedPassengers; // linked
 
     private boolean hasInconsistencies;
     private List<InconsistencyReportResponseDTO> inconsistencies;
 
-    private String cancelledBy; // "DRIVER", "PASSENGER", or null
+    private String cancelledBy; // DRIVER or PASSENGER
     private String cancellationReason; // optional
 
     private RideRatingDTO ratings; // vehicle + driver ratings
