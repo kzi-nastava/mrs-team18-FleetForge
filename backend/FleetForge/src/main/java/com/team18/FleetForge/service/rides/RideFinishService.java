@@ -4,6 +4,7 @@ import com.team18.FleetForge.dto.driver.DriverInfoDTO;
 import com.team18.FleetForge.dto.ride.lifecycle.FinishRideRequestDTO;
 import com.team18.FleetForge.dto.ride.lifecycle.FinishRideResponseDTO;
 import com.team18.FleetForge.dto.ride.view.RideTrackingDTO;
+import com.team18.FleetForge.model.enums.NotificationType;
 import com.team18.FleetForge.model.enums.RideStatus;
 import com.team18.FleetForge.model.enums.VehicleType;
 import com.team18.FleetForge.model.ride.Ride;
@@ -15,6 +16,7 @@ import com.team18.FleetForge.repository.rides.RideLocationRepository;
 import com.team18.FleetForge.repository.rides.RideRepository;
 import com.team18.FleetForge.repository.users.DriverRepository;
 import com.team18.FleetForge.service.EmailService;
+import com.team18.FleetForge.service.NotificationService;
 import com.team18.FleetForge.service.PriceCalculationService;
 import com.team18.FleetForge.util.GeoUtils;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +40,7 @@ public class RideFinishService {
     private final EmailService emailService;
     private final RideLocationRepository rideLocationRepository;
     private final PriceCalculationService priceCalculationService;
+    private final NotificationService notificationService;
 
     @Transactional
     public FinishRideResponseDTO finishRide(FinishRideRequestDTO request) {
@@ -140,6 +143,18 @@ public class RideFinishService {
         driverRepository.save(driver);
 
         sendRideCompletionEmails(ride);
+
+        if (ride.getLinkedPassengers() != null && !ride.getLinkedPassengers().isEmpty()) {
+            for (Passenger passenger : ride.getLinkedPassengers()) {
+                sendRideCompletionEmails(ride);
+            }
+        }
+
+        notificationService.sendNotificationToLinkedPassengers(
+                ride,
+                NotificationType.RIDE_COMPLETED,
+                "Ride finished"
+        );
 
         return FinishRideResponseDTO.builder()
                 .rideId(ride.getId())
