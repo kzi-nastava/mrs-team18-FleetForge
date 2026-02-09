@@ -1,26 +1,53 @@
 package com.ognjen.fleetforge.fragments.driver;
 
 import com.ognjen.fleetforge.R;
+import com.ognjen.fleetforge.api.DriverService;
+import com.ognjen.fleetforge.api.RetrofitClient;
+import com.ognjen.fleetforge.adapters.RideHistoryAdapter;
+import com.ognjen.fleetforge.dtos.driver.CompletedRideDTO;
+
+import android.app.DatePickerDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import com.ognjen.fleetforge.adapters.RideHistoryAdapter;
-import com.ognjen.fleetforge.model.Ride;
-import java.util.ArrayList;
-import java.util.List;
 
+import com.google.android.material.textfield.TextInputEditText;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Locale;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class DriverHistoryFragment extends Fragment {
 
+    private static final String TAG = "DriverHistoryFragment";
+
     private RecyclerView rvRides;
+    private LinearLayout llEmptyState;
+    private TextInputEditText etDatePicker;
+    private Button btnClearFilter;
+
     private RideHistoryAdapter adapter;
-    private List<Ride> rideList;
+    private List<CompletedRideDTO> allRides;
+    private List<CompletedRideDTO> filteredRides;
+    private DriverService driverService;
+
+    private String selectedDateForDisplay = null;
 
     @Nullable
     @Override
@@ -31,106 +58,139 @@ public class DriverHistoryFragment extends Fragment {
 
         initViews(view);
         setupRecyclerView();
-        loadMockData();
+        setupDatePicker();
+        initRetrofit();
+        loadRideHistory();
 
         return view;
     }
 
     private void initViews(View view) {
         rvRides = view.findViewById(R.id.rv_rides);
+        llEmptyState = view.findViewById(R.id.ll_empty_state);
+        etDatePicker = view.findViewById(R.id.et_date_picker);
+        btnClearFilter = view.findViewById(R.id.btn_clear_filter);
     }
 
     private void setupRecyclerView() {
-        rideList = new ArrayList<>();
-        adapter = new RideHistoryAdapter(rideList);
+        allRides = new ArrayList<>();
+        filteredRides = new ArrayList<>();
+        adapter = new RideHistoryAdapter(filteredRides);
 
         rvRides.setLayoutManager(new LinearLayoutManager(getContext()));
         rvRides.setAdapter(adapter);
     }
 
-    // This function will be replaced with real data from backend
-    private void loadMockData() {
-        rideList.clear();
+    private void setupDatePicker() {
+        etDatePicker.setOnClickListener(v -> showDatePickerDialog());
 
-        // Mock ride data
-        rideList.add(new Ride(
-                "1",
-                "Peter Petrovic",
-                "123465798",
-                "Kneza Milosa 3",
-                "Kajmakalinska 5",
-                "24 Oct, 2025",
-                1500.00,
-                "Not cancelled",
-                false,
-                4.0f
-        ));
+        btnClearFilter.setOnClickListener(v -> {
+            selectedDateForDisplay = null;
+            etDatePicker.setText("");
+            filterRides();
+        });
+    }
 
-        rideList.add(new Ride(
-                "2",
-                "Marko Markovic",
-                "987654321",
-                "Despota Stefana 4",
-                "Sekspirova 2",
-                "24 Oct, 2025",
-                2500.00,
-                "By passenger",
-                false,
-                5.0f
-        ));
+    private void showDatePickerDialog() {
+        Calendar calendar = Calendar.getInstance();
 
-        rideList.add(new Ride(
-                "3",
-                "Ana Anic",
-                "456789123",
-                "Kozaciniskog 1",
-                "Stalijinova 10",
-                "18 Oct, 2025",
-                450.00,
-                "By driver",
-                false,
-                4.0f
-        ));
+        DatePickerDialog datePickerDialog = new DatePickerDialog(
+                requireContext(),
+                (view, year, month, dayOfMonth) -> {
+                    selectedDateForDisplay = String.format(Locale.US, "%d-%02d-%02d",
+                            year, month + 1, dayOfMonth);
 
-        rideList.add(new Ride(
-                "4",
-                "Jovan Jovanovic",
-                "321654987",
-                "Meksinijeva 28",
-                "Mise Dimitrijevica 32",
-                "8 Oct, 2025",
-                552.00,
-                "By passenger",
-                true,
-                4.0f
-        ));
+                    etDatePicker.setText(selectedDateForDisplay);
 
-        rideList.add(new Ride(
-                "5",
-                "Nikola Nikolic",
-                "147258369",
-                "Makedonska 14",
-                "Gogoljeva 25",
-                "15 Sep, 2025",
-                1150.00,
-                "Not cancelled",
-                false,
-                3.0f
-        ));
+                    filterRides();
+                },
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+        );
 
-        rideList.add(new Ride(
-                "6",
-                "Stefan Stefanovic",
-                "963852741",
-                "Masarikova 88",
-                "Danila Kisa 11",
-                "12 Sep, 2025",
-                917.00,
-                "Not cancelled",
-                false,
-                5.0f
-        ));
+        datePickerDialog.show();
+    }
 
-        adapter.notifyDataSetChanged();
+    private void initRetrofit() {
+        driverService = RetrofitClient.getInstance().getDriverService();
+    }
+
+    private void loadRideHistory() {
+
+        Call<List<CompletedRideDTO>> call = driverService.getDriverRideHistory();
+        call.enqueue(new Callback<List<CompletedRideDTO>>() {
+            @Override
+            public void onResponse(Call<List<CompletedRideDTO>> call,
+                                   Response<List<CompletedRideDTO>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    allRides = response.body();
+                    Log.d(TAG, "Successfully loaded " + allRides.size() + " rides");
+
+                    filterRides();
+                } else {
+                    Log.e(TAG, "Failed to load ride history. Code: " + response.code());
+                    showError("Failed to load ride history");
+                    showEmptyState();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<CompletedRideDTO>> call, Throwable t) {
+                Log.e(TAG, "Error loading ride history", t);
+                showError("Error: " + t.getMessage());
+                showEmptyState();
+            }
+        });
+    }
+
+    private void filterRides() {
+        if (selectedDateForDisplay == null || selectedDateForDisplay.isEmpty()) {
+            filteredRides = new ArrayList<>(allRides);
+            Log.d(TAG, "No filter - showing all " + filteredRides.size() + " rides");
+        } else {
+            // Filter by selected date
+            filteredRides = new ArrayList<>();
+
+            for (CompletedRideDTO ride : allRides) {
+                String rideDate = ride.getRideDate();
+
+                if (rideDate != null && rideDate.equals(selectedDateForDisplay)) {
+                    filteredRides.add(ride);
+                    Log.d(TAG, "Match found!");
+                }
+            }
+
+            Log.d(TAG, "Filtered " + filteredRides.size() + " rides for date: " + selectedDateForDisplay);
+        }
+
+        if (filteredRides.isEmpty()) {
+            showEmptyState();
+        } else {
+            hideEmptyState();
+            adapter.updateData(filteredRides);
+        }
+    }
+
+    private void showEmptyState() {
+        rvRides.setVisibility(View.GONE);
+        llEmptyState.setVisibility(View.VISIBLE);
+    }
+
+    private void hideEmptyState() {
+        rvRides.setVisibility(View.VISIBLE);
+        llEmptyState.setVisibility(View.GONE);
+    }
+
+    private void showError(String message) {
+        if (getContext() != null) {
+            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadRideHistory();
     }
 }
