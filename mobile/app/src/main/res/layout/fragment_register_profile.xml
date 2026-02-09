@@ -94,7 +94,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/first_name"
-                android:inputType="textCapWords" />
+                android:inputType="textCapWords"
+                android:autofillHints="personGivenName"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -111,7 +112,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/last_name"
-                android:inputType="textCapWords"/>
+                android:inputType="textCapWords"
+                android:autofillHints="personFamilyName"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -128,7 +130,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/home_address"
-                android:inputType="textPostalAddress|textCapWords" />
+                android:inputType="textPostalAddress|textCapWords"
+                android:autofillHints="postalAddress"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.button.MaterialButton
