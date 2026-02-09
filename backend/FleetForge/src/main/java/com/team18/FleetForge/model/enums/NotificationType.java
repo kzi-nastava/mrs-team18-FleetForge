@@ -1,0 +1,18 @@
+package com.team18.FleetForge.model.enums;
+
+public enum NotificationType {
+    RIDE_CREATED,
+    RIDE_ASSIGNED,
+    RIDE_ACCEPTED,
+    RIDE_REJECTED,
+    RIDE_STARTED,
+    RIDE_COMPLETED,
+    RIDE_CANCELLED,
+    DRIVER_ARRIVED,
+    PANIC_ACTIVATED,
+    RIDE_REMINDER,
+    DRIVER_ASSIGNED,
+    PASSENGER_RATED,
+    ACCOUNT_BLOCKED,
+    SUPPORT_MESSAGE
+}
