@@ -54,7 +54,7 @@
 							<td>{{ ride.pickupAddress }}</td>
 							<td>{{ ride.dropoffAddress }}</td>
 							<td>{{ ride.startDate | date: 'd MMM, y HH:mm' }}</td>
-							<td>{{ ride.endDate ? (ride.endDate | date: 'd MMM, y HH:mm') : '—' }}</td>
+							<td>{{ ride.endDate ? (ride.endDate | date: 'd MMM, y HH:mm') : '-' }}</td>
 							<td>
 								<span class="status" [class.completed]="ride.status === 'COMPLETED'"
 									[class.cancelled]="ride.status === 'CANCELLED'">

@@ -2,16 +2,17 @@ import { Component, signal, WritableSignal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { MapComponent } from '../../shared/map/map';
 import { ChangeDetectorRef } from '@angular/core';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { Subject } from 'rxjs';
-import { DriverProfileChangesService, AdminRide } from '../service/driver-profile-changes/driver-profile-changes-service';
+import { DriverProfileChangesService, AdminRide, AdminRideDetailsDto } from '../service/driver-profile-changes/driver-profile-changes-service';
 
 
 @Component({
   selector: 'app-admin-history',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MapComponent],
   templateUrl: './admin-history.component.html',
   styleUrls: ['./admin-history.component.css']
 })
@@ -31,6 +32,11 @@ export class AdminHistoryComponent {
 
   sortBy = signal<string>('startTime');
   sortDirection = signal<'asc' | 'desc'>('desc');
+  
+  expandedRideId: number | null = null;
+
+  rideDetails = signal<Record<number, AdminRideDetailsDto>>({});
+  detailsLoading = signal<Set<number>>(new Set());
 
   protected rides: WritableSignal<AdminRide[]> = signal<AdminRide[]>([]);
 
@@ -53,6 +59,65 @@ export class AdminHistoryComponent {
 
         this.cdr.detectChanges();
       });
+  }
+  
+  getStarArray(rating: number): boolean[] {
+    const safeRating = Math.max(0, Math.min(5, Math.floor(rating)));
+    return Array(5)
+      .fill(false)
+      .map((_, index) => index < safeRating);
+  }
+
+  toggleDetails(ride: AdminRide): void {
+    if (this.expandedRideId === ride.rideId) {
+      this.expandedRideId = null;
+      return;
+    }
+
+    this.expandedRideId = ride.rideId;
+
+    if (this.rideDetails()[ride.rideId]) {
+      return;
+    }
+
+    this.detailsLoading.update(s => new Set(s).add(ride.rideId));
+
+    this.driverService.getRideDetails(ride.rideId).subscribe({
+      next: details => {
+        this.rideDetails.update(prev => ({
+          ...prev,
+          [ride.rideId]: details,
+        }));
+        this.detailsLoading.update(s => {
+          const next = new Set(s);
+          next.delete(ride.rideId);
+          return next;
+        });
+      },
+      error: () => {
+        this.detailsLoading.update(s => {
+          const next = new Set(s);
+          next.delete(ride.rideId);
+          return next;
+        });
+      }
+    });
+  }
+
+  isExpanded(ride: AdminRide): boolean {
+    return this.expandedRideId === ride.rideId;
+  }
+
+  getDetails(rideId: number) {
+    return this.rideDetails()[rideId];
+  }
+
+  getStaticRoute(details: AdminRideDetailsDto) {
+    return {
+      pickup: [details.startLocation.latitude, details.startLocation.longitude] as [number, number],
+      dropoff: [details.endLocation.latitude, details.endLocation.longitude] as [number, number],
+      waypoints: details.wayPoints.map(p => [p.latitude, p.longitude] as [number, number])
+    };
   }
 
   onUsernameInputChange(): void {

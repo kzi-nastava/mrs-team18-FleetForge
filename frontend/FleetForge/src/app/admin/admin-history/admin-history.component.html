@@ -63,19 +63,136 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let ride of displayedRides">
-                        <td>{{ ride.rideId }}</td>
-                        <td>{{ ride.startTime | date: 'd MMM, y HH:mm' }}</td>
-                        <td>{{ ride.endTime | date: 'd MMM, y HH:mm' }}</td>
-                        <td>{{ ride.startAddress }}</td>
-                        <td>{{ ride.destinationAddress }}</td>
-                        <td>{{ ride.status }}</td>
-                        <td>{{ ride.panicActivated ? 'Yes' : 'No' }}</td>
-                        <td>
-                            <button class="details-btn" (click)="viewDetails(ride)">View Details</button>
-                        </td>
-                    </tr>
+                    <ng-container *ngFor="let ride of displayedRides">
+
+                        <!-- MAIN ROW -->
+                        <tr>
+                            <td>{{ ride.rideId }}</td>
+                            <td>{{ ride.startTime | date: 'd MMM, y HH:mm' }}</td>
+                            <td>{{ ride.endTime ? (ride.endTime | date: 'd MMM, y HH:mm') : '-' }}</td>
+                            <td>{{ ride.startAddress }}</td>
+                            <td>{{ ride.destinationAddress }}</td>
+                            <td>
+                                <span class="status" [class.completed]="ride.status === 'COMPLETED'"
+                                    [class.cancelled]="ride.status === 'CANCELLED'">
+                                    {{ ride.status }}
+                                </span>
+                            </td>
+                            <td>
+                                <span *ngIf="ride.panicActivated">⚠️</span>
+                                <span *ngIf="!ride.panicActivated">-</span>
+                            </td>
+                            <td>
+                                <button class="details-btn" (click)="toggleDetails(ride)">
+                                    {{ isExpanded(ride) ? 'Hide details' : 'View details' }}
+                                </button>
+                            </td>
+                        </tr>
+
+                        <!-- DETAILS ROW (IMMEDIATELY AFTER MAIN ROW) -->
+                        <tr *ngIf="isExpanded(ride)" class="details-row">
+                            <td colspan="8">
+
+                                <ng-container *ngIf="!detailsLoading().has(ride.rideId); else loading">
+                                    <div class="detail-layout" *ngIf="getDetails(ride.rideId) as details">
+
+                                        <!-- MAP -->
+                                        <div class="map-preview">
+                                            <div class="map-header">Route</div>
+                                            <app-map class="mini-map" [staticRoute]="getStaticRoute(details)">
+                                            </app-map>
+                                        </div>
+
+                                        <!-- INFO -->
+                                        <div class="details-content-column">
+                                            <div class="detail-grid">
+                                                <div class="detail-card">
+                                                    <div class="detail-label">Price</div>
+                                                    <div class="detail-value">{{ details.totalCost }} RSD</div>
+
+                                                    <div class="detail-label">Distance</div>
+                                                    <div class="detail-value">{{ details.totalDistance }} km</div>
+                                                </div>
+
+                                                <div class="detail-card">
+                                                    <div class="detail-label">Driver</div>
+                                                    <div class="detail-value">
+                                                        {{ details.driver.firstName }} {{ details.driver.lastName }}
+                                                    </div>
+
+                                                    <div class="detail-label">Phone</div>
+                                                    <div class="detail-value">{{ details.driver.phoneNumber }}</div>
+                                                </div>
+
+                                                <div class="detail-card">
+                                                    <div class="detail-label">Main passenger</div>
+                                                    <div class="detail-value">
+                                                        {{ details.mainPassenger.firstName }}
+                                                        {{ details.mainPassenger.lastName }}
+                                                    </div>
+
+                                                    <div *ngIf="details.linkedPassengers.length">
+                                                        <div class="detail-label">Linked passengers</div>
+                                                        <div class="detail-value"
+                                                            *ngFor="let p of details.linkedPassengers">
+                                                            {{ p.firstName }} {{ p.lastName }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="detail-card" *ngIf="details.status === 'CANCELLED'">
+                                                    <div class="detail-label">Cancelled by</div>
+                                                    <div class="detail-value">{{ details.cancelledBy }}</div>
+
+                                                    <div *ngIf="details.cancellationReason">
+                                                        <div class="detail-label">Reason</div>
+                                                        <div class="detail-value">{{ details.cancellationReason }}</div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="detail-card" >
+                                                    <div class="detail-label">Ratings</div>
+
+                                                    <div class="detail-value rating-breakdown">
+                                                        <div class="rating-item">
+                                                            <span>Driver:</span>
+                                                            <span class="stars-mini">
+                                                                <span
+                                                                    *ngFor="let filled of getStarArray(details.ratings?.driverRating ?? 0)"
+                                                                    class="star" [class.filled]="filled">
+                                                                    ★
+                                                                </span>
+                                                            </span>
+                                                        </div>
+
+                                                        <div class="rating-item">
+                                                            <span>Vehicle:</span>
+                                                            <span class="stars-mini">
+                                                                <span
+                                                                    *ngFor="let filled of getStarArray(details.ratings?.vehicleRating ?? 0)"
+                                                                        class="star" [class.filled]="filled">
+                                                                    ★
+                                                                </span>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </ng-container>
+
+                                <ng-template #loading>
+                                    <div class="muted-text">Loading details…</div>
+                                </ng-template>
+
+                            </td>
+                        </tr>
+
+                    </ng-container>
                 </tbody>
+
             </table>
         </div>
     </div>
