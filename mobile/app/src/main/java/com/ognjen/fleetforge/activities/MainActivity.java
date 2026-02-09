@@ -15,6 +15,8 @@ import com.ognjen.fleetforge.fragments.admin.RegisterDriver;
 import com.ognjen.fleetforge.fragments.driver.DriverHistoryFragment;
 import com.ognjen.fleetforge.fragments.PlaceholderFragment;
 import com.ognjen.fleetforge.R;
+import com.ognjen.fleetforge.fragments.passenger.FavoriteRoutes;
+import com.ognjen.fleetforge.fragments.passenger.PassengerHistoryFragment;
 import com.ognjen.fleetforge.fragments.passenger.RideOrder;
 import com.ognjen.fleetforge.fragments.unregistered.UnregisteredFragment;
 import com.ognjen.fleetforge.model.UserRole;
@@ -111,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
         } else if (itemId == R.id.nav_dashboard) {
             return PlaceholderFragment.newInstance("Dashboard");
         } else if (itemId == R.id.nav_history_user) {
-            return PlaceholderFragment.newInstance("Ride History");
+            return new PassengerHistoryFragment();
         } else if (itemId == R.id.nav_history_driver) {
             return new DriverHistoryFragment();
         }else if (itemId== R.id.nav_current_driver){
@@ -128,6 +130,8 @@ public class MainActivity extends AppCompatActivity {
             return PlaceholderFragment.newInstance("Block Users");
         } else if (itemId == R.id.nav_profile_changes) {
             return new DriverChangesFragment();
+        }else if(itemId==R.id.nav_favorites){
+            return new FavoriteRoutes();
         }
         return null;
     }
