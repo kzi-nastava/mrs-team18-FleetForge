@@ -2,6 +2,11 @@ import { Component, signal, WritableSignal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { ChangeDetectorRef } from '@angular/core';
+import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { Subject } from 'rxjs';
+import { DriverProfileChangesService } from '../service/driver-profile-changes/driver-profile-changes-service';
+
 
 interface AdminRide {
   rideId: number;
@@ -25,6 +30,10 @@ export class AdminHistoryComponent {
   startDate: string = '';
   endDate: string = '';
 
+  usernameSuggestions: string[] = [];
+  showSuggestions: boolean = false;
+  private searchSubject = new Subject<string>();
+
   currentPage = signal(0);
   pageSize = signal(10);
   totalPages = signal(0);
@@ -35,17 +44,54 @@ export class AdminHistoryComponent {
 
   protected rides: WritableSignal<AdminRide[]> = signal<AdminRide[]>([]);
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private driverService: DriverProfileChangesService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.loadRides();
+    
+    this.searchSubject.pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        switchMap(prefix => this.driverService.searchUsersByPrefix(prefix))
+      ).subscribe(suggestions => {
+        this.usernameSuggestions = suggestions;
+        this.showSuggestions = suggestions.length > 0;
+
+        this.cdr.detectChanges();
+      });
+  }
+
+  onUsernameInputChange(): void {
+    if (this.searchUsername.trim() === '') {
+      this.showSuggestions = false;
+      this.usernameSuggestions = [];
+      return;
+    }
+        
+    this.showSuggestions = true;
+
+    this.searchSubject.next(this.searchUsername);
+  }
+
+  selectSuggestion(suggestion: string): void {
+    this.searchUsername = suggestion;
+    this.showSuggestions = false;
+    this.loadRides();
+  }
+
+  hideSuggestionsWithDelay(): void {
+    setTimeout(() => {
+      this.showSuggestions = false;
+    }, 200);
   }
 
   loadRides(): void {
     this.isLoading.set(true);
 
-    // Example API call simulation (replace with actual service)
-    // Filter by username, startDate, endDate can be applied here
     fetch('/api/admin/rides?username=' + this.searchUsername + 
           '&startDate=' + this.startDate + '&endDate=' + this.endDate)
       .then(res => res.json())

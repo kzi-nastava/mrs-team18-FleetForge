@@ -3,12 +3,33 @@
         <h2 class="dashboard-title">Admin Ride History</h2>
     </div>
 
-    <div class="filter-section">
-        <input type="text" placeholder="Search username" [(ngModel)]="searchUsername" />
-        <input type="date" [(ngModel)]="startDate" />
-        <input type="date" [(ngModel)]="endDate" />
-        <button (click)="loadRides()">Filter</button>
+    <div class="filter-section" style="display: flex; gap: 12px; align-items: flex-end;">
+        <div class="username-wrapper" style="position: relative; display: inline-block; width: 200px;">
+            <label for="username">Username</label>
+            <input id="username" type="text" placeholder="Search username" [(ngModel)]="searchUsername"
+                (input)="onUsernameInputChange()" (focus)="showSuggestions = usernameSuggestions.length > 0"
+                style="width: 100%;" />
+            <ul class="suggestions" *ngIf="showSuggestions && usernameSuggestions.length">
+                <li *ngFor="let suggestion of usernameSuggestions" (click)="selectSuggestion(suggestion)">
+                    {{ suggestion }}
+                </li>
+            </ul>
+        </div>
+        <div style="display: flex; flex-direction: column;">
+            <label for="startDate">From</label>
+            <input id="startDate" type="date" [(ngModel)]="startDate" />
+        </div>
+        <div style="display: flex; flex-direction: column;">
+            <label for="endDate">To</label>
+            <input id="endDate" type="date" [(ngModel)]="endDate" />
+        </div>
+        <div>
+            <button (click)="loadRides()">Search</button>
+        </div>
     </div>
+
+
+
 
 
     <div class="rides-section">

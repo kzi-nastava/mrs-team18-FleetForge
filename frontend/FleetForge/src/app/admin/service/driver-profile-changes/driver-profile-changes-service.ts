@@ -18,12 +18,14 @@ export class DriverProfileChangesService{
     return this.http.get<VehicleProfileChangePendingRequestsDTO[]>(`${this.apiUrl}/vehicle-change-requests`);
   }
 
-    sendDriverChangeDecision(request:ChangeAcceptanceDTO,requestId:number): Observable<ChangeAcceptanceResponseDTO>{
+  sendDriverChangeDecision(request:ChangeAcceptanceDTO,requestId:number): Observable<ChangeAcceptanceResponseDTO>{
     return this.http.put<ChangeAcceptanceResponseDTO>(`${this.apiUrl}/${requestId}/driver-info`,  request);
-
   }
-    sendVehicleChangeDecision(request:ChangeAcceptanceDTO,requestId:number): Observable<ChangeAcceptanceResponseDTO>{
+  sendVehicleChangeDecision(request:ChangeAcceptanceDTO,requestId:number): Observable<ChangeAcceptanceResponseDTO>{
     return this.http.put<ChangeAcceptanceResponseDTO>(`${this.apiUrl}/${requestId}/vehicle-info`, request);
+  }
 
+  searchUsersByPrefix(prefix: string): Observable<string[]> {
+    return this.http.get<string[]>(`${this.apiUrl}/search-users?prefix=${prefix}`);
   }
 }

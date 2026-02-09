@@ -508,6 +508,14 @@
   border: 1px solid #ccc;
 }
 
+
+.filter-section label {
+  margin-bottom: 4px;
+  font-weight: 500;
+  color: var(--color-text-gray);
+  font-size: smaller;
+}
+
 .filter-section button {
   padding: 6px 12px;
   border-radius: 6px;
@@ -515,4 +523,28 @@
   background-color: var(--color-primary);
   color: white;
   cursor: pointer;
+}
+
+.suggestions {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 0 0;
+  border: 1px solid #ccc;
+  max-height: 160px;
+  overflow-y: auto;
+  position: absolute;
+  background: white;
+  width: 100%;
+  z-index: 1000;
+  top: 100%;
+  left: 0;
+}
+
+.suggestions li {
+  padding: 8px;
+  cursor: pointer;
+}
+
+.suggestions li:hover {
+  background: #f0f0f0;
 }
