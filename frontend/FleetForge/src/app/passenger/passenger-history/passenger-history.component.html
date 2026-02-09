@@ -7,6 +7,20 @@
 
 	<div class="rides-section">
 		<h3 class="section-title">Latest Rides</h3>
+		
+		<div class="filter-section" style="display: flex; gap: 12px; align-items: flex-end; margin-bottom: 16px;">
+			<div style="display: flex; flex-direction: column;">
+				<label for="startDate">From</label>
+				<input id="startDate" type="date" [(ngModel)]="startDate" />
+			</div>
+			<div style="display: flex; flex-direction: column;">
+				<label for="endDate">To</label>
+				<input id="endDate" type="date" [(ngModel)]="endDate" />
+			</div>
+			<div>
+				<button type="button" (click)="loadRides()">Search</button>
+			</div>
+		</div>
 
 		<div class="table-container">
 			<table class="rides-table">
@@ -54,7 +68,7 @@
 							<td>{{ ride.pickupAddress }}</td>
 							<td>{{ ride.dropoffAddress }}</td>
 							<td>{{ ride.startDate | date: 'd MMM, y HH:mm' }}</td>
-							<td>{{ ride.endDate ? (ride.endDate | date: 'd MMM, y HH:mm') : '—' }}</td>
+							<td>{{ ride.endDate ? (ride.endDate | date: 'd MMM, y HH:mm') : '-' }}</td>
 							<td>
 								<span class="status" [class.completed]="ride.status === 'COMPLETED'"
 									[class.cancelled]="ride.status === 'CANCELLED'">
@@ -102,7 +116,7 @@
 											<div class="map-header">Route</div>
 											<app-map class="mini-map" [staticRoute]="getStaticRoute(details)"></app-map>
 										</div>
-										
+
 										<!-- Other Ride Details -->
 										<div class="details-content-column">
 											<div class="detail-grid">
@@ -150,6 +164,21 @@
 														</div>
 													</div>
 												</div>
+
+												<div class="detail-card"
+													*ngIf="details.hasInconsistencies && details.inconsistencies.length">
+													<div class="detail-label">Inconsistencies</div>
+
+													<div class="detail-value"
+														*ngFor="let inc of details.inconsistencies">
+														<div class="inconsistency-item">
+															<div class="message">{{ inc.message }}</div>
+															<div class="reported-at">{{ inc.reportedAt | date:'short' }}
+															</div>
+														</div>
+													</div>
+												</div>
+
 											</div>
 
 											<div class="action-footer">

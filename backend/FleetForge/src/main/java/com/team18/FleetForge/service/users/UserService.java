@@ -6,6 +6,8 @@ import com.team18.FleetForge.model.users.Driver;
 import com.team18.FleetForge.model.users.Passenger;
 import com.team18.FleetForge.model.users.User;
 
+import java.util.List;
+
 public interface UserService {
 
     Passenger getCurrentPassenger();
@@ -14,4 +16,6 @@ public interface UserService {
     void save(User user);
     User getUserById(Long id);
     Driver createDriver(DriverCreateRequestDTO driver);
+
+    List<String> searchUserEmailsByPrefix(String prefix);
 }

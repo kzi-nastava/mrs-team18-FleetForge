@@ -31,6 +31,7 @@ import { PassengerScheduledRidesComponent } from './passenger/passenger-schedule
 import { PassengerLiveChatComponent } from './passenger/live-chat/live-chat.component';
 import { DriverLiveChatComponent } from './driver/live-chat/live-chat.component';
 import { AdminLiveChatComponent } from './admin/live-chat/live-chat.component';
+import { AdminHistoryComponent } from './admin/admin-history/admin-history.component';
 
 export const routes: Routes = [
   /** ROUTES WITH NAVBAR */
@@ -107,6 +108,11 @@ export const routes: Routes = [
       {
         path: 'admin/live-chat',
         component: AdminLiveChatComponent,
+        canActivate: [authGuard, roleGuard(['ADMIN'])]
+      },
+      {
+        path: 'admin/admin-history',
+        component: AdminHistoryComponent,
         canActivate: [authGuard, roleGuard(['ADMIN'])]
       },
 

@@ -17,15 +17,22 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
-    private final UserRepository repo;
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    public List<String> searchUserEmailsByPrefix(String prefix) {
+        return userRepository.findTop5ByEmailPrefix(prefix)
+                .stream()
+                .map(User::getEmail)
+                .toList();
+    }
 
     @Override
     public Passenger getCurrentPassenger() {
@@ -60,12 +67,12 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void save(User user) {
-        repo.save(user);
+        userRepository.save(user);
     }
 
     @Override
     public User getUserById(Long id) {
-        return repo.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
     }
 
     @Override
@@ -95,7 +102,7 @@ public class UserServiceImpl implements UserService {
 
         driverEntity.setVehicle(vehicleEntity);
 
-        repo.save(driverEntity);
+        userRepository.save(driverEntity);
         return  driverEntity;
     }
 }

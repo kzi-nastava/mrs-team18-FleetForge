@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { InconsistencyReportDto } from '../../../admin/service/driver-profile-changes/driver-profile-changes-service';
 
 export interface PassengerRideResponse {
   content: PassengerRideHistoryDto[];
@@ -53,6 +54,8 @@ export interface PassengerRideDetailsDto {
     lastName: string;
     phoneNumber: string;
   };
+  hasInconsistencies: boolean;
+  inconsistencies: InconsistencyReportDto[];
 }
 
 @Injectable({ providedIn: 'root' })
@@ -65,20 +68,17 @@ export interface PassengerRideDetailsDto {
     page: number,
     size: number,
     sortBy: string,
-    direction: 'asc' | 'desc'
+    direction: 'asc' | 'desc',
+    from?: string,
+    to?: string
   ) {
-    return this.http.get<PageResponse<PassengerRideHistoryDto>>(
-      `${this.apiUrl}/rides`,
-      {
-        params: {
-          page,
-          size,
-          sortBy,
-          direction,
-        },
-      }
-    );
+    const params: any = { page, size, sortBy, direction };
+    if (from) params.from = from;
+    if (to) params.to = to;
+
+    return this.http.get<PageResponse<PassengerRideHistoryDto>>(`${this.apiUrl}/rides`, { params });
   }
+
 
   getRideDetails(rideId: number) {
     return this.http.get<PassengerRideDetailsDto>(
