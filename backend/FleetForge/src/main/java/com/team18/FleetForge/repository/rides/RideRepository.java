@@ -64,7 +64,7 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
     List<Ride> findActiveRidesByDriverId(@Param("driverId") Long driverId);
 
     @Query("SELECT r FROM Ride r WHERE r.driver.id = :driverId " +
-            "AND r.status = 'COMPLETED' "+
+            "AND r.status IN ('COMPLETED', 'CANCELLED')"+
             "ORDER BY r.startTime ASC")
     List<Ride> findCompletedRidesByDriverId(@Param("driverId") Long driverId);
 
