@@ -1,5 +1,6 @@
 package com.ognjen.fleetforge.api;
 
+import com.ognjen.fleetforge.dtos.driver.CompletedRideDTO;
 import com.ognjen.fleetforge.dtos.driver.DriverCreateRequestDTO;
 import com.ognjen.fleetforge.dtos.driver.DriverCreateResponseDTO;
 import com.ognjen.fleetforge.dtos.driver.DriverGetResponseDTO;
@@ -11,6 +12,8 @@ import com.ognjen.fleetforge.dtos.vehicle.VehicleInformationChangeResponseDTO;
 import com.ognjen.fleetforge.dtos.driver.DriverLocationUpdateRequestDTO;
 import com.ognjen.fleetforge.dtos.driver.DriverLocationUpdateResponseDTO;
 import com.ognjen.fleetforge.dtos.ride.RideTrackingDTO;
+
+import java.util.List;
 
 import okhttp3.MultipartBody;
 import retrofit2.Call;
@@ -52,4 +55,7 @@ public interface DriverService {
     Call<DriverLocationUpdateResponseDTO> updateDriverLocation(
             @Body DriverLocationUpdateRequestDTO request
     );
+
+    @GET("/api/drivers/ride-history")
+    Call<List<CompletedRideDTO>> getDriverRideHistory();
 }

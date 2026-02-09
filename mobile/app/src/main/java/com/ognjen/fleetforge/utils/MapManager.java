@@ -102,7 +102,6 @@ public class MapManager {
         mapView.getOverlays().clear();
         vehicleMarkers.clear();
         mapView.invalidate();
-        Log.d(TAG, "Cleared all map overlays");
     }
 
     public Marker addMarker(double latitude, double longitude, String title, int iconResId) {
