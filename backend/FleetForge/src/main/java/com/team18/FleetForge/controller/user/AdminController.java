@@ -204,6 +204,19 @@ public class AdminController {
     }
 
     /**
+     * GET /api/admin/search-users
+     * Get usernames by string prefix
+     * Query params:
+     *  - prefix (username prefix)
+     */
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/search-users")
+    public ResponseEntity<List<String>> searchUsersByEmail(@RequestParam String prefix) {
+        List<String> emails = userService.searchUserEmailsByPrefix(prefix);
+        return ResponseEntity.ok(emails);
+    }
+
+    /**
      * GET /api/admin/rides
      * Get ride history for a specific user (passenger or driver)
      * Query params:
