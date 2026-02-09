@@ -90,7 +90,7 @@ export const SIDEBAR_MENU_CONFIG: Record<UserRole, SidebarMenuItem[]> = {
     {
       label: 'Ride History',
       icon: '⏱',
-      path: '/admin/ride-history'
+      path: '/admin/admin-history'
     },
     {
       label: 'Block Users',

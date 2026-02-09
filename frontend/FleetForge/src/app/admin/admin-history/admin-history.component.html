@@ -1,0 +1,71 @@
+<div class="admin-dashboard">
+    <div class="header-section">
+        <h2 class="dashboard-title">Admin Ride History</h2>
+    </div>
+
+    <div class="filter-section">
+        <input type="text" placeholder="Search username" [(ngModel)]="searchUsername" />
+        <input type="date" [(ngModel)]="startDate" />
+        <input type="date" [(ngModel)]="endDate" />
+        <button (click)="loadRides()">Filter</button>
+    </div>
+
+
+    <div class="rides-section">
+        <div class="table-container">
+            <table class="rides-table">
+                <thead>
+                    <tr>
+                        <th (click)="onSort('rideId')">
+                            Ride ID <span *ngIf="isSortedBy('rideId')">{{ sortDirection() === 'asc' ? '▲' : '▼'
+                                }}</span>
+                        </th>
+                        <th (click)="onSort('startTime')">
+                            Start Time <span *ngIf="isSortedBy('startTime')">{{ sortDirection() === 'asc' ? '▲' : '▼'
+                                }}</span>
+                        </th>
+                        <th (click)="onSort('endTime')">
+                            End Time <span *ngIf="isSortedBy('endTime')">{{ sortDirection() === 'asc' ? '▲' : '▼'
+                                }}</span>
+                        </th>
+                        <th (click)="onSort('startAddress')">
+                            Start Address <span *ngIf="isSortedBy('startAddress')">{{ sortDirection() === 'asc' ? '▲' :
+                                '▼'
+                                }}</span>
+                        </th>
+                        <th (click)="onSort('destinationAddress')">
+                            End Address <span *ngIf="isSortedBy('destinationAddress')">{{ sortDirection() === 'asc' ?
+                                '▲' :
+                                '▼' }}</span>
+                        </th>
+                        <th (click)="onSort('status')">
+                            Status <span *ngIf="isSortedBy('status')">{{ sortDirection() === 'asc' ? '▲' : '▼' }}</span>
+                        </th>
+                        <th>Panic Activation</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let ride of displayedRides">
+                        <td>{{ ride.rideId }}</td>
+                        <td>{{ ride.startTime | date: 'd MMM, y HH:mm' }}</td>
+                        <td>{{ ride.endTime | date: 'd MMM, y HH:mm' }}</td>
+                        <td>{{ ride.startAddress }}</td>
+                        <td>{{ ride.destinationAddress }}</td>
+                        <td>{{ ride.status }}</td>
+                        <td>{{ ride.panicActivated ? 'Yes' : 'No' }}</td>
+                        <td>
+                            <button class="details-btn" (click)="viewDetails(ride)">View Details</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="pagination">
+        <button (click)="prevPage()" [disabled]="currentPage() === 0 || isLoading()">Previous</button>
+        <span>Page {{ currentPage() + 1 }} of {{ totalPages() }}</span>
+        <button (click)="nextPage()" [disabled]="currentPage() >= totalPages() - 1 || isLoading()">Next</button>
+    </div>
+</div>
