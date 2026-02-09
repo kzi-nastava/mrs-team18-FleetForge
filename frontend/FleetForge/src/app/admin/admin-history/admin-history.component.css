@@ -20,6 +20,21 @@
 	margin: 0;
 }
 
+.inconsistency-item {
+  margin-bottom: 8px;
+  padding: 4px 0;
+  border-bottom: 1px dashed #ccc;
+}
+
+.inconsistency-item .message {
+  font-weight: 500;
+}
+
+.inconsistency-item .reported-at {
+  font-size: 0.85rem;
+  color: #666;
+}
+
 .rides-section {
 	background: var(--color-white);
 	border-radius: 12px;

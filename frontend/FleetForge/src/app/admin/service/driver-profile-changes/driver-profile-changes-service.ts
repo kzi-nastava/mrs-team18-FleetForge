@@ -59,8 +59,16 @@ export interface AdminRideDetailsDto {
     driverRating?: number;
     vehicleRating?: number;
   };
+
+  hasInconsistencies: boolean;
+  inconsistencies: InconsistencyReportDto[];
 }
 
+export interface InconsistencyReportDto {
+  reportId: number;
+  message: string;
+  reportedAt: string; 
+}
 
 export interface AdminRideResponse {
   content: AdminRide[];

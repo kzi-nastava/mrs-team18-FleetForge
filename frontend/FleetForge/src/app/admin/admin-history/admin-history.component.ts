@@ -6,7 +6,7 @@ import { MapComponent } from '../../shared/map/map';
 import { ChangeDetectorRef } from '@angular/core';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { Subject } from 'rxjs';
-import { DriverProfileChangesService, AdminRide, AdminRideDetailsDto } from '../service/driver-profile-changes/driver-profile-changes-service';
+import { DriverProfileChangesService, AdminRide, AdminRideDetailsDto, InconsistencyReportDto} from '../service/driver-profile-changes/driver-profile-changes-service';
 
 
 @Component({
@@ -60,7 +60,7 @@ export class AdminHistoryComponent {
         this.cdr.detectChanges();
       });
   }
-  
+
   getStarArray(rating: number): boolean[] {
     const safeRating = Math.max(0, Math.min(5, Math.floor(rating)));
     return Array(5)

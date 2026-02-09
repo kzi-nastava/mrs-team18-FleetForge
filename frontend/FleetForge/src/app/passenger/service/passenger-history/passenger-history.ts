@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { InconsistencyReportDto } from '../../../admin/service/driver-profile-changes/driver-profile-changes-service';
 
 export interface PassengerRideResponse {
   content: PassengerRideHistoryDto[];
@@ -53,6 +54,8 @@ export interface PassengerRideDetailsDto {
     lastName: string;
     phoneNumber: string;
   };
+  hasInconsistencies: boolean;
+  inconsistencies: InconsistencyReportDto[];
 }
 
 @Injectable({ providedIn: 'root' })

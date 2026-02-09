@@ -150,6 +150,21 @@
 														</div>
 													</div>
 												</div>
+
+												<div class="detail-card"
+													*ngIf="details.hasInconsistencies && details.inconsistencies.length">
+													<div class="detail-label">Inconsistencies</div>
+
+													<div class="detail-value"
+														*ngFor="let inc of details.inconsistencies">
+														<div class="inconsistency-item">
+															<div class="message">{{ inc.message }}</div>
+															<div class="reported-at">{{ inc.reportedAt | date:'short' }}
+															</div>
+														</div>
+													</div>
+												</div>
+
 											</div>
 
 											<div class="action-footer">

@@ -150,7 +150,20 @@
                                                     </div>
                                                 </div>
 
-                                                <div class="detail-card" >
+                                                <div class="detail-card"
+                                                    *ngIf="details.hasInconsistencies && details.inconsistencies.length">
+                                                    <div class="detail-label">Inconsistencies</div>
+
+                                                    <div class="detail-value"
+                                                        *ngFor="let inc of details.inconsistencies">
+                                                        <div class="inconsistency-item">
+                                                            <div class="message">{{ inc.message }}</div>
+                                                            <div class="reported-at">{{ inc.reportedAt | date:'short' }}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="detail-card">
                                                     <div class="detail-label">Ratings</div>
 
                                                     <div class="detail-value rating-breakdown">
@@ -170,7 +183,7 @@
                                                             <span class="stars-mini">
                                                                 <span
                                                                     *ngFor="let filled of getStarArray(details.ratings?.vehicleRating ?? 0)"
-                                                                        class="star" [class.filled]="filled">
+                                                                    class="star" [class.filled]="filled">
                                                                     ★
                                                                 </span>
                                                             </span>
