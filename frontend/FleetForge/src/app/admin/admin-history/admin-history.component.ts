@@ -5,18 +5,8 @@ import { Router } from '@angular/router';
 import { ChangeDetectorRef } from '@angular/core';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { Subject } from 'rxjs';
-import { DriverProfileChangesService } from '../service/driver-profile-changes/driver-profile-changes-service';
+import { DriverProfileChangesService, AdminRide } from '../service/driver-profile-changes/driver-profile-changes-service';
 
-
-interface AdminRide {
-  rideId: number;
-  startTime: string;
-  endTime: string;
-  startAddress: string;
-  destinationAddress: string;
-  status: string;
-  panicActivated: boolean;
-}
 
 @Component({
   selector: 'app-admin-history',
@@ -92,16 +82,29 @@ export class AdminHistoryComponent {
   loadRides(): void {
     this.isLoading.set(true);
 
-    fetch('/api/admin/rides?username=' + this.searchUsername + 
-          '&startDate=' + this.startDate + '&endDate=' + this.endDate)
-      .then(res => res.json())
-      .then(data => {
-        this.rides.set(data.content);
-        this.totalPages.set(data.totalPages);
-        this.isLoading.set(false);
-      })
-      .catch(() => this.isLoading.set(false));
+    const startIso = this.startDate ? new Date(this.startDate).toISOString() : undefined;
+    const endIso = this.endDate ? new Date(this.endDate).toISOString() : undefined;
+
+    this.driverService
+      .getRides(
+        this.searchUsername,
+        startIso,
+        endIso,
+        this.currentPage(),
+        this.pageSize(),
+        this.sortBy(),
+        this.sortDirection()
+      )
+      .subscribe({
+        next: (data: any) => {
+          this.rides.set(data.content);
+          this.totalPages.set(data.totalPages);
+          this.isLoading.set(false);
+        },
+        error: () => this.isLoading.set(false),
+      });
   }
+
 
   onSort(column: string): void {
     if (this.sortBy() === column) {
@@ -140,9 +143,8 @@ export class AdminHistoryComponent {
   }
 
   viewDetails(ride: AdminRide) {
+    //todo: navigate to ride details page
     console.log('View details for ride', ride.rideId);
-    // Navigate to details page if needed
-    // this.router.navigate(['/admin/ride', ride.rideId]);
   }
 
   get displayedRides(): AdminRide[] {
