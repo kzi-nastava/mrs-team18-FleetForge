@@ -397,7 +397,7 @@ public class RideServiceImpl implements RideService {
         Pageable pageable = PageRequest.of(page, size, Sort.by("startTime").ascending());
         LocalDateTime now = LocalDateTime.now();
 
-        return rideRepository.findAcceptedNotStartedRides(passengerId, now, pageable)
+        return rideRepository.findScheduled(passengerId, now, pageable)
                 .map(ride -> new ScheduledRideDTO(
                         ride.getId(),
                         ride.getStartAddress(),

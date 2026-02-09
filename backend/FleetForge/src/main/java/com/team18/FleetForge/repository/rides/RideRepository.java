@@ -139,10 +139,10 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
 
     @Query("SELECT r FROM Ride r " +
             "WHERE r.passenger.id = :passengerId " +
-            "AND r.status = 'ACCEPTED' " +
+            "AND r.status in ('ACCEPTED','CANCELLED') " +
             "AND r.startTime >= :now " +
             "ORDER BY r.startTime ASC")
-    Page<Ride> findAcceptedNotStartedRides(
+    Page<Ride> findScheduled(
             @Param("passengerId") Long passengerId,
             @Param("now") LocalDateTime now,
             Pageable pageable

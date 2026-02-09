@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { RideTrackingDTO } from '../dtos/ride-tracking.dtos';
@@ -11,6 +11,23 @@ export interface CancelRideResponse {
 export interface PanicResponse {
   success: boolean;
   message: string;
+}
+
+
+export interface ScheduledRideResponse {
+  content: ScheduledRideDto[];
+  totalPages: number;
+  totalElements: number;
+  number: number;
+}
+
+export interface ScheduledRideDto {
+  id: number;
+  pickup: string;
+  dropoff: string;
+  scheduledTime: string;
+  estimatedCost: number;
+  status: 'CANCELLED' | 'ACCEPTED';
 }
 
 @Injectable({
@@ -39,6 +56,14 @@ export class RideService {
 
   setActiveRide(ride: RideTrackingDTO | null) {
     this.activeRideSubject.next(ride);
+  }
+
+  getScheduledRides(page: number, size: number): Observable<ScheduledRideResponse> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString());
+
+    return this.http.get<ScheduledRideResponse>(`${this.apiUrl}/scheduled`, { params });
   }
 
   get isRideActive(): boolean {
