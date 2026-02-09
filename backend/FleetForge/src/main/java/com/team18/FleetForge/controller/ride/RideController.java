@@ -3,8 +3,10 @@ package com.team18.FleetForge.controller.ride;
 import com.team18.FleetForge.dto.ride.lifecycle.*;
 
 import com.team18.FleetForge.dto.ride.panic.RidePanicResponseDTO;
+import com.team18.FleetForge.dto.ride.view.ScheduledRideDTO;
 import com.team18.FleetForge.model.ride.GeoPoint;
 import com.team18.FleetForge.model.ride.Ride;
+import com.team18.FleetForge.model.users.User;
 import com.team18.FleetForge.service.rides.RideCancellationService;
 import com.team18.FleetForge.service.rides.RidePanicService;
 import com.team18.FleetForge.service.rides.RideService;
@@ -13,6 +15,7 @@ import com.team18.FleetForge.service.rides.RideCancellationService;
 import com.team18.FleetForge.service.rides.RidePanicService;
 import com.team18.FleetForge.service.rides.RideService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -94,12 +97,31 @@ public class RideController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-//    Authentication authentication = authenticationManager.authenticate(
-//            new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword())
-//    );
-//
-//SecurityContextHolder.getContext().setAuthentication(authentication);
+    /**
+     * GET /api/rides/scheduled
+     * Query Parameters:
+     *  - page
+     *  - size
+     * Response (paginated):
+     * - id (Long)
+     * - pickup (String)
+     * - dropoff (String)
+     * - scheduledTime (LocalDateTime)
+     * - estimatedCost (Double)
+     * - status (String)
+     */
+    @PreAuthorize("hasRole('PASSENGER')")
+    @GetMapping(value = "/scheduled", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Page<ScheduledRideDTO>> getScheduledRides(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Authentication authentication
+    ) {
+        Long passengerId = ((User) authentication.getPrincipal()).getId();
 
+        Page<ScheduledRideDTO> rides = rideService.getScheduledRidesForPassenger(passengerId, page, size);
+        return ResponseEntity.ok(rides);
+    }
 
     /**
      * PUT /api/rides/{rideId}/complete

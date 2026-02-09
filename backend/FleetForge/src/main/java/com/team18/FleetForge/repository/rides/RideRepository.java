@@ -137,6 +137,17 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
             Pageable pageable
     );
 
+    @Query("SELECT r FROM Ride r " +
+            "WHERE r.passenger.id = :passengerId " +
+            "AND r.status = 'ACCEPTED' " +
+            "AND r.startTime >= :now " +
+            "ORDER BY r.startTime ASC")
+    Page<Ride> findAcceptedNotStartedRides(
+            @Param("passengerId") Long passengerId,
+            @Param("now") LocalDateTime now,
+            Pageable pageable
+    );
+
     @Query("""
         SELECT new com.team18.FleetForge.dto.ride.view.AdminRideHistoryDTO(
             r.id,

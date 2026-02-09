@@ -389,6 +389,27 @@ public class RideServiceImpl implements RideService {
     }
 
     @Override
+    public Page<ScheduledRideDTO> getScheduledRidesForPassenger(
+            Long passengerId,
+            int page,
+            int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("startTime").ascending());
+        LocalDateTime now = LocalDateTime.now();
+
+        return rideRepository.findAcceptedNotStartedRides(passengerId, now, pageable)
+                .map(ride -> new ScheduledRideDTO(
+                        ride.getId(),
+                        ride.getStartAddress(),
+                        ride.getEndAddress(),
+                        ride.getStartTime(),
+                        ride.getTotalCost(),
+                        ride.getStatus().name()
+                ));
+    }
+
+
+    @Override
     public Page<AdminRideHistoryDTO> getAdminRideHistory(
             Long userId,
             String email,
