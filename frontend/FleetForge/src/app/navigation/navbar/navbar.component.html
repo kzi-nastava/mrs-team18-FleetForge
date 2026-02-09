@@ -21,10 +21,7 @@
 
   @if (isAuthenticated$ | async) {
     <div class="navbar-right">
-      <button type="button" class="icon-btn" aria-label="Notifications">
-        <span class="icon-ring">🔔</span>
-        <span class="icon-badge"></span>
-      </button>
+      <app-notification-dropdown></app-notification-dropdown>
 
       <div class="divider"></div>
 

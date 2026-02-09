@@ -143,6 +143,7 @@ public class RideFinishService {
         driverRepository.save(driver);
 
         sendRideCompletionEmails(ride);
+        notificationService.sendNotificationToUser(ride.getPassenger(), NotificationType.RIDE_COMPLETED, "Ride finished", ride);
 
         if (ride.getLinkedPassengers() != null && !ride.getLinkedPassengers().isEmpty()) {
             for (Passenger passenger : ride.getLinkedPassengers()) {
