@@ -68,20 +68,17 @@ export interface PassengerRideDetailsDto {
     page: number,
     size: number,
     sortBy: string,
-    direction: 'asc' | 'desc'
+    direction: 'asc' | 'desc',
+    from?: string,
+    to?: string
   ) {
-    return this.http.get<PageResponse<PassengerRideHistoryDto>>(
-      `${this.apiUrl}/rides`,
-      {
-        params: {
-          page,
-          size,
-          sortBy,
-          direction,
-        },
-      }
-    );
+    const params: any = { page, size, sortBy, direction };
+    if (from) params.from = from;
+    if (to) params.to = to;
+
+    return this.http.get<PageResponse<PassengerRideHistoryDto>>(`${this.apiUrl}/rides`, { params });
   }
+
 
   getRideDetails(rideId: number) {
     return this.http.get<PassengerRideDetailsDto>(

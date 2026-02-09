@@ -7,6 +7,20 @@
 
 	<div class="rides-section">
 		<h3 class="section-title">Latest Rides</h3>
+		
+		<div class="filter-section" style="display: flex; gap: 12px; align-items: flex-end; margin-bottom: 16px;">
+			<div style="display: flex; flex-direction: column;">
+				<label for="startDate">From</label>
+				<input id="startDate" type="date" [(ngModel)]="startDate" />
+			</div>
+			<div style="display: flex; flex-direction: column;">
+				<label for="endDate">To</label>
+				<input id="endDate" type="date" [(ngModel)]="endDate" />
+			</div>
+			<div>
+				<button type="button" (click)="loadRides()">Search</button>
+			</div>
+		</div>
 
 		<div class="table-container">
 			<table class="rides-table">

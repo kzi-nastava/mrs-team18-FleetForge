@@ -145,6 +145,7 @@ export class AdminHistoryComponent {
   }
 
   loadRides(): void {
+    this.showSuggestions = false;
     this.isLoading.set(true);
 
     const startIso = this.startDate ? new Date(this.startDate).toISOString() : undefined;

@@ -48,6 +48,9 @@ export class PassengerHistoryComponent {
   isRatingModalOpen = false;
   selectedRide: Ride | null = null;
   isRatingLoading = false;
+  
+  startDate: string = '';
+  endDate: string = '';
 
 	isFavoriteModalOpen = false;
 	favoriteRide: Ride | null = null;
@@ -163,12 +166,17 @@ export class PassengerHistoryComponent {
   loadRides(): void {
     this.isLoading.set(true);
 
+    const startIso = this.startDate ? new Date(this.startDate).toISOString() : undefined;
+    const endIso = this.endDate ? new Date(this.endDate).toISOString() : undefined;
+
     this.passengerHistory
       .getPassengerRides(
         this.currentPage(),
         this.pageSize(),
         this.sortBy(),
-        this.sortDirection()
+        this.sortDirection(),
+        startIso,
+        endIso
       )
       .subscribe({
         next: (response) => {
@@ -191,6 +199,7 @@ export class PassengerHistoryComponent {
         error: () => this.isLoading.set(false),
       });
   }
+
 
   onSort(column: string): void {
     if (this.sortBy() === column) {

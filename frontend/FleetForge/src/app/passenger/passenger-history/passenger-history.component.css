@@ -487,3 +487,33 @@
   font-size: 0.85rem;
   color: #666;
 }
+
+
+.filter-section {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.filter-section input[type="text"],
+.filter-section input[type="date"] {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.filter-section button {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  background-color: var(--color-primary);
+  color: white;
+  cursor: pointer;
+}
+
+.filter-section label {
+  margin-bottom: 4px;
+  font-weight: 500;
+  color: var(--color-text-gray);
+  font-size: smaller;
+}
