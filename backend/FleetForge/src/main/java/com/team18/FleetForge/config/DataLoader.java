@@ -58,7 +58,7 @@ public class DataLoader implements CommandLineRunner {
         driver1.setLastName("Doe");
         driver1.setPhoneNumber("+381641234567");
         driver1.setAddress("Bulevar oslobođenja 10, Novi Sad");
-        driver1.setProfilePicture("/uploads/pfp/default.png");
+        driver1.setProfilePicture("/uploads/pfp/driver1@test.com.png");
         driver1.setVehicle(vehicle1);
         driver1.setActive(true);
         driver1.setAvailable(false);
@@ -253,7 +253,7 @@ public class DataLoader implements CommandLineRunner {
                 LocalDateTime.now().plusDays(5).withHour(9).withMinute(0),
                 null,
                 4.8, 18.0, 760.0,
-                RideStatus.CANCELLED, false, null, null
+                RideStatus.CANCELLED, false, RideActor.PASSENGER, null
         );
         rideRepository.save(ride9);
 

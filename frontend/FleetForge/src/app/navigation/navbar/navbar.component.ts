@@ -1,8 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { AsyncPipe, LowerCasePipe } from '@angular/common';
 import { SidebarService } from '../sidebar/sidebar.service';
-import { Navbar } from './service/navbar';
+import { Navbar, CurrentUserDTO } from './service/navbar';
 
 export interface NavItem {
   label: string;
@@ -24,6 +24,8 @@ export class NavbarComponent {
     { label: 'Contact', path: '/contact', exact: false },
   ];
 
+  currentUser: CurrentUserDTO | null = null;
+
   isAuthenticated$!: SidebarService['isAuthenticated$'];
   userRole$!: SidebarService['userRole$'];
   showProfileMenu = false;
@@ -32,6 +34,16 @@ export class NavbarComponent {
   constructor(private sidebarService: SidebarService, private router: Router, private navbarService: Navbar) {
     this.isAuthenticated$ = this.sidebarService.isAuthenticated$;
     this.userRole$ = this.sidebarService.userRole$;
+  }
+
+  ngOnInit(): void {
+    this.isAuthenticated$.subscribe(isAuth => {
+      if (isAuth) {
+        this.navbarService.getCurrentUser().subscribe(user => {
+          this.currentUser = user;
+        });
+      }
+    });
   }
 
   onLogoClick(): void {

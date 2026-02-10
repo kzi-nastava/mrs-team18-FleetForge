@@ -42,7 +42,7 @@
 .card-avatar {
   width: 86px;
   height: 86px;
-  border-radius: 12px;
+  border-radius: 50%;
   object-fit: cover;
   background-color: #e0e0e0;
   border: 2px solid var(--color-border);
