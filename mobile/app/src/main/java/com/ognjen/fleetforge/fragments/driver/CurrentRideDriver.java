@@ -16,6 +16,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.ognjen.fleetforge.BuildConfig;
 import com.ognjen.fleetforge.R;
@@ -79,6 +80,13 @@ public class CurrentRideDriver extends Fragment {
     private static final int SIMULATION_STEP_SIZE = 5; // Skip 5 coordinates per update
     private static final double WAYPOINT_THRESHOLD = 0.0005; // ~50 meters
 
+    private CurrentRideDriverViewModel viewModel;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        viewModel=new ViewModelProvider(this).get(CurrentRideDriverViewModel.class);
+    }
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -553,7 +561,14 @@ public class CurrentRideDriver extends Fragment {
 
 
     private void onPrimaryActionClick() {
-        Toast.makeText(requireContext(), "Primary action clicked", Toast.LENGTH_SHORT).show();
+        if(btnPrimaryAction.getText().equals("Start Ride")){
+            viewModel.startRide(currentRide.getRideId()).observe(getViewLifecycleOwner(),response->{
+                if(response!=null){
+                    fetchActiveRide();
+                    Toast.makeText(requireContext(), "Ride with id: "+response.getId()+" started. Status: "+response.getStatus(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 
     private void onSecondaryActionClick() {
