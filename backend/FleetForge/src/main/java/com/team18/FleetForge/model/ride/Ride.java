@@ -118,4 +118,13 @@ public class Ride {
 
     @OneToOne(mappedBy = "ride")
     private RideReview review;
+
+    @Column(name="notification_sent_15_min")
+    private boolean notificationSent15Min=false;
+
+    @Column(name="notification_sent_10_min")
+    private boolean notificationSent10Min=false;
+
+    @Column(name="notification_sent_5_min")
+    private boolean notificationSent5Min=false;
 }
