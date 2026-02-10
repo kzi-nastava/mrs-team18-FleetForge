@@ -1,0 +1,166 @@
+<div class="admin-active-rides-container">
+  <div class="header">
+    <h1 class="page-title">Active Rides Monitor</h1>
+    <button class="refresh-btn" (click)="refresh()" [disabled]="isLoading">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+      </svg>
+      Refresh
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading active rides...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="errorMessage" class="error-state">
+    <p>{{ errorMessage }}</p>
+    <button class="retry-btn" (click)="loadActiveRides()">Retry</button>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && !errorMessage && activeRides.length === 0" class="empty-state">
+    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99z"/>
+    </svg>
+    <h2>No Active Rides</h2>
+    <p>There are currently no rides in progress.</p>
+  </div>
+
+  <!-- Rides List -->
+  <div *ngIf="!isLoading && !errorMessage && activeRides.length > 0" class="rides-list">
+    <div *ngFor="let ride of activeRides" class="ride-card" [class.expanded]="isExpanded(ride.rideId)">
+      <!-- Ride Summary -->
+      <div class="ride-summary" (click)="toggleDetails(ride.rideId)">
+        <div class="driver-info">
+          <img 
+            [src]="'http://localhost:8080' + ride.driverProfileImage" 
+            alt="Driver"
+            class="driver-avatar"
+            onerror="this.src='assets/default-avatar.png'"
+          />
+          <div class="driver-details">
+            <h3 class="driver-name">{{ ride.driverFirstName }} {{ ride.driverLastName }}</h3>
+            <span class="ride-id">Ride #{{ ride.rideId }}</span>
+          </div>
+        </div>
+
+        <div class="ride-route">
+          <div class="route-item">
+            <span class="route-icon start">📍</span>
+            <span class="route-address">{{ ride.startAddress }}</span>
+          </div>
+          <div class="route-arrow">→</div>
+          <div class="route-item">
+            <span class="route-icon end">🏁</span>
+            <span class="route-address">{{ ride.endAddress }}</span>
+          </div>
+        </div>
+
+        <div class="ride-meta">
+          <div class="meta-item">
+            <span class="meta-label">Passengers</span>
+            <span class="meta-value">{{ ride.passengerCount }}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Started</span>
+            <span class="meta-value">{{ formatDateTime(ride.startTime) }}</span>
+          </div>
+          <div *ngIf="ride.panicActivated" class="panic-badge">
+            🚨 PANIC ACTIVATED
+          </div>
+        </div>
+
+        <button class="details-toggle-btn">
+          <svg 
+            width="24" 
+            height="24" 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            stroke="currentColor" 
+            stroke-width="2"
+            [style.transform]="isExpanded(ride.rideId) ? 'rotate(180deg)' : 'rotate(0deg)'">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Ride Details (Expanded) -->
+      <div *ngIf="isExpanded(ride.rideId) && rideDetails" class="ride-details">
+        <div class="details-content">
+          <!-- Left Column: Information -->
+          <div class="info-column">
+            <div class="info-section">
+              <h4 class="section-title">Driver Information</h4>
+              <div class="info-grid">
+                <div class="info-item">
+                  <span class="info-label">Name:</span>
+                  <span class="info-value">{{ rideDetails.driverFirstName }} {{ rideDetails.driverLastName }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Phone:</span>
+                  <span class="info-value">{{ rideDetails.driverPhoneNumber }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="info-section">
+              <h4 class="section-title">Route Details</h4>
+              <div class="route-details">
+                <div class="route-point-detail start">
+                  <span class="point-icon">📍</span>
+                  <div class="point-info">
+                    <span class="point-label">Start</span>
+                    <span class="point-address">{{ rideDetails.startAddress }}</span>
+                  </div>
+                </div>
+                <div class="route-point-detail end">
+                  <span class="point-icon">🏁</span>
+                  <div class="point-info">
+                    <span class="point-label">Destination</span>
+                    <span class="point-address">{{ rideDetails.endAddress }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="info-section">
+              <h4 class="section-title">Passengers ({{ rideDetails.passengers.length }})</h4>
+              <div class="passengers-list">
+                <div *ngFor="let passenger of rideDetails.passengers" class="passenger-item">
+                  <div class="passenger-avatar">{{ passenger.firstName.charAt(0) }}{{ passenger.lastName.charAt(0) }}</div>
+                  <div class="passenger-info">
+                    <span class="passenger-name">{{ passenger.firstName }} {{ passenger.lastName }}</span>
+                    <span class="passenger-email">{{ passenger.email }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div *ngIf="rideDetails.panicActivated" class="panic-alert">
+              <div class="panic-icon">🚨</div>
+              <div class="panic-info">
+                <h4>PANIC ACTIVATED</h4>
+                <p *ngIf="rideDetails.panicActivatedAt">
+                  Activated at: {{ formatDateTime(rideDetails.panicActivatedAt) }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Map -->
+          <div class="map-column">
+            <div class="map-container">
+              <app-map 
+                [currentRide]="getRideTrackingData()">
+              </app-map>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
