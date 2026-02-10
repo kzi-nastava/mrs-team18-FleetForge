@@ -7,6 +7,8 @@ import { VehicleLocationDTO } from '../../shared/models/vehicle.model';
 import { RideFavoriteRoutesDTO } from '../../shared/dtos/ride.dtos';
 import { PassengerFavorite } from '../service/passenger-favorite/passenger-favorite';
 import { RideService, ScheduledRideDto } from '../../shared/services/ride.service';
+import { NotificationPopupComponent } from '../../shared/popups/popup-dialog/notification-popup.component';
+import { ConfirmationPopupComponent } from '../../shared/popups/confirmation-popup/confirmation-popup.component';
 
 @Component({
   selector: 'app-passenger-dashboard',
@@ -14,7 +16,9 @@ import { RideService, ScheduledRideDto } from '../../shared/services/ride.servic
   imports: [
     CommonModule,
     RouterModule,
-    MapComponent
+    MapComponent,
+    NotificationPopupComponent,
+    ConfirmationPopupComponent
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
@@ -25,6 +29,13 @@ export class PassengerDashboardComponent implements OnInit {
   
   scheduledRides: ScheduledRideDto[] = [];
   isLoadingScheduled = false;
+
+  showPopup = false;
+  popupSuccess = false;
+  popupMessage = '';
+  
+  showConfirmPopup = false;
+  rideToCancelId: number | null = null;
 
   favoriteRoutes: WritableSignal<RideFavoriteRoutesDTO[]> = signal<RideFavoriteRoutesDTO[]>([]);
 
@@ -45,6 +56,57 @@ export class PassengerDashboardComponent implements OnInit {
     });
   }
 
+  closePopup(): void {
+    this.showPopup = false;
+  }
+
+  isCancelDisabled(ride: ScheduledRideDto): boolean {
+    const now = new Date().getTime();
+    const scheduledTime = new Date(ride.scheduledTime).getTime();
+
+    const diffInMinutes = (scheduledTime - now) / (1000 * 60);
+
+    // Disable if ride starts in 10 minutes or less
+    return diffInMinutes <= 10;
+  }
+
+  openCancelConfirmation(rideId: number): void {
+  this.rideToCancelId = rideId;
+  this.showConfirmPopup = true;
+}
+
+onCancelConfirmed(): void {
+  if (!this.rideToCancelId) return;
+
+  this.rideService.cancelRide(this.rideToCancelId).subscribe({
+      next: (res) => {
+        this.popupSuccess = true;
+        this.popupMessage = res.message || 'Ride cancelled successfully.';
+        this.showPopup = true;
+
+        this.loadScheduledRides();
+      },
+      error: () => {
+        this.popupSuccess = false;
+        this.popupMessage = 'Failed to cancel ride.';
+        this.showPopup = true;
+      },
+      complete: () => {
+        this.resetConfirmation();
+      }
+    });
+  }
+
+  onCancelDismissed(): void {
+    this.resetConfirmation();
+  }
+
+  private resetConfirmation(): void {
+    this.showConfirmPopup = false;
+    this.rideToCancelId = null;
+  }
+
+
   private loadScheduledRides(): void {
     this.isLoadingScheduled = true;
 
@@ -63,10 +125,22 @@ export class PassengerDashboardComponent implements OnInit {
   }
 
   cancelRide(rideId: number): void {
-    this.rideService.cancelRide(rideId).subscribe(() => {
-      this.loadScheduledRides(); // refresh after cancel
+    this.rideService.cancelRide(rideId).subscribe({
+      next: (res) => {
+        this.popupSuccess = true;
+        this.popupMessage = res.message || 'Ride cancelled successfully.';
+        this.showPopup = true;
+
+        this.loadScheduledRides();
+      },
+      error: () => {
+        this.popupSuccess = false;
+        this.popupMessage = 'Failed to cancel ride.';
+        this.showPopup = true;
+      }
     });
   }
+
 
   orderRide(route: RideFavoriteRoutesDTO): void {
     this.router.navigate(['/passenger/passenger-home'], {

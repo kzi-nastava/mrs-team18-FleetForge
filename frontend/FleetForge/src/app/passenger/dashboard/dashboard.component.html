@@ -52,7 +52,8 @@
                         </div>
                     </div>
 
-                    <button class="btn-action-small btn-cancel" (click)="cancelRide(ride.id)">
+                    <button class="btn-action-small btn-cancel" [disabled]="isCancelDisabled(ride)"
+                        (click)="openCancelConfirmation(ride.id)">
                         Cancel
                     </button>
                 </div>
@@ -85,3 +86,19 @@
         </div>
     </div>
 </div>
+<app-notification-popup
+  [visible]="showPopup"
+  [success]="popupSuccess"
+  [message]="popupMessage"
+  (closed)="closePopup()">
+</app-notification-popup>
+<app-confirmation-popup
+  [visible]="showConfirmPopup"
+  title="Cancel Scheduled Ride"
+  message="Are you sure you want to cancel this ride? This action cannot be undone."
+  cancelButtonText="Abort"
+  confirmButtonText="Cancel"
+  confirmButtonColor="red"
+  (confirmed)="onCancelConfirmed()"
+  (cancelled)="onCancelDismissed()">
+</app-confirmation-popup>
