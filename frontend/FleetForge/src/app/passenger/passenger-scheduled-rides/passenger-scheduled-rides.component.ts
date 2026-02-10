@@ -1,7 +1,7 @@
-import { Component, signal, WritableSignal, ChangeDetectorRef} from '@angular/core';
+import { Component, signal, WritableSignal, ChangeDetectorRef, OnInit } from '@angular/core';
+import { RideService, ScheduledRideDto } from '../../shared/services/ride.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RideService } from '../../shared/services/ride.service';
 import { ConfirmationPopupComponent } from '../../shared/popups/confirmation-popup/confirmation-popup.component';
 import { NotificationPopupComponent } from '../../shared/popups/popup-dialog/notification-popup.component';
 
@@ -11,7 +11,7 @@ interface ScheduledRide {
   dropoffAddress: string;
   scheduledAt: string;
   estimatedCost: number;
-  status: 'SCHEDULED' | 'CANCELLED';
+  status: 'CANCELLED' | 'ACCEPTED';
 }
 
 @Component({
@@ -21,9 +21,8 @@ interface ScheduledRide {
   templateUrl: './passenger-scheduled-rides.component.html',
   styleUrls: ['./passenger-scheduled-rides.component.css'],
 })
-export class PassengerScheduledRidesComponent {
+export class PassengerScheduledRidesComponent implements OnInit {
   searchQuery = '';
-  
   showConfirmPopup = false;
   ridePendingCancel: ScheduledRide | null = null;
 
@@ -32,61 +31,75 @@ export class PassengerScheduledRidesComponent {
   notificationMessage = '';
   notificationSuccess = true;
 
+  currentPage = signal(0);
+  pageSize = signal(5);
+  totalPages = signal(0);
+  isLoading = signal(false);
+
+  protected rides: WritableSignal<ScheduledRide[]> = signal([]);
+
   constructor(
     private rideService: RideService,
     private cdr: ChangeDetectorRef
   ) {}
 
-  protected rides: WritableSignal<ScheduledRide[]> = signal([
-    {
-      id: 7,
-      pickupAddress: 'Bulevar oslobođenja 12, Novi Sad',
-      dropoffAddress: 'Liman 4',
-      scheduledAt: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
-      estimatedCost: 920,
-      status: 'SCHEDULED',
-    },
-    {
-      id: 8,
-      pickupAddress: 'Cara Dušana 55, Novi Sad',
-      dropoffAddress: 'Petrovaradin',
-      scheduledAt: this.futureDate(1),
-      estimatedCost: 1100,
-      status: 'SCHEDULED',
-    },
-    {
-      id: 9,
-      pickupAddress: 'Futoška 18, Novi Sad',
-      dropoffAddress: 'Trg slobode',
-      scheduledAt: this.futureDate(5),
-      estimatedCost: 760,
-      status: 'SCHEDULED',
-    },
-  ]);
+  ngOnInit(): void {
+    this.loadRides();
+  }
 
   get displayedRides(): ScheduledRide[] {
     const q = this.searchQuery.trim().toLowerCase();
     if (!q) return this.rides();
 
-    return this.rides().filter((ride) =>
-      [
-        ride.id,
-        ride.pickupAddress,
-        ride.dropoffAddress,
-        new Date(ride.scheduledAt).toDateString(),
-        ride.status,
-      ]
+    return this.rides().filter(ride =>
+      [ride.id, ride.pickupAddress, ride.dropoffAddress, new Date(ride.scheduledAt).toDateString(), ride.status]
         .join(' ')
         .toLowerCase()
         .includes(q)
     );
   }
 
+
+  loadRides(): void {
+    this.isLoading.set(true);
+
+    this.rideService.getScheduledRides(this.currentPage(), this.pageSize()).subscribe({
+      next: (response) => {
+        const mapped: ScheduledRide[] = response.content.map(r => ({
+          id: r.id,
+          pickupAddress: r.pickup,
+          dropoffAddress: r.dropoff,
+          scheduledAt: r.scheduledTime,
+          estimatedCost: r.estimatedCost,
+          status: r.status,
+        }));
+        this.rides.set(mapped);
+        this.totalPages.set(response.totalPages);
+        this.isLoading.set(false);
+      },
+      error: () => this.isLoading.set(false),
+    });
+  }
+
+  nextPage(): void {
+    if (this.currentPage() < this.totalPages() - 1) {
+      this.currentPage.update(p => p + 1);
+      this.loadRides();
+    }
+  }
+
+  prevPage(): void {
+    if (this.currentPage() > 0) {
+      this.currentPage.update(p => p - 1);
+      this.loadRides();
+    }
+  }
+
   canCancel(ride: ScheduledRide): boolean {
     const rideTime = new Date(ride.scheduledAt).getTime();
     const now = Date.now();
     const diffMinutes = (rideTime - now) / 60000;
-    return diffMinutes > 10 && ride.status === 'SCHEDULED';
+    return diffMinutes > 10 && ride.status === 'ACCEPTED';
   }
 
   requestCancel(ride: ScheduledRide): void {

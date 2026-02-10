@@ -1,9 +1,11 @@
+
 import { Component, OnInit, OnDestroy, Inject } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { AsyncPipe, LowerCasePipe, DOCUMENT } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { SidebarService } from '../sidebar/sidebar.service';
-import { Navbar } from './service/navbar';
+
+import { Navbar, CurrentUserDTO } from './service/navbar';
 import { NotificationService } from '../../shared/services/notification.service';
 import { NotificationDropdownComponent } from './notification-dropdown/notification-dropdown.component';
 
@@ -27,6 +29,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
     { label: 'Contact', path: '/contact', exact: false },
   ];
 
+  currentUser: CurrentUserDTO | null = null;
+
   isAuthenticated$!: SidebarService['isAuthenticated$'];
   userRole$!: SidebarService['userRole$'];
   showProfileMenu = false;
@@ -48,6 +52,9 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.authSubscription = this.isAuthenticated$.subscribe(isAuthenticated => {
       if (isAuthenticated) {
         this.initializeNotifications();
+        this.navbarService.getCurrentUser().subscribe(user => {
+          this.currentUser = user;
+        });
       } else {
         this.notificationService.disconnect();
       }

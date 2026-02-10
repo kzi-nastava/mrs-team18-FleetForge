@@ -38,6 +38,12 @@ public interface RideService {
             int size
     );
 
+    Page<ScheduledRideDTO> getScheduledRidesForPassenger(
+            Long passengerId,
+            int page,
+            int size
+    );
+
     Page<AdminRideHistoryDTO> getAdminRideHistory(
             Long userId,
             String email,

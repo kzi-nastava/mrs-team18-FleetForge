@@ -25,24 +25,44 @@
                     </p>
                 </div>
 
-                <div class="scheduled-ride" *ngFor="let ride of scheduledRides">
-                    <div class="ride-content">
-                        <div class="ride-meta">
-                            <span class="ride-date">{{ ride.date }}</span>
-                        </div>
-                        <div class="ride-route">
-                            <strong>{{ ride.from }}</strong>
-                            <div class="arrow">→</div>
-                            <span>{{ ride.to }}</span>
-                        </div>
-                    </div>
-                    <button class="btn-action-small btn-cancel">Cancel</button>
+                <!-- Loading state -->
+                <div *ngIf="isLoadingScheduled" class="empty-state">
+                    Loading scheduled rides...
                 </div>
 
-                <a routerLink="/passenger/scheduled-rides" class="hint-link">
+                <!-- No scheduled rides -->
+                <div *ngIf="!isLoadingScheduled && scheduledRides.length === 0" class="empty-state">
+                    🚫 No scheduled rides
+                </div>
+
+                <!-- Scheduled rides -->
+                <div class="scheduled-ride" *ngFor="let ride of scheduledRides">
+
+                    <div class="ride-content">
+                        <div class="ride-meta">
+                            <span class="ride-date">
+                                {{ ride.scheduledTime | date:'dd MMM, HH:mm' }}
+                            </span>
+                        </div>
+
+                        <div class="ride-route">
+                            <strong>{{ ride.pickup }}</strong>
+                            <div class="arrow">→</div>
+                            <span>{{ ride.dropoff }}</span>
+                        </div>
+                    </div>
+
+                    <button class="btn-action-small btn-cancel" [disabled]="isCancelDisabled(ride)"
+                        (click)="openCancelConfirmation(ride.id)">
+                        Cancel
+                    </button>
+                </div>
+
+                <a *ngIf="scheduledRides.length > 0" routerLink="/passenger/scheduled-rides" class="hint-link">
                     Click to see all scheduled routes
                 </a>
             </div>
+
 
             <div class="card">
                 <div class="card-header">
@@ -52,13 +72,13 @@
                     </h3>
                 </div>
                 @for(route of favoriteRoutes().slice(0, 2); track route.id) {
-                <div class="favorite-route-container" >
+                <div class="favorite-route-container">
                     <div class="favorite-route-info">
                         <div class="route-name">{{ route.name }}</div>
                     </div>
                     <button class="btn-action-small btn-order-small" (click)="orderRide(route)">Order</button>
                 </div>
-            }
+                }
                 <a routerLink="/passenger/favourite-rides" class="hint-link">
                     Click to see all favorite routes
                 </a>
@@ -66,3 +86,19 @@
         </div>
     </div>
 </div>
+<app-notification-popup
+  [visible]="showPopup"
+  [success]="popupSuccess"
+  [message]="popupMessage"
+  (closed)="closePopup()">
+</app-notification-popup>
+<app-confirmation-popup
+  [visible]="showConfirmPopup"
+  title="Cancel Scheduled Ride"
+  message="Are you sure you want to cancel this ride? This action cannot be undone."
+  cancelButtonText="Abort"
+  confirmButtonText="Cancel"
+  confirmButtonColor="red"
+  (confirmed)="onCancelConfirmed()"
+  (cancelled)="onCancelDismissed()">
+</app-confirmation-popup>

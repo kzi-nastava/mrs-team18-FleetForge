@@ -53,6 +53,7 @@ export interface PassengerRideDetailsDto {
     firstName: string;
     lastName: string;
     phoneNumber: string;
+    profileImage: string;
   };
   hasInconsistencies: boolean;
   inconsistencies: InconsistencyReportDto[];
@@ -65,19 +66,19 @@ export interface PassengerRideDetailsDto {
     constructor(private http: HttpClient) {}
 
     getPassengerRides(
-    page: number,
-    size: number,
-    sortBy: string,
-    direction: 'asc' | 'desc',
-    from?: string,
-    to?: string
-  ) {
-    const params: any = { page, size, sortBy, direction };
-    if (from) params.from = from;
-    if (to) params.to = to;
+      page: number,
+      size: number,
+      sortBy: string,
+      direction: 'asc' | 'desc',
+      from?: string,
+      to?: string
+    ) {
+      const params: any = { page, size, sortBy, direction };
+      if (from) params.from = from;
+      if (to) params.to = to;
 
-    return this.http.get<PageResponse<PassengerRideHistoryDto>>(`${this.apiUrl}/rides`, { params });
-  }
+      return this.http.get<PageResponse<PassengerRideHistoryDto>>(`${this.apiUrl}/rides`, { params });
+    }
 
 
   getRideDetails(rideId: number) {

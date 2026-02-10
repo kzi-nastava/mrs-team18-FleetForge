@@ -517,3 +517,27 @@
   color: var(--color-text-gray);
   font-size: smaller;
 }
+
+.driver-card {
+  display: flex;          /* side by side layout */
+  gap: 12px;              /* space between image and info */
+  align-items: center;    /* vertically center the content */
+  padding: 14px;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+}
+
+.driver-image img {
+  width: 50px;           /* smaller image */
+  height: 50px;
+  border-radius: 50%;    /* circular */
+  object-fit: cover;
+  border: 1px solid #ddd;
+}
+
+.driver-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}

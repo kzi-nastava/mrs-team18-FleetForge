@@ -58,7 +58,7 @@ public class DataLoader implements CommandLineRunner {
         driver1.setLastName("Doe");
         driver1.setPhoneNumber("+381641234567");
         driver1.setAddress("Bulevar oslobođenja 10, Novi Sad");
-        driver1.setProfilePicture("/uploads/pfp/default.png");
+        driver1.setProfilePicture("/uploads/pfp/driver1@test.com.png");
         driver1.setVehicle(vehicle1);
         driver1.setActive(true);
         driver1.setAvailable(false);
@@ -236,7 +236,7 @@ public class DataLoader implements CommandLineRunner {
 //        rideRepository.save(ride7);
 
         Ride ride8 = createRide(
-                driver2, passenger2,
+                driver2, passenger4,
                 new GeoPoint(45.2670, 19.8305), "Cara Dušana 55, Novi Sad",
                 new GeoPoint(45.2520, 19.8615), "Petrovaradin",
                 LocalDateTime.now().plusDays(1).withHour(16).withMinute(30),
@@ -246,16 +246,16 @@ public class DataLoader implements CommandLineRunner {
         );
         rideRepository.save(ride8);
 
-//        Ride ride9 = createRide(
-//                driver1, passenger3,
-//                new GeoPoint(45.2590, 19.8350), "Futoška 18, Novi Sad",
-//                new GeoPoint(45.2671, 19.8335), "Trg slobode",
-//                LocalDateTime.now().plusDays(5).withHour(9).withMinute(0),
-//                null,
-//                4.8, 18.0, 760.0,
-//                RideStatus.ACCEPTED, false, null, null
-//        );
-//        rideRepository.save(ride9);
+        Ride ride9 = createRide(
+                driver1, passenger4,
+                new GeoPoint(45.2590, 19.8350), "Futoška 18, Novi Sad",
+                new GeoPoint(45.2671, 19.8335), "Trg slobode",
+                LocalDateTime.now().plusDays(5).withHour(9).withMinute(0),
+                null,
+                4.8, 18.0, 760.0,
+                RideStatus.CANCELLED, false, RideActor.PASSENGER, null
+        );
+        rideRepository.save(ride9);
 
         Ride ride10 = createRide(
                 driver2, passenger4,
@@ -344,10 +344,10 @@ public class DataLoader implements CommandLineRunner {
                 driver1, passenger4,
                 new GeoPoint(45.2610, 19.8430), "Futoski put 30, Novi Sad",
                 new GeoPoint(45.2490, 19.8310), "Satelit, Novi Sad",
-                LocalDateTime.now().minusDays(1).withHour(7).withMinute(30),
+                LocalDateTime.now().plusDays(1).withHour(7).withMinute(30),
                 null,
                 4.0, 16.0, 650.0,
-                RideStatus.CANCELLED, false, RideActor.DRIVER,
+                RideStatus.ACCEPTED, false, RideActor.DRIVER,
                 "Emergency situation"
         );
         ride17.setCancelledAt(LocalDateTime.now().minusDays(1).withHour(7).withMinute(20));

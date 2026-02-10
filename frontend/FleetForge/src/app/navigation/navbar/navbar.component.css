@@ -157,7 +157,32 @@
   font-weight: 700;
   text-transform: uppercase;
 }
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden; /* Ensures the image stays circular */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ddd; /* Fallback background color */
+  flex-shrink: 0; /* Prevents the circle from squishing */
+}
 
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Crops image to fill circle without stretching */
+  display: block;
+}
+
+.profile {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  position: relative; /* Keeps the dropdown menu positioned correctly */
+  gap: 10px;
+}
 .profile-text {
   display: flex;
   flex-direction: column;

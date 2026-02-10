@@ -44,20 +44,28 @@
                     </tr>
                 </tbody>
             </table>
+            <div class="pagination">
+                <button (click)="prevPage()" [disabled]="currentPage() === 0 || isLoading()">
+                    Previous
+                </button>
+
+                <span>
+                    Page {{ currentPage() + 1 }} of {{ totalPages() }}
+                </span>
+
+                <button (click)="nextPage()" [disabled]="currentPage() >= totalPages() - 1 || isLoading()">
+                    Next
+                </button>
+            </div>
 
         </div>
     </div>
 </div>
 <app-confirmation-popup [visible]="showConfirmPopup" title="Cancel scheduled ride"
     message="Are you sure you want to cancel this scheduled ride? This action cannot be undone."
-    confirmButtonText="Cancel" cancelButtonText="Abort" confirmButtonColor="red"
-    (confirmed)="confirmCancel()" (cancelled)="closePopup()">
+    confirmButtonText="Cancel" cancelButtonText="Abort" confirmButtonColor="red" (confirmed)="confirmCancel()"
+    (cancelled)="closePopup()">
 </app-confirmation-popup>
-<app-notification-popup
-  [visible]="notificationVisible"
-  [title]="notificationTitle"
-  [message]="notificationMessage"
-  [success]="notificationSuccess"
-  okButtonText="OK"
-  (closed)="onNotificationClosed()">
+<app-notification-popup [visible]="notificationVisible" [title]="notificationTitle" [message]="notificationMessage"
+    [success]="notificationSuccess" okButtonText="OK" (closed)="onNotificationClosed()">
 </app-notification-popup>

@@ -7,7 +7,7 @@
 
 	<div class="rides-section">
 		<h3 class="section-title">Latest Rides</h3>
-		
+
 		<div class="filter-section" style="display: flex; gap: 12px; align-items: flex-end; margin-bottom: 16px;">
 			<div style="display: flex; flex-direction: column;">
 				<label for="startDate">From</label>
@@ -120,12 +120,18 @@
 										<!-- Other Ride Details -->
 										<div class="details-content-column">
 											<div class="detail-grid">
-												<div class="detail-card">
-													<div class="detail-label">Driver</div>
-													<div class="detail-value">{{ details.driver.firstName }} {{
-														details.driver.lastName }}</div>
-													<div class="detail-label">Phone</div>
-													<div class="detail-value">{{ details.driver.phoneNumber }}</div>
+												<div class="detail-card driver-card">
+													<div class="driver-info">
+														<div class="detail-label">Driver</div>
+														<div class="detail-value">{{ details.driver.firstName }} {{
+															details.driver.lastName }}</div>
+														<div class="detail-label">Phone</div>
+														<div class="detail-value">{{ details.driver.phoneNumber }}</div>
+													</div>
+													<div class="driver-image">
+														<img src="http://localhost:8080{{ details.driver.profileImage }}"
+															alt="Driver Image">
+													</div>
 												</div>
 
 												<div class="detail-card">

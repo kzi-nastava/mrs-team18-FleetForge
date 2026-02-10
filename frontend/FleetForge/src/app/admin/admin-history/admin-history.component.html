@@ -114,14 +114,18 @@
                                                     <div class="detail-value">{{ details.totalDistance }} km</div>
                                                 </div>
 
-                                                <div class="detail-card">
-                                                    <div class="detail-label">Driver</div>
-                                                    <div class="detail-value">
-                                                        {{ details.driver.firstName }} {{ details.driver.lastName }}
+                                                <div class="detail-card driver-card">
+                                                    <div class="driver-info">
+                                                        <div class="detail-label">Driver</div>
+                                                        <div class="detail-value">{{ details.driver.firstName }} {{
+                                                            details.driver.lastName }}</div>
+                                                        <div class="detail-label">Phone</div>
+                                                        <div class="detail-value">{{ details.driver.phoneNumber }}</div>
                                                     </div>
-
-                                                    <div class="detail-label">Phone</div>
-                                                    <div class="detail-value">{{ details.driver.phoneNumber }}</div>
+                                                    <div class="driver-image">
+                                                        <img src="http://localhost:8080{{ details.driver.profileImage }}"
+                                                            alt="Driver Image">
+                                                    </div>
                                                 </div>
 
                                                 <div class="detail-card">
