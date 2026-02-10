@@ -110,6 +110,11 @@ export const SIDEBAR_MENU_CONFIG: Record<UserRole, SidebarMenuItem[]> = {
       label:'Register new driver',
       icon:'➕',
       path: '/admin/register-new-driver'
+    },
+    {
+      label:'Active Rides',
+      icon:'🚗',
+      path: '/admin/active-rides'
     }
   ]
 };
