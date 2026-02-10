@@ -194,4 +194,16 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
     List<Ride> findAllByDriver(Driver driver);
     List<Ride> findAllByDriverAndStatus(Driver driver, RideStatus status);
     Ride getRideById(Long rideId);
+
+    @Query("SELECT DISTINCT r FROM Ride r " +
+            "LEFT JOIN FETCH r.driver " +
+            "LEFT JOIN FETCH r.passenger " +
+            "LEFT JOIN FETCH r.linkedPassengers where " +
+            "r.status = 'ACCEPTED' AND " +
+            "r.startTime > CURRENT_TIMESTAMP AND " +
+            "r.startTime <= :endWindow AND " +
+            "(r.notificationSent15Min = false OR " +
+            " r.notificationSent10Min = false OR " +
+            " r.notificationSent5Min = false)")
+    List<Ride> findAcceptedRidesForReminders(@Param("endWindow") LocalDateTime endWindow);
 }
