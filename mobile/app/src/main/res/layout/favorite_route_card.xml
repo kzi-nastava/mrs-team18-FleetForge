@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/card_favorite_route"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/driver_profile_info_bg">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/favorite_route_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Favorite route name"
+            android:textColor="@color/black"
+            android:textSize="24sp"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/from"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="From: "
+            android:textSize="18sp"
+            app:layout_constraintBaseline_toBaselineOf="@+id/start_location"
+            app:layout_constraintEnd_toStartOf="@+id/start_location"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/start_location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:layout_marginStart="8dp"
+            android:text="Start Location"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/from"
+            app:layout_constraintTop_toBottomOf="@+id/favorite_route_name" />
+
+        <TextView
+            android:id="@+id/waypoints_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Waypoints: "
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="@id/waypoint_container"
+            app:layout_constraintEnd_toStartOf="@+id/waypoint_container"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/waypoint_container" />
+
+        <LinearLayout
+            android:id="@+id/waypoint_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/waypoints_label"
+            app:layout_constraintTop_toBottomOf="@id/start_location">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Waypoint 1"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:layout_marginTop="4dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Waypoint 2"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:layout_marginTop="4dp"/>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/to_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="To: "
+            android:textSize="18sp"
+            app:layout_constraintBaseline_toBaselineOf="@+id/end_location"
+            app:layout_constraintEnd_toStartOf="@+id/end_location"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/end_location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:layout_marginStart="8dp"
+            android:text="End Location"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/to_label"
+            app:layout_constraintTop_toBottomOf="@id/waypoint_container" />
+
+
+        <Button
+            android:id="@+id/btnOrder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="8dp"
+            android:text="Order"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btnRemove"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/end_location" />
+
+        <Button
+            android:id="@+id/btnRemove"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="Remove"
+            android:textColor="@color/primary_orange"
+            app:backgroundTint="@color/white"
+            app:layout_constraintBaseline_toBaselineOf="@id/btnOrder"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/btnOrder" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>

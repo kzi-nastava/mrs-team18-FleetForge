@@ -9,13 +9,16 @@ import androidx.lifecycle.MutableLiveData;
 import com.ognjen.fleetforge.api.PassengerService;
 import com.ognjen.fleetforge.api.RetrofitClient;
 import com.ognjen.fleetforge.dtos.common.PasswordChangeRequestDTO;
+import com.ognjen.fleetforge.dtos.passenger.FavoriteRouteGetResponseDTO;
 import com.ognjen.fleetforge.dtos.passenger.PassengerChangeInformationRequestDTO;
 import com.ognjen.fleetforge.dtos.passenger.PassengerChangeInformationResponseDTO;
 import com.ognjen.fleetforge.dtos.passenger.PassengerGetResponseDTO;
+import com.ognjen.fleetforge.model.FavoriteRoute;
 import com.ognjen.fleetforge.utils.FileUtil;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -128,5 +131,83 @@ public class PassengerRepo {
                 });
                 return data;
 
+        }
+        public LiveData<List<FavoriteRouteGetResponseDTO>> getFavorites(){
+            MutableLiveData<List<FavoriteRouteGetResponseDTO>> data= new MutableLiveData<>();
+
+            service.getFavorites().enqueue(new Callback<List<FavoriteRouteGetResponseDTO>>() {
+                @Override
+                public void onResponse(Call<List<FavoriteRouteGetResponseDTO>> call, Response<List<FavoriteRouteGetResponseDTO>> response) {
+                    if(response.isSuccessful()){
+                        data.setValue(response.body());
+                    }
+                    else{
+                        try {
+                            android.util.Log.e("API_ERROR", "Error body: " + response.errorBody().string());
+                        } catch (Exception e) { e.printStackTrace(); }
+                        data.setValue(null);
+
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<List<FavoriteRouteGetResponseDTO>> call, Throwable throwable) {
+                android.util.Log.e("API_FAILURE", "Doslo je do greske: ", throwable);
+                data.setValue(null);
+                }
+            });
+            return data;
+        }
+
+        public LiveData<Boolean> deleteFavorite(Long id){
+            MutableLiveData<Boolean> data= new MutableLiveData<>();
+
+            service.deleteFavorite(id).enqueue(new Callback<Void>() {
+                @Override
+                public void onResponse(Call<Void> call, Response<Void> response) {
+                    if(response.isSuccessful()){
+                        data.setValue(true);
+                    }else{
+                        try {
+                            android.util.Log.e("API_ERROR", "Error body: " + response.errorBody().string());
+                        } catch (Exception e) { e.printStackTrace(); }
+                        data.setValue(false);
+
+
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Void> call, Throwable throwable) {
+                    android.util.Log.e("API_FAILURE", "Doslo je do greske: ", throwable);
+                    data.setValue(false);
+                }
+            });
+            return data;
+        }
+
+        public LiveData<Boolean> addFavorite(String routeName, Long rideId){
+            MutableLiveData<Boolean> data= new MutableLiveData<>();
+            service.addFavorite(routeName,rideId).enqueue(new Callback<Void>() {
+                @Override
+                public void onResponse(Call<Void> call, Response<Void> response) {
+                    if(response.isSuccessful()){
+                        data.setValue(true);
+
+                    }else{
+                        try {
+                            android.util.Log.e("API_ERROR", "Error body: " + response.errorBody().string());
+                        } catch (Exception e) { e.printStackTrace(); }
+                        data.setValue(false);
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Void> call, Throwable throwable) {
+                    android.util.Log.e("API_FAILURE", "Doslo je do greske: ", throwable);
+                    data.setValue(false);
+                }
+            });
+            return data;
         }
 }

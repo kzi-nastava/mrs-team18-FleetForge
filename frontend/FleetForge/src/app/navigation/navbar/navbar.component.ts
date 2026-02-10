@@ -1,8 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+
+import { Component, OnInit, OnDestroy, Inject } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { AsyncPipe, LowerCasePipe } from '@angular/common';
+import { AsyncPipe, LowerCasePipe, DOCUMENT } from '@angular/common';
+import { Subscription } from 'rxjs';
 import { SidebarService } from '../sidebar/sidebar.service';
+
 import { Navbar, CurrentUserDTO } from './service/navbar';
+import { NotificationService } from '../../shared/services/notification.service';
+import { NotificationDropdownComponent } from './notification-dropdown/notification-dropdown.component';
 
 export interface NavItem {
   label: string;
@@ -12,12 +17,12 @@ export interface NavItem {
 
 @Component({
   selector: 'app-navbar',
-  imports: [RouterModule, AsyncPipe, LowerCasePipe],
+  imports: [RouterModule, AsyncPipe, LowerCasePipe, NotificationDropdownComponent],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css',
   standalone: true,
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnInit, OnDestroy {
   navItems: NavItem[] = [
     { label: 'Home', path: '/', exact: true },
     { label: 'Map', path: '/map', exact: false },
@@ -30,20 +35,44 @@ export class NavbarComponent {
   userRole$!: SidebarService['userRole$'];
   showProfileMenu = false;
   status: boolean = false;
+  private authSubscription?: Subscription;
 
-  constructor(private sidebarService: SidebarService, private router: Router, private navbarService: Navbar) {
+  constructor(
+    private sidebarService: SidebarService, 
+    private router: Router, 
+    private navbarService: Navbar,
+    private notificationService: NotificationService,
+    @Inject(DOCUMENT) private document: Document
+  ) {
     this.isAuthenticated$ = this.sidebarService.isAuthenticated$;
     this.userRole$ = this.sidebarService.userRole$;
   }
 
   ngOnInit(): void {
-    this.isAuthenticated$.subscribe(isAuth => {
-      if (isAuth) {
+    this.authSubscription = this.isAuthenticated$.subscribe(isAuthenticated => {
+      if (isAuthenticated) {
+        this.initializeNotifications();
         this.navbarService.getCurrentUser().subscribe(user => {
           this.currentUser = user;
         });
+      } else {
+        this.notificationService.disconnect();
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    if (this.authSubscription) {
+      this.authSubscription.unsubscribe();
+    }
+  }
+
+  private async initializeNotifications(): Promise<void> {
+    try {
+      await this.notificationService.initialize();
+    } catch (error) {
+      console.error('❌ Failed to initialize notifications:', error);
+    }
   }
 
   onLogoClick(): void {
@@ -55,15 +84,20 @@ export class NavbarComponent {
   }
 
   onLogout(): void {
-    if(localStorage.getItem('role') === 'DRIVER' && this.status){
-      this.navbarService.goOffline({sessionId: Number(localStorage.getItem('sessionId'))}).subscribe();
+    const storage = this.document.defaultView?.localStorage;
+    if(storage?.getItem('role') === 'DRIVER' && this.status){
+      this.navbarService.goOffline({sessionId: Number(storage?.getItem('sessionId'))}).subscribe();
     }
     this.status = false;
+    
+    // Disconnect notifications before logging out
+    this.notificationService.disconnect();
+    
     this.sidebarService.setAuthenticated(false);
     this.sidebarService.setUserRole(null);
     this.showProfileMenu = false;
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
+    storage?.removeItem('token');
+    storage?.removeItem('role');
     this.router.navigate(['/']);
   }
 
@@ -81,13 +115,14 @@ export class NavbarComponent {
     });
   }
   changeStatus(): void {
+    const storage = this.document.defaultView?.localStorage;
     if(!this.status){
       this.navbarService.goOnline().subscribe((response)=>{
-        localStorage.setItem('sessionId', response.sessionId.toString());
+        storage?.setItem('sessionId', response.sessionId.toString());
         this.status = true;
       });
     } else {
-      this.navbarService.goOffline({sessionId: Number(localStorage.getItem('sessionId'))}).subscribe(()=>{
+      this.navbarService.goOffline({sessionId: Number(storage?.getItem('sessionId'))}).subscribe(()=>{
         this.status = false;
       });
     }

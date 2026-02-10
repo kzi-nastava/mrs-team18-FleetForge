@@ -13,6 +13,7 @@ import com.team18.FleetForge.exception.common.InvalidSortFieldException;
 import com.team18.FleetForge.exception.common.UserIdentifierRequiredException;
 import com.team18.FleetForge.exception.ride.RideNotFoundException;
 import com.team18.FleetForge.exception.user.InvalidUserRoleException;
+import com.team18.FleetForge.model.enums.NotificationType;
 import com.team18.FleetForge.model.enums.Role;
 import com.team18.FleetForge.model.ride.*;
 import com.team18.FleetForge.model.users.Driver;
@@ -23,6 +24,8 @@ import com.team18.FleetForge.repository.rides.InconsistencyReportRepository;
 import com.team18.FleetForge.repository.rides.RideLocationRepository;
 import com.team18.FleetForge.repository.rides.RideRepository;
 import com.team18.FleetForge.repository.users.UserRepository;
+import com.team18.FleetForge.service.EmailService;
+import com.team18.FleetForge.service.NotificationService;
 import com.team18.FleetForge.service.users.DriverService;
 import com.team18.FleetForge.service.PriceCalculationService;
 import com.team18.FleetForge.service.rides.RideService;
@@ -58,6 +61,8 @@ public class RideServiceImpl implements RideService {
     private final PriceCalculationService priceCalculationService;
     private final RideLocationRepository rideLocationRepository;
     private final InconsistencyReportRepository inconsistencyReportRepository;
+    private final EmailService emailService;
+    private final NotificationService notificationService;
 
     private static final Set<String> ALLOWED_SORT_FIELDS = Set.of(
             "startTime",
@@ -270,6 +275,21 @@ public class RideServiceImpl implements RideService {
             }
         }
         rideRepository.save(ride);
+
+        if (ride.getLinkedPassengers() != null && !ride.getLinkedPassengers().isEmpty()) {
+            for (Passenger linkedPassenger : ride.getLinkedPassengers()) {
+                emailService.sendRideNotificationEmail(linkedPassenger.getEmail(), ride);
+                System.out.println("Sending email to: " +  linkedPassenger.getEmail());
+            }
+        }
+
+        notificationService.sendNotificationToLinkedPassengers(
+                ride,
+                NotificationType.RIDE_CREATED,
+                "You have been added to a ride"
+        );
+
+
         return ride;
     }
 

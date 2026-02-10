@@ -1,645 +1,803 @@
-package com.ognjen.fleetforge.fragments.passenger;
+    package com.ognjen.fleetforge.fragments.passenger;
 
-import static androidx.appcompat.content.res.AppCompatResources.getDrawable;
-import static androidx.core.util.TypedValueCompat.dpToPx;
+    import static androidx.appcompat.content.res.AppCompatResources.getDrawable;
+    import static androidx.core.util.TypedValueCompat.dpToPx;
 
-import android.graphics.Color;
-import android.os.Bundle;
+    import android.graphics.Color;
+    import android.os.Bundle;
 
-import androidx.appcompat.app.WindowDecorActionBar;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
+    import androidx.appcompat.app.WindowDecorActionBar;
+    import androidx.core.content.ContextCompat;
+    import androidx.fragment.app.Fragment;
+    import androidx.lifecycle.ViewModelProvider;
 
-import android.os.Handler;
-import android.os.Looper;
-import android.text.Editable;
-import android.text.InputType;
-import android.text.TextWatcher;
-import android.util.DisplayMetrics;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.Toast;
+    import android.os.Handler;
+    import android.os.Looper;
+    import android.text.Editable;
+    import android.text.InputType;
+    import android.text.TextWatcher;
+    import android.util.DisplayMetrics;
+    import android.util.Log;
+    import android.view.LayoutInflater;
+    import android.view.MotionEvent;
+    import android.view.View;
+    import android.view.ViewGroup;
+    import android.widget.ArrayAdapter;
+    import android.widget.Button;
+    import android.widget.EditText;
+    import android.widget.LinearLayout;
+    import android.widget.TextView;
+    import android.widget.Toast;
 
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.checkbox.MaterialCheckBox;
-import com.google.android.material.datepicker.CalendarConstraints;
-import com.google.android.material.datepicker.DateValidatorPointForward;
-import com.google.android.material.datepicker.MaterialDatePicker;
-import com.google.android.material.textfield.MaterialAutoCompleteTextView;
-import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.TextInputLayout;
-import com.google.android.material.timepicker.MaterialTimePicker;
-import com.google.android.material.timepicker.TimeFormat;
-import com.ognjen.fleetforge.BuildConfig;
-import com.ognjen.fleetforge.R;
-import com.ognjen.fleetforge.dtos.photon.PhotonResponse;
-import com.ognjen.fleetforge.dtos.ride.WaypointRideCreateDTO;
-import com.ognjen.fleetforge.model.CalculatedRoute;
-import com.ognjen.fleetforge.model.VehicleType;
-import com.ognjen.fleetforge.utils.MapManager;
+    import com.google.android.material.bottomsheet.BottomSheetBehavior;
+    import com.google.android.material.checkbox.MaterialCheckBox;
+    import com.google.android.material.datepicker.CalendarConstraints;
+    import com.google.android.material.datepicker.DateValidatorPointForward;
+    import com.google.android.material.datepicker.MaterialDatePicker;
+    import com.google.android.material.textfield.MaterialAutoCompleteTextView;
+    import com.google.android.material.textfield.TextInputEditText;
+    import com.google.android.material.textfield.TextInputLayout;
+    import com.google.android.material.timepicker.MaterialTimePicker;
+    import com.google.android.material.timepicker.TimeFormat;
+    import com.ognjen.fleetforge.BuildConfig;
+    import com.ognjen.fleetforge.R;
+    import com.ognjen.fleetforge.dtos.photon.PhotonResponse;
+    import com.ognjen.fleetforge.dtos.ride.WaypointRideCreateDTO;
+    import com.ognjen.fleetforge.model.CalculatedRoute;
+    import com.ognjen.fleetforge.model.VehicleType;
+    import com.ognjen.fleetforge.model.WayPoint;
+    import com.ognjen.fleetforge.utils.MapManager;
 
-import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.Marker;
-import org.osmdroid.views.overlay.Polyline;
-import org.w3c.dom.Text;
-import org.osmdroid.util.GeoPoint;
+    import org.osmdroid.views.MapView;
+    import org.osmdroid.views.overlay.Marker;
+    import org.osmdroid.views.overlay.Polyline;
+    import org.w3c.dom.Text;
+    import org.osmdroid.util.GeoPoint;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.UUID;
+    import java.io.IOException;
+    import java.text.SimpleDateFormat;
+    import java.time.LocalDateTime;
+    import java.time.format.DateTimeFormatter;
+    import java.util.ArrayList;
+    import java.util.Calendar;
+    import java.util.List;
+    import java.util.Locale;
+    import java.util.Objects;
+    import java.util.UUID;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link RideOrder#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class RideOrder extends Fragment {
-    private static final String MAPBOX_API_KEY = BuildConfig.MAPBOX_API_KEY;
-    private MapView mapView;
-    private MapManager mapManager;
+    /**
+     * A simple {@link Fragment} subclass.
+     * Use the {@link RideOrder#newInstance} factory method to
+     * create an instance of this fragment.
+     */
+    public class RideOrder extends Fragment {
+        private static final String MAPBOX_API_KEY = BuildConfig.MAPBOX_API_KEY;
+        private MapView mapView;
+        private MapManager mapManager;
 
-    private MaterialAutoCompleteTextView startLocation;
-    private MaterialAutoCompleteTextView endLocation;
-    private LinearLayout waypointsContainer;
-    private Button addWaypointBtn;
-    private TextInputEditText passengerNum;
-    private LinearLayout passengersContainer;
-    private Button addPassenger;
-    private TextInputEditText dateTime;
-    private MaterialCheckBox now;
-    private MaterialAutoCompleteTextView vehicleType;
-    private MaterialCheckBox babySeat;
-    private MaterialCheckBox petFriendly;
-    private Button orderBtn;
-    private int waypointCounter = 0;
-    private int passengerCounter=0;
-    private LinearLayout bottomSheet;
+        private MaterialAutoCompleteTextView startLocation;
+        private MaterialAutoCompleteTextView endLocation;
+        private LinearLayout waypointsContainer;
+        private Button addWaypointBtn;
+        private TextInputEditText passengerNum;
+        private LinearLayout passengersContainer;
+        private Button addPassenger;
+        private TextInputEditText dateTime;
+        private MaterialCheckBox now;
+        private MaterialAutoCompleteTextView vehicleType;
+        private MaterialCheckBox babySeat;
+        private MaterialCheckBox petFriendly;
+        private Button orderBtn;
+        private int waypointCounter = 0;
+        private int passengerCounter=0;
+        private LinearLayout bottomSheet;
 
-    private Handler searchHandler = new Handler(Looper.getMainLooper());
-    private Runnable searchRunnable;
-    private RideOrderViewModel viewModel;
-    private String sessionToken;
-    public RideOrder() {
-        // Required empty public constructor
-    }
-
-    public static RideOrder newInstance(String param1, String param2) {
-        return new RideOrder();
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        viewModel= new ViewModelProvider(this).get(RideOrderViewModel.class);
-        viewModel.init(MAPBOX_API_KEY);
-        org.osmdroid.config.Configuration.getInstance().setUserAgentValue(requireContext().getPackageName());
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view= inflater.inflate(R.layout.fragment_ride_order, container, false);
-        viewModel.getSuggestionsData().observe(getViewLifecycleOwner(), response -> {
-            if (response != null && response.getFeatures() != null) {
-                updateDropdown(response);
-            }
-        });
-        viewModel.getRouteData().observe(getViewLifecycleOwner(), calculatedRoute -> {
-            if (calculatedRoute != null) {
-                List<org.osmdroid.util.GeoPoint> osmPoints = new ArrayList<>();
-                for (com.ognjen.fleetforge.model.GeoPoint point : calculatedRoute.getCoordinates()) {
-                    osmPoints.add(new org.osmdroid.util.GeoPoint(
-                            point.getLatitude(),
-                            point.getLongitude()
-                    ));
-                }
-                mapManager.drawRoute(osmPoints, 0xFFFF9900);
-            }
-        });
-        mapView=view.findViewById(R.id.map_view);
-        mapManager = new MapManager(mapView, requireContext());
-        mapManager.centerOnDefault();
-        bottomSheet=view.findViewById(R.id.bottom_sheet);
-        BottomSheetBehavior<LinearLayout> behavior= BottomSheetBehavior.from(bottomSheet);
-        startLocation=view.findViewById(R.id.start_location);
-        endLocation=view.findViewById(R.id.end_destination);
-        waypointsContainer=view.findViewById(R.id.waypointsContainer);
-        addWaypointBtn=view.findViewById(R.id.add_waypoint_btn);
-        passengerNum=view.findViewById(R.id.passengerNum);
-        passengersContainer=view.findViewById(R.id.passengersContainer);
-        addPassenger=view.findViewById(R.id.add_passenger_btn);
-        dateTime=view.findViewById(R.id.dateTime);
-        now=view.findViewById(R.id.now);
-        vehicleType=view.findViewById(R.id.vehicleTypeSpinner);
-        ArrayAdapter<String> adapter=  new ArrayAdapter<>(
-                getContext(),
-                android.R.layout.simple_dropdown_item_1line,
-                getResources().getStringArray(R.array.vehicle_types)
-        );
-        vehicleType.setAdapter(adapter);
-        babySeat=view.findViewById(R.id.babySeatCB);
-        petFriendly=view.findViewById(R.id.petFriendlyCB);
-        orderBtn=view.findViewById(R.id.orderBtn);
-
-        addWaypointBtn.setOnClickListener(v -> {
-            addWayPointField();
-        });
-
-        addPassenger.setOnClickListener(v -> {
-            addPassengerField();
-        });
-        now.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if(isChecked){
-                dateTime.setEnabled(false);
-                dateTime.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.text_primary));
-            }else{
-                dateTime.setEnabled(true);
-                dateTime.setBackgroundColor(Color.WHITE);
-            }
-        });
-        dateTime.setFocusable(false);
-        dateTime.setClickable(true);
-        dateTime.setOnClickListener(v -> showDateTimePicker());
-
-        startLocation.setOnFocusChangeListener((v, hasFocus) -> {
-            if(hasFocus){
-                behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-            }
-        });
-        mapView.setOnClickListener(v -> {
-            behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-        });
-
-        setupAutocomplete(startLocation);
-        setupAutocomplete(endLocation);
-        startLocation.setOnItemClickListener((parent, view1, position, id)->{
-            PhotonResponse.Feature selected = (PhotonResponse.Feature) parent.getItemAtPosition(position);
-
-            double lat = selected.getGeometry().getLat();
-            double lon = selected.getGeometry().getLon();
-            String name = selected.getProperties().getDisplayName();
-            if (startLocation.getTag() instanceof Marker) {
-                mapManager.removeMarker((Marker) startLocation.getTag());
-            }
-            Marker newMarker = mapManager.addMarker(lat, lon, name, R.drawable.ic_map_point);
-            startLocation.setTag(newMarker);
-            startLocation.setText(name, false);
-            mapView.getController().animateTo(new org.osmdroid.util.GeoPoint(lat, lon));
-            try {
-                drawRoute();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
-
-        endLocation.setOnItemClickListener((parent, view1, position, id)->{
-            PhotonResponse.Feature selected = (PhotonResponse.Feature) parent.getItemAtPosition(position);
-
-            double lat = selected.getGeometry().getLat();
-            double lon = selected.getGeometry().getLon();
-            String name = selected.getProperties().getDisplayName();
-            if (endLocation.getTag() instanceof Marker) {
-                mapManager.removeMarker((Marker) endLocation.getTag());
-            }
-            Marker newMarker = mapManager.addMarker(lat, lon, name, R.drawable.ic_map_point);
-            endLocation.setTag(newMarker);
-            endLocation.setText(name, false);
-            mapView.getController().animateTo(new org.osmdroid.util.GeoPoint(lat, lon));
-            try {
-                drawRoute();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
-
-        orderBtn.setOnClickListener(v -> {
-            if(canOrder()){
-                ArrayList<WaypointRideCreateDTO> coordinates= new ArrayList<>();
-                WaypointRideCreateDTO startWaypoint= new WaypointRideCreateDTO();
-                Marker startMarker= (Marker) startLocation.getTag();
-                String startAddress= startMarker.getTitle();
-                com.ognjen.fleetforge.model.GeoPoint startPoint= new com.ognjen.fleetforge.model.GeoPoint(startMarker.getPosition().getLatitude(),startMarker.getPosition().getLongitude());
-                startWaypoint.setAddress(startAddress);
-                startWaypoint.setLocation(startPoint);
-                startWaypoint.setOrderIndex(0);
-                coordinates.add(startWaypoint);
-
-                for(int i=0;i<waypointsContainer.getChildCount();i++){
-                    View viewLayout= waypointsContainer.getChildAt(i);
-                    if (viewLayout instanceof TextInputLayout) {
-                        EditText et = ((TextInputLayout) viewLayout).getEditText();
-                        if(et.getTag()!=null) {
-                            WaypointRideCreateDTO waypoint= new WaypointRideCreateDTO();
-                            Marker waypointMarker= (Marker) et.getTag();
-                            String waypointAddress= waypointMarker.getTitle();
-                            com.ognjen.fleetforge.model.GeoPoint waypointGeoPoint= new com.ognjen.fleetforge.model.GeoPoint(waypointMarker.getPosition().getLatitude(),waypointMarker.getPosition().getLongitude());
-                            waypoint.setAddress(waypointAddress);
-                            waypoint.setLocation(waypointGeoPoint);
-                            waypoint.setOrderIndex(i+1);
-                            coordinates.add(waypoint);
-                        }
-                    }
-                }
-
-                WaypointRideCreateDTO endWaypoint= new WaypointRideCreateDTO();
-                Marker endMarker= (Marker) endLocation.getTag();
-                String endAddress= endMarker.getTitle();
-                com.ognjen.fleetforge.model.GeoPoint endPoint= new com.ognjen.fleetforge.model.GeoPoint(endMarker.getPosition().getLatitude(),endMarker.getPosition().getLongitude());
-                endWaypoint.setAddress(endAddress);
-                endWaypoint.setLocation(endPoint);
-                endWaypoint.setOrderIndex(waypointsContainer.getChildCount());
-                coordinates.add(endWaypoint);
-
-                DateTimeFormatter format= DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
-                LocalDateTime startTime= LocalDateTime.now();
-                if(!now.isChecked()){
-                    startTime=LocalDateTime.parse(dateTime.getText().toString(),format);
-                }
-                ArrayList<String> passengerEmails= new ArrayList<>();
-                for(int i=0;i<passengersContainer.getChildCount();i++){
-                    View viewLayout= passengersContainer.getChildAt(i);
-                    if (viewLayout instanceof TextInputLayout) {
-                        EditText et = ((TextInputLayout) viewLayout).getEditText();
-                        if(!et.getText().toString().equals("")){
-                            passengerEmails.add(et.getText().toString());
-                        }
-                    }
-                }
-
-                viewModel.createRide(coordinates,Integer.valueOf(passengerNum.getText().toString())
-                , startTime,now.isChecked(),passengerEmails, com.ognjen.fleetforge.enums.VehicleType.valueOf(vehicleType.getText().toString().toUpperCase())
-                ,babySeat.isChecked(),petFriendly.isChecked(),startAddress,endAddress,viewModel.getRouteData().getValue().getDistanceKm()
-                ,viewModel.getRouteData().getValue().getEstimatedMinutes()).observe(getViewLifecycleOwner(),response->{
-                    if(response.isCreated()){
-                        Toast.makeText(getContext(),"Ride ordered successfully!", Toast.LENGTH_SHORT).show();
-                        resetForm();
-                    }else{
-                        Toast.makeText(getContext(),"Ride order failed, there is no available drivers", Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-
-            }else{
-                Toast.makeText(getContext(),"Form is not valid. Check if all text fields are filled and if all waypoints are selected from dropdown list.",
-                        Toast.LENGTH_LONG).show();
-            }
-        });
-        return view;
-    }
-    private void setupAutocomplete(MaterialAutoCompleteTextView field) {
-        field.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void afterTextChanged(Editable s) {
-                searchHandler.removeCallbacks(searchRunnable);
-                if (s.length() > 2) {
-                    searchRunnable = () -> viewModel.fetchSuggestions(s.toString());
-                    searchHandler.postDelayed(searchRunnable, 500);
-                }else if(s.length()==0){
-                    if(field.getTag()!=null){
-                        mapManager.removeMarker((Marker)field.getTag());
-                        field.setTag(null);
-                        mapManager.clearRoute();
-                    }
-                }
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-        });
-    }
-    private void addWayPointField(){
-        TextInputLayout fieldLayout= new TextInputLayout(getContext(),null,com.google.android.material.R.attr.textInputOutlinedStyle);
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        DisplayMetrics metrics = getResources().getDisplayMetrics();
-        layoutParams.topMargin = (int) dpToPx(8,metrics);
-        fieldLayout.setLayoutParams(layoutParams);
-        fieldLayout.setHint("Waypoint " + waypointCounter);
-        fieldLayout.setBoxBackgroundMode(TextInputLayout.BOX_BACKGROUND_OUTLINE);
-        fieldLayout.setEndIconMode(TextInputLayout.END_ICON_CUSTOM);
-        fieldLayout.setEndIconDrawable(ContextCompat.getDrawable(getContext(), R.drawable.minus));
-        fieldLayout.setId(View.generateViewId());
-
-        MaterialAutoCompleteTextView editText = new MaterialAutoCompleteTextView(fieldLayout.getContext());
-        LinearLayout.LayoutParams editTextParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        editText.setLayoutParams(editTextParams);
-        editText.setInputType(InputType.TYPE_CLASS_TEXT);
-        editText.setId(View.generateViewId());
-        int padding16dp = (int) dpToPx(16, metrics);
-        editText.setPadding(padding16dp, padding16dp, padding16dp, padding16dp);
-        setupAutocomplete(editText);
-        editText.setOnItemClickListener((parent, view1, position, id) -> {
-            PhotonResponse.Feature selected = (PhotonResponse.Feature) parent.getItemAtPosition(position);
-            String displayName = selected.getProperties().getDisplayName();
-            editText.setText(displayName, false);
-            double lat = selected.getGeometry().getLat();
-            double lon = selected.getGeometry().getLon();
-            String name = selected.getProperties().getDisplayName();
-            if (editText.getTag() instanceof org.osmdroid.views.overlay.Marker) {
-                org.osmdroid.views.overlay.Marker oldMarker = (org.osmdroid.views.overlay.Marker) editText.getTag();
-                mapView.getOverlays().remove(oldMarker);
-            }
-
-            org.osmdroid.views.overlay.Marker newMarker = mapManager.addMarker(lat, lon, name, R.drawable.ic_map_point);
-
-            editText.setTag(newMarker);
-
-            editText.setText(name, false);
-            mapView.getController().animateTo(new org.osmdroid.util.GeoPoint(lat, lon));
-            try {
-                drawRoute();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
-        fieldLayout.addView(editText);
-
-        fieldLayout.setEndIconOnClickListener(v -> {
-            mapManager.removeMarker((Marker) editText.getTag());
-            mapManager.clearRoute();
-            fieldLayout.animate()
-                    .alpha(0f)
-                    .setDuration(300)
-                    .withEndAction(() -> {
-                        waypointsContainer.removeView(fieldLayout);
-                        updateWaypointHints();
-                        try {
-                            drawRoute();
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    })
-                    .start();
-        });
-        int addButtonIndex = waypointsContainer.indexOfChild(addWaypointBtn);
-        waypointsContainer.addView(fieldLayout, addButtonIndex);
-        updateWaypointHints();
-    }
-    private void updateWaypointHints() {
-        int counter = 1;
-        for (int i = 0; i < waypointsContainer.getChildCount(); i++) {
-            View view = waypointsContainer.getChildAt(i);
-            if (view instanceof TextInputLayout && view.getId() != R.id.add_waypoint_btn) {
-                TextInputLayout til = (TextInputLayout) view;
-                til.setHint("Waypoint " + counter);
-                counter++;
-            }
+        private Handler searchHandler = new Handler(Looper.getMainLooper());
+        private Runnable searchRunnable;
+        private RideOrderViewModel viewModel;
+        private String sessionToken;
+        public RideOrder() {
+            // Required empty public constructor
         }
-    }
 
-    private void addPassengerField(){
-        TextInputLayout fieldLayout= new TextInputLayout(getContext(),null,com.google.android.material.R.attr.textInputOutlinedStyle);
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        DisplayMetrics metrics = getResources().getDisplayMetrics();
-        layoutParams.topMargin = (int) dpToPx(8,metrics);
-        fieldLayout.setLayoutParams(layoutParams);
-        fieldLayout.setHint("Passenger " + passengerCounter);
-        fieldLayout.setBoxBackgroundMode(TextInputLayout.BOX_BACKGROUND_OUTLINE);
-        fieldLayout.setEndIconMode(TextInputLayout.END_ICON_CUSTOM);
-        fieldLayout.setEndIconDrawable(ContextCompat.getDrawable(getContext(), R.drawable.minus));
-        fieldLayout.setId(View.generateViewId());
-
-        TextInputEditText editText = new TextInputEditText(fieldLayout.getContext());
-        LinearLayout.LayoutParams editTextParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        editText.setLayoutParams(editTextParams);
-        editText.setInputType(InputType.TYPE_CLASS_TEXT);
-        editText.setId(View.generateViewId());
-        int padding16dp = (int) dpToPx(16, metrics);
-        editText.setPadding(padding16dp, padding16dp, padding16dp, padding16dp);
-        fieldLayout.addView(editText);
-
-        fieldLayout.setEndIconOnClickListener(v -> {
-            fieldLayout.animate()
-                    .alpha(0f)
-                    .setDuration(300)
-                    .withEndAction(() -> {
-                        passengersContainer.removeView(fieldLayout);
-                        updatePassengerHints();
-                    })
-                    .start();
-        });
-        int addButtonIndex = passengersContainer.indexOfChild(addPassenger);
-        passengersContainer.addView(fieldLayout, addButtonIndex);
-        updatePassengerHints();
-    }
-
-    private void updatePassengerHints() {
-        int counter = 1;
-        for (int i = 0; i < passengersContainer.getChildCount(); i++) {
-            View view = passengersContainer.getChildAt(i);
-            if (view instanceof TextInputLayout && view.getId() != R.id.add_passenger_btn) {
-                TextInputLayout til = (TextInputLayout) view;
-                til.setHint("Passenger " + counter);
-                counter++;
-            }
+        public static RideOrder newInstance(String param1, String param2) {
+            return new RideOrder();
         }
-    }
 
-    private void showDateTimePicker() {
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            viewModel= new ViewModelProvider(this).get(RideOrderViewModel.class);
+            viewModel.init(MAPBOX_API_KEY);
+            org.osmdroid.config.Configuration.getInstance().setUserAgentValue(requireContext().getPackageName());
+        }
 
-        Calendar now = Calendar.getInstance();
-
-        CalendarConstraints constraints = new CalendarConstraints.Builder()
-                .setValidator(DateValidatorPointForward.now())
-                .build();
-
-        MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder.datePicker()
-                .setTitleText("Select date")
-                .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
-                .setCalendarConstraints(constraints)
-                .build();
-
-        datePicker.addOnPositiveButtonClickListener(selection -> {
-            MaterialTimePicker timePicker = new MaterialTimePicker.Builder()
-                    .setTimeFormat(TimeFormat.CLOCK_24H)
-                    .setHour(now.get(Calendar.HOUR_OF_DAY))
-                    .setMinute(now.get(Calendar.MINUTE))
-                    .setTitleText("Select time")
-                    .build();
-
-            timePicker.addOnPositiveButtonClickListener(v -> {
-                Calendar selectedDateTime = Calendar.getInstance();
-                selectedDateTime.setTimeInMillis(selection);
-                selectedDateTime.set(Calendar.HOUR_OF_DAY, timePicker.getHour());
-                selectedDateTime.set(Calendar.MINUTE, timePicker.getMinute());
-
-                if (selectedDateTime.getTimeInMillis() < System.currentTimeMillis()) {
-                    Toast.makeText(getContext(), "Selected time is in the past", Toast.LENGTH_SHORT).show();
-                    return;
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            // Inflate the layout for this fragment
+            View view= inflater.inflate(R.layout.fragment_ride_order, container, false);
+            viewModel.getSuggestionsData().observe(getViewLifecycleOwner(), response -> {
+                if (response != null && response.getFeatures() != null) {
+                    updateDropdown(response);
                 }
+            });
+            viewModel.getRouteData().observe(getViewLifecycleOwner(), calculatedRoute -> {
+                if (calculatedRoute != null) {
+                    List<org.osmdroid.util.GeoPoint> osmPoints = new ArrayList<>();
+                    for (com.ognjen.fleetforge.model.GeoPoint point : calculatedRoute.getCoordinates()) {
+                        osmPoints.add(new org.osmdroid.util.GeoPoint(
+                                point.getLatitude(),
+                                point.getLongitude()
+                        ));
+                    }
+                    mapManager.drawRoute(osmPoints, 0xFFFF9900);
+                }
+            });
+            mapView=view.findViewById(R.id.map_view);
+            mapManager = new MapManager(mapView, requireContext());
+            mapManager.centerOnDefault();
+            bottomSheet=view.findViewById(R.id.bottom_sheet);
+            BottomSheetBehavior<LinearLayout> behavior= BottomSheetBehavior.from(bottomSheet);
+            startLocation=view.findViewById(R.id.start_location);
+            endLocation=view.findViewById(R.id.end_destination);
+            waypointsContainer=view.findViewById(R.id.waypointsContainer);
+            addWaypointBtn=view.findViewById(R.id.add_waypoint_btn);
+            passengerNum=view.findViewById(R.id.passengerNum);
+            passengersContainer=view.findViewById(R.id.passengersContainer);
+            addPassenger=view.findViewById(R.id.add_passenger_btn);
+            dateTime=view.findViewById(R.id.dateTime);
+            now=view.findViewById(R.id.now);
+            vehicleType=view.findViewById(R.id.vehicleTypeSpinner);
+            ArrayAdapter<String> adapter=  new ArrayAdapter<>(
+                    getContext(),
+                    android.R.layout.simple_dropdown_item_1line,
+                    getResources().getStringArray(R.array.vehicle_types)
+            );
+            vehicleType.setAdapter(adapter);
+            babySeat=view.findViewById(R.id.babySeatCB);
+            petFriendly=view.findViewById(R.id.petFriendlyCB);
+            orderBtn=view.findViewById(R.id.orderBtn);
 
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.getDefault());
-                dateTime.setText(sdf.format(selectedDateTime.getTime()));
+            addWaypointBtn.setOnClickListener(v -> {
+                addWayPointField();
             });
 
-            timePicker.show(getChildFragmentManager(), "TIME_PICKER");
-        });
+            addPassenger.setOnClickListener(v -> {
+                addPassengerField();
+            });
+            now.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if(isChecked){
+                    dateTime.setEnabled(false);
+                    dateTime.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.text_primary));
+                }else{
+                    dateTime.setEnabled(true);
+                    dateTime.setBackgroundColor(Color.WHITE);
+                }
+            });
+            dateTime.setFocusable(false);
+            dateTime.setClickable(true);
+            dateTime.setOnClickListener(v -> showDateTimePicker());
 
-        datePicker.show(getChildFragmentManager(), "DATE_PICKER");
-    }
+            startLocation.setOnFocusChangeListener((v, hasFocus) -> {
+                if(hasFocus){
+                    behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                }
+            });
+            mapView.setOnClickListener(v -> {
+                behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            });
 
-    private void updateDropdown(PhotonResponse response) {
-        View focusedView = getActivity().getCurrentFocus();
-        if (!(focusedView instanceof MaterialAutoCompleteTextView)) return;
+            setupAutocomplete(startLocation);
+            setupAutocomplete(endLocation);
+            startLocation.setOnItemClickListener((parent, view1, position, id)->{
+                PhotonResponse.Feature selected = (PhotonResponse.Feature) parent.getItemAtPosition(position);
 
-        MaterialAutoCompleteTextView field = (MaterialAutoCompleteTextView) focusedView;
+                double lat = selected.getGeometry().getLat();
+                double lon = selected.getGeometry().getLon();
+                String name = selected.getProperties().getDisplayName();
+                if (startLocation.getTag() instanceof Marker) {
+                    mapManager.removeMarker((Marker) startLocation.getTag());
+                }
+                Marker newMarker = mapManager.addMarker(lat, lon, name, R.drawable.ic_map_point);
+                startLocation.setTag(newMarker);
+                startLocation.setText(name, false);
+                mapView.getController().animateTo(new org.osmdroid.util.GeoPoint(lat, lon));
+                try {
+                    drawRoute();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
 
-        ArrayAdapter<PhotonResponse.Feature> adapter = new ArrayAdapter<PhotonResponse.Feature>(
-                getContext(), android.R.layout.simple_dropdown_item_1line, response.getFeatures()) {
-            @Override
-            public View getView(int pos, View convert, ViewGroup parent) {
-                TextView tv = (TextView) super.getView(pos, convert, parent);
-                tv.setText(getItem(pos).getProperties().getDisplayName());
-                return tv;
+            endLocation.setOnItemClickListener((parent, view1, position, id)->{
+                PhotonResponse.Feature selected = (PhotonResponse.Feature) parent.getItemAtPosition(position);
+
+                double lat = selected.getGeometry().getLat();
+                double lon = selected.getGeometry().getLon();
+                String name = selected.getProperties().getDisplayName();
+                if (endLocation.getTag() instanceof Marker) {
+                    mapManager.removeMarker((Marker) endLocation.getTag());
+                }
+                Marker newMarker = mapManager.addMarker(lat, lon, name, R.drawable.ic_map_point);
+                endLocation.setTag(newMarker);
+                endLocation.setText(name, false);
+                mapView.getController().animateTo(new org.osmdroid.util.GeoPoint(lat, lon));
+                try {
+                    drawRoute();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+
+            orderBtn.setOnClickListener(v -> {
+                if(canOrder()){
+                    ArrayList<WaypointRideCreateDTO> coordinates= new ArrayList<>();
+                    WaypointRideCreateDTO startWaypoint= new WaypointRideCreateDTO();
+                    Marker startMarker= (Marker) startLocation.getTag();
+                    String startAddress= startMarker.getTitle();
+                    com.ognjen.fleetforge.model.GeoPoint startPoint= new com.ognjen.fleetforge.model.GeoPoint(startMarker.getPosition().getLatitude(),startMarker.getPosition().getLongitude());
+                    startWaypoint.setAddress(startAddress);
+                    startWaypoint.setLocation(startPoint);
+                    startWaypoint.setOrderIndex(0);
+                    coordinates.add(startWaypoint);
+
+                    for(int i=0;i<waypointsContainer.getChildCount();i++){
+                        View viewLayout= waypointsContainer.getChildAt(i);
+                        if (viewLayout instanceof TextInputLayout) {
+                            EditText et = ((TextInputLayout) viewLayout).getEditText();
+                            if(et.getTag()!=null) {
+                                WaypointRideCreateDTO waypoint= new WaypointRideCreateDTO();
+                                Marker waypointMarker= (Marker) et.getTag();
+                                String waypointAddress= waypointMarker.getTitle();
+                                com.ognjen.fleetforge.model.GeoPoint waypointGeoPoint= new com.ognjen.fleetforge.model.GeoPoint(waypointMarker.getPosition().getLatitude(),waypointMarker.getPosition().getLongitude());
+                                waypoint.setAddress(waypointAddress);
+                                waypoint.setLocation(waypointGeoPoint);
+                                waypoint.setOrderIndex(i+1);
+                                coordinates.add(waypoint);
+                            }
+                        }
+                    }
+
+                    WaypointRideCreateDTO endWaypoint= new WaypointRideCreateDTO();
+                    Marker endMarker= (Marker) endLocation.getTag();
+                    String endAddress= endMarker.getTitle();
+                    com.ognjen.fleetforge.model.GeoPoint endPoint= new com.ognjen.fleetforge.model.GeoPoint(endMarker.getPosition().getLatitude(),endMarker.getPosition().getLongitude());
+                    endWaypoint.setAddress(endAddress);
+                    endWaypoint.setLocation(endPoint);
+                    endWaypoint.setOrderIndex(waypointsContainer.getChildCount());
+                    coordinates.add(endWaypoint);
+
+                    DateTimeFormatter format= DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
+                    LocalDateTime startTime= LocalDateTime.now();
+                    if(!now.isChecked()){
+                        startTime=LocalDateTime.parse(dateTime.getText().toString(),format);
+                    }
+                    ArrayList<String> passengerEmails= new ArrayList<>();
+                    for(int i=0;i<passengersContainer.getChildCount();i++){
+                        View viewLayout= passengersContainer.getChildAt(i);
+                        if (viewLayout instanceof TextInputLayout) {
+                            EditText et = ((TextInputLayout) viewLayout).getEditText();
+                            if(!et.getText().toString().equals("")){
+                                passengerEmails.add(et.getText().toString());
+                            }
+                        }
+                    }
+
+                    viewModel.createRide(coordinates,Integer.valueOf(passengerNum.getText().toString())
+                    , startTime,now.isChecked(),passengerEmails, com.ognjen.fleetforge.enums.VehicleType.valueOf(vehicleType.getText().toString().toUpperCase())
+                    ,babySeat.isChecked(),petFriendly.isChecked(),startAddress,endAddress,viewModel.getRouteData().getValue().getDistanceKm()
+                    ,viewModel.getRouteData().getValue().getEstimatedMinutes()).observe(getViewLifecycleOwner(),response->{
+                        if(response.isCreated()){
+                            Toast.makeText(getContext(),"Ride ordered successfully!", Toast.LENGTH_SHORT).show();
+                            resetForm();
+                        }else{
+                            Toast.makeText(getContext(),"Ride order failed, there is no available drivers", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+
+                }else{
+                    Toast.makeText(getContext(),"Form is not valid. Check if all text fields are filled and if all waypoints are selected from dropdown list.",
+                            Toast.LENGTH_LONG).show();
+                }
+            });
+
+            if(getArguments() != null) {
+                populateFromFavoriteRoute();
             }
-
-        };
-
-        field.setAdapter(adapter);
-        if(!response.getFeatures().isEmpty()) {
-            field.showDropDown();
+            return view;
         }
-    }
-    private void drawRoute() throws IOException {
-        if(startLocation.getTag()!=null&&endLocation.getTag()!=null){
-            List<com.ognjen.fleetforge.model.GeoPoint> addresses= new ArrayList<>();
-            Marker startMarker= (Marker)startLocation.getTag();
-            com.ognjen.fleetforge.model.GeoPoint startPoint= new com.ognjen.fleetforge.model.GeoPoint(startMarker.getPosition().getLatitude()
-            ,startMarker.getPosition().getLongitude());
-            addresses.add(startPoint);
+        private void setupAutocomplete(MaterialAutoCompleteTextView field) {
+            field.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void afterTextChanged(Editable s) {
+                    searchHandler.removeCallbacks(searchRunnable);
+                    if (s.length() > 2) {
+                        searchRunnable = () -> viewModel.fetchSuggestions(s.toString());
+                        searchHandler.postDelayed(searchRunnable, 500);
+                    }else if(s.length()==0){
+                        if(field.getTag()!=null){
+                            mapManager.removeMarker((Marker)field.getTag());
+                            field.setTag(null);
+                            mapManager.clearRoute();
+                        }
+                    }
+                }
+
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                }
+            });
+        }
+        private void addWayPointField(){
+            TextInputLayout fieldLayout= new TextInputLayout(getContext(),null,com.google.android.material.R.attr.textInputOutlinedStyle);
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            DisplayMetrics metrics = getResources().getDisplayMetrics();
+            layoutParams.topMargin = (int) dpToPx(8,metrics);
+            fieldLayout.setLayoutParams(layoutParams);
+            fieldLayout.setHint("Waypoint " + waypointCounter);
+            fieldLayout.setBoxBackgroundMode(TextInputLayout.BOX_BACKGROUND_OUTLINE);
+            fieldLayout.setEndIconMode(TextInputLayout.END_ICON_CUSTOM);
+            fieldLayout.setEndIconDrawable(ContextCompat.getDrawable(getContext(), R.drawable.minus));
+            fieldLayout.setId(View.generateViewId());
+
+            MaterialAutoCompleteTextView editText = new MaterialAutoCompleteTextView(fieldLayout.getContext());
+            LinearLayout.LayoutParams editTextParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            editText.setLayoutParams(editTextParams);
+            editText.setInputType(InputType.TYPE_CLASS_TEXT);
+            editText.setId(View.generateViewId());
+            int padding16dp = (int) dpToPx(16, metrics);
+            editText.setPadding(padding16dp, padding16dp, padding16dp, padding16dp);
+            setupAutocomplete(editText);
+            editText.setOnItemClickListener((parent, view1, position, id) -> {
+                PhotonResponse.Feature selected = (PhotonResponse.Feature) parent.getItemAtPosition(position);
+                String displayName = selected.getProperties().getDisplayName();
+                editText.setText(displayName, false);
+                double lat = selected.getGeometry().getLat();
+                double lon = selected.getGeometry().getLon();
+                String name = selected.getProperties().getDisplayName();
+                if (editText.getTag() instanceof org.osmdroid.views.overlay.Marker) {
+                    org.osmdroid.views.overlay.Marker oldMarker = (org.osmdroid.views.overlay.Marker) editText.getTag();
+                    mapView.getOverlays().remove(oldMarker);
+                }
+
+                org.osmdroid.views.overlay.Marker newMarker = mapManager.addMarker(lat, lon, name, R.drawable.ic_map_point);
+
+                editText.setTag(newMarker);
+
+                editText.setText(name, false);
+                mapView.getController().animateTo(new org.osmdroid.util.GeoPoint(lat, lon));
+                try {
+                    drawRoute();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            fieldLayout.addView(editText);
+
+            fieldLayout.setEndIconOnClickListener(v -> {
+                mapManager.removeMarker((Marker) editText.getTag());
+                mapManager.clearRoute();
+                fieldLayout.animate()
+                        .alpha(0f)
+                        .setDuration(300)
+                        .withEndAction(() -> {
+                            waypointsContainer.removeView(fieldLayout);
+                            updateWaypointHints();
+                            try {
+                                drawRoute();
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                        })
+                        .start();
+            });
+            int addButtonIndex = waypointsContainer.indexOfChild(addWaypointBtn);
+            waypointsContainer.addView(fieldLayout, addButtonIndex);
+            updateWaypointHints();
+        }
+        private void updateWaypointHints() {
+            int counter = 1;
             for (int i = 0; i < waypointsContainer.getChildCount(); i++) {
                 View view = waypointsContainer.getChildAt(i);
+                if (view instanceof TextInputLayout && view.getId() != R.id.add_waypoint_btn) {
+                    TextInputLayout til = (TextInputLayout) view;
+                    til.setHint("Waypoint " + counter);
+                    counter++;
+                }
+            }
+        }
+
+        private void addPassengerField(){
+            TextInputLayout fieldLayout= new TextInputLayout(getContext(),null,com.google.android.material.R.attr.textInputOutlinedStyle);
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            DisplayMetrics metrics = getResources().getDisplayMetrics();
+            layoutParams.topMargin = (int) dpToPx(8,metrics);
+            fieldLayout.setLayoutParams(layoutParams);
+            fieldLayout.setHint("Passenger " + passengerCounter);
+            fieldLayout.setBoxBackgroundMode(TextInputLayout.BOX_BACKGROUND_OUTLINE);
+            fieldLayout.setEndIconMode(TextInputLayout.END_ICON_CUSTOM);
+            fieldLayout.setEndIconDrawable(ContextCompat.getDrawable(getContext(), R.drawable.minus));
+            fieldLayout.setId(View.generateViewId());
+
+            TextInputEditText editText = new TextInputEditText(fieldLayout.getContext());
+            LinearLayout.LayoutParams editTextParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            editText.setLayoutParams(editTextParams);
+            editText.setInputType(InputType.TYPE_CLASS_TEXT);
+            editText.setId(View.generateViewId());
+            int padding16dp = (int) dpToPx(16, metrics);
+            editText.setPadding(padding16dp, padding16dp, padding16dp, padding16dp);
+            fieldLayout.addView(editText);
+
+            fieldLayout.setEndIconOnClickListener(v -> {
+                fieldLayout.animate()
+                        .alpha(0f)
+                        .setDuration(300)
+                        .withEndAction(() -> {
+                            passengersContainer.removeView(fieldLayout);
+                            updatePassengerHints();
+                        })
+                        .start();
+            });
+            int addButtonIndex = passengersContainer.indexOfChild(addPassenger);
+            passengersContainer.addView(fieldLayout, addButtonIndex);
+            updatePassengerHints();
+        }
+
+        private void updatePassengerHints() {
+            int counter = 1;
+            for (int i = 0; i < passengersContainer.getChildCount(); i++) {
+                View view = passengersContainer.getChildAt(i);
+                if (view instanceof TextInputLayout && view.getId() != R.id.add_passenger_btn) {
+                    TextInputLayout til = (TextInputLayout) view;
+                    til.setHint("Passenger " + counter);
+                    counter++;
+                }
+            }
+        }
+
+        private void showDateTimePicker() {
+
+            Calendar now = Calendar.getInstance();
+
+            CalendarConstraints constraints = new CalendarConstraints.Builder()
+                    .setValidator(DateValidatorPointForward.now())
+                    .build();
+
+            MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder.datePicker()
+                    .setTitleText("Select date")
+                    .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+                    .setCalendarConstraints(constraints)
+                    .build();
+
+            datePicker.addOnPositiveButtonClickListener(selection -> {
+                MaterialTimePicker timePicker = new MaterialTimePicker.Builder()
+                        .setTimeFormat(TimeFormat.CLOCK_24H)
+                        .setHour(now.get(Calendar.HOUR_OF_DAY))
+                        .setMinute(now.get(Calendar.MINUTE))
+                        .setTitleText("Select time")
+                        .build();
+
+                timePicker.addOnPositiveButtonClickListener(v -> {
+                    Calendar selectedDateTime = Calendar.getInstance();
+                    selectedDateTime.setTimeInMillis(selection);
+                    selectedDateTime.set(Calendar.HOUR_OF_DAY, timePicker.getHour());
+                    selectedDateTime.set(Calendar.MINUTE, timePicker.getMinute());
+
+                    if (selectedDateTime.getTimeInMillis() < System.currentTimeMillis()) {
+                        Toast.makeText(getContext(), "Selected time is in the past", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.getDefault());
+                    dateTime.setText(sdf.format(selectedDateTime.getTime()));
+                });
+
+                timePicker.show(getChildFragmentManager(), "TIME_PICKER");
+            });
+
+            datePicker.show(getChildFragmentManager(), "DATE_PICKER");
+        }
+
+        private void updateDropdown(PhotonResponse response) {
+            View focusedView = getActivity().getCurrentFocus();
+            if (!(focusedView instanceof MaterialAutoCompleteTextView)) return;
+
+            MaterialAutoCompleteTextView field = (MaterialAutoCompleteTextView) focusedView;
+
+            ArrayAdapter<PhotonResponse.Feature> adapter = new ArrayAdapter<PhotonResponse.Feature>(
+                    getContext(), android.R.layout.simple_dropdown_item_1line, response.getFeatures()) {
+                @Override
+                public View getView(int pos, View convert, ViewGroup parent) {
+                    TextView tv = (TextView) super.getView(pos, convert, parent);
+                    tv.setText(getItem(pos).getProperties().getDisplayName());
+                    return tv;
+                }
+
+            };
+
+            field.setAdapter(adapter);
+            if(!response.getFeatures().isEmpty()) {
+                field.showDropDown();
+            }
+        }
+        private void drawRoute() throws IOException {
+            if(startLocation.getTag()!=null&&endLocation.getTag()!=null){
+                List<com.ognjen.fleetforge.model.GeoPoint> addresses= new ArrayList<>();
+                Marker startMarker= (Marker)startLocation.getTag();
+                com.ognjen.fleetforge.model.GeoPoint startPoint= new com.ognjen.fleetforge.model.GeoPoint(startMarker.getPosition().getLatitude()
+                ,startMarker.getPosition().getLongitude());
+                addresses.add(startPoint);
+                for (int i = 0; i < waypointsContainer.getChildCount(); i++) {
+                    View view = waypointsContainer.getChildAt(i);
+                    if (view instanceof TextInputLayout) {
+                        EditText et = ((TextInputLayout) view).getEditText();
+                        if (et != null && et.getTag() instanceof Marker) {
+                            Marker waypointMarker= (Marker) et.getTag();
+                            com.ognjen.fleetforge.model.GeoPoint waypoint= new com.ognjen.fleetforge.model.GeoPoint(waypointMarker.getPosition().getLatitude()
+                                    ,waypointMarker.getPosition().getLongitude());
+                            addresses.add(waypoint);
+                        }
+                    }
+                }
+                Marker endMarker= (Marker)endLocation.getTag();
+                com.ognjen.fleetforge.model.GeoPoint endpoint= new com.ognjen.fleetforge.model.GeoPoint(endMarker.getPosition().getLatitude()
+                        ,endMarker.getPosition().getLongitude());
+                addresses.add(endpoint);
+                viewModel.drawRoute(addresses);
+            }
+        }
+
+        private boolean canOrder(){
+            boolean allWaypointFieldsHaveTags=true;
+            for(int i=0;i<waypointsContainer.getChildCount();i++){
+                View view= waypointsContainer.getChildAt(i);
                 if (view instanceof TextInputLayout) {
                     EditText et = ((TextInputLayout) view).getEditText();
-                    if (et != null && et.getTag() instanceof Marker) {
-                        Marker waypointMarker= (Marker) et.getTag();
-                        com.ognjen.fleetforge.model.GeoPoint waypoint= new com.ognjen.fleetforge.model.GeoPoint(waypointMarker.getPosition().getLatitude()
-                                ,waypointMarker.getPosition().getLongitude());
-                        addresses.add(waypoint);
+                    if(et.getTag()==null) {
+                        allWaypointFieldsHaveTags=false;
+                        break;
                     }
                 }
             }
-            Marker endMarker= (Marker)endLocation.getTag();
-            com.ognjen.fleetforge.model.GeoPoint endpoint= new com.ognjen.fleetforge.model.GeoPoint(endMarker.getPosition().getLatitude()
-                    ,endMarker.getPosition().getLongitude());
-            addresses.add(endpoint);
-            viewModel.drawRoute(addresses);
-        }
-    }
-
-    private boolean canOrder(){
-        boolean allWaypointFieldsHaveTags=true;
-        for(int i=0;i<waypointsContainer.getChildCount();i++){
-            View view= waypointsContainer.getChildAt(i);
-            if (view instanceof TextInputLayout) {
-                EditText et = ((TextInputLayout) view).getEditText();
-                if(et.getTag()==null) {
-                    allWaypointFieldsHaveTags=false;
-                    break;
-                }
+            if(!allWaypointFieldsHaveTags){
+                return false;
             }
-        }
-        if(!allWaypointFieldsHaveTags){
+            if(startLocation.getTag()!=null
+                    &&endLocation.getTag()!=null
+            && !passengerNum.getText().toString().equals("")
+            && (!dateTime.getText().toString().equals("")||now.isChecked())
+            && !vehicleType.getText().toString().equals("")){
+                return true;
+            }
             return false;
         }
-        if(startLocation.getTag()!=null
-                &&endLocation.getTag()!=null
-        && !passengerNum.getText().toString().equals("")
-        && (!dateTime.getText().toString().equals("")||now.isChecked())
-        && !vehicleType.getText().toString().equals("")){
-            return true;
+        private void resetForm(){
+            startLocation.setText("");
+            endLocation.setText("");
+            vehicleType.setText("",false);
+            clearAllPassengers();
+            clearAllWaypoints();
+            passengerNum.setText("");
+            dateTime.setText("");
+            dateTime.setEnabled(true);
+            now.setChecked(false);
+            babySeat.setChecked(false);
+            petFriendly.setChecked(false);
+
         }
-        return false;
-    }
-    private void resetForm(){
-        startLocation.setText("");
-        endLocation.setText("");
-        vehicleType.setText("",false);
-        clearAllPassengers();
-        clearAllWaypoints();
-        passengerNum.setText("");
-        dateTime.setText("");
-        dateTime.setEnabled(true);
-        now.setChecked(false);
-        babySeat.setChecked(false);
-        petFriendly.setChecked(false);
 
-    }
+        private void clearAllWaypoints() {
+            List<View> waypointsToRemove = new ArrayList<>();
 
-    private void clearAllWaypoints() {
-        List<View> waypointsToRemove = new ArrayList<>();
+            for (int i = 0; i < waypointsContainer.getChildCount(); i++) {
+                View view = waypointsContainer.getChildAt(i);
+                if (view instanceof TextInputLayout && view.getId() != R.id.add_waypoint_btn) {
+                    waypointsToRemove.add(view);
+                }
+            }
 
-        for (int i = 0; i < waypointsContainer.getChildCount(); i++) {
-            View view = waypointsContainer.getChildAt(i);
-            if (view instanceof TextInputLayout && view.getId() != R.id.add_waypoint_btn) {
-                waypointsToRemove.add(view);
+            for (View view : waypointsToRemove) {
+                TextInputLayout til = (TextInputLayout) view;
+                EditText et = til.getEditText();
+                if (et != null && et.getTag() instanceof Marker) {
+                    mapManager.removeMarker((Marker) et.getTag());
+                }
+
+                waypointsContainer.removeView(til);
+            }
+
+            waypointCounter = 0;
+            updateWaypointHints();
+            mapManager.clearRoute();
+            try {
+                drawRoute();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        private void clearAllPassengers() {
+            List<View> passengersToRemove = new ArrayList<>();
+            for (int i = 0; i < passengersContainer.getChildCount(); i++) {
+                View view = passengersContainer.getChildAt(i);
+                if (view instanceof TextInputLayout && view.getId() != R.id.add_passenger_btn) {
+                    passengersToRemove.add(view);
+                }
+            }
+            for (View view : passengersToRemove) {
+                passengersContainer.removeView(view);
+            }
+            passengerCounter = 0;
+            updatePassengerHints();
+        }
+
+        private void populateFromFavoriteRoute(){
+            Bundle args = getArguments();
+            String startAddress = args.getString("start");
+            String endAddress = args.getString("end");
+            ArrayList<WayPoint> waypoints = (ArrayList<WayPoint>) args.getSerializable("waypoints");
+            if(startAddress != null) {
+                searchAndSetLocation(startAddress, startLocation, () -> {
+                    if(endAddress != null) {
+                        searchAndSetLocation(endAddress, endLocation, () -> {
+                            if(waypoints != null && !waypoints.isEmpty()) {
+                                addWaypointsFromFavorite(waypoints);
+                            } else {
+                                try {
+                                    drawRoute();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                    }
+                });
             }
         }
 
-        for (View view : waypointsToRemove) {
-            TextInputLayout til = (TextInputLayout) view;
-            EditText et = til.getEditText();
-            if (et != null && et.getTag() instanceof Marker) {
-                mapManager.removeMarker((Marker) et.getTag());
-            }
+        private void searchAndSetLocation(String address, MaterialAutoCompleteTextView field, Runnable onComplete){
+            PhotonResponse staleData = viewModel.getSuggestionsData().getValue();
+            viewModel.getSuggestionsData().observe(getViewLifecycleOwner(), new androidx.lifecycle.Observer<PhotonResponse>() {
+                @Override
+                public void onChanged(PhotonResponse response) {
+                    if (response == staleData) {
+                        return;
+                    }
+                    if (response != null && response.getFeatures() != null && !response.getFeatures().isEmpty()) {
+                        PhotonResponse.Feature firstResult = response.getFeatures().get(0);
+                        double lat = firstResult.getGeometry().getLat();
+                        double lon = firstResult.getGeometry().getLon();
+                        String name = firstResult.getProperties().getDisplayName();
 
-            waypointsContainer.removeView(til);
+                        if(field.getTag() instanceof Marker) {
+                            mapManager.removeMarker((Marker) field.getTag());
+                        }
+
+                        Marker marker = mapManager.addMarker(lat, lon, name, R.drawable.ic_map_point);
+                        field.setTag(marker);
+                        field.setText(name, false);
+
+                        viewModel.getSuggestionsData().removeObserver(this);
+
+                        if(onComplete != null) {
+                            onComplete.run();
+                        }
+                    }
+                }
+                    });
+
+                viewModel.fetchSuggestions(address);
         }
 
-        waypointCounter = 0;
-        updateWaypointHints();
-        mapManager.clearRoute();
-        try {
-            drawRoute();
-        } catch (IOException e) {
-            e.printStackTrace();
+        private void addWaypointsFromFavorite(List<WayPoint> waypoints) {
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                for(WayPoint wp : waypoints) {
+                    addWayPointFieldWithData(wp.getAddress(),
+                            wp.getLocation().getLatitude(),
+                            wp.getLocation().getLongitude());
+                }
+                try {
+                    drawRoute();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }, 300);
+        }
+        private void addWayPointFieldWithData(String address, double lat, double lon){
+            TextInputLayout fieldLayout = new TextInputLayout(getContext(), null,
+                    com.google.android.material.R.attr.textInputOutlinedStyle);
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            DisplayMetrics metrics = getResources().getDisplayMetrics();
+            layoutParams.topMargin = (int) dpToPx(8, metrics);
+            fieldLayout.setLayoutParams(layoutParams);
+            fieldLayout.setHint("Waypoint " + (waypointCounter + 1));
+            fieldLayout.setBoxBackgroundMode(TextInputLayout.BOX_BACKGROUND_OUTLINE);
+            fieldLayout.setEndIconMode(TextInputLayout.END_ICON_CUSTOM);
+            fieldLayout.setEndIconDrawable(ContextCompat.getDrawable(getContext(), R.drawable.minus));
+            fieldLayout.setId(View.generateViewId());
+
+            MaterialAutoCompleteTextView editText = new MaterialAutoCompleteTextView(fieldLayout.getContext());
+            LinearLayout.LayoutParams editTextParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            editText.setLayoutParams(editTextParams);
+            editText.setInputType(InputType.TYPE_CLASS_TEXT);
+            editText.setId(View.generateViewId());
+            int padding16dp = (int) dpToPx(16, metrics);
+            editText.setPadding(padding16dp, padding16dp, padding16dp, padding16dp);
+            setupAutocomplete(editText);
+
+
+            Marker marker = mapManager.addMarker(lat, lon, address, R.drawable.ic_map_point);
+            editText.setTag(marker);
+            editText.setText(address, false);
+
+            editText.setOnItemClickListener((parent, view1, position, id) -> {
+                PhotonResponse.Feature selected = (PhotonResponse.Feature) parent.getItemAtPosition(position);
+                handleLocationSelection(editText, selected);
+            });
+
+            fieldLayout.addView(editText);
+            fieldLayout.setEndIconOnClickListener(v -> {
+                mapManager.removeMarker((Marker) editText.getTag());
+                mapManager.clearRoute();
+                fieldLayout.animate()
+                        .alpha(0f)
+                        .setDuration(300)
+                        .withEndAction(() -> {
+                            waypointsContainer.removeView(fieldLayout);
+                            updateWaypointHints();
+                            try {
+                                drawRoute();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        })
+                        .start();
+            });
+
+            int addButtonIndex = waypointsContainer.indexOfChild(addWaypointBtn);
+            waypointsContainer.addView(fieldLayout, addButtonIndex);
+            waypointCounter++;
+            updateWaypointHints();
+        }
+
+        private void handleLocationSelection(MaterialAutoCompleteTextView field, PhotonResponse.Feature selected) {
+            double lat = selected.getGeometry().getLat();
+            double lon = selected.getGeometry().getLon();
+            String name = selected.getProperties().getDisplayName();
+            if (field.getTag() instanceof Marker) {
+                mapManager.removeMarker((Marker) field.getTag());
+            }
+            Marker newMarker = mapManager.addMarker(lat, lon, name, R.drawable.ic_map_point);
+            field.setTag(newMarker);
+            field.setText(name, false);
+            mapView.getController().animateTo(new GeoPoint(lat, lon));
+            try {
+                drawRoute();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
-    private void clearAllPassengers() {
-        List<View> passengersToRemove = new ArrayList<>();
-        for (int i = 0; i < passengersContainer.getChildCount(); i++) {
-            View view = passengersContainer.getChildAt(i);
-            if (view instanceof TextInputLayout && view.getId() != R.id.add_passenger_btn) {
-                passengersToRemove.add(view);
-            }
-        }
-        for (View view : passengersToRemove) {
-            passengersContainer.removeView(view);
-        }
-        passengerCounter = 0;
-        updatePassengerHints();
-    }
-}
