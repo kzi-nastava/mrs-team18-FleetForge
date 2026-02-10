@@ -8,7 +8,7 @@
       <!-- Card (Driver/Passenger Info) -->
       <div class="info-card">
         <div class="card-avatar-block">
-          <img [src]="cardInfo.profileImage" alt="Profile" class="card-avatar" />
+          <img [src]="'http://localhost:8080' + cardInfo.profileImage" alt="Profile" class="card-avatar" />
         </div>
         <div class="card-details">
           <span class="card-label">{{ cardInfo.label }}</span>

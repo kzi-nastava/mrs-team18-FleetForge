@@ -1,6 +1,7 @@
 package com.team18.FleetForge.controller.user;
 
 
+import com.team18.FleetForge.dto.CurrentUserDTO;
 import com.team18.FleetForge.model.users.User;
 import com.team18.FleetForge.service.ProfilePictureService;
 import com.team18.FleetForge.service.users.UserService;
@@ -23,6 +24,22 @@ public class UserController {
 
     private final ProfilePictureService profilePictureService;
     private final UserService userService;
+
+    @GetMapping("/current")
+    public ResponseEntity<CurrentUserDTO> getCurrentUser(Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        if(user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        CurrentUserDTO dto = new CurrentUserDTO();
+        dto.setFirstName(user.getFirstName());
+        dto.setLastName(user.getLastName());
+        dto.setProfileImage(user.getProfilePicture());
+        dto.setRole(user.getRole().name());
+
+        return ResponseEntity.ok(dto);
+    }
 
     /**
      * POST /api/users/profile-picture

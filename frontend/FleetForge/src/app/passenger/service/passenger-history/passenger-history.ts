@@ -53,6 +53,7 @@ export interface PassengerRideDetailsDto {
     firstName: string;
     lastName: string;
     phoneNumber: string;
+    profileImage: string;
   };
   hasInconsistencies: boolean;
   inconsistencies: InconsistencyReportDto[];

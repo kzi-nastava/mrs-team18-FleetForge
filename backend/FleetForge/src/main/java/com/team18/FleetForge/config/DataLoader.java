@@ -253,7 +253,7 @@ public class DataLoader implements CommandLineRunner {
                 LocalDateTime.now().plusDays(5).withHour(9).withMinute(0),
                 null,
                 4.8, 18.0, 760.0,
-                RideStatus.CANCELLED, false, null, null
+                RideStatus.CANCELLED, false, RideActor.PASSENGER, null
         );
         rideRepository.save(ride9);
 

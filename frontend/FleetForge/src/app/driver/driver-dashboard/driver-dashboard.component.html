@@ -79,7 +79,7 @@
         <div class="ride-card" *ngFor="let ride of upcomingRides">
           <div class="ride-header">
             <div class="passenger-info">
-              <img [src]="ride.passengerImage" alt="Passenger" class="passenger-avatar">
+              <img [src]="'http://localhost:8080' + ride.passengerImage" alt="Passenger" class="passenger-avatar">
               <div class="passenger-details">
                 <span class="passenger-name">{{ ride.passengerName }}</span>
                 <span class="ride-time">{{ formatTime(ride.startTime) }} • {{ getTimeUntilRide(ride.startTime) }}</span>
