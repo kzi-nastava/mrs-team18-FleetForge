@@ -6,6 +6,7 @@ import { VehicleService } from '../../shared/services/vehicle.service';
 import { VehicleLocationDTO } from '../../shared/models/vehicle.model';
 import { RideFavoriteRoutesDTO } from '../../shared/dtos/ride.dtos';
 import { PassengerFavorite } from '../service/passenger-favorite/passenger-favorite';
+import { RideService, ScheduledRideDto } from '../../shared/services/ride.service';
 
 @Component({
   selector: 'app-passenger-dashboard',
@@ -21,24 +22,15 @@ import { PassengerFavorite } from '../service/passenger-favorite/passenger-favor
 export class PassengerDashboardComponent implements OnInit {
 
   vehicles: VehicleLocationDTO[] = [];
-
-  scheduledRides = [
-    {
-      date: '24 JAN, 18:30',
-      from: 'Bulevar oslobođenja 12',
-      to: 'Fruškogorska 4'
-    },
-    {
-      date: '26 JAN, 09:00',
-      from: 'Cara Dušana 45',
-      to: 'Airport'
-    }
-  ];
+  
+  scheduledRides: ScheduledRideDto[] = [];
+  isLoadingScheduled = false;
 
   favoriteRoutes: WritableSignal<RideFavoriteRoutesDTO[]> = signal<RideFavoriteRoutesDTO[]>([]);
 
   constructor(
     private vehicleService: VehicleService,
+    private rideService: RideService,
     private cdr: ChangeDetectorRef,
     private router: Router,
     private passengerFavorite: PassengerFavorite
@@ -46,8 +38,39 @@ export class PassengerDashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadVehicles();
+    this.loadScheduledRides();
+
     this.passengerFavorite.getFavoriteRoutes().subscribe(routes => {
       this.favoriteRoutes.set(routes);
+    });
+  }
+
+  private loadScheduledRides(): void {
+    this.isLoadingScheduled = true;
+
+    // request only 2 newest scheduled rides
+    this.rideService.getScheduledRides(0, 2).subscribe({
+      next: (res) => {
+        this.scheduledRides = res.content;
+        this.isLoadingScheduled = false;
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        console.error('Failed to load scheduled rides', err);
+        this.isLoadingScheduled = false;
+      }
+    });
+  }
+
+  cancelRide(rideId: number): void {
+    this.rideService.cancelRide(rideId).subscribe(() => {
+      this.loadScheduledRides(); // refresh after cancel
+    });
+  }
+
+  orderRide(route: RideFavoriteRoutesDTO): void {
+    this.router.navigate(['/passenger/passenger-home'], {
+      state: { favoriteRoute: route }
     });
   }
 
@@ -61,9 +84,6 @@ export class PassengerDashboardComponent implements OnInit {
         console.error('Failed to load vehicles', err);
       }
     });
-  }
-  orderRide(route: RideFavoriteRoutesDTO): void {
-    this.router.navigate(['/passenger/passenger-home'], { state: { favoriteRoute: route } });
   }
 
 }
