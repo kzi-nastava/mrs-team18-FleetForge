@@ -161,7 +161,7 @@ public class DataLoader implements CommandLineRunner {
                 LocalDateTime.now(),
                 null,
                 5.2, 20.0, 850.0,
-                RideStatus.IN_PROGRESS, false, null, null
+                RideStatus.ACCEPTED, false, null, null
         );
         rideRepository.save(ride1);
 

@@ -33,7 +33,7 @@ public class ActiveRideController {
     }
 
     /**
-     * GET /api/admin/rides/active/{rideId}/live
+     * GET /api/rides/active/{rideId}
      *
      *
      * @param rideId ID of the ride to monitor
