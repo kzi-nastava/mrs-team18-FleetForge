@@ -178,6 +178,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     this.markers = [];
 
     const route = this._currentRide.route;
+    const vehicleType = this._currentRide.vehicleType as any;
     
     const remainingWaypoints = route.waypoints
     .filter(wp => !wp.isCompleted)
@@ -206,7 +207,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       createMarker: function() { return null; }
     } as any).addTo(this.map);
 
-    // Listen for route calculation
+    // Listen for route calculation and estimate price with vehicleType
     this.routeControl.on('routesfound', (e: any) => {
       const routes = e.routes;
       const summary = routes[0].summary;
@@ -220,7 +221,12 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       
       this.routeCalculated.emit({ distanceKm, estimatedMinutes });
       this.routeCoordinatesAvailable.emit(coordinates);
+
+      // Call ride estimate with vehicleType and duration
+      this.routingService.estimateRidePrice(distanceKm, estimatedMinutes, vehicleType);
     });
+
+
 
     this.addRouteMarkers(route.startLocation, route.startAddress, 'start');
     
