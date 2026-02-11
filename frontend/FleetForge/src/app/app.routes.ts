@@ -33,6 +33,7 @@ import { DriverLiveChatComponent } from './driver/live-chat/live-chat.component'
 import { AdminLiveChatComponent } from './admin/live-chat/live-chat.component';
 import { AdminHistoryComponent } from './admin/admin-history/admin-history.component';
 import { AdminActiveRidesComponent } from './admin/admin-active-rides/admin-active-rides.component';
+import { PriceManagementComponent } from './admin/price-management/price-management.component';
 
 export const routes: Routes = [
   /** ROUTES WITH NAVBAR */
@@ -119,6 +120,11 @@ export const routes: Routes = [
       {
         path: 'admin/active-rides',
         component: AdminActiveRidesComponent,
+        canActivate: [authGuard, roleGuard(['ADMIN'])]
+      },
+      {
+        path: 'admin/price-management',
+        component: PriceManagementComponent,
         canActivate: [authGuard, roleGuard(['ADMIN'])]
       },
 
