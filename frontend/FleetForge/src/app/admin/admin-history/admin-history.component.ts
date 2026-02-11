@@ -1,18 +1,17 @@
 import { Component, signal, WritableSignal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
 import { MapComponent } from '../../shared/map/map';
 import { ChangeDetectorRef } from '@angular/core';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { Subject } from 'rxjs';
-import { DriverProfileChangesService, AdminRide, AdminRideDetailsDto, InconsistencyReportDto} from '../service/driver-profile-changes/driver-profile-changes-service';
-
+import { DriverProfileChangesService, AdminRide, AdminRideDetailsDto} from '../service/driver-profile-changes/driver-profile-changes-service';
+import { NotificationPopupComponent } from '../../shared/popups/popup-dialog/notification-popup.component';
 
 @Component({
   selector: 'app-admin-history',
   standalone: true,
-  imports: [CommonModule, FormsModule, MapComponent],
+  imports: [CommonModule, FormsModule, MapComponent, NotificationPopupComponent],
   templateUrl: './admin-history.component.html',
   styleUrls: ['./admin-history.component.css']
 })
@@ -30,6 +29,10 @@ export class AdminHistoryComponent {
   totalPages = signal(0);
   isLoading = signal(false);
 
+  showPopup = signal(false);
+  popupMessage = signal('');
+  popupSuccess = signal(true);
+
   sortBy = signal<string>('startTime');
   sortDirection = signal<'asc' | 'desc'>('desc');
   
@@ -41,14 +44,11 @@ export class AdminHistoryComponent {
   protected rides: WritableSignal<AdminRide[]> = signal<AdminRide[]>([]);
 
   constructor(
-    private router: Router,
     private driverService: DriverProfileChangesService,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
-    this.loadRides();
-    
     this.searchSubject.pipe(
         debounceTime(300),
         distinctUntilChanged(),
@@ -66,6 +66,10 @@ export class AdminHistoryComponent {
     return Array(5)
       .fill(false)
       .map((_, index) => index < safeRating);
+  }
+  
+  closePopup(): void {
+    this.showPopup.set(false);
   }
 
   toggleDetails(ride: AdminRide): void {
@@ -145,6 +149,20 @@ export class AdminHistoryComponent {
   }
 
   loadRides(): void {
+    if (!this.searchUsername.trim()) {
+      this.popupMessage.set('Username cannot be empty');
+      this.popupSuccess.set(false);
+      this.showPopup.set(true);
+      return;
+    }
+
+    if (this.startDate && this.endDate && new Date(this.startDate) > new Date(this.endDate)) {
+      this.popupMessage.set('Start date cannot be later than end date');
+      this.popupSuccess.set(false);
+      this.showPopup.set(true);
+      return;
+    }
+
     this.showSuggestions = false;
     this.isLoading.set(true);
 
@@ -166,10 +184,26 @@ export class AdminHistoryComponent {
           this.rides.set(data.content);
           this.totalPages.set(data.totalPages);
           this.isLoading.set(false);
+
         },
-        error: () => this.isLoading.set(false),
+        error: (err: any) => {
+          this.isLoading.set(false);
+
+          let message = 'An unexpected error occurred';
+          if (typeof err.error === 'string') {
+            message = err.error; 
+          } else if (err?.error?.message) {
+            message = err.error.message;
+          }
+
+          this.popupMessage.set(message);
+          this.popupSuccess.set(false);
+          this.showPopup.set(true);
+        },
       });
   }
+
+
 
 
   onSort(column: string): void {
@@ -206,11 +240,6 @@ export class AdminHistoryComponent {
       this.currentPage.set(page);
       this.loadRides();
     }
-  }
-
-  viewDetails(ride: AdminRide) {
-    //todo: navigate to ride details page
-    console.log('View details for ride', ride.rideId);
   }
 
   get displayedRides(): AdminRide[] {

@@ -178,6 +178,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     this.markers = [];
 
     const route = this._currentRide.route;
+    const vehicleType = this._currentRide.vehicleType as any;
     
     const remainingWaypoints = route.waypoints
     .filter(wp => !wp.isCompleted)
@@ -206,7 +207,6 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       createMarker: function() { return null; }
     } as any).addTo(this.map);
 
-    // Listen for route calculation
     this.routeControl.on('routesfound', (e: any) => {
       const routes = e.routes;
       const summary = routes[0].summary;
@@ -220,7 +220,11 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       
       this.routeCalculated.emit({ distanceKm, estimatedMinutes });
       this.routeCoordinatesAvailable.emit(coordinates);
+
+      this.routingService.estimateRidePrice(distanceKm, estimatedMinutes, vehicleType);
     });
+
+
 
     this.addRouteMarkers(route.startLocation, route.startAddress, 'start');
     
@@ -388,13 +392,10 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
     let iconHtml = '';
     if (type === 'pickup') {
-      // Green pointer - same as route markers
       iconHtml = '<img src="/map-pointer.svg" style="width: 28px; height: 28px; filter: invert(65%) sepia(74%) saturate(1200%) hue-rotate(65deg);" />';
     } else if (type === 'dropoff') {
-      // Red pointer - same as route markers
       iconHtml = '<img src="/map-pointer.svg" style="width: 28px; height: 28px; filter: invert(35%) sepia(74%) saturate(1200%) hue-rotate(340deg);" />';
     } else {
-      // Neutral waypoint circle - same as route markers
       iconHtml = '<img src="/waypoint-circle.svg" style="width: 28px; height: 28px;" />';
     }
     
@@ -454,13 +455,10 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
     let iconHtml = '';
     if (type === 'pickup') {
-      // Green pointer (matches current-ride component)
       iconHtml = '<img src="/map-pointer.svg" style="width: 28px; height: 28px; filter: invert(65%) sepia(74%) saturate(1200%) hue-rotate(65deg);" />';
     } else if (type === 'dropoff') {
-      // Red pointer (matches current-ride component)
       iconHtml = '<img src="/map-pointer.svg" style="width: 28px; height: 28px; filter: invert(35%) sepia(74%) saturate(1200%) hue-rotate(340deg);" />';
     } else {
-      // Neutral waypoint circle
       iconHtml = '<img src="/waypoint-circle.svg" style="width: 28px; height: 28px;" />';
     }
 

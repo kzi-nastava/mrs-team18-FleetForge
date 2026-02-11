@@ -1,6 +1,7 @@
 package com.team18.FleetForge.config;
 
 import com.team18.FleetForge.model.ride.GeoPoint;
+import com.team18.FleetForge.model.ride.PriceConfiguration;
 import com.team18.FleetForge.model.vecihles.Vehicle;
 import com.team18.FleetForge.model.enums.RideActor;
 import com.team18.FleetForge.model.enums.Role;
@@ -16,6 +17,7 @@ import com.team18.FleetForge.model.chat.ChatMessage;
 import com.team18.FleetForge.repository.chat.ChatMessageRepository;
 import com.team18.FleetForge.repository.chat.ChatRepository;
 import com.team18.FleetForge.repository.rides.FavoriteRouteRepo;
+import com.team18.FleetForge.repository.rides.PriceConfigurationRepository;
 import com.team18.FleetForge.repository.rides.RideRepository;
 import com.team18.FleetForge.repository.users.DriverRepository;
 import com.team18.FleetForge.repository.users.PassengerRepository;
@@ -41,10 +43,18 @@ public class DataLoader implements CommandLineRunner {
     private final FavoriteRouteRepo favoriteRouteRepo;
     private final ChatRepository chatRepository;
     private final ChatMessageRepository chatMessageRepository;
+    private final PriceConfigurationRepository priceConfigurationRepository;
 
     @Override
     public void run(String... args) {
         System.out.println("DataLoader: Starting to load test data...");
+
+        PriceConfiguration priceConfiguration=new PriceConfiguration(null, VehicleType.STANDARD, 300.0, 120.0, null, null );
+        PriceConfiguration priceConfiguration2=new PriceConfiguration(null, VehicleType.LUXURY, 500.0, 120.0, null, null );
+        PriceConfiguration priceConfiguration3=new PriceConfiguration(null, VehicleType.VAN, 600.0, 120.0, null, null );
+        priceConfigurationRepository.save(priceConfiguration);
+        priceConfigurationRepository.save(priceConfiguration2);
+        priceConfigurationRepository.save(priceConfiguration3);
 
         Vehicle vehicle1 = new Vehicle(null, "Toyota Camry", VehicleType.STANDARD,
                 "NS-123-AB", 4, false, false);

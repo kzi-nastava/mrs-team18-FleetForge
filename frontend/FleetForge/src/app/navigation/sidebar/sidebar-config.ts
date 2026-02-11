@@ -115,6 +115,11 @@ export const SIDEBAR_MENU_CONFIG: Record<UserRole, SidebarMenuItem[]> = {
       label:'Active Rides',
       icon:'🚗',
       path: '/admin/active-rides'
+    },
+    {
+      label:'Price Management',
+      icon:'💰',
+      path: '/admin/price-management'
     }
   ]
 };

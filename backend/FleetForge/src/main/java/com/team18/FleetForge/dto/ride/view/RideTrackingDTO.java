@@ -1,6 +1,7 @@
 package com.team18.FleetForge.dto.ride.view;
 
 import com.team18.FleetForge.dto.driver.DriverInfoDTO;
+import com.team18.FleetForge.model.enums.VehicleType;
 import com.team18.FleetForge.model.ride.GeoPoint;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,6 +24,7 @@ public class RideTrackingDTO {
     private DriverInfoDTO driver;
     private PassengerInfoDTO passenger;
     private Boolean panicActivated;
+    private VehicleType vehicleType;
 
     @Data
     @NoArgsConstructor

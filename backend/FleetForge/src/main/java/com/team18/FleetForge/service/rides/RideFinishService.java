@@ -128,6 +128,7 @@ public class RideFinishService {
                         .estimatedArrivalMinutes(null)
                         .route(buildRouteInfo(nextRide))
                         .driver(buildDriverInfo(driver))
+                        .vehicleType(driver.getVehicle().getType())
                         .passenger(buildPassengerInfo(passenger))
                         .panicActivated(nextRide.getPanicActivated() != null && nextRide.getPanicActivated())
                         .build();

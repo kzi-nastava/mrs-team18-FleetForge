@@ -101,6 +101,7 @@ public class ActiveRideService {
                 .startAddress(ride.getStartAddress())
                 .endLocation(ride.getEndLocation())
                 .endAddress(ride.getEndAddress())
+                .vehicleType(driver.getVehicle().getType())
                 // Timing
                 .startTime(ride.getStartTime())
                 // Status
