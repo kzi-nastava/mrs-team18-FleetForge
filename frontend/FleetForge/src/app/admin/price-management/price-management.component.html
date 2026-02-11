@@ -1,0 +1,109 @@
+<div class="price-management-container">
+  <div class="header">
+    <h1>Ride Price Management</h1>
+    <p class="subtitle">Configure pricing for different vehicle types</p>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading price configurations...</p>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="alert alert-error">
+    <span class="alert-icon">⚠️</span>
+    <span>{{ errorMessage }}</span>
+  </div>
+
+  <!-- Success Message -->
+  <div *ngIf="successMessage" class="alert alert-success">
+    <span class="alert-icon">✓</span>
+    <span>{{ successMessage }}</span>
+  </div>
+
+  <!-- Price Configuration Cards -->
+  <div *ngIf="!isLoading" class="price-cards-grid">
+    <div *ngFor="let priceForm of priceForms" class="price-card">
+      <div class="card-header">
+        <div class="vehicle-info">
+          <span class="vehicle-icon">{{ getVehicleTypeIcon(priceForm.vehicleType) }}</span>
+          <h2>{{ vehicleTypeLabels[priceForm.vehicleType] }}</h2>
+        </div>
+        <span *ngIf="priceForm.isModified" class="modified-badge">Modified</span>
+      </div>
+
+      <form [formGroup]="priceForm.form" class="price-form">
+        <div class="form-group">
+          <label for="basePrice-{{ priceForm.vehicleType }}">
+            Base Price ($)
+          </label>
+          <input
+            type="number"
+            [id]="'basePrice-' + priceForm.vehicleType"
+            formControlName="basePrice"
+            placeholder="Enter base price"
+            step="0.01"
+            min="0.01"
+            [class.error-input]="priceForm.form.get('basePrice')?.invalid && priceForm.form.get('basePrice')?.touched"
+          />
+          <small 
+            class="error-text"
+            *ngIf="priceForm.form.get('basePrice')?.invalid && priceForm.form.get('basePrice')?.touched"
+          >
+            Base price must be greater than 0
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="pricePerKm-{{ priceForm.vehicleType }}">
+            Price per Kilometer ($)
+          </label>
+          <input
+            type="number"
+            [id]="'pricePerKm-' + priceForm.vehicleType"
+            formControlName="pricePerKm"
+            placeholder="Enter price per km"
+            step="0.01"
+            min="0.01"
+            [class.error-input]="priceForm.form.get('pricePerKm')?.invalid && priceForm.form.get('pricePerKm')?.touched"
+          />
+          <small 
+            class="error-text"
+            *ngIf="priceForm.form.get('pricePerKm')?.invalid && priceForm.form.get('pricePerKm')?.touched"
+          >
+            Price per km must be greater than 0
+          </small>
+        </div>
+
+        <div class="card-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="resetForm(priceForm)"
+            [disabled]="!priceForm.isModified || priceForm.isSaving"
+          >
+            Reset
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            (click)="savePriceConfiguration(priceForm)"
+            [disabled]="!priceForm.isModified || priceForm.form.invalid || priceForm.isSaving"
+          >
+            <span *ngIf="!priceForm.isSaving">Save Changes</span>
+            <span *ngIf="priceForm.isSaving">Saving...</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Info Section -->
+  <div *ngIf="!isLoading" class="info-section">
+    <div class="info-card">
+      <h3>💡 Pricing Formula</h3>
+      <p>Final Price = <strong>Base Price</strong> + (<strong>Distance in km</strong> × <strong>Price per km</strong>)</p>
+    </div>
+  </div>
+</div>

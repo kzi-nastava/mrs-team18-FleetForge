@@ -2,8 +2,9 @@ import { Injectable } from '@angular/core';
 import * as L from 'leaflet';
 import 'leaflet-routing-machine';
 import { environment } from '../../../../environments/environment';
-import { HttpClient } from '@angular/common/http';
 import { Subject } from 'rxjs';
+import { RideEstimateService } from '../../services/ride-estimate.service';
+import { VehicleType } from '../../models/vehicle.model';
 
 
 @Injectable({
@@ -12,7 +13,21 @@ import { Subject } from 'rxjs';
 export class RoutingService {  
   routeSummary$ = new Subject<{ distanceKm: number; durationMin: number; cost: number }>();
 
-  constructor(private http: HttpClient) {}
+  constructor(private rideEstimateService: RideEstimateService) {}
+
+  estimateRidePrice(distanceKm: number, durationMin: number, vehicleType: string): void {
+    this.rideEstimateService.estimateRide({ distanceKm, vehicleType: vehicleType as VehicleType })
+      .subscribe({
+        next: res => {
+          this.routeSummary$.next({
+            distanceKm,
+            durationMin,
+            cost: res.estimatedPrice   
+          });
+        },
+        error: err => console.error('Estimate error:', err)
+      });
+  }
 
   addRoute(
   map: L.Map,
@@ -21,9 +36,12 @@ export class RoutingService {
   waypoints: L.LatLngExpression[] = [],
   opts?: {
     color?: string;
+    vehicleType?: VehicleType;
     createMarker?: (i: number, wp: L.Routing.Waypoint, n: number) => L.Marker | false;
   }
 ): L.Routing.Control {
+
+  const vehicleType = opts?.vehicleType ?? VehicleType.STANDARD;
 
   const allWaypoints: L.Routing.Waypoint[] = [
     L.Routing.waypoint(L.latLng(start)),
@@ -56,7 +74,7 @@ export class RoutingService {
     const distanceKm = +(route.summary.totalDistance / 1000).toFixed(2);
     const durationMin = +(route.summary.totalTime / 60).toFixed(1);
 
-    this.http.post<any>('http://localhost:8080/api/ride-estimates', { distanceKm })
+    this.rideEstimateService.estimateRide({ distanceKm, vehicleType })
       .subscribe({
         next: res => {
           this.routeSummary$.next({

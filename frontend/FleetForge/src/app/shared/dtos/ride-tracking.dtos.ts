@@ -42,4 +42,5 @@ export interface RideTrackingDTO {
   driver: DriverInfoDTO;
   panicActivated: boolean;
   passenger: PassengerInfoDTO;
+  vehicleType: string; 
 }

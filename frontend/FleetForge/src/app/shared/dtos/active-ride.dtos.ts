@@ -33,6 +33,7 @@ export interface ActiveRideDetailsDTO {
   panicActivatedAt: string | null;
   
   passengers: PassengerDTO[];
+  vehicleType: string;
 }
 
 export interface PassengerDTO {
