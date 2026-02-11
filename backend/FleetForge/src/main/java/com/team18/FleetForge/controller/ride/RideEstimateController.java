@@ -2,7 +2,6 @@ package com.team18.FleetForge.controller.ride;
 
 import com.team18.FleetForge.dto.ride.estimate.RideEstimateRequestDTO;
 import com.team18.FleetForge.dto.ride.estimate.RideEstimateResponseDTO;
-import com.team18.FleetForge.model.enums.VehicleType;
 import com.team18.FleetForge.service.PriceCalculationService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -21,6 +20,7 @@ public class RideEstimateController {
      * POST /api/ride-estimates
      * Request Body:
      *  - distanceKm (double)
+     *  - vehicleType (VehicleType)
      * Response:
      *  - estimatedPrice (double)
      */
@@ -33,7 +33,7 @@ public class RideEstimateController {
     ) {
         double price = priceCalculationService.calculatePrice(
                 request.getDistanceKm(),
-                VehicleType.STANDARD
+                request.getVehicleType()
         );
         RideEstimateResponseDTO response = new RideEstimateResponseDTO();
         response.setEstimatedPrice(price);
