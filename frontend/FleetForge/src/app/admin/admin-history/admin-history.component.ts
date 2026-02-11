@@ -1,7 +1,6 @@
 import { Component, signal, WritableSignal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
 import { MapComponent } from '../../shared/map/map';
 import { ChangeDetectorRef } from '@angular/core';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
@@ -50,8 +49,6 @@ export class AdminHistoryComponent {
   ) {}
 
   ngOnInit(): void {
-    this.loadRides();
-    
     this.searchSubject.pipe(
         debounceTime(300),
         distinctUntilChanged(),
