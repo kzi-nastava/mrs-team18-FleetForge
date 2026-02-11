@@ -16,7 +16,7 @@ import com.ognjen.fleetforge.dtos.NotificationDTO;
 import com.ognjen.fleetforge.utils.WebSocketManager;
 
 public class WebSocketService  extends Service {
-    private static final int FOREGROUND_ID = 1_000_000;
+    private static final int FOREGROUND_ID = 1;
     private static final String CHANNEL_ID = "WS_Notifications";
     public static final String ACTION_NEW_NOTIFICATION = "com.team18.NEW_NOTIFICATION";
 
@@ -83,6 +83,6 @@ public class WebSocketService  extends Service {
                 .setAutoCancel(true)
                 .build();
 
-        notificationManager.notify(Math.toIntExact(notification.getId()), notif);
+        notificationManager.notify(Math.toIntExact(notification.getId())+1000, notif);
     }
 }
