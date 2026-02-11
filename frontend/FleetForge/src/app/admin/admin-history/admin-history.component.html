@@ -29,194 +29,205 @@
     </div>
 
     <div class="rides-section">
-        <div class="table-container">
-            <table class="rides-table">
-                <thead>
-                    <tr>
-                        <th (click)="onSort('rideId')">
-                            Ride ID <span *ngIf="isSortedBy('rideId')">{{ sortDirection() === 'asc' ? '▲' : '▼'
-                                }}</span>
-                        </th>
-                        <th (click)="onSort('startTime')">
-                            Start Time <span *ngIf="isSortedBy('startTime')">{{ sortDirection() === 'asc' ? '▲' : '▼'
-                                }}</span>
-                        </th>
-                        <th (click)="onSort('endTime')">
-                            End Time <span *ngIf="isSortedBy('endTime')">{{ sortDirection() === 'asc' ? '▲' : '▼'
-                                }}</span>
-                        </th>
-                        <th (click)="onSort('startAddress')">
-                            Start Address <span *ngIf="isSortedBy('startAddress')">{{ sortDirection() === 'asc' ? '▲' :
-                                '▼'
-                                }}</span>
-                        </th>
-                        <th (click)="onSort('destinationAddress')">
-                            End Address <span *ngIf="isSortedBy('destinationAddress')">{{ sortDirection() === 'asc' ?
-                                '▲' :
-                                '▼' }}</span>
-                        </th>
-                        <th (click)="onSort('status')">
-                            Status <span *ngIf="isSortedBy('status')">{{ sortDirection() === 'asc' ? '▲' : '▼' }}</span>
-                        </th>
-                        <th>Panic Activation</th>
-                        <th>Details</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <ng-container *ngFor="let ride of displayedRides">
-
-                        <!-- MAIN ROW -->
+        <div class="rides-section">
+            <div *ngIf="displayedRides.length === 0 && !isLoading()" class="no-rides-message">
+                <p>No rides found for the given filters.</p>
+            </div>
+            <div *ngIf="displayedRides.length > 0" class="table-container">
+                <table class="rides-table">
+                    <thead>
                         <tr>
-                            <td>{{ ride.rideId }}</td>
-                            <td>{{ ride.startTime | date: 'd MMM, y HH:mm' }}</td>
-                            <td>{{ ride.endTime ? (ride.endTime | date: 'd MMM, y HH:mm') : '-' }}</td>
-                            <td>{{ ride.startAddress }}</td>
-                            <td>{{ ride.destinationAddress }}</td>
-                            <td>
-                                <span class="status" [class.completed]="ride.status === 'COMPLETED'"
-                                    [class.cancelled]="ride.status === 'CANCELLED'">
-                                    {{ ride.status }}
-                                </span>
-                            </td>
-                            <td>
-                                <span *ngIf="ride.panicActivated">⚠️</span>
-                                <span *ngIf="!ride.panicActivated">-</span>
-                            </td>
-                            <td>
-                                <button class="details-btn" (click)="toggleDetails(ride)">
-                                    {{ isExpanded(ride) ? 'Hide details' : 'View details' }}
-                                </button>
-                            </td>
+                            <th (click)="onSort('rideId')">
+                                Ride ID <span *ngIf="isSortedBy('rideId')">{{ sortDirection() === 'asc' ? '▲' : '▼'
+                                    }}</span>
+                            </th>
+                            <th (click)="onSort('startTime')">
+                                Start Time <span *ngIf="isSortedBy('startTime')">{{ sortDirection() === 'asc' ? '▲' :
+                                    '▼'
+                                    }}</span>
+                            </th>
+                            <th (click)="onSort('endTime')">
+                                End Time <span *ngIf="isSortedBy('endTime')">{{ sortDirection() === 'asc' ? '▲' : '▼'
+                                    }}</span>
+                            </th>
+                            <th (click)="onSort('startAddress')">
+                                Start Address <span *ngIf="isSortedBy('startAddress')">{{ sortDirection() === 'asc' ?
+                                    '▲' :
+                                    '▼'
+                                    }}</span>
+                            </th>
+                            <th (click)="onSort('destinationAddress')">
+                                End Address <span *ngIf="isSortedBy('destinationAddress')">{{ sortDirection() === 'asc'
+                                    ?
+                                    '▲' :
+                                    '▼' }}</span>
+                            </th>
+                            <th (click)="onSort('status')">
+                                Status <span *ngIf="isSortedBy('status')">{{ sortDirection() === 'asc' ? '▲' : '▼'
+                                    }}</span>
+                            </th>
+                            <th>Panic Activation</th>
+                            <th>Details</th>
                         </tr>
+                    </thead>
+                    <tbody>
+                        <ng-container *ngFor="let ride of displayedRides">
 
-                        <!-- DETAILS ROW (IMMEDIATELY AFTER MAIN ROW) -->
-                        <tr *ngIf="isExpanded(ride)" class="details-row">
-                            <td colspan="8">
+                            <!-- MAIN ROW -->
+                            <tr>
+                                <td>{{ ride.rideId }}</td>
+                                <td>{{ ride.startTime | date: 'd MMM, y HH:mm' }}</td>
+                                <td>{{ ride.endTime ? (ride.endTime | date: 'd MMM, y HH:mm') : '-' }}</td>
+                                <td>{{ ride.startAddress }}</td>
+                                <td>{{ ride.destinationAddress }}</td>
+                                <td>
+                                    <span class="status" [class.completed]="ride.status === 'COMPLETED'"
+                                        [class.cancelled]="ride.status === 'CANCELLED'">
+                                        {{ ride.status }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span *ngIf="ride.panicActivated">⚠️</span>
+                                    <span *ngIf="!ride.panicActivated">-</span>
+                                </td>
+                                <td>
+                                    <button class="details-btn" (click)="toggleDetails(ride)">
+                                        {{ isExpanded(ride) ? 'Hide details' : 'View details' }}
+                                    </button>
+                                </td>
+                            </tr>
 
-                                <ng-container *ngIf="!detailsLoading().has(ride.rideId); else loading">
-                                    <div class="detail-layout" *ngIf="getDetails(ride.rideId) as details">
+                            <!-- DETAILS ROW (IMMEDIATELY AFTER MAIN ROW) -->
+                            <tr *ngIf="isExpanded(ride)" class="details-row">
+                                <td colspan="8">
 
-                                        <!-- MAP -->
-                                        <div class="map-preview">
-                                            <div class="map-header">Route</div>
-                                            <app-map class="mini-map" [staticRoute]="getStaticRoute(details)">
-                                            </app-map>
-                                        </div>
+                                    <ng-container *ngIf="!detailsLoading().has(ride.rideId); else loading">
+                                        <div class="detail-layout" *ngIf="getDetails(ride.rideId) as details">
 
-                                        <!-- INFO -->
-                                        <div class="details-content-column">
-                                            <div class="detail-grid">
-                                                <div class="detail-card">
-                                                    <div class="detail-label">Price</div>
-                                                    <div class="detail-value">{{ details.totalCost }} RSD</div>
+                                            <!-- MAP -->
+                                            <div class="map-preview">
+                                                <div class="map-header">Route</div>
+                                                <app-map class="mini-map" [staticRoute]="getStaticRoute(details)">
+                                                </app-map>
+                                            </div>
 
-                                                    <div class="detail-label">Distance</div>
-                                                    <div class="detail-value">{{ details.totalDistance }} km</div>
-                                                </div>
+                                            <!-- INFO -->
+                                            <div class="details-content-column">
+                                                <div class="detail-grid">
+                                                    <div class="detail-card">
+                                                        <div class="detail-label">Price</div>
+                                                        <div class="detail-value">{{ details.totalCost }} RSD</div>
 
-                                                <div class="detail-card driver-card">
-                                                    <div class="driver-info">
-                                                        <div class="detail-label">Driver</div>
-                                                        <div class="detail-value">{{ details.driver.firstName }} {{
-                                                            details.driver.lastName }}</div>
-                                                        <div class="detail-label">Phone</div>
-                                                        <div class="detail-value">{{ details.driver.phoneNumber }}</div>
+                                                        <div class="detail-label">Distance</div>
+                                                        <div class="detail-value">{{ details.totalDistance }} km</div>
                                                     </div>
-                                                    <div class="driver-image">
-                                                        <img src="http://localhost:8080{{ details.driver.profileImage }}"
-                                                            alt="Driver Image">
-                                                    </div>
-                                                </div>
 
-                                                <div class="detail-card">
-                                                    <div class="detail-label">Main passenger</div>
-                                                    <div class="detail-value">
-                                                        {{ details.mainPassenger.firstName }}
-                                                        {{ details.mainPassenger.lastName }}
-                                                    </div>
-
-                                                    <div *ngIf="details.linkedPassengers.length">
-                                                        <div class="detail-label">Linked passengers</div>
-                                                        <div class="detail-value"
-                                                            *ngFor="let p of details.linkedPassengers">
-                                                            {{ p.firstName }} {{ p.lastName }}
+                                                    <div class="detail-card driver-card">
+                                                        <div class="driver-info">
+                                                            <div class="detail-label">Driver</div>
+                                                            <div class="detail-value">{{ details.driver.firstName }} {{
+                                                                details.driver.lastName }}</div>
+                                                            <div class="detail-label">Phone</div>
+                                                            <div class="detail-value">{{ details.driver.phoneNumber }}
+                                                            </div>
+                                                        </div>
+                                                        <div class="driver-image">
+                                                            <img src="http://localhost:8080{{ details.driver.profileImage }}"
+                                                                alt="Driver Image">
                                                         </div>
                                                     </div>
-                                                </div>
 
-                                                <div class="detail-card" *ngIf="details.status === 'CANCELLED'">
-                                                    <div class="detail-label">Cancelled by</div>
-                                                    <div class="detail-value">{{ details.cancelledBy }}</div>
+                                                    <div class="detail-card">
+                                                        <div class="detail-label">Main passenger</div>
+                                                        <div class="detail-value">
+                                                            {{ details.mainPassenger.firstName }}
+                                                            {{ details.mainPassenger.lastName }}
+                                                        </div>
 
-                                                    <div *ngIf="details.cancellationReason">
-                                                        <div class="detail-label">Reason</div>
-                                                        <div class="detail-value">{{ details.cancellationReason }}</div>
+                                                        <div *ngIf="details.linkedPassengers.length">
+                                                            <div class="detail-label">Linked passengers</div>
+                                                            <div class="detail-value"
+                                                                *ngFor="let p of details.linkedPassengers">
+                                                                {{ p.firstName }} {{ p.lastName }}
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                </div>
 
-                                                <div class="detail-card"
-                                                    *ngIf="details.hasInconsistencies && details.inconsistencies.length">
-                                                    <div class="detail-label">Inconsistencies</div>
+                                                    <div class="detail-card" *ngIf="details.status === 'CANCELLED'">
+                                                        <div class="detail-label">Cancelled by</div>
+                                                        <div class="detail-value">{{ details.cancelledBy }}</div>
 
-                                                    <div class="detail-value"
-                                                        *ngFor="let inc of details.inconsistencies">
-                                                        <div class="inconsistency-item">
-                                                            <div class="message">{{ inc.message }}</div>
-                                                            <div class="reported-at">{{ inc.reportedAt | date:'short' }}
+                                                        <div *ngIf="details.cancellationReason">
+                                                            <div class="detail-label">Reason</div>
+                                                            <div class="detail-value">{{ details.cancellationReason }}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="detail-card"
+                                                        *ngIf="details.hasInconsistencies && details.inconsistencies.length">
+                                                        <div class="detail-label">Inconsistencies</div>
+
+                                                        <div class="detail-value"
+                                                            *ngFor="let inc of details.inconsistencies">
+                                                            <div class="inconsistency-item">
+                                                                <div class="message">{{ inc.message }}</div>
+                                                                <div class="reported-at">{{ inc.reportedAt |
+                                                                    date:'short' }}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="detail-card">
+                                                        <div class="detail-label">Ratings</div>
+
+                                                        <div class="detail-value rating-breakdown">
+                                                            <div class="rating-item">
+                                                                <span>Driver:</span>
+                                                                <span class="stars-mini">
+                                                                    <span
+                                                                        *ngFor="let filled of getStarArray(details.ratings?.driverRating ?? 0)"
+                                                                        class="star" [class.filled]="filled">
+                                                                        ★
+                                                                    </span>
+                                                                </span>
+                                                            </div>
+
+                                                            <div class="rating-item">
+                                                                <span>Vehicle:</span>
+                                                                <span class="stars-mini">
+                                                                    <span
+                                                                        *ngFor="let filled of getStarArray(details.ratings?.vehicleRating ?? 0)"
+                                                                        class="star" [class.filled]="filled">
+                                                                        ★
+                                                                    </span>
+                                                                </span>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="detail-card">
-                                                    <div class="detail-label">Ratings</div>
-
-                                                    <div class="detail-value rating-breakdown">
-                                                        <div class="rating-item">
-                                                            <span>Driver:</span>
-                                                            <span class="stars-mini">
-                                                                <span
-                                                                    *ngFor="let filled of getStarArray(details.ratings?.driverRating ?? 0)"
-                                                                    class="star" [class.filled]="filled">
-                                                                    ★
-                                                                </span>
-                                                            </span>
-                                                        </div>
-
-                                                        <div class="rating-item">
-                                                            <span>Vehicle:</span>
-                                                            <span class="stars-mini">
-                                                                <span
-                                                                    *ngFor="let filled of getStarArray(details.ratings?.vehicleRating ?? 0)"
-                                                                    class="star" [class.filled]="filled">
-                                                                    ★
-                                                                </span>
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </div>
                                             </div>
+
                                         </div>
+                                    </ng-container>
 
-                                    </div>
-                                </ng-container>
+                                    <ng-template #loading>
+                                        <div class="muted-text">Loading details…</div>
+                                    </ng-template>
 
-                                <ng-template #loading>
-                                    <div class="muted-text">Loading details…</div>
-                                </ng-template>
+                                </td>
+                            </tr>
 
-                            </td>
-                        </tr>
+                        </ng-container>
+                    </tbody>
 
-                    </ng-container>
-                </tbody>
+                </table>
+            </div>
+        </div>
 
-            </table>
+        <div class="pagination" *ngIf="displayedRides.length > 0">
+            <button (click)="prevPage()" [disabled]="currentPage() === 0 || isLoading()">Previous</button>
+            <span>Page {{ currentPage() + 1 }} of {{ totalPages() }}</span>
+            <button (click)="nextPage()" [disabled]="currentPage() >= totalPages() - 1 || isLoading()">Next</button>
         </div>
     </div>
-
-    <div class="pagination">
-        <button (click)="prevPage()" [disabled]="currentPage() === 0 || isLoading()">Previous</button>
-        <span>Page {{ currentPage() + 1 }} of {{ totalPages() }}</span>
-        <button (click)="nextPage()" [disabled]="currentPage() >= totalPages() - 1 || isLoading()">Next</button>
-    </div>
-</div>
