@@ -146,7 +146,8 @@ export class AdminActiveRidesComponent implements OnInit, OnDestroy {
         lastName: '',
         phoneNumber: '',
         profileImage: ''
-      }
+      },
+      vehicleType: this.rideDetails.vehicleType
     };
   }
 
