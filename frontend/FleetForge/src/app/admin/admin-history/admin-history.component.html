@@ -231,3 +231,10 @@
             <button (click)="nextPage()" [disabled]="currentPage() >= totalPages() - 1 || isLoading()">Next</button>
         </div>
     </div>
+</div>
+<app-notification-popup
+  [visible]="showPopup()"
+  [success]="popupSuccess()"
+  [message]="popupMessage()"
+  (closed)="closePopup()">
+</app-notification-popup>
