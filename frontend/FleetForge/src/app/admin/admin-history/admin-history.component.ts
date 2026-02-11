@@ -145,6 +145,16 @@ export class AdminHistoryComponent {
   }
 
   loadRides(): void {
+    if (!this.searchUsername.trim()) {
+      alert('Username cannot be empty');
+      return;
+    }
+
+    if (this.startDate && this.endDate && new Date(this.startDate) > new Date(this.endDate)) {
+      alert('Start date cannot be later than end date');
+      return;
+    }
+
     this.showSuggestions = false;
     this.isLoading.set(true);
 
@@ -170,6 +180,7 @@ export class AdminHistoryComponent {
         error: () => this.isLoading.set(false),
       });
   }
+
 
 
   onSort(column: string): void {
@@ -206,11 +217,6 @@ export class AdminHistoryComponent {
       this.currentPage.set(page);
       this.loadRides();
     }
-  }
-
-  viewDetails(ride: AdminRide) {
-    //todo: navigate to ride details page
-    console.log('View details for ride', ride.rideId);
   }
 
   get displayedRides(): AdminRide[] {
