@@ -148,6 +148,7 @@ public class RideTrackingService {
                 .estimatedArrivalMinutes(null)
                 .route(buildRouteInfo(ride))
                 .driver(buildDriverInfo(driver))
+                .vehicleType(driver.getVehicle().getType())
                 .passenger(buildPassengerInfo(passenger))
                 .panicActivated(ride.getPanicActivated() != null && ride.getPanicActivated())
                 .build();

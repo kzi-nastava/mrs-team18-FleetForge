@@ -1,5 +1,6 @@
 package com.team18.FleetForge.dto.ride.view;
 
+import com.team18.FleetForge.model.enums.VehicleType;
 import com.team18.FleetForge.model.ride.GeoPoint;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,6 +29,7 @@ public class ActiveRideDetailsDTO {
     private String startAddress;
     private GeoPoint endLocation;
     private String endAddress;
+    private VehicleType vehicleType;
 
     private LocalDateTime startTime;
 
