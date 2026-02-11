@@ -1,6 +1,8 @@
 package com.ognjen.fleetforge.activities.auth;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.EditText;
@@ -15,6 +17,7 @@ import com.ognjen.fleetforge.dtos.LoginRequestDTO;
 import com.ognjen.fleetforge.dtos.LoginResponseDTO;
 import com.ognjen.fleetforge.model.UserRole;
 import com.ognjen.fleetforge.auth.AuthManager;
+import com.ognjen.fleetforge.services.WebSocketService;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -159,6 +162,16 @@ public class LoginActivity extends AppCompatActivity {
                         btnLogin.setEnabled(true);
 
                         if (response.isSuccessful() && response.body() != null) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS)
+                                        != PackageManager.PERMISSION_GRANTED) {
+
+                                    requestPermissions(
+                                            new String[]{android.Manifest.permission.POST_NOTIFICATIONS},
+                                            1001
+                                    );
+                                }
+                            }
                             LoginResponseDTO loginResponse = response.body();
                             String token = loginResponse.getToken();
                             String role = loginResponse.getRole();
@@ -168,6 +181,15 @@ public class LoginActivity extends AppCompatActivity {
                             Log.d(TAG, "LoginActivity: Received token: " + token);
                             Log.d(TAG, "LoginActivity: User role: " + role);
                             Log.d(TAG, "LoginActivity: Logged in at: " + loggedInAt);
+
+                            Intent serviceIntent = new Intent(LoginActivity.this, WebSocketService.class);
+                            serviceIntent.putExtra("TOKEN", token);
+
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                startForegroundService(serviceIntent);
+                            } else {
+                                startService(serviceIntent);
+                            }
 
                             UserRole userRole = mapStringToUserRole(role);
                             authManager.login(userRole, email, email);

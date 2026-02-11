@@ -23,6 +23,7 @@ import com.ognjen.fleetforge.R;
 import com.ognjen.fleetforge.activities.MainActivity;
 import com.ognjen.fleetforge.fragments.common.PasswordChangeProfile;
 import com.ognjen.fleetforge.auth.AuthManager;
+import com.ognjen.fleetforge.services.WebSocketService;
 
 import java.io.IOException;
 
@@ -79,7 +80,8 @@ public class AdminProfile extends Fragment {
         View view = inflater.inflate(R.layout.fragment_admin_profile, container, false);
         Button logout=view.findViewById(R.id.btn_logout);
         logout.setOnClickListener(v -> {authManager.logout();
-
+            Intent serviceIntent = new Intent(requireContext(), WebSocketService.class);
+            requireActivity().stopService(serviceIntent);
             Intent intent = new Intent(getActivity(), MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);

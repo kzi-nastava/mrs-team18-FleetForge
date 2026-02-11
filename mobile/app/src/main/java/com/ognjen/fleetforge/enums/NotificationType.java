@@ -1,4 +1,4 @@
-package com.team18.FleetForge.model.enums;
+package com.ognjen.fleetforge.enums;
 
 public enum NotificationType {
     RIDE_CREATED,
@@ -19,4 +19,5 @@ public enum NotificationType {
     RIDE_IN_10_MIN,
     RIDE_IN_5_MIN,
     NO_AVAILABLE_DRIVER
+
 }

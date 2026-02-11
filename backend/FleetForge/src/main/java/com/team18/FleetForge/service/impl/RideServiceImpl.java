@@ -264,17 +264,20 @@ public class RideServiceImpl implements RideService {
         if(rideCreateRequestDTO.isRideNow()) {
             Driver driver = driverService.findAvailableDriver(ride);
             if (driver == null) {
+                notificationService.sendNotificationToUser(passenger,NotificationType.NO_AVAILABLE_DRIVER,"There are no available drivers. From: "+ride.getStartAddress()+ " to: "+ride.getEndAddress(),null);
                 return null;
             }
             driver.setAvailable(false);
             userRepository.save(driver);
             ride.setDriver(driver);
+            notificationService.sendNotificationToUser(driver,NotificationType.RIDE_CREATED,"New ride! From: "+ride.getStartAddress()+" to: "+ride.getEndAddress(),ride);
         }else{
             if(!driverService.checkAlreadyBookedDateTime(ride)){
+                notificationService.sendNotificationToUser(passenger,NotificationType.NO_AVAILABLE_DRIVER,"There are no available drivers. From: "+ride.getStartAddress()+ " to: "+ride.getEndAddress(),null);
                 return null;
             }
         }
-        rideRepository.save(ride);
+         rideRepository.save(ride);
 
         if (ride.getLinkedPassengers() != null && !ride.getLinkedPassengers().isEmpty()) {
             for (Passenger linkedPassenger : ride.getLinkedPassengers()) {
