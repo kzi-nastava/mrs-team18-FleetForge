@@ -1,0 +1,23 @@
+package com.ognjen.fleetforge.enums;
+
+public enum NotificationType {
+    RIDE_CREATED,
+    RIDE_ASSIGNED,
+    RIDE_ACCEPTED,
+    RIDE_REJECTED,
+    RIDE_STARTED,
+    RIDE_COMPLETED,
+    RIDE_CANCELLED,
+    DRIVER_ARRIVED,
+    PANIC_ACTIVATED,
+    RIDE_REMINDER,
+    DRIVER_ASSIGNED,
+    PASSENGER_RATED,
+    ACCOUNT_BLOCKED,
+    SUPPORT_MESSAGE,
+    RIDE_IN_15_MIN,
+    RIDE_IN_10_MIN,
+    RIDE_IN_5_MIN,
+    NO_AVAILABLE_DRIVER
+
+}
