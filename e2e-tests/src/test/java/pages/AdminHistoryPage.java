@@ -9,12 +9,15 @@ import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.time.Duration;
 import java.util.List;
 
 public class AdminHistoryPage {
+
+    private WebDriver driver;
     private WebDriverWait wait;
 
-    private static String PAGE_URL = "http://localhost:4200/admin/admin-history";
+    private static final String PAGE_URL = "http://localhost:4200/admin/admin-history";
 
     // FILTERS
     @FindBy(how = How.ID, using = "username")
@@ -29,9 +32,8 @@ public class AdminHistoryPage {
     @FindBy(how = How.CSS, using = ".filter-section button")
     private WebElement searchButton;
 
-    // Username suggestions list
-    @FindBy(how = How.CSS, using = ".suggestions li")
-    private List<WebElement> usernameSuggestions;
+    // Username suggestions locator (better than cached list)
+    private By suggestionsLocator = By.cssSelector(".suggestions li");
 
     // TABLE
     @FindBy(how = How.CSS, using = ".rides-table tbody tr")
@@ -48,11 +50,12 @@ public class AdminHistoryPage {
     private WebElement pageInfo;
 
     public AdminHistoryPage(WebDriver driver) {
+        this.driver = driver;
         this.wait = new WebDriverWait(driver, 5);
+
         driver.get(PAGE_URL);
         PageFactory.initElements(driver, this);
 
-        // Wait for username input to appear as page is ready
         wait.until(ExpectedConditions.visibilityOf(usernameInput));
     }
 
@@ -62,9 +65,31 @@ public class AdminHistoryPage {
         usernameInput.sendKeys(username);
     }
 
+    public void clearUsername() {
+        wait.until(ExpectedConditions.visibilityOf(usernameInput)).clear();
+    }
+
+    public void waitForSuggestionsToLoad() {
+        wait.until(ExpectedConditions.visibilityOfElementLocated(suggestionsLocator));
+    }
+
+    public void waitForSuggestionsCount(int expectedCount) {
+        wait.until(driver ->
+                driver.findElements(suggestionsLocator).size() == expectedCount
+        );
+    }
+
+    public void waitForSuggestionsToDisappear() {
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(suggestionsLocator));
+    }
+
+    public List<WebElement> getUsernameSuggestions() {
+        return driver.findElements(suggestionsLocator);
+    }
+
     public void selectUsernameSuggestion(String suggestion) {
-        wait.until(ExpectedConditions.visibilityOfAllElements(usernameSuggestions));
-        for (WebElement el : usernameSuggestions) {
+        waitForSuggestionsToLoad();
+        for (WebElement el : getUsernameSuggestions()) {
             if (el.getText().equals(suggestion)) {
                 el.click();
                 break;
@@ -73,12 +98,12 @@ public class AdminHistoryPage {
     }
 
     public void enterStartDate(String date) {
-        startDateInput.clear();
+        wait.until(ExpectedConditions.visibilityOf(startDateInput)).clear();
         startDateInput.sendKeys(date);
     }
 
     public void enterEndDate(String date) {
-        endDateInput.clear();
+        wait.until(ExpectedConditions.visibilityOf(endDateInput)).clear();
         endDateInput.sendKeys(date);
     }
 
@@ -88,7 +113,7 @@ public class AdminHistoryPage {
 
     // TABLE INTERACTIONS
     public List<WebElement> getRideRows() {
-        return wait.until(ExpectedConditions.visibilityOfAllElements(rideRows));
+        return driver.findElements(By.cssSelector(".rides-table tbody tr"));
     }
 
     public WebElement getRideRowByIndex(int index) {
@@ -103,7 +128,8 @@ public class AdminHistoryPage {
 
     public boolean isRideDetailsVisible(int index) {
         WebElement row = getRideRowByIndex(index);
-        WebElement detailsRow = row.findElement(By.xpath("following-sibling::tr[contains(@class,'details-row')]"));
+        WebElement detailsRow = row.findElement(
+                By.xpath("following-sibling::tr[contains(@class,'details-row')]"));
         return detailsRow.isDisplayed();
     }
 
@@ -117,6 +143,6 @@ public class AdminHistoryPage {
     }
 
     public String getPageInfo() {
-        return pageInfo.getText();
+        return wait.until(ExpectedConditions.visibilityOf(pageInfo)).getText();
     }
 }

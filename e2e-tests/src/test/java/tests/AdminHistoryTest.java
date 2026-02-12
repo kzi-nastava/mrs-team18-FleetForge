@@ -1,21 +1,53 @@
 package tests;
 
 import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 import pages.AdminHistoryPage;
 import pages.NavbarPage;
 
 public class AdminHistoryTest extends TestBase {
 
+    @BeforeSuite
+    public void setUp(){
+        loginAsAdmin();
+
+        NavbarPage navbar = new NavbarPage(driver);
+        navbar.waitUntilLoggedIn();
+    }
+
+    @Test
+    public void testUsernameAutocompleteSuggestions() {
+        AdminHistoryPage adminPage = new AdminHistoryPage(driver);
+
+        // --- 1. Insert "x" -> No suggestions ---
+        adminPage.enterUsername("x");
+        adminPage.waitForSuggestionsCount(0);
+        Assert.assertEquals(adminPage.getUsernameSuggestions().size(), 0);
+
+        // --- 2. Insert "p" -> 3 suggestions ---
+        adminPage.clearUsername();
+        adminPage.enterUsername("p");
+        adminPage.waitForSuggestionsCount(3);
+        Assert.assertEquals(adminPage.getUsernameSuggestions().size(), 3);
+
+        // --- 3. Insert "passenger1" -> 1 suggestion ---
+        adminPage.clearUsername();
+        adminPage.enterUsername("passenger1");
+        adminPage.waitForSuggestionsCount(1);
+        Assert.assertEquals(adminPage.getUsernameSuggestions().size(), 1);
+
+        // --- 4. Clear input -> No suggestions ---
+        adminPage.clearUsername();
+        adminPage.enterUsername(" ");
+        adminPage.enterUsername("");
+        adminPage.waitForSuggestionsToDisappear();
+        Assert.assertEquals(adminPage.getUsernameSuggestions().size(), 0);
+    }
+
     @Test
     public void testAdminHistoryPageSelectors() {
-
-        // --- LOGIN ---
-        loginAsAdmin();
-        NavbarPage navbar = new NavbarPage(driver);
-        navbar.waitUntilLoggedIn(); // validate login succeeded
-
-        // --- ADMIN HISTORY PAGE ---
         AdminHistoryPage adminPage = new AdminHistoryPage(driver);
 
         // Use filter methods
