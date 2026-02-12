@@ -30,7 +30,10 @@
 
     <div class="rides-section">
         <div class="rides-section">
-            <div *ngIf="displayedRides.length === 0 && !isLoading()" class="no-rides-message">
+            <div *ngIf="!searchUsername && !isLoading()" class="no-rides-message">
+                <p>Please insert a username to show ride history.</p>
+            </div>
+            <div *ngIf="searchUsername && displayedRides.length === 0 && !isLoading()" class="no-rides-message">
                 <p>No rides found for the given filters.</p>
             </div>
             <div *ngIf="displayedRides.length > 0" class="table-container">
@@ -232,9 +235,6 @@
         </div>
     </div>
 </div>
-<app-notification-popup
-  [visible]="showPopup()"
-  [success]="popupSuccess()"
-  [message]="popupMessage()"
-  (closed)="closePopup()">
+<app-notification-popup [visible]="showPopup()" [success]="popupSuccess()" [message]="popupMessage()"
+    (closed)="closePopup()">
 </app-notification-popup>

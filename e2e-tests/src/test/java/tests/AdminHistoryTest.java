@@ -38,13 +38,69 @@ public class AdminHistoryTest extends TestBase {
         adminPage.waitForSuggestionsCount(1);
         Assert.assertEquals(adminPage.getUsernameSuggestions().size(), 1);
 
-        // --- 4. Clear input -> No suggestions ---
+        // --- 4. Select first suggestion ---
+        String selectedUsername =
+                adminPage.getUsernameSuggestions().get(0).getText();
+        adminPage.selectUsernameSuggestion(selectedUsername);
+        Assert.assertEquals(adminPage.getUsernameInputValue(),
+                selectedUsername,
+                "Selected username should be populated in input field");
+
+        // --- 5. Clear input -> No suggestions ---
         adminPage.clearUsername();
         adminPage.enterUsername(" ");
         adminPage.enterUsername("");
         adminPage.waitForSuggestionsToDisappear();
         Assert.assertEquals(adminPage.getUsernameSuggestions().size(), 0);
     }
+
+    @Test
+    public void testPageInitialState() {
+        AdminHistoryPage adminPage = new AdminHistoryPage(driver);
+
+        // Assert username input visible
+        Assert.assertTrue(adminPage.getUsernameInputValue().isEmpty());
+
+        // Initial info message shown
+        Assert.assertTrue(adminPage.isInitialMessageDisplayed(),
+                "Initial instruction message should be visible");
+
+        // Table should NOT be visible
+        Assert.assertFalse(adminPage.isTableDisplayed(),
+                "Rides table should not be visible before search");
+
+        // Pagination should NOT be visible
+        Assert.assertFalse(adminPage.isPaginationDisplayed(),
+                "Pagination should not be visible before search");
+    }
+
+    @Test
+    public void testValidSearch() {
+        AdminHistoryPage adminPage = new AdminHistoryPage(driver);
+
+        // Enter valid filters
+        adminPage.enterUsername("passenger1@test.com");
+        adminPage.enterStartDate("01-02-2026");
+        adminPage.enterEndDate("10-02-2026");
+
+        // Click search
+        adminPage.clickSearch();
+
+        // Wait for table to load
+        adminPage.waitForTableToLoad();
+
+        // Assert table visible
+        Assert.assertTrue(adminPage.isTableDisplayed(),
+                "Rides table should be displayed after valid search");
+
+        // Assert at 2 rows returned
+        Assert.assertEquals(adminPage.getRideRows().size(), 2, "Rides should be loaded");
+
+        // If rides exist, pagination should be visible
+        Assert.assertTrue(adminPage.isPaginationDisplayed(),
+                "Pagination should be visible when rides exist");
+    }
+
 
     @Test
     public void testAdminHistoryPageSelectors() {

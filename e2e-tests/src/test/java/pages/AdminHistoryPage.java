@@ -1,6 +1,7 @@
 package pages;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -19,6 +20,10 @@ public class AdminHistoryPage {
 
     private static final String PAGE_URL = "http://localhost:4200/admin/admin-history";
 
+    // MESSAGES
+    @FindBy(how = How.CSS, using = ".no-rides-message")
+    private WebElement noRidesMessage;
+
     // FILTERS
     @FindBy(how = How.ID, using = "username")
     private WebElement usernameInput;
@@ -32,12 +37,15 @@ public class AdminHistoryPage {
     @FindBy(how = How.CSS, using = ".filter-section button")
     private WebElement searchButton;
 
-    // Username suggestions locator (better than cached list)
-    private By suggestionsLocator = By.cssSelector(".suggestions li");
+    // Username suggestions locator
+    private final By suggestionsLocator = By.cssSelector(".suggestions li");
 
     // TABLE
     @FindBy(how = How.CSS, using = ".rides-table tbody tr")
     private List<WebElement> rideRows;
+
+    @FindBy(how = How.CSS, using = ".table-container")
+    private List<WebElement> tableContainer;
 
     // PAGINATION
     @FindBy(how = How.XPATH, using = "//div[contains(@class,'pagination')]/button[text()='Previous']")
@@ -51,7 +59,7 @@ public class AdminHistoryPage {
 
     public AdminHistoryPage(WebDriver driver) {
         this.driver = driver;
-        this.wait = new WebDriverWait(driver, 5);
+        this.wait = new WebDriverWait(driver, 3);
 
         driver.get(PAGE_URL);
         PageFactory.initElements(driver, this);
@@ -60,6 +68,10 @@ public class AdminHistoryPage {
     }
 
     // FILTER ACTIONS
+    public String getUsernameInputValue() {
+        return usernameInput.getAttribute("value");
+    }
+
     public void enterUsername(String username) {
         wait.until(ExpectedConditions.visibilityOf(usernameInput)).clear();
         usernameInput.sendKeys(username);
@@ -111,7 +123,19 @@ public class AdminHistoryPage {
         wait.until(ExpectedConditions.elementToBeClickable(searchButton)).click();
     }
 
-    // TABLE INTERACTIONS
+    // TABLE
+    public boolean isInitialMessageDisplayed() {
+        return wait.until(ExpectedConditions.visibilityOf(noRidesMessage)).isDisplayed();
+    }
+
+    public void waitForTableToLoad() {
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".rides-table")));
+    }
+
+    public boolean isTableDisplayed() {
+        return isElementVisible(By.cssSelector(".table-container"));
+    }
+
     public List<WebElement> getRideRows() {
         return driver.findElements(By.cssSelector(".rides-table tbody tr"));
     }
@@ -134,6 +158,10 @@ public class AdminHistoryPage {
     }
 
     // PAGINATION ACTIONS
+    public boolean isPaginationDisplayed() {
+        return isElementVisible(By.cssSelector(".pagination"));
+    }
+
     public void clickNextPage() {
         wait.until(ExpectedConditions.elementToBeClickable(nextPageButton)).click();
     }
@@ -144,5 +172,15 @@ public class AdminHistoryPage {
 
     public String getPageInfo() {
         return wait.until(ExpectedConditions.visibilityOf(pageInfo)).getText();
+    }
+
+    // HELPERS
+    private boolean isElementVisible(By locator) {
+        try {
+            wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+            return true;
+        } catch (TimeoutException e) {
+            return false;
+        }
     }
 }
