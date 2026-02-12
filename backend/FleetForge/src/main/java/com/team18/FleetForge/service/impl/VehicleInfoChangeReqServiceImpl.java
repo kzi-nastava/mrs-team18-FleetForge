@@ -1,6 +1,6 @@
 package com.team18.FleetForge.service.impl;
 
-import com.team18.FleetForge.model.vecihles.VehicleInformationChangeRequest;
+import com.team18.FleetForge.model.vehicles.VehicleInformationChangeRequest;
 import com.team18.FleetForge.model.enums.InformationChangeRequestStatus;
 import com.team18.FleetForge.model.users.Driver;
 import com.team18.FleetForge.repository.users.DriverRepository;
