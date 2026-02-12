@@ -31,8 +31,15 @@ public class DriverServiceImpl implements DriverService {
         if(activeDrivers.isEmpty())
             return null;
         List<Driver> availableDrivers = driverRepository.findByIsAvailableTrue();
-        List<Driver> activeDriversWithNeedeVehicle=filterByVehicleType(activeDrivers,ride.getVehicleType());
-        List<Driver> availableDriversWithNeedeVehicle=filterByVehicleType(availableDrivers,ride.getVehicleType());
+
+        List<Driver> petFriendlyListActiveDrivers= filterByPetFriendly(activeDrivers,ride.isPetFriendly());
+        List<Driver> petFriendlyListAvailableDrivers= filterByPetFriendly(availableDrivers,ride.isPetFriendly());
+
+        List<Driver> babySeatListActiveDrivers= filterByBabySeat(petFriendlyListActiveDrivers,ride.isBabySeat());
+        List<Driver> babySeatListAvailableDrivers= filterByBabySeat(petFriendlyListAvailableDrivers, ride.isBabySeat());
+
+        List<Driver> activeDriversWithNeedeVehicle=filterByVehicleType(babySeatListActiveDrivers,ride.getVehicleType());
+        List<Driver> availableDriversWithNeedeVehicle=filterByVehicleType(babySeatListAvailableDrivers,ride.getVehicleType());
 
 
         if(availableDriversWithNeedeVehicle.isEmpty()){
@@ -71,6 +78,26 @@ private List<Driver> filterByVehicleType(List<Driver> drivers, VehicleType vehic
     }
     return driversWithNeedeVehicle;
 }
+private List<Driver> filterByBabySeat(List<Driver> drivers, boolean babySeat) {
+    List<Driver> newDriversList= new ArrayList<>();
+    for(Driver driver:drivers){
+        if(driver.getVehicle().isBabySeat()==babySeat){
+            newDriversList.add(driver);
+        }
+    }
+    return newDriversList;
+}
+
+    private List<Driver> filterByPetFriendly(List<Driver> drivers, boolean petFreindly) {
+        List<Driver> newDriversList= new ArrayList<>();
+        for(Driver driver:drivers){
+            if(driver.getVehicle().isPetFriendly()==petFreindly){
+                newDriversList.add(driver);
+            }
+        }
+        return newDriversList;
+    }
+
     private boolean canDriverRideNextRide(Driver driver, Ride ride) {// ako je voznja pending i ima vozaca tog znaci da ne moze da vozi
         // jer voznje koje imaju vozaca su samo one u bliskoj buducnosti nece imati vozaca voznja koja je za npr sat vremena ili vise od sad
         List<Ride> pendingRides = rideRepository.findAllByDriverAndStatus(driver, RideStatus.ACCEPTED);
@@ -114,7 +141,9 @@ private Driver scoring(List<Driver>drivers,Ride ride){
         for(Driver driver:drivers){
             List<Ride> currentRide=rideRepository.findAllByDriverAndStatus(driver,RideStatus.IN_PROGRESS);
             if(currentRide.size()>1){
-                System.out.println("VOZAC IMA VISE OD JEDNE VOZNJE AKTIVNE! Greska!");
+                throw new IllegalArgumentException("Vozac ima vise od jedne aktivne voznje");
+            }else if(currentRide.isEmpty()){
+                throw new IllegalArgumentException("Vozac nema aktivnu voznju a nije available");
             }
             Ride rideInProgress=currentRide.get(0);
             LocalDateTime endTimeEstimation=rideInProgress.getStartTime().plusMinutes(Math.round(rideInProgress.getEstimatedDuration()));
