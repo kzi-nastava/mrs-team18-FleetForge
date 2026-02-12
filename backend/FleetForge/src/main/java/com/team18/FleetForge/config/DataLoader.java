@@ -59,7 +59,7 @@ public class DataLoader implements CommandLineRunner {
         Vehicle vehicle1 = new Vehicle(null, "Toyota Camry", VehicleType.STANDARD,
                 "NS-123-AB", 4, false, false);
         Vehicle vehicle2 = new Vehicle(null, "Mercedes S-Class", VehicleType.STANDARD,
-                "NS-456-CD", 4, true, false);
+                "NS-456-CD", 4, false, false);
 
         Driver driver1 = new Driver();
         driver1.setEmail("driver1@test.com");

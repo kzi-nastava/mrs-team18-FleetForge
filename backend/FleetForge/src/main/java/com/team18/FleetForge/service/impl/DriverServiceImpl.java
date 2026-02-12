@@ -31,8 +31,15 @@ public class DriverServiceImpl implements DriverService {
         if(activeDrivers.isEmpty())
             return null;
         List<Driver> availableDrivers = driverRepository.findByIsAvailableTrue();
-        List<Driver> activeDriversWithNeedeVehicle=filterByVehicleType(activeDrivers,ride.getVehicleType());
-        List<Driver> availableDriversWithNeedeVehicle=filterByVehicleType(availableDrivers,ride.getVehicleType());
+
+        List<Driver> petFriendlyListActiveDrivers= filterByPetFriendly(activeDrivers,ride.isPetFriendly());
+        List<Driver> petFriendlyListAvailableDrivers= filterByPetFriendly(availableDrivers,ride.isPetFriendly());
+
+        List<Driver> babySeatListActiveDrivers= filterByBabySeat(petFriendlyListActiveDrivers,ride.isBabySeat());
+        List<Driver> babySeatListAvailableDrivers= filterByBabySeat(petFriendlyListAvailableDrivers, ride.isBabySeat());
+
+        List<Driver> activeDriversWithNeedeVehicle=filterByVehicleType(babySeatListActiveDrivers,ride.getVehicleType());
+        List<Driver> availableDriversWithNeedeVehicle=filterByVehicleType(babySeatListAvailableDrivers,ride.getVehicleType());
 
 
         if(availableDriversWithNeedeVehicle.isEmpty()){
@@ -62,15 +69,35 @@ public class DriverServiceImpl implements DriverService {
             return availableDriverNearest(validAvailableDrivers, ride);
         }
     }
-private List<Driver> filterByVehicleType(List<Driver> drivers, VehicleType vehicleType) {
+    private List<Driver> filterByVehicleType(List<Driver> drivers, VehicleType vehicleType) {
         List<Driver> driversWithNeedeVehicle=new ArrayList<>();
-    for(Driver driver:drivers){
-        if(driver.getVehicle().getType()==vehicleType){
-            driversWithNeedeVehicle.add(driver);
+        for(Driver driver:drivers){
+            if(driver.getVehicle().getType()==vehicleType){
+                driversWithNeedeVehicle.add(driver);
+            }
         }
+        return driversWithNeedeVehicle;
     }
-    return driversWithNeedeVehicle;
-}
+    private List<Driver> filterByBabySeat(List<Driver> drivers, boolean babySeat) {
+        List<Driver> newDriversList= new ArrayList<>();
+        for(Driver driver:drivers){
+            if(driver.getVehicle().isBabySeat()==babySeat){
+                newDriversList.add(driver);
+            }
+        }
+        return newDriversList;
+    }
+
+    private List<Driver> filterByPetFriendly(List<Driver> drivers, boolean petFreindly) {
+        List<Driver> newDriversList= new ArrayList<>();
+        for(Driver driver:drivers){
+            if(driver.getVehicle().isPetFriendly()==petFreindly){
+                newDriversList.add(driver);
+            }
+        }
+        return newDriversList;
+    }
+
     private boolean canDriverRideNextRide(Driver driver, Ride ride) {// ako je voznja pending i ima vozaca tog znaci da ne moze da vozi
         // jer voznje koje imaju vozaca su samo one u bliskoj buducnosti nece imati vozaca voznja koja je za npr sat vremena ili vise od sad
         List<Ride> pendingRides = rideRepository.findAllByDriverAndStatus(driver, RideStatus.ACCEPTED);
@@ -90,31 +117,33 @@ private List<Driver> filterByVehicleType(List<Driver> drivers, VehicleType vehic
 
         return leftTime.toMinutes() <= 10;
     }
-private Driver scoring(List<Driver>drivers,Ride ride){
+    private Driver scoring(List<Driver>drivers,Ride ride){
         HashMap<Driver,Double> nearestInTime = nearestTimeToEndDriver(drivers);
         HashMap<Driver,Double> nearestInDistance=closestToStart(drivers,ride);
         HashMap<Driver,Double> score=new HashMap<>();
 
-    for (Driver driver : drivers) {
-        double time = nearestInTime.getOrDefault(driver, 10.0);
-        double distance = nearestInDistance.getOrDefault(driver, 0.0);
+        for (Driver driver : drivers) {
+            double time = nearestInTime.getOrDefault(driver, 10.0);
+            double distance = nearestInDistance.getOrDefault(driver, 0.0);
 
-        double totalScore = 0.3 * time + 0.7 * distance / 1000;
-        score.put(driver, totalScore);
+            double totalScore = 0.3 * time + 0.7 * distance / 1000;
+            score.put(driver, totalScore);
+        }
+
+        return score.entrySet()
+                .stream()
+                .min(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse(null);
     }
-
-    return score.entrySet()
-            .stream()
-            .min(Map.Entry.comparingByValue())
-            .map(Map.Entry::getKey)
-            .orElse(null);
-}
     private HashMap<Driver,Double> nearestTimeToEndDriver(List<Driver> drivers) {
         HashMap<Driver, Double> driverLeftTime = new HashMap<>();
         for(Driver driver:drivers){
             List<Ride> currentRide=rideRepository.findAllByDriverAndStatus(driver,RideStatus.IN_PROGRESS);
             if(currentRide.size()>1){
-                System.out.println("VOZAC IMA VISE OD JEDNE VOZNJE AKTIVNE! Greska!");
+                throw new IllegalArgumentException("Vozac ima vise od jedne aktivne voznje");
+            }else if(currentRide.isEmpty()){
+                throw new IllegalArgumentException("Vozac nema aktivnu voznju a nije available");
             }
             Ride rideInProgress=currentRide.get(0);
             LocalDateTime endTimeEstimation=rideInProgress.getStartTime().plusMinutes(Math.round(rideInProgress.getEstimatedDuration()));
@@ -122,7 +151,7 @@ private Driver scoring(List<Driver>drivers,Ride ride){
             driverLeftTime.put(driver,(double)leftTime.toMinutes());
         }
 
-       return driverLeftTime;
+        return driverLeftTime;
 
     }
 
@@ -140,7 +169,7 @@ private Driver scoring(List<Driver>drivers,Ride ride){
         }
         return driverLeftMeters;
     }
-   private double distanceInMeters(double lat1, double lon1, double lat2, double lon2) {
+    private double distanceInMeters(double lat1, double lon1, double lat2, double lon2) {
         final int R = 6371000;
         double latDistance = Math.toRadians(lat2 - lat1);
         double lonDistance = Math.toRadians(lon2 - lon1);
@@ -193,10 +222,10 @@ private Driver scoring(List<Driver>drivers,Ride ride){
         List<Ride> pendingRides=rideRepository.findAllByDriverAndStatus(null,RideStatus.ACCEPTED);
         List<Ride> upcominPendingRides=new ArrayList<>();
         for(Ride ride:pendingRides){
-           Duration dur= Duration.between(LocalDateTime.now(),ride.getStartTime());
-           if(dur.toMinutes()<=60){
-               upcominPendingRides.add(ride);
-           }
+            Duration dur= Duration.between(LocalDateTime.now(),ride.getStartTime());
+            if(dur.toMinutes()<=60){
+                upcominPendingRides.add(ride);
+            }
         }
         List<Driver> activeDrivers=driverRepository.findByIsActiveTrue();
         List<Driver> validActiveDrivers = new ArrayList<>();
