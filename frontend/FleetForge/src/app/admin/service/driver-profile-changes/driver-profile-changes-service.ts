@@ -8,7 +8,7 @@ export interface AdminRide {
   startTime: string;
   endTime: string;
   startAddress: string;
-  destinationAddress: string;
+  endAddress: string;
   status: string;
   panicActivated: boolean;
 }

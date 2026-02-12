@@ -65,6 +65,7 @@ public class RideServiceImpl implements RideService {
     private final NotificationService notificationService;
 
     private static final Set<String> ALLOWED_SORT_FIELDS = Set.of(
+            "id",
             "startTime",
             "endTime",
             "price",

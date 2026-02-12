@@ -37,8 +37,8 @@
                 <table class="rides-table">
                     <thead>
                         <tr>
-                            <th (click)="onSort('rideId')">
-                                Ride ID <span *ngIf="isSortedBy('rideId')">{{ sortDirection() === 'asc' ? '▲' : '▼'
+                            <th (click)="onSort('id')">
+                                Ride ID <span *ngIf="isSortedBy('id')">{{ sortDirection() === 'asc' ? '▲' : '▼'
                                     }}</span>
                             </th>
                             <th (click)="onSort('startTime')">
@@ -56,8 +56,8 @@
                                     '▼'
                                     }}</span>
                             </th>
-                            <th (click)="onSort('destinationAddress')">
-                                End Address <span *ngIf="isSortedBy('destinationAddress')">{{ sortDirection() === 'asc'
+                            <th (click)="onSort('endAddress')">
+                                End Address <span *ngIf="isSortedBy('endAddress')">{{ sortDirection() === 'asc'
                                     ?
                                     '▲' :
                                     '▼' }}</span>
@@ -79,7 +79,7 @@
                                 <td>{{ ride.startTime | date: 'd MMM, y HH:mm' }}</td>
                                 <td>{{ ride.endTime ? (ride.endTime | date: 'd MMM, y HH:mm') : '-' }}</td>
                                 <td>{{ ride.startAddress }}</td>
-                                <td>{{ ride.destinationAddress }}</td>
+                                <td>{{ ride.endAddress }}</td>
                                 <td>
                                     <span class="status" [class.completed]="ride.status === 'COMPLETED'"
                                         [class.cancelled]="ride.status === 'CANCELLED'">
