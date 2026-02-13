@@ -1,5 +1,6 @@
 package com.team18.FleetForge.config;
 
+import com.team18.FleetForge.model.ride.*;
 import com.team18.FleetForge.model.ride.GeoPoint;
 import com.team18.FleetForge.model.ride.PriceConfiguration;
 import com.team18.FleetForge.model.vehicles.Vehicle;
@@ -7,8 +8,6 @@ import com.team18.FleetForge.model.enums.RideActor;
 import com.team18.FleetForge.model.enums.Role;
 import com.team18.FleetForge.model.enums.RideStatus;
 import com.team18.FleetForge.model.enums.VehicleType;
-import com.team18.FleetForge.model.ride.FavoriteRoute;
-import com.team18.FleetForge.model.ride.Ride;
 import com.team18.FleetForge.model.users.Admin;
 import com.team18.FleetForge.model.users.Driver;
 import com.team18.FleetForge.model.users.Passenger;
@@ -16,9 +15,7 @@ import com.team18.FleetForge.model.chat.Chat;
 import com.team18.FleetForge.model.chat.ChatMessage;
 import com.team18.FleetForge.repository.chat.ChatMessageRepository;
 import com.team18.FleetForge.repository.chat.ChatRepository;
-import com.team18.FleetForge.repository.rides.FavoriteRouteRepo;
-import com.team18.FleetForge.repository.rides.PriceConfigurationRepository;
-import com.team18.FleetForge.repository.rides.RideRepository;
+import com.team18.FleetForge.repository.rides.*;
 import com.team18.FleetForge.repository.users.DriverRepository;
 import com.team18.FleetForge.repository.users.PassengerRepository;
 import com.team18.FleetForge.repository.users.UserRepository;
@@ -44,6 +41,8 @@ public class DataLoader implements CommandLineRunner {
     private final ChatRepository chatRepository;
     private final ChatMessageRepository chatMessageRepository;
     private final PriceConfigurationRepository priceConfigurationRepository;
+    private final InconsistencyReportRepository inconsistencyReportRepository;
+    private final RideReviewRepository rideReviewRepository;
 
     @Override
     public void run(String... args) {
@@ -204,7 +203,7 @@ public class DataLoader implements CommandLineRunner {
                 new GeoPoint(45.2700, 19.8500), "Liman 3",
                 LocalDateTime.now().minusDays(5).withHour(16).withMinute(0),
                 null, // No end time because cancelled
-                8.0, 25.0, 1080.0,
+                0.0, 0.0, 0.0,
                 RideStatus.CANCELLED, false, RideActor.PASSENGER,
                 "Changed plans, no longer need ride"
         );
@@ -262,7 +261,7 @@ public class DataLoader implements CommandLineRunner {
                 new GeoPoint(45.2671, 19.8335), "Trg slobode",
                 LocalDateTime.now().plusDays(5).withHour(9).withMinute(0),
                 null,
-                4.8, 18.0, 760.0,
+                0.0, 0.0, 0.0,
                 RideStatus.CANCELLED, false, RideActor.PASSENGER, null
         );
         rideRepository.save(ride9);
@@ -284,7 +283,7 @@ public class DataLoader implements CommandLineRunner {
                 new GeoPoint(45.2630, 19.8410), "Delta City, Novi Sad",
                 LocalDateTime.now().minusDays(8).withHour(19).withMinute(15),
                 null,
-                3.8, 15.0, 680.0,
+                0.0, 0.0, 0.0,
                 RideStatus.CANCELLED, false, RideActor.DRIVER,
                 "Vehicle breakdown"
         );
@@ -320,7 +319,7 @@ public class DataLoader implements CommandLineRunner {
                 new GeoPoint(45.2700, 19.8350), "Centar, Novi Sad",
                 LocalDateTime.now().minusDays(4).withHour(14).withMinute(0),
                 null,
-                7.2, 30.0, 1150.0,
+                0.0, 0.0, 0.0,
                 RideStatus.CANCELLED, false, RideActor.PASSENGER,
                 "Found alternative transportation"
         );
@@ -380,7 +379,7 @@ public class DataLoader implements CommandLineRunner {
                 new GeoPoint(45.2540, 19.8390), "Mise Dimitrijevica 12, Novi Sad",
                 LocalDateTime.now().minusHours(3).withMinute(0),
                 null,
-                3.5, 14.0, 580.0,
+                0.0, 0.0,0.0,
                 RideStatus.CANCELLED, false, RideActor.PASSENGER,
                 "Plans changed unexpectedly"
         );
@@ -398,6 +397,26 @@ public class DataLoader implements CommandLineRunner {
         );
         ride20.setLinkedPassengers(new ArrayList<>(List.of(passenger1, passenger2)));
         rideRepository.save(ride20);
+
+        InconsistencyReport report = InconsistencyReport.builder()
+                .ride(ride20)
+                .reporter(passenger2)
+                .description("Driver took wrong turn")
+                .reportedAt(LocalDateTime.now().minusHours(12).withMinute(0))
+                .reportLocation(new GeoPoint(45.2600, 19.8400))
+                .build();
+
+        inconsistencyReportRepository.save(report);
+
+        RideReview review = RideReview.builder()
+                .ride(ride20)
+                .passenger(passenger4)
+                .vehicleRating(4)
+                .driverRating(2)
+                .comment("Driver very rude")
+                .reviewedAt(LocalDateTime.now().minusHours(12).withMinute(0))
+                .build();
+        rideReviewRepository.save(review);
 
 
         FavoriteRoute route=new FavoriteRoute();

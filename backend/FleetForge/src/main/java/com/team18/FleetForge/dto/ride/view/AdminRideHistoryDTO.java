@@ -14,7 +14,7 @@ public class AdminRideHistoryDTO {
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private String startAddress;
-    private String destinationAddress;
+    private String endAddress;
     private boolean panicActivated;
     private RideStatus status;
 }
