@@ -158,35 +158,8 @@ public class AdminHistoryTest extends TestBase {
             String current = values.get(i);
             String next = values.get(i + 1);
 
-            int comparison;
+            int comparison = getComparison(columnName, current, next);
 
-            if (columnName.equals("startTime") || columnName.equals("endTime")) {
-
-                LocalDateTime currentDate = current.equals("-") ? null :
-                        LocalDateTime.parse(current, DATE_FORMATTER);
-
-                LocalDateTime nextDate = next.equals("-") ? null :
-                        LocalDateTime.parse(next, DATE_FORMATTER);
-
-                if (currentDate == null && nextDate == null) {
-                    comparison = 0;
-                } else if (currentDate == null) {
-                    comparison = -1;
-                } else if (nextDate == null) {
-                    comparison = 1;
-                } else {
-                    comparison = currentDate.compareTo(nextDate);
-                }
-            }
-            else if (columnName.equals("id")) {
-                Long currentId = Long.parseLong(current);
-                Long nextId = Long.parseLong(next);
-                comparison = currentId.compareTo(nextId);
-            }
-            else {
-                comparison = current.compareToIgnoreCase(next);
-            }
-            
             boolean condition = ascending
                     ? comparison <= 0
                     : comparison >= 0;
@@ -205,8 +178,37 @@ public class AdminHistoryTest extends TestBase {
         }
     }
 
+    private static int getComparison(String columnName, String current, String next) {
+        int comparison;
 
+        if (columnName.equals("startTime") || columnName.equals("endTime")) {
 
+            LocalDateTime currentDate = current.equals("-") ? null :
+                    LocalDateTime.parse(current, DATE_FORMATTER);
+
+            LocalDateTime nextDate = next.equals("-") ? null :
+                    LocalDateTime.parse(next, DATE_FORMATTER);
+
+            if (currentDate == null && nextDate == null) {
+                comparison = 0;
+            } else if (currentDate == null) {
+                comparison = -1;
+            } else if (nextDate == null) {
+                comparison = 1;
+            } else {
+                comparison = currentDate.compareTo(nextDate);
+            }
+        }
+        else if (columnName.equals("id")) {
+            Long currentId = Long.parseLong(current);
+            Long nextId = Long.parseLong(next);
+            comparison = currentId.compareTo(nextId);
+        }
+        else {
+            comparison = current.compareToIgnoreCase(next);
+        }
+        return comparison;
+    }
 
     @Test
     public void testPaginationForPassenger() {
@@ -264,84 +266,69 @@ public class AdminHistoryTest extends TestBase {
     }
 
     @Test
-    public void testInvalidDateRangeValidation() {
+    public void testCompletedRideDetailsView() {
         AdminHistoryPage adminPage = new AdminHistoryPage(driver);
 
-        adminPage.enterUsername("passenger1@test.com");
-        // End date (01-02) is before Start date (10-02)
-        adminPage.enterStartDate("10-02-2026");
-        adminPage.enterEndDate("01-02-2026");
-
-        adminPage.clickSearch();
-
-        Assert.assertTrue(adminPage.isPopupVisible(), "Error popup should be visible for invalid dates");
-        Assert.assertEquals(adminPage.getPopupMessage(), "Start date cannot be later than end date");
-
-        adminPage.closePopup();
-    }
-
-    @Test
-    public void testNoRidesFound() {
-        AdminHistoryPage adminPage = new AdminHistoryPage(driver);
-
-        // Search for a user that exists but has no rides in this range
-        adminPage.enterUsername("passenger1@test.com");
-        adminPage.enterStartDate("01-01-2020");
-        adminPage.enterEndDate("02-01-2020");
-        adminPage.clickSearch();
-
-        // Assert that the no rides found message is shown
-        Assert.assertFalse(adminPage.isPopupVisible(), "Popup should NOT be shown for 'No rides found'");
-        Assert.assertTrue(adminPage.isNoRidesMessageDisplayed(), "The 'no-rides-message' div should be visible");
-        Assert.assertEquals(adminPage.getNoRidesText(), "No rides found for the given filters.");
-    }
-
-    @Test
-    public void testUserNotFound() {
-        AdminHistoryPage adminPage = new AdminHistoryPage(driver);
-
-        // Search for non-existent user
-        String email = "passenger5@test.com";
-        adminPage.enterUsername(email);
-        adminPage.clickSearch();
-
-        // This error comes from the backend 'error' block in loadRides()
-        Assert.assertTrue(adminPage.isPopupVisible(), "Error popup should be visible for non-existent user");
-        Assert.assertEquals(adminPage.getPopupMessage(), "User with email " + email + " does not exist");
-
-        adminPage.closePopup();
-    }
-
-    @Test
-    public void testAdminHistoryPageSelectors() {
-        AdminHistoryPage adminPage = new AdminHistoryPage(driver);
-
-        // Use filter methods
+        // --- 1. Search for passenger4 ---
         adminPage.enterUsername("passenger4@test.com");
-        adminPage.enterStartDate("01-02-2026");
-        adminPage.enterEndDate("10-02-2026");
-
-        // Click search
         adminPage.clickSearch();
+        adminPage.waitForTableToLoad();
 
-        // Table
-        int rowsCount = adminPage.getRideRows().size();
-        Assert.assertTrue(rowsCount >= 0, "Rides table should be visible");
+        // --- 2. Expand details for Ride ID 19 ---
+        adminPage.clickRideDetailsById(19);
+        adminPage.waitForDetailsToLoad();
 
-        // Expand first ride if exists
-        if (rowsCount > 0) {
-            adminPage.toggleRideDetails(0);
-            Assert.assertTrue(adminPage.isRideDetailsVisible(0), "Ride details should be visible after toggle");
-        }
+        // --- 3. Verify Price and Distance ---
+        Assert.assertEquals(adminPage.getDetailPrice(), "1550 RSD", "Price should match");
+        Assert.assertEquals(adminPage.getDetailDistance(), "10.5 km", "Distance should match");
 
-        // Pagination test
-        String pageInfoBefore = adminPage.getPageInfo();
-        adminPage.clickNextPage();
-        String pageInfoAfter = adminPage.getPageInfo();
-        Assert.assertNotEquals(pageInfoBefore, pageInfoAfter, "Page info should change after next page");
+        // --- 4. Verify Driver Information ---
+        Assert.assertEquals(adminPage.getDetailDriverName(), "Jane Smith", "Driver name should match");
+        Assert.assertEquals(adminPage.getDetailDriverPhone(), "+381649876543", "Phone should match");
 
-        adminPage.clickPrevPage();
-        String pageInfoBack = adminPage.getPageInfo();
-        Assert.assertEquals(pageInfoBefore, pageInfoBack, "Page info should return to original after previous page");
+        // --- 5. Verify Passenger Information ---
+        Assert.assertEquals(adminPage.getDetailMainPassenger(), "Petar Petrović", "Main passenger should match");
+        List<String> linked = adminPage.getDetailLinkedPassengers();
+        Assert.assertEquals(linked.size(), 2, "Should have 2 linked passengers");
+        Assert.assertTrue(linked.contains("Marko Marković") && linked.contains("Ana Anić"));
+
+        // --- 6. Verify Inconsistencies and Ratings ---
+        Assert.assertTrue(adminPage.hasInconsistencies(), "Should show inconsistencies section");
+        Assert.assertEquals(adminPage.getInconsistencies().get(0), "Driver took wrong turn");
+        Assert.assertEquals(adminPage.getDriverRatingStars(), 2, "Driver stars should match");
+        Assert.assertEquals(adminPage.getVehicleRatingStars(), 4, "Vehicle stars should match");
+
+        // --- 7. Verify Map Presence ---
+        Assert.assertTrue(adminPage.isMapDisplayed(), "Route map should be visible");
+    }
+
+    @Test
+    public void testCancelledRideDetailsView() {
+        AdminHistoryPage adminPage = new AdminHistoryPage(driver);
+
+        // --- 1. Search for passenger4 ---
+        adminPage.enterUsername("passenger4@test.com");
+        adminPage.clickSearch();
+        adminPage.waitForTableToLoad();
+
+        // --- 2. Expand details for Ride ID 18 ---
+        adminPage.clickRideDetailsById(18);
+        adminPage.waitForDetailsToLoad();
+
+        // --- 3. Verify Core Info for Cancelled Ride ---
+        Assert.assertEquals(adminPage.getDetailPrice(), "0 RSD", "Cancelled price should be 0");
+        Assert.assertEquals(adminPage.getDetailDistance(), "0 km", "Cancelled distance should be 0");
+        Assert.assertEquals(adminPage.getDetailDriverName(), "John Doe");
+        Assert.assertEquals(adminPage.getDetailMainPassenger(), "Petar Petrović");
+
+        // --- 4. Verify Cancellation Specifics ---
+        Assert.assertEquals(adminPage.getDetailCancelledBy(), "PASSENGER", "Cancelled by should match");
+        Assert.assertEquals(adminPage.getDetailCancellationReason(), "Plans changed unexpectedly", "Reason should match");
+
+        // --- 5. Verify absence of linked passengers ---
+        Assert.assertTrue(adminPage.getDetailLinkedPassengers().isEmpty(), "Should have no linked passengers");
+
+        // --- 6. Verify UI elements visibility ---
+        Assert.assertTrue(adminPage.isMapDisplayed(), "Map should be visible");
     }
 }

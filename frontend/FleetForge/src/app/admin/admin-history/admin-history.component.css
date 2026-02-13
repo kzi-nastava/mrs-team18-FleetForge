@@ -13,6 +13,22 @@
 	margin-bottom: 32px;
 }
 
+.map-preview {
+  background: linear-gradient(135deg, #eef4ff, #fdf7e6);
+  border: 1px solid #dfe7ff;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.map-header {
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 12px;
+}
+
 .dashboard-title {
 	font-size: 32px;
 	font-weight: 700;

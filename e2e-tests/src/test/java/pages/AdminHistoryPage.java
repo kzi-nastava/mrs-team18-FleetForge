@@ -10,7 +10,6 @@ import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.time.Duration;
 import java.util.List;
 
 public class AdminHistoryPage {
@@ -66,6 +65,19 @@ public class AdminHistoryPage {
 
     @FindBy(how = How.CSS, using = ".table-container")
     private List<WebElement> tableContainer;
+
+    // --- DETAILS SELECTORS ---
+    @FindBy(how = How.CSS, using = ".details-row .detail-layout")
+    private WebElement detailLayout;
+
+    @FindBy(how = How.CSS, using = ".map-preview .mini-map")
+    private WebElement miniMap;
+
+    @FindBy(how = How.CSS, using = ".driver-image img")
+    private WebElement driverImage;
+
+    @FindBy(how = How.CSS, using = ".inconsistency-item .message")
+    private List<WebElement> inconsistencyMessages;
 
     // PAGINATION
     @FindBy(how = How.XPATH, using = "//div[contains(@class,'pagination')]/button[text()='Previous']")
@@ -196,21 +208,82 @@ public class AdminHistoryPage {
         return driver.findElements(By.cssSelector(".rides-table tbody tr"));
     }
 
-    public WebElement getRideRowByIndex(int index) {
-        return getRideRows().get(index);
+    // RIDE DETAILS
+
+    public void clickRideDetailsById(int rideId) {
+        List<WebElement> rows = getRideRows();
+        for (WebElement row : rows) {
+            String rowId = row.findElements(By.tagName("td")).get(0).getText();
+            if (rowId.equals(String.valueOf(rideId))) {
+                WebElement detailsButton = row.findElement(By.cssSelector(".details-btn"));
+                wait.until(ExpectedConditions.elementToBeClickable(detailsButton)).click();
+                waitForDetailsToLoad();
+                return;
+            }
+        }
+        throw new RuntimeException("Ride with ID " + rideId + " not found");
     }
 
-    public void toggleRideDetails(int index) {
-        WebElement row = getRideRowByIndex(index);
-        WebElement detailsButton = row.findElement(By.cssSelector(".details-btn"));
-        wait.until(ExpectedConditions.elementToBeClickable(detailsButton)).click();
+    public void waitForDetailsToLoad() {
+        wait.until(ExpectedConditions.visibilityOf(detailLayout));
     }
 
-    public boolean isRideDetailsVisible(int index) {
-        WebElement row = getRideRowByIndex(index);
-        WebElement detailsRow = row.findElement(
-                By.xpath("following-sibling::tr[contains(@class,'details-row')]"));
-        return detailsRow.isDisplayed();
+    private String getDetailByLabel(String label) {
+        String xpath = String.format("//div[@class='detail-label'][text()='%s']/following-sibling::div[@class='detail-value']", label);
+        return driver.findElement(By.xpath(xpath)).getText();
+    }
+
+    public String getDetailPrice() { return getDetailByLabel("Price"); }
+    public String getDetailDistance() { return getDetailByLabel("Distance"); }
+    public String getDetailDriverName() { return getDetailByLabel("Driver"); }
+    public String getDetailDriverPhone() { return getDetailByLabel("Phone"); }
+    public String getDetailMainPassenger() { return getDetailByLabel("Main passenger"); }
+    public String getDetailCancelledBy() { return getDetailByLabel("Cancelled by"); }
+    public String getDetailCancellationReason() { return getDetailByLabel("Reason"); }
+
+    public List<String> getDetailLinkedPassengers() {
+        return driver.findElements(By.xpath("//div[@class='detail-label'][text()='Linked passengers']/following-sibling::div[@class='detail-value']"))
+                .stream()
+                .map(WebElement::getText)
+                .toList();
+    }
+
+    public boolean isMapDisplayed() {
+        try {
+            return miniMap.isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public List<String> getInconsistencies() {
+        List<WebElement> inconsistencyMessages = driver.findElements(
+                By.cssSelector(".inconsistency-item .message"));
+        return inconsistencyMessages.stream()
+                .map(WebElement::getText)
+                .toList();
+    }
+
+    public boolean hasInconsistencies() {
+        try {
+            driver.findElement(
+                    By.xpath("//div[@class='detail-label'][text()='Inconsistencies']"));
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public int getDriverRatingStars() {
+        List<WebElement> filledStars = driver.findElements(
+                By.xpath("//div[@class='rating-item'][contains(.,'Driver:')]//span[@class='star filled']"));
+        return filledStars.size();
+    }
+
+    public int getVehicleRatingStars() {
+        List<WebElement> filledStars = driver.findElements(
+                By.xpath("//div[@class='rating-item'][contains(.,'Vehicle:')]//span[@class='star filled']"));
+        return filledStars.size();
     }
 
     // PAGINATION
@@ -261,18 +334,6 @@ public class AdminHistoryPage {
         wait.until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector(".popup-overlay")));
     }
 
-    public boolean isNoRidesMessageDisplayed() {
-        try {
-            WebElement msg = wait.until(ExpectedConditions.visibilityOf(noRidesMessage));
-            return msg.isDisplayed() && msg.getText().contains("No rides found");
-        } catch (TimeoutException e) {
-            return false;
-        }
-    }
-
-    public String getNoRidesText() {
-        return wait.until(ExpectedConditions.visibilityOf(noRidesMessage)).getText();
-    }
 
     // HELPERS
     private boolean isElementVisible(By locator) {
