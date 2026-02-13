@@ -2,7 +2,7 @@ package com.team18.FleetForge.config;
 
 import com.team18.FleetForge.model.ride.GeoPoint;
 import com.team18.FleetForge.model.ride.PriceConfiguration;
-import com.team18.FleetForge.model.vecihles.Vehicle;
+import com.team18.FleetForge.model.vehicles.Vehicle;
 import com.team18.FleetForge.model.enums.RideActor;
 import com.team18.FleetForge.model.enums.Role;
 import com.team18.FleetForge.model.enums.RideStatus;

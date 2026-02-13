@@ -13,8 +13,8 @@ import com.team18.FleetForge.model.users.DriverProfileChangeRequest;
 import com.team18.FleetForge.model.users.DriverSession;
 import com.team18.FleetForge.model.users.User;
 import com.team18.FleetForge.model.enums.InformationChangeRequestStatus;
-import com.team18.FleetForge.model.vecihles.Vehicle;
-import com.team18.FleetForge.model.vecihles.VehicleInformationChangeRequest;
+import com.team18.FleetForge.model.vehicles.Vehicle;
+import com.team18.FleetForge.model.vehicles.VehicleInformationChangeRequest;
 import com.team18.FleetForge.service.*;
 import com.team18.FleetForge.service.rides.RideService;
 import com.team18.FleetForge.service.users.*;
@@ -32,9 +32,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 

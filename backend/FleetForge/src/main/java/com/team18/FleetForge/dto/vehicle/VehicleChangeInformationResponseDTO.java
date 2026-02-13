@@ -1,7 +1,7 @@
 package com.team18.FleetForge.dto.vehicle;
 
-import com.team18.FleetForge.model.vecihles.Vehicle;
-import com.team18.FleetForge.model.vecihles.VehicleInformationChangeRequest;
+import com.team18.FleetForge.model.vehicles.Vehicle;
+import com.team18.FleetForge.model.vehicles.VehicleInformationChangeRequest;
 import com.team18.FleetForge.model.enums.VehicleType;
 import com.team18.FleetForge.model.users.Driver;
 import jakarta.validation.constraints.Min;

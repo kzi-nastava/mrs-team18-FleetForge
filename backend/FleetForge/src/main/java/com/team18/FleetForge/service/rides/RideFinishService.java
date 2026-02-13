@@ -4,6 +4,8 @@ import com.team18.FleetForge.dto.driver.DriverInfoDTO;
 import com.team18.FleetForge.dto.ride.lifecycle.FinishRideRequestDTO;
 import com.team18.FleetForge.dto.ride.lifecycle.FinishRideResponseDTO;
 import com.team18.FleetForge.dto.ride.view.RideTrackingDTO;
+import com.team18.FleetForge.exception.ride.RideNotActiveException;
+import com.team18.FleetForge.exception.ride.RideNotFoundException;
 import com.team18.FleetForge.model.enums.NotificationType;
 import com.team18.FleetForge.model.enums.RideStatus;
 import com.team18.FleetForge.model.enums.VehicleType;
@@ -45,49 +47,58 @@ public class RideFinishService {
     @Transactional
     public FinishRideResponseDTO finishRide(FinishRideRequestDTO request) {
         Ride ride = rideRepository.findById(request.getRideId())
-                .orElseThrow(() -> new RuntimeException("Ride not found with id: " + request.getRideId()));
+                .orElseThrow(() -> new RideNotFoundException("Ride not found with id: " + request.getRideId()));
 
         if (ride.getStatus() != RideStatus.IN_PROGRESS) {
-            throw new RuntimeException("Cannot finish ride. Ride is not in progress. Current status: " + ride.getStatus());
+            throw new RideNotActiveException("Ride is not in progress. Current status: " + ride.getStatus());
         }
 
         ride.setStatus(RideStatus.COMPLETED);
         ride.setEndTime(LocalDateTime.now());
 
-
-        System.out.println("FFLOG: Ride ID: " + ride.getId());
         LocalDateTime startTime = ride.getStartTime();
 
+        Driver driver = ride.getDriver();
+        double distanceToEnd = GeoUtils.distanceKm(
+                driver.getCurrentLocation().getLatitude(),
+                driver.getCurrentLocation().getLongitude(),
+                ride.getEndLocation().getLatitude(),
+                ride.getEndLocation().getLongitude()
+        );
 
-        List<RideLocation> locations =
-                rideLocationRepository
-                        .findByRideAndRecordedAtAfterOrderByRecordedAtAsc(
-                                ride,
-                                startTime
-                        );
+        double totalDistanceKm;
 
-        double totalDistanceKm = 0.0;
+        if (distanceToEnd <= 0.1) {
+            totalDistanceKm = ride.getTotalDistance();
+        } else {
 
+            List<RideLocation> locations =
+                    rideLocationRepository
+                            .findByRideAndRecordedAtAfterOrderByRecordedAtAsc(
+                                    ride,
+                                    startTime
+                            );
 
-        System.out.println("FFLOG: RideLocation ID: " + locations.get(0).getId());
-        System.out.println("FFLOG: Number of RideLocations: " + locations.size());
+            totalDistanceKm = 0.0;
 
-        for (int i = 1; i < locations.size(); i++) {
+            System.out.println("FFLOG: Recalculating distance from " + locations.size() + " GPS points");
 
-            RideLocation prev = locations.get(i - 1);
-            RideLocation curr = locations.get(i);
+            for (int i = 1; i < locations.size(); i++) {
+                RideLocation prev = locations.get(i - 1);
+                RideLocation curr = locations.get(i);
 
-            totalDistanceKm += GeoUtils.distanceKm(
-                    prev.getLatitude(), prev.getLongitude(),
-                    curr.getLatitude(), curr.getLongitude()
-            );
+                totalDistanceKm += GeoUtils.distanceKm(
+                        prev.getLatitude(), prev.getLongitude(),
+                        curr.getLatitude(), curr.getLongitude()
+                );
+                totalDistanceKm = BigDecimal.valueOf(totalDistanceKm)
+                        .setScale(2, RoundingMode.HALF_UP)
+                        .doubleValue();
+
+                ride.setTotalDistance(totalDistanceKm);
+            }
         }
 
-        double roundedDistance = BigDecimal.valueOf(totalDistanceKm)
-                .setScale(2, RoundingMode.HALF_UP)
-                .doubleValue();
-
-        ride.setTotalDistance(roundedDistance);
 
         VehicleType vehicleType = ride.getVehicleType();
 
@@ -104,7 +115,6 @@ public class RideFinishService {
 
         rideRepository.save(ride);
 
-        Driver driver = ride.getDriver();
         List<Ride> activeRides = rideRepository.findAllByDriverAndStatus(driver, RideStatus.ACCEPTED);
         activeRides.sort((r1, r2) -> r1.getStartTime().compareTo(r2.getStartTime()));
 
@@ -145,12 +155,6 @@ public class RideFinishService {
 
         sendRideCompletionEmails(ride);
         notificationService.sendNotificationToUser(ride.getPassenger(), NotificationType.RIDE_COMPLETED, "Ride finished", ride);
-
-        if (ride.getLinkedPassengers() != null && !ride.getLinkedPassengers().isEmpty()) {
-            for (Passenger passenger : ride.getLinkedPassengers()) {
-                sendRideCompletionEmails(ride);
-            }
-        }
 
         notificationService.sendNotificationToLinkedPassengers(
                 ride,

@@ -1,4 +1,4 @@
-package com.team18.FleetForge.model.vecihles;
+package com.team18.FleetForge.model.vehicles;
 
 import com.team18.FleetForge.model.enums.InformationChangeRequestStatus;
 import com.team18.FleetForge.model.enums.VehicleType;
