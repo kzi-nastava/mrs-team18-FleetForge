@@ -211,6 +211,9 @@ public class RideServiceImpl implements RideService {
     @Transactional
     @Override
     public Ride createRide(RideCreateRequestDTO rideCreateRequestDTO) {
+        if (rideCreateRequestDTO.getCoordinates() == null || rideCreateRequestDTO.getCoordinates().size() < 2) {
+            throw new IllegalArgumentException("Ride must have at least a start and end coordinate.");
+        }
         Ride ride = new Ride();
         List<WayPointDTO> wayPoints = new ArrayList<>(rideCreateRequestDTO.getCoordinates());
         ride.setStartLocation(wayPoints.get(0).getLocation());
@@ -240,9 +243,10 @@ public class RideServiceImpl implements RideService {
         List<Passenger>  passengers = new ArrayList<>();
         for(String email:rideCreateRequestDTO.getPassengerEmails()){
             Optional<User> user=userRepository.findByEmail(email);
-            if(user.isPresent()) {
-                Passenger passenger = (Passenger) user.get();
+            if(user.isPresent()&& user.get() instanceof Passenger passenger) {
                 passengers.add(passenger);
+            }else{
+                throw new InvalidUserRoleException("User must be passenger");
             }
         }
         ride.setLinkedPassengers(passengers);
@@ -278,7 +282,7 @@ public class RideServiceImpl implements RideService {
                 return null;
             }
         }
-         rideRepository.save(ride);
+        rideRepository.save(ride);
 
         if (ride.getLinkedPassengers() != null && !ride.getLinkedPassengers().isEmpty()) {
             for (Passenger linkedPassenger : ride.getLinkedPassengers()) {

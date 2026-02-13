@@ -1,7 +1,7 @@
 package com.team18.FleetForge.dto.vehicle;
 
 
-import com.team18.FleetForge.model.vecihles.VehicleInformationChangeRequest;
+import com.team18.FleetForge.model.vehicles.VehicleInformationChangeRequest;
 import com.team18.FleetForge.model.enums.InformationChangeRequestStatus;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

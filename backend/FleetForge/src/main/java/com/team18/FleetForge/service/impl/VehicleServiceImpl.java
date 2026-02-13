@@ -1,7 +1,7 @@
 package com.team18.FleetForge.service.impl;
 
 import com.team18.FleetForge.dto.vehicle.VehicleLocationDTO;
-import com.team18.FleetForge.model.vecihles.Vehicle;
+import com.team18.FleetForge.model.vehicles.Vehicle;
 import com.team18.FleetForge.model.users.Driver;
 import com.team18.FleetForge.repository.users.DriverRepository;
 import com.team18.FleetForge.repository.vehicles.VehicleRepo;

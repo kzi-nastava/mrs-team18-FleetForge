@@ -1,6 +1,6 @@
 package com.team18.FleetForge.repository.vehicles;
 
-import com.team18.FleetForge.model.vecihles.VehicleInformationChangeRequest;
+import com.team18.FleetForge.model.vehicles.VehicleInformationChangeRequest;
 import com.team18.FleetForge.model.enums.InformationChangeRequestStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 

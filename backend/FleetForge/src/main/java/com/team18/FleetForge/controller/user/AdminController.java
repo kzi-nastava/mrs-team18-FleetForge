@@ -1,17 +1,15 @@
 package com.team18.FleetForge.controller.user;
 
 
-import com.team18.FleetForge.dto.RouteDTO;
 import com.team18.FleetForge.dto.admin.*;
 import com.team18.FleetForge.dto.ride.view.AdminRideDetailsDTO;
 import com.team18.FleetForge.dto.ride.view.AdminRideHistoryDTO;
 import com.team18.FleetForge.dto.vehicle.VehicleChangeInformationResponseDTO;
 import com.team18.FleetForge.model.users.DriverProfileChangeRequest;
-import com.team18.FleetForge.model.ride.GeoPoint;
 import com.team18.FleetForge.model.users.Admin;
 import com.team18.FleetForge.model.users.Driver;
-import com.team18.FleetForge.model.vecihles.Vehicle;
-import com.team18.FleetForge.model.vecihles.VehicleInformationChangeRequest;
+import com.team18.FleetForge.model.vehicles.Vehicle;
+import com.team18.FleetForge.model.vehicles.VehicleInformationChangeRequest;
 import com.team18.FleetForge.model.enums.InformationChangeRequestStatus;
 import com.team18.FleetForge.service.rides.RideService;
 import jakarta.validation.Valid;

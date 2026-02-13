@@ -1,6 +1,6 @@
 package com.team18.FleetForge.service.vehicles;
 
-import com.team18.FleetForge.model.vecihles.VehicleInformationChangeRequest;
+import com.team18.FleetForge.model.vehicles.VehicleInformationChangeRequest;
 import com.team18.FleetForge.model.users.Driver;
 
 import java.util.List;

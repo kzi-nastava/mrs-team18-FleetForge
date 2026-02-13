@@ -2,7 +2,7 @@ package com.team18.FleetForge.model.users;
 
 
 import com.team18.FleetForge.model.ride.GeoPoint;
-import com.team18.FleetForge.model.vecihles.Vehicle;
+import com.team18.FleetForge.model.vehicles.Vehicle;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
