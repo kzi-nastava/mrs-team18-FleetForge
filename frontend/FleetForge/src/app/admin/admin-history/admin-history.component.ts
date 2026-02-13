@@ -125,16 +125,24 @@ export class AdminHistoryComponent {
   }
 
   onUsernameInputChange(): void {
-    if (this.searchUsername.trim() === '') {
-      this.showSuggestions = false;
-      this.usernameSuggestions = [];
-      return;
-    }
-        
-    this.showSuggestions = true;
+  if (this.searchUsername.trim() === '') {
+    this.showSuggestions = false;
+    this.usernameSuggestions = [];
 
-    this.searchSubject.next(this.searchUsername);
+    this.rides.set([]);          
+    this.totalPages.set(0);      
+    this.currentPage.set(0);     
+    
+    this.expandedRideId = null;  
+    this.rideDetails.set({});    
+    this.detailsLoading.set(new Set());
+
+    return;
   }
+        
+  this.showSuggestions = true;
+  this.searchSubject.next(this.searchUsername);
+}
 
   selectSuggestion(suggestion: string): void {
     this.searchUsername = suggestion;

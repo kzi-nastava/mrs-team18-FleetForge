@@ -41,6 +41,26 @@ public class AdminHistoryPage {
     private final By suggestionsLocator = By.cssSelector(".suggestions li");
 
     // TABLE
+    // Sortable headers
+    @FindBy(how = How.XPATH, using = "//th[contains(.,'Ride ID')]")
+    private WebElement rideIdHeader;
+
+    @FindBy(how = How.XPATH, using = "//th[contains(.,'Start Time')]")
+    private WebElement startTimeHeader;
+
+    @FindBy(how = How.XPATH, using = "//th[contains(.,'End Time')]")
+    private WebElement endTimeHeader;
+
+    @FindBy(how = How.XPATH, using = "//th[contains(.,'Start Address')]")
+    private WebElement startAddressHeader;
+
+    @FindBy(how = How.XPATH, using = "//th[contains(.,'End Address')]")
+    private WebElement endAddressHeader;
+
+    @FindBy(how = How.XPATH, using = "//th[contains(.,'Status')]")
+    private WebElement statusHeader;
+
+    // table body
     @FindBy(how = How.CSS, using = ".rides-table tbody tr")
     private List<WebElement> rideRows;
 
@@ -124,6 +144,32 @@ public class AdminHistoryPage {
     }
 
     // TABLE
+    public void sortBy(String column) {
+        WebElement header;
+
+        switch (column) {
+            case "id": header = rideIdHeader; break;
+            case "startTime": header = startTimeHeader; break;
+            case "endTime": header = endTimeHeader; break;
+            case "startAddress": header = startAddressHeader; break;
+            case "endAddress": header = endAddressHeader; break;
+            case "status": header = statusHeader; break;
+            default: throw new IllegalArgumentException("Invalid column: " + column);
+        }
+
+        wait.until(ExpectedConditions.elementToBeClickable(header)).click();
+        waitForTableToLoad();
+    }
+
+    public List<String> getColumnValues(int columnIndex) {
+        List<WebElement> rows = driver.findElements(
+                By.cssSelector(".rides-table tbody tr"));
+
+        return rows.stream()
+                .map(row -> row.findElements(By.tagName("td")).get(columnIndex).getText())
+                .toList();
+    }
+
     public boolean isInitialMessageDisplayed() {
         return wait.until(ExpectedConditions.visibilityOf(noRidesMessage)).isDisplayed();
     }
@@ -157,7 +203,24 @@ public class AdminHistoryPage {
         return detailsRow.isDisplayed();
     }
 
-    // PAGINATION ACTIONS
+    // PAGINATION
+    public boolean isNextEnabled() {
+        return nextPageButton.isEnabled();
+    }
+
+    public boolean isPrevEnabled() {
+        return prevPageButton.isEnabled();
+    }
+
+    public String getCurrentPageInfo() {
+        return pageInfo.getText();
+    }
+
+    public void waitForTableRefresh() {
+        wait.until(ExpectedConditions.visibilityOfElementLocated(
+                By.cssSelector(".rides-table")));
+    }
+
     public boolean isPaginationDisplayed() {
         return isElementVisible(By.cssSelector(".pagination"));
     }
