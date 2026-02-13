@@ -3,7 +3,7 @@ package com.team18.FleetForge.RideOrderTest.repository;
 import com.team18.FleetForge.model.enums.Role;
 import com.team18.FleetForge.model.enums.VehicleType;
 import com.team18.FleetForge.model.users.Driver;
-import com.team18.FleetForge.model.vecihles.Vehicle;
+import com.team18.FleetForge.model.vehicles.Vehicle;
 import com.team18.FleetForge.repository.users.DriverRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;

@@ -4,7 +4,7 @@ import com.team18.FleetForge.model.enums.Role;
 import com.team18.FleetForge.model.enums.VehicleType;
 import com.team18.FleetForge.model.users.Driver;
 import com.team18.FleetForge.model.users.DriverSession;
-import com.team18.FleetForge.model.vecihles.Vehicle;
+import com.team18.FleetForge.model.vehicles.Vehicle;
 import com.team18.FleetForge.repository.users.DriverRepository;
 import com.team18.FleetForge.repository.users.DriverSessionRepo;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -6,7 +6,7 @@ import com.team18.FleetForge.model.ride.GeoPoint;
 import com.team18.FleetForge.model.ride.Ride;
 import com.team18.FleetForge.model.users.Driver;
 import com.team18.FleetForge.model.users.DriverSession;
-import com.team18.FleetForge.model.vecihles.Vehicle;
+import com.team18.FleetForge.model.vehicles.Vehicle;
 import com.team18.FleetForge.repository.rides.RideRepository;
 import com.team18.FleetForge.repository.users.DriverRepository;
 import com.team18.FleetForge.repository.users.DriverSessionRepo;

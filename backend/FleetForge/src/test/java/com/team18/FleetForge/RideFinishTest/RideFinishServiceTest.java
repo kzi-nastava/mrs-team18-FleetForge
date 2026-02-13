@@ -1,4 +1,4 @@
-package com.team18.FleetForge.service.rides;
+package com.team18.FleetForge.RideFinishTest;
 
 import com.team18.FleetForge.dto.ride.lifecycle.FinishRideRequestDTO;
 import com.team18.FleetForge.dto.ride.lifecycle.FinishRideResponseDTO;
@@ -18,6 +18,7 @@ import com.team18.FleetForge.repository.users.DriverRepository;
 import com.team18.FleetForge.service.EmailService;
 import com.team18.FleetForge.service.NotificationService;
 import com.team18.FleetForge.service.PriceCalculationService;
+import com.team18.FleetForge.service.rides.RideFinishService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
