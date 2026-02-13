@@ -158,8 +158,35 @@ public class AdminHistoryTest extends TestBase {
             String current = values.get(i);
             String next = values.get(i + 1);
 
-            int comparison = getComparison(columnName, current, next);
+            int comparison;
 
+            if (columnName.equals("startTime") || columnName.equals("endTime")) {
+
+                LocalDateTime currentDate = current.equals("-") ? null :
+                        LocalDateTime.parse(current, DATE_FORMATTER);
+
+                LocalDateTime nextDate = next.equals("-") ? null :
+                        LocalDateTime.parse(next, DATE_FORMATTER);
+
+                if (currentDate == null && nextDate == null) {
+                    comparison = 0;
+                } else if (currentDate == null) {
+                    comparison = -1;
+                } else if (nextDate == null) {
+                    comparison = 1;
+                } else {
+                    comparison = currentDate.compareTo(nextDate);
+                }
+            }
+            else if (columnName.equals("id")) {
+                Long currentId = Long.parseLong(current);
+                Long nextId = Long.parseLong(next);
+                comparison = currentId.compareTo(nextId);
+            }
+            else {
+                comparison = current.compareToIgnoreCase(next);
+            }
+            
             boolean condition = ascending
                     ? comparison <= 0
                     : comparison >= 0;
@@ -178,37 +205,7 @@ public class AdminHistoryTest extends TestBase {
         }
     }
 
-    private static int getComparison(String columnName, String current, String next) {
-        int comparison;
 
-        if (columnName.equals("startTime") || columnName.equals("endTime")) {
-
-            LocalDateTime currentDate = current.equals("-") ? null :
-                    LocalDateTime.parse(current, DATE_FORMATTER);
-
-            LocalDateTime nextDate = next.equals("-") ? null :
-                    LocalDateTime.parse(next, DATE_FORMATTER);
-
-            if (currentDate == null && nextDate == null) {
-                comparison = 0;
-            } else if (currentDate == null) {
-                comparison = -1;
-            } else if (nextDate == null) {
-                comparison = 1;
-            } else {
-                comparison = currentDate.compareTo(nextDate);
-            }
-        }
-        else if (columnName.equals("id")) {
-            Long currentId = Long.parseLong(current);
-            Long nextId = Long.parseLong(next);
-            comparison = currentId.compareTo(nextId);
-        }
-        else {
-            comparison = current.compareToIgnoreCase(next);
-        }
-        return comparison;
-    }
 
 
     @Test
@@ -251,6 +248,69 @@ public class AdminHistoryTest extends TestBase {
         Assert.assertTrue(secondPageInfo.contains("Page 2 of 2"));
     }
 
+    @Test
+    public void testEmptyUsernameValidation() {
+        AdminHistoryPage adminPage = new AdminHistoryPage(driver);
+
+        // Ensure username is empty and click search
+        adminPage.clearUsername();
+        adminPage.clickSearch();
+
+        // Assert popup is shown with specific message
+        Assert.assertTrue(adminPage.isPopupVisible(), "Error popup should be visible");
+        Assert.assertEquals(adminPage.getPopupMessage(), "Username cannot be empty");
+
+        adminPage.closePopup();
+    }
+
+    @Test
+    public void testInvalidDateRangeValidation() {
+        AdminHistoryPage adminPage = new AdminHistoryPage(driver);
+
+        adminPage.enterUsername("passenger1@test.com");
+        // End date (01-02) is before Start date (10-02)
+        adminPage.enterStartDate("10-02-2026");
+        adminPage.enterEndDate("01-02-2026");
+
+        adminPage.clickSearch();
+
+        Assert.assertTrue(adminPage.isPopupVisible(), "Error popup should be visible for invalid dates");
+        Assert.assertEquals(adminPage.getPopupMessage(), "Start date cannot be later than end date");
+
+        adminPage.closePopup();
+    }
+
+    @Test
+    public void testNoRidesFound() {
+        AdminHistoryPage adminPage = new AdminHistoryPage(driver);
+
+        // Search for a user that exists but has no rides in this range
+        adminPage.enterUsername("passenger1@test.com");
+        adminPage.enterStartDate("01-01-2020");
+        adminPage.enterEndDate("02-01-2020");
+        adminPage.clickSearch();
+
+        // Assert that the no rides found message is shown
+        Assert.assertFalse(adminPage.isPopupVisible(), "Popup should NOT be shown for 'No rides found'");
+        Assert.assertTrue(adminPage.isNoRidesMessageDisplayed(), "The 'no-rides-message' div should be visible");
+        Assert.assertEquals(adminPage.getNoRidesText(), "No rides found for the given filters.");
+    }
+
+    @Test
+    public void testUserNotFound() {
+        AdminHistoryPage adminPage = new AdminHistoryPage(driver);
+
+        // Search for non-existent user
+        String email = "passenger5@test.com";
+        adminPage.enterUsername(email);
+        adminPage.clickSearch();
+
+        // This error comes from the backend 'error' block in loadRides()
+        Assert.assertTrue(adminPage.isPopupVisible(), "Error popup should be visible for non-existent user");
+        Assert.assertEquals(adminPage.getPopupMessage(), "User with email " + email + " does not exist");
+
+        adminPage.closePopup();
+    }
 
     @Test
     public void testAdminHistoryPageSelectors() {

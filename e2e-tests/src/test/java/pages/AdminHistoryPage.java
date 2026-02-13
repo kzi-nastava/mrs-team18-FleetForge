@@ -77,6 +77,16 @@ public class AdminHistoryPage {
     @FindBy(how = How.CSS, using = ".pagination span")
     private WebElement pageInfo;
 
+    // POPUP LOCATORS
+    @FindBy(how = How.CSS, using = ".popup-overlay")
+    private WebElement popupOverlay;
+
+    @FindBy(how = How.CSS, using = ".popup-message")
+    private WebElement popupMessage;
+
+    @FindBy(how = How.CSS, using = ".popup-button")
+    private WebElement popupCloseButton;
+
     public AdminHistoryPage(WebDriver driver) {
         this.driver = driver;
         this.wait = new WebDriverWait(driver, 3);
@@ -235,6 +245,33 @@ public class AdminHistoryPage {
 
     public String getPageInfo() {
         return wait.until(ExpectedConditions.visibilityOf(pageInfo)).getText();
+    }
+
+    // POPUP ACTIONS
+    public boolean isPopupVisible() {
+        return isElementVisible(By.cssSelector(".popup-overlay"));
+    }
+
+    public String getPopupMessage() {
+        return wait.until(ExpectedConditions.visibilityOf(popupMessage)).getText();
+    }
+
+    public void closePopup() {
+        wait.until(ExpectedConditions.elementToBeClickable(popupCloseButton)).click();
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector(".popup-overlay")));
+    }
+
+    public boolean isNoRidesMessageDisplayed() {
+        try {
+            WebElement msg = wait.until(ExpectedConditions.visibilityOf(noRidesMessage));
+            return msg.isDisplayed() && msg.getText().contains("No rides found");
+        } catch (TimeoutException e) {
+            return false;
+        }
+    }
+
+    public String getNoRidesText() {
+        return wait.until(ExpectedConditions.visibilityOf(noRidesMessage)).getText();
     }
 
     // HELPERS
