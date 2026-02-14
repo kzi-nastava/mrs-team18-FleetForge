@@ -22,13 +22,4 @@ export class RideReviewService {
     );
   }
 
-  /**
-   * Check if a passenger can review a ride
-   * GET /api/rides/{rideId}/can-review
-   */
-  canReviewRide(rideId: number): Observable<{ canReview: boolean }> {
-    return this.http.get<{ canReview: boolean }>(
-      `${this.apiUrl}/${rideId}/can-review`
-    );
-  }
 }
