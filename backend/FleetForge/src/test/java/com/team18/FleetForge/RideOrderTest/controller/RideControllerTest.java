@@ -8,36 +8,18 @@ import com.team18.FleetForge.dto.ride.lifecycle.RideCreateResponseDTO;
 import com.team18.FleetForge.dto.ride.routes.WayPointDTO;
 import com.team18.FleetForge.model.enums.VehicleType;
 import com.team18.FleetForge.model.ride.GeoPoint;
-import com.team18.FleetForge.model.ride.Ride;
-import com.team18.FleetForge.repository.rides.RideRepository;
-import com.team18.FleetForge.repository.users.UserRepository;
-import com.team18.FleetForge.service.impl.RideServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 import org.testng.Assert;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
-import org.springframework.security.test.context.support.WithMockUser;
-
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.testng.AssertJUnit.assertFalse;
 import static org.testng.AssertJUnit.assertTrue;
 
