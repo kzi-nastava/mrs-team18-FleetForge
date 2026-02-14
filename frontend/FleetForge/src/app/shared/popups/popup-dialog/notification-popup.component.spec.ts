@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { PopupDialogComponent } from './notification-popup.component';
+import { NotificationPopupComponent } from './notification-popup.component';
 
-describe('PopupDialogComponent', () => {
-  let component: PopupDialogComponent;
-  let fixture: ComponentFixture<PopupDialogComponent>;
+describe('NotificationPopupComponent', () => {
+  let component: NotificationPopupComponent;
+  let fixture: ComponentFixture<NotificationPopupComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PopupDialogComponent]
+      imports: [NotificationPopupComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(PopupDialogComponent);
+    fixture = TestBed.createComponent(NotificationPopupComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });
