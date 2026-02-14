@@ -10,6 +10,7 @@ import com.team18.FleetForge.repository.users.DriverSessionRepo;
 import com.team18.FleetForge.repository.rides.RideRepository;
 import com.team18.FleetForge.service.users.DriverService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -30,21 +31,16 @@ public class DriverServiceImpl implements DriverService {
         List<Driver> activeDrivers = driverRepository.findByIsActiveTrue();
         if(activeDrivers.isEmpty())
             return null;
-        List<Driver> availableDrivers = driverRepository.findByIsAvailableTrue();
 
-        List<Driver> petFriendlyListActiveDrivers= filterByPetFriendly(activeDrivers,ride.isPetFriendly());
-        List<Driver> petFriendlyListAvailableDrivers= filterByPetFriendly(availableDrivers,ride.isPetFriendly());
+        List<Driver> filteredActiveDrivers=filterActiveDrivers(activeDrivers,ride);
+        if(filteredActiveDrivers.isEmpty()){
+            return null;
+        }
+        List<Driver> availableDrivers = filterAvailable(filteredActiveDrivers);
 
-        List<Driver> babySeatListActiveDrivers= filterByBabySeat(petFriendlyListActiveDrivers,ride.isBabySeat());
-        List<Driver> babySeatListAvailableDrivers= filterByBabySeat(petFriendlyListAvailableDrivers, ride.isBabySeat());
-
-        List<Driver> activeDriversWithNeedeVehicle=filterByVehicleType(babySeatListActiveDrivers,ride.getVehicleType());
-        List<Driver> availableDriversWithNeedeVehicle=filterByVehicleType(babySeatListAvailableDrivers,ride.getVehicleType());
-
-
-        if(availableDriversWithNeedeVehicle.isEmpty()){
+        if(availableDrivers.isEmpty()){
             List<Driver> canDriveNext=new ArrayList<>();
-            for(Driver driver:activeDriversWithNeedeVehicle){
+            for(Driver driver:filteredActiveDrivers){
                 if(canDriverRideNextRide(driver,ride) &&
                         checkDriverActivity(driverSessionRepo.findByDriver(driver),false)) {
                     canDriveNext.add(driver);
@@ -58,7 +54,7 @@ public class DriverServiceImpl implements DriverService {
             return driver;
         }else{
             List<Driver> validAvailableDrivers = new ArrayList<>();
-            for(Driver driver : availableDriversWithNeedeVehicle) {
+            for(Driver driver : availableDrivers) {
                 if(checkDriverActivity(driverSessionRepo.findByDriver(driver),false)) {
                     validAvailableDrivers.add(driver);
                 }
@@ -69,33 +65,24 @@ public class DriverServiceImpl implements DriverService {
             return availableDriverNearest(validAvailableDrivers, ride);
         }
     }
-    private List<Driver> filterByVehicleType(List<Driver> drivers, VehicleType vehicleType) {
-        List<Driver> driversWithNeedeVehicle=new ArrayList<>();
+    private List<Driver> filterAvailable(List<Driver> drivers){
+        List<Driver> available= new ArrayList<>();
         for(Driver driver:drivers){
-            if(driver.getVehicle().getType()==vehicleType){
-                driversWithNeedeVehicle.add(driver);
-            }
+            if(driver.isAvailable())
+                available.add(driver);
         }
-        return driversWithNeedeVehicle;
+        return available;
     }
-    private List<Driver> filterByBabySeat(List<Driver> drivers, boolean babySeat) {
-        List<Driver> newDriversList= new ArrayList<>();
+    private List<Driver> filterActiveDrivers(List<Driver> drivers, Ride ride){
+        List<Driver> filteredDrivers= new ArrayList<>();
         for(Driver driver:drivers){
-            if(driver.getVehicle().isBabySeat()==babySeat){
-                newDriversList.add(driver);
+            if(!driver.isBlocked()&&driver.getVehicle().getType()==ride.getVehicleType()
+            &&driver.getVehicle().isPetFriendly()==ride.isPetFriendly()
+            &&driver.getVehicle().isBabySeat()==ride.isBabySeat()){
+                filteredDrivers.add(driver);
             }
         }
-        return newDriversList;
-    }
-
-    private List<Driver> filterByPetFriendly(List<Driver> drivers, boolean petFreindly) {
-        List<Driver> newDriversList= new ArrayList<>();
-        for(Driver driver:drivers){
-            if(driver.getVehicle().isPetFriendly()==petFreindly){
-                newDriversList.add(driver);
-            }
-        }
-        return newDriversList;
+        return filteredDrivers;
     }
 
     private boolean canDriverRideNextRide(Driver driver, Ride ride) {// ako je voznja pending i ima vozaca tog znaci da ne moze da vozi
@@ -235,11 +222,11 @@ public class DriverServiceImpl implements DriverService {
             }
         }
         for(Ride ride:upcominPendingRides) {
-            List<Driver> validActiveWithNeededVehicle=filterByVehicleType(validActiveDrivers,ride.getVehicleType());
-            if(validActiveWithNeededVehicle.isEmpty()) {
+            List<Driver> validActive=filterActiveDrivers(validActiveDrivers,ride);
+            if(validActive.isEmpty()) {
                 return;
             }
-            Driver driver=availableDriverNearest(validActiveWithNeededVehicle,ride);
+            Driver driver=availableDriverNearest(validActive,ride);
             ride.setDriver(driver);
             driver.setAvailable(false);
             driverRepository.save(driver);
