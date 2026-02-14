@@ -398,6 +398,18 @@ public class DataLoader implements CommandLineRunner {
         ride20.setLinkedPassengers(new ArrayList<>(List.of(passenger1, passenger2)));
         rideRepository.save(ride20);
 
+        Ride ride21 = createRide(
+                driver1, passenger1,
+                new GeoPoint(45.2580, 19.8620), "Sajam, Novi Sad",
+                new GeoPoint(45.2470, 19.8250), "Novo Naselje, Novi Sad",
+                LocalDateTime.now().minusDays(4).minusHours(12).withMinute(0),
+                LocalDateTime.now().minusDays(4).minusHours(11).withMinute(20),
+                10.5, 40.0, 1550.0,
+                RideStatus.COMPLETED, false, null, null
+        );
+        rideRepository.save(ride21);
+
+
         InconsistencyReport report = InconsistencyReport.builder()
                 .ride(ride20)
                 .reporter(passenger2)

@@ -1,4 +1,4 @@
-import { Component, signal, WritableSignal } from '@angular/core';
+import { Component, signal, WritableSignal, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PassengerHistory, PassengerRideDetailsDto } from '../service/passenger-history/passenger-history';
@@ -20,7 +20,6 @@ interface Ride {
   status: RideStatus;
   driverRating?: number;
   vehicleRating?: number;
-  averageReview?: number;
   ratingComment?: string;
 }
 
@@ -43,7 +42,8 @@ export class PassengerHistoryComponent {
     private passengerHistory: PassengerHistory,
     private passengerFavorite: PassengerFavorite,
     private rideReviewService: RideReviewService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
   isRatingModalOpen = false;
   selectedRide: Ride | null = null;
@@ -304,12 +304,17 @@ export class PassengerHistoryComponent {
       })
       .subscribe({
         next: (response) => {
-          this.selectedRide!.driverRating = response.driverRating;
-          this.selectedRide!.vehicleRating = response.vehicleRating;
-          this.selectedRide!.ratingComment = response.comment;
+          if (this.selectedRide) {
+            this.selectedRide.driverRating = response.driverRating;
+            this.selectedRide.vehicleRating = response.vehicleRating;
+            this.selectedRide.ratingComment = response.comment;
+          }
 
           this.isRatingLoading = false;
-          this.closeRatingModal();
+          this.isRatingModalOpen = false;
+          this.selectedRide = null;
+          this.ratingForm = { driverRating: 0, vehicleRating: 0, comment: '' };
+          this.cdr.markForCheck();
         },
         error: (err) => {
           console.error('Failed to submit rating:', err);

@@ -78,7 +78,7 @@
 							<td class="action-cell">
 								<ng-container [ngSwitch]="getRatingState(ride)">
 									<div *ngSwitchCase="'rated'" class="stars">
-										<span *ngFor="let filled of getStarArray(ride.averageReview || 0)" class="star"
+										<span *ngFor="let filled of getStarArray(ride.driverRating || 0)" class="star"
 											[class.filled]="filled">
 											★
 										</span>
