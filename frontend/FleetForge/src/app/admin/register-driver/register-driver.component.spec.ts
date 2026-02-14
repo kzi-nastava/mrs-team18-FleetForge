@@ -34,6 +34,7 @@ describe('RegisterDriverComponent', () => {
   }
 
   beforeEach(async () => {
+    spyOn(window, 'alert');
     const registerDriverService=jasmine.createSpyObj('RegisterDriverService', ['registerDriver', 'uploadProfilePicture']);
     await TestBed.configureTestingModule({
       
@@ -81,8 +82,17 @@ describe('RegisterDriverComponent', () => {
     it('should update imageUrl on file selection', () => {
       const file = new File([''], 'test-image.jpg', { type: 'image/*' });
       const event = { target: { files: [file] } };
+      spyOn(URL, 'createObjectURL').and.returnValue('blob:http://localhost/test-image');
       component.onFileSelected(event as any);
-      expect(component.imageUrl).toContain('blob:');
+      expect(component.imageUrl).toBe('blob:http://localhost/test-image');
+      expect(component.formData.get('file')).toBe(file);
+      expect(component.registerDriverForm.get('driverInfo')?.get('profilePicture')?.value).toBe('test-image.jpg');
+    });
+    it('should do nothing when no file is present in the event', () => {
+      const originalUrl = component.imageUrl;
+      const fakeEvent = {target: { files: [] },}
+      component.onFileSelected(fakeEvent as any);
+      expect(component.imageUrl).toBe(originalUrl);
     });
   });
 
@@ -180,14 +190,108 @@ describe('RegisterDriverComponent', () => {
       });
   
     });
+    describe('Successful registration without profile picture', () => {
     it('should submit valid form and reset it', () => {
       fillValidDriverInfo(component);
       fillValidVehicleInfo(component);
       component.registerDriver();
-      const service = fixture.debugElement.injector.get(RegisterDriverService);
-      expect(service.registerDriver).toHaveBeenCalled();
-      expect(component.registerDriverForm.pristine).toBeTrue();
+      const service = fixture.debugElement.injector.get(RegisterDriverService)as jasmine.SpyObj<RegisterDriverService>;
+      expect(service.registerDriver).toHaveBeenCalled()
+      const returnedObservable = service.registerDriver.calls.mostRecent().returnValue;
+      returnedObservable.subscribe((response: DriverCreateResponseDTO) => {
+          expect(response.driverId).toBe(1);
+      });
+      expect(service.registerDriver).toHaveBeenCalledWith({
+        firstName: 'Marko',
+        lastName: 'Marković',
+        email: 'marko@gmail.com',
+        phoneNumber: '+381601234567',
+        address: 'Spens, Novi Sad',
+        vehicle: {
+          model: 'Toyota Corolla',
+          type: VehicleType.STANDARD,
+          registrationNumber: 'NS-123-AB',
+          space: 4,
+          babySeat: true,
+          petFriendly: false,
+        }
+      });
+      expect(service.uploadProfilePicture).not.toHaveBeenCalled();
       expect(component.registerDriverForm.untouched).toBeTrue();
+      expect(component.registerDriverForm.get('driverInfo')?.get('firstName')?.value).toBe('');
+      expect(component.registerDriverForm.get('driverInfo')?.get('lastName')?.value).toBe('');
+      expect(component.registerDriverForm.get('driverInfo')?.get('email')?.value).toBe('');
+      expect(component.registerDriverForm.get('driverInfo')?.get('phoneNumber')?.value).toBe('');
+      expect(component.registerDriverForm.get('driverInfo')?.get('address')?.value).toBe('');
+      expect(component.registerDriverForm.get('vehicleInfo')?.get('model')?.value).toBe('');
+      expect(component.registerDriverForm.get('vehicleInfo')?.get('type')?.value).toBe('');
+      expect(component.registerDriverForm.get('vehicleInfo')?.get('registrationNumber')?.value).toBe('');
+      expect(component.registerDriverForm.get('vehicleInfo')?.get('space')?.value).toBe('');
+      expect(component.registerDriverForm.get('vehicleInfo')?.get('babySeat')?.value).toBe(false);
+      expect(component.registerDriverForm.get('vehicleInfo')?.get('petFriendly')?.value).toBe(false);
+      expect(component.imageUrl).toBe('blank_profile.webp');
+    });
+    it('should show a success alert after a successful registration', () => {
+      fillValidDriverInfo(component);
+      fillValidVehicleInfo(component);
+      component.registerDriver();
+      expect(window.alert).toHaveBeenCalledWith('Driver successfully registered!');
     });
   });
+    describe('Successful registration with profile picture', () => {
+    it('should submit valid form with profile picture and reset it', () => {
+      const file = new File([''], 'test-image.jpg', { type: 'image/*' });
+      const event = { target: { files: [file] } };
+      component.onFileSelected(event as any);
+      expect(component.imageUrl).toContain('blob:');
+      fillValidDriverInfo(component);
+      fillValidVehicleInfo(component);
+      component.registerDriverForm.get('driverInfo')?.get('profilePicture')?.setValue(file.name);
+      component.registerDriver();
+      const service = fixture.debugElement.injector.get(RegisterDriverService)as jasmine.SpyObj<RegisterDriverService>;
+      expect(service.registerDriver).toHaveBeenCalled()
+      const returnedObservable = service.registerDriver.calls.mostRecent().returnValue;
+      returnedObservable.subscribe((response: DriverCreateResponseDTO) => {
+          expect(response.driverId).toBe(1);
+      });
+      expect(service.registerDriver).toHaveBeenCalledWith({
+        firstName: 'Marko',
+        lastName: 'Marković',
+        email: 'marko@gmail.com',
+        phoneNumber: '+381601234567',
+        address: 'Spens, Novi Sad',
+        vehicle: {
+          model: 'Toyota Corolla',
+          type: VehicleType.STANDARD,
+          registrationNumber: 'NS-123-AB',
+          space: 4,
+          babySeat: true,
+          petFriendly: false,
+        }
+        
+      });
+      expect(service.uploadProfilePicture).toHaveBeenCalledWith(component.formData, 1);
+      expect(component.registerDriverForm.untouched).toBeTrue();
+      expect(component.registerDriverForm.get('driverInfo')?.get('firstName')?.value).toBe('');
+      expect(component.registerDriverForm.get('driverInfo')?.get('lastName')?.value).toBe('');
+      expect(component.registerDriverForm.get('driverInfo')?.get('email')?.value).toBe('');
+      expect(component.registerDriverForm.get('driverInfo')?.get('phoneNumber')?.value).toBe('');
+      expect(component.registerDriverForm.get('driverInfo')?.get('address')?.value).toBe('');
+      expect(component.registerDriverForm.get('vehicleInfo')?.get('model')?.value).toBe('');
+      expect(component.registerDriverForm.get('vehicleInfo')?.get('type')?.value).toBe('');
+      expect(component.registerDriverForm.get('vehicleInfo')?.get('registrationNumber')?.value).toBe('');
+      expect(component.registerDriverForm.get('vehicleInfo')?.get('space')?.value).toBe('');
+      expect(component.registerDriverForm.get('vehicleInfo')?.get('babySeat')?.value).toBe(false);
+      expect(component.registerDriverForm.get('vehicleInfo')?.get('petFriendly')?.value).toBe(false);
+      expect(component.imageUrl).toBe('blank_profile.webp');
+
+    });  
+    it('should show a success alert after a successful registration', () => {
+      fillValidDriverInfo(component);
+      fillValidVehicleInfo(component);
+      component.registerDriver();
+      expect(window.alert).toHaveBeenCalledWith('Driver successfully registered!');
+    });
+  });
+});
 
