@@ -71,7 +71,6 @@ public class DriverServiceTest {
     @Test
     public void findAvailableDriver_noActiveDrivers_returnsNull() {
         when(driverRepository.findByIsActiveTrue()).thenReturn(new ArrayList<>());
-        when(driverRepository.findByIsAvailableTrue()).thenReturn(new ArrayList<>());
 
         Ride ride = buildRide(VehicleType.STANDARD, 45.0, 19.0);
         Driver result = driverService.findAvailableDriver(ride);
@@ -92,7 +91,6 @@ public class DriverServiceTest {
         driverList.add(driver2);
 
         when(driverRepository.findByIsActiveTrue()).thenReturn(driverList);
-        when(driverRepository.findByIsAvailableTrue()).thenReturn(driverList);
 
         DriverSession session = buildSession(LocalDateTime.now().minusHours(2), LocalDateTime.now());
         ArrayList<DriverSession> sessions=new ArrayList<>();
@@ -104,7 +102,6 @@ public class DriverServiceTest {
 
         assertNotNull(result);
         assertEquals(result, driver1);
-        verify(driverRepository).findByIsAvailableTrue();
         verify(driverRepository).findByIsActiveTrue();
         verify(driverSessionRepo).findByDriver(driver1);
         verify(driverSessionRepo).findByDriver(driver2);
@@ -118,7 +115,6 @@ public class DriverServiceTest {
         ArrayList<Driver> driverList= new ArrayList<>();
         driverList.add(driver);
         when(driverRepository.findByIsActiveTrue()).thenReturn(driverList);
-        when(driverRepository.findByIsAvailableTrue()).thenReturn(driverList);
         when(driverSessionRepo.findByDriver(any())).thenReturn(new ArrayList<>());
 
         Ride ride = buildRide(VehicleType.STANDARD, 45.0, 19.0);
@@ -126,7 +122,6 @@ public class DriverServiceTest {
 
         assertNull(result);
         verify(driverRepository).findByIsActiveTrue();
-        verify(driverRepository).findByIsAvailableTrue();
         verifyNoMoreInteractions(driverRepository);
         verifyNoInteractions(driverSessionRepo);
         verifyNoInteractions(rideRepository);
@@ -139,7 +134,6 @@ public class DriverServiceTest {
         ArrayList<Driver> driverList= new ArrayList<>();
         driverList.add(driver);
         when(driverRepository.findByIsActiveTrue()).thenReturn(driverList);
-        when(driverRepository.findByIsAvailableTrue()).thenReturn(driverList);
 
 
         DriverSession session = buildSession(LocalDateTime.now().minusHours(9), LocalDateTime.now());
@@ -152,7 +146,6 @@ public class DriverServiceTest {
 
         assertNull(result);
         verify(driverRepository).findByIsActiveTrue();
-        verify(driverRepository).findByIsAvailableTrue();
         verify(driverSessionRepo).findByDriver(driver);
         verifyNoInteractions(rideRepository);
     }
@@ -164,7 +157,6 @@ public class DriverServiceTest {
         ArrayList<Driver> driverList= new ArrayList<>();
         driverList.add(driver);
         when(driverRepository.findByIsActiveTrue()).thenReturn(driverList);
-        when(driverRepository.findByIsAvailableTrue()).thenReturn(new ArrayList<>());
 
         when(rideRepository.findAllByDriverAndStatus(driver, RideStatus.ACCEPTED)).thenReturn(new ArrayList<>()); //nema pending voznje
 
@@ -189,7 +181,6 @@ public class DriverServiceTest {
         assertNotNull(result);
         assertEquals(result, driver);
         verify(driverRepository).findByIsActiveTrue();
-        verify(driverRepository).findByIsAvailableTrue();
         verify(driverSessionRepo).findByDriver(driver);
         verify(rideRepository).findAllByDriverAndStatus(driver,RideStatus.ACCEPTED);
        // verify(rideRepository).findAllByDriverAndStatus(driver,RideStatus.IN_PROGRESS);
@@ -202,7 +193,6 @@ public class DriverServiceTest {
         ArrayList<Driver> driverList= new ArrayList<>();
         driverList.add(driver);
         when(driverRepository.findByIsActiveTrue()).thenReturn(driverList);
-        when(driverRepository.findByIsAvailableTrue()).thenReturn(new ArrayList<>());
 
         // ima pending vožnju
         ArrayList<Ride> rides= new ArrayList<>();
@@ -214,7 +204,6 @@ public class DriverServiceTest {
 
         assertNull(result);
         verify(driverRepository).findByIsActiveTrue();
-        verify(driverRepository).findByIsAvailableTrue();
         verifyNoInteractions(driverSessionRepo);
         verify(rideRepository).findAllByDriverAndStatus(driver,RideStatus.ACCEPTED);
         verifyNoMoreInteractions(rideRepository);
@@ -228,7 +217,6 @@ public class DriverServiceTest {
         ArrayList<Driver> driverList= new ArrayList<>();
         driverList.add(driver);
         when(driverRepository.findByIsActiveTrue()).thenReturn(driverList);
-        when(driverRepository.findByIsAvailableTrue()).thenReturn(new ArrayList<>());
 
         when(rideRepository.findAllByDriverAndStatus(driver, RideStatus.ACCEPTED)).thenReturn(new ArrayList<>());
         when(rideRepository.findAllByDriverAndStatus(driver, RideStatus.IN_PROGRESS)).thenReturn(new ArrayList<>());
@@ -243,7 +231,6 @@ public class DriverServiceTest {
 
         assertNotNull(result);
         verify(driverRepository).findByIsActiveTrue();
-        verify(driverRepository).findByIsAvailableTrue();
         verify(rideRepository).findAllByDriverAndStatus(driver,RideStatus.ACCEPTED);
         verify(rideRepository).findAllByDriverAndStatus(driver,RideStatus.IN_PROGRESS);
         verify(rideRepository).findAllByDriverAndStatus(driver,RideStatus.IN_PROGRESS);
@@ -259,7 +246,6 @@ public class DriverServiceTest {
         ArrayList<Driver> driverList= new ArrayList<>();
         driverList.add(driver);
         when(driverRepository.findByIsActiveTrue()).thenReturn(driverList);
-        when(driverRepository.findByIsAvailableTrue()).thenReturn(new ArrayList<>());
 
         when(rideRepository.findAllByDriverAndStatus(driver, RideStatus.ACCEPTED)).thenReturn(new ArrayList<>());
 
@@ -276,11 +262,28 @@ public class DriverServiceTest {
 
         assertNull(result);
         verify(driverRepository).findByIsActiveTrue();
-        verify(driverRepository).findByIsAvailableTrue();
         verify(rideRepository).findAllByDriverAndStatus(driver,RideStatus.ACCEPTED);
         verify(rideRepository).findAllByDriverAndStatus(driver,RideStatus.IN_PROGRESS);
         verifyNoMoreInteractions(driverRepository);
         verifyNoMoreInteractions(rideRepository);
+    }
+
+    @Test
+    public void findAvailableDriver_DriverBlocked() {
+        Driver driver = buildDriver(VehicleType.STANDARD, true, true, 45.1, 19.1);
+        driver.setBlocked(true);
+        ArrayList<Driver> driverList= new ArrayList<>();
+        driverList.add(driver);
+        when(driverRepository.findByIsActiveTrue()).thenReturn(driverList);
+
+
+        Ride ride = buildRide(VehicleType.STANDARD, 45.0, 19.0);
+        Driver result = driverService.findAvailableDriver(ride);
+
+        assertNull(result);
+        verify(driverRepository).findByIsActiveTrue();
+        verifyNoMoreInteractions(driverRepository);
+        verifyNoInteractions(rideRepository);
     }
 
     @Test
