@@ -419,11 +419,6 @@ public class DataLoader implements CommandLineRunner {
         rideReviewRepository.save(review);
 
 
-        FavoriteRoute route=new FavoriteRoute();
-        route.setRide(ride1);
-        route.setPassenger(passenger1);
-        route.setName("Home-work");
-        favoriteRouteRepo.save(route);
 
 
         Chat chat1 = Chat.builder()

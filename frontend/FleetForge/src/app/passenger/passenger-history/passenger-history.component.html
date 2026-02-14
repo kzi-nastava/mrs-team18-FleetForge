@@ -254,7 +254,7 @@
 			<div class="favorite-modal__actions">
 				<button type="button" class="modal-btn ghost" (click)="closeFavoriteModal()">Cancel</button>
 				<button type="button" class="modal-btn primary" [disabled]="!favoriteRouteName.trim()"
-					(click)="saveFavoriteRoute()">
+					(click)="saveFavoriteRoute()" id="saveFavoriteRouteBtn">
 					Save
 				</button>
 			</div>
