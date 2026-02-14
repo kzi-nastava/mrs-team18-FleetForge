@@ -11,7 +11,7 @@ export interface DriverCreateRequestDTO{
 }
 
 export interface DriverCreateResponseDTO{
-    driver:Driver;
+    driverId:number;
 }
 
 export interface PasswordSetDTO{
