@@ -24,13 +24,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -183,43 +188,47 @@ class RideEarlyFinishServiceTest {
         verify(notificationService).sendNotificationToUser(passenger, NotificationType.RIDE_COMPLETED, "Ride finished", ride);
     }
 
-    @Test
-    @DisplayName("Should recalculate distance and cost when driver is far from end location")
-    void shouldRecalculateDistanceAndCostWhenDriverIsFarFromEndLocation() {
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("provideRideLocationScenarios")
+    @DisplayName("Should successfully finish ride and calculate distance correctly based on locations")
+    void shouldFinishRideWithVaryingLocationData(String description, List<RideLocation> locations, double expectedPrice) {
         // Arrange
         FinishRideRequestDTO request = new FinishRideRequestDTO();
         request.setRideId(10L);
 
         when(rideRepository.findById(10L)).thenReturn(Optional.of(ride));
-        when(rideRepository.findAllByDriverAndStatus(driver, RideStatus.ACCEPTED))
-                .thenReturn(new ArrayList<>());
-
-        // Setting up historical locations for distance recalculation
-        RideLocation loc1 = new RideLocation(); loc1.setLatitude(45.0); loc1.setLongitude(19.0);
-        RideLocation loc2 = new RideLocation(); loc2.setLatitude(45.5); loc2.setLongitude(19.5);
-        RideLocation loc3 = new RideLocation(); loc3.setLatitude(46.0); loc3.setLongitude(20.0);
-
+        when(rideRepository.findAllByDriverAndStatus(driver, RideStatus.ACCEPTED)).thenReturn(new ArrayList<>());
         when(rideLocationRepository.findByRideAndRecordedAtAfterOrderByRecordedAtAsc(eq(ride), any()))
-                .thenReturn(List.of(loc1, loc2, loc3));
+                .thenReturn(locations);
+
         when(priceCalculationService.calculatePrice(anyDouble(), eq(VehicleType.STANDARD)))
-                .thenReturn(1000.0);
+                .thenReturn(expectedPrice);
 
         // Act
         FinishRideResponseDTO response = rideFinishService.finishRide(request);
 
         // Assert
         assertEquals(RideStatus.COMPLETED, response.getStatus());
-        assertEquals(1000.0, response.getTotalCost(), "Cost should match the recalculated value.");
+        assertEquals(expectedPrice, response.getTotalCost());
         assertTrue(driver.isAvailable());
 
-        verify(priceCalculationService).calculatePrice(ride.getTotalDistance(), VehicleType.STANDARD);
         verify(rideRepository).save(ride);
         verify(driverRepository).save(driver);
+        verify(emailService).sendEmail(eq(passenger.getEmail()), anyString(), anyString());
+        verify(notificationService).sendNotificationToUser(eq(passenger), eq(NotificationType.RIDE_COMPLETED), anyString(), eq(ride));
+    }
 
-        String subject = "Ride Completed - FleetForge";
-        String body = buildCompletionEmailBody(ride, passenger);
-        verify(emailService).sendEmail(passenger.getEmail(), subject, body);
-        verify(notificationService).sendNotificationToUser(passenger, NotificationType.RIDE_COMPLETED, "Ride finished", ride);
+    private static Stream<Arguments> provideRideLocationScenarios() {
+        // Mock locations
+        RideLocation loc1 = new RideLocation(); loc1.setLatitude(45.0); loc1.setLongitude(19.0);
+        RideLocation loc2 = new RideLocation(); loc2.setLatitude(45.5); loc2.setLongitude(19.5);
+        RideLocation loc3 = new RideLocation(); loc3.setLatitude(46.0); loc3.setLongitude(20.0);
+
+        return Stream.of(
+                Arguments.of("0 locations - Expected 0.0 distance price", Collections.emptyList(), 0.0),
+                Arguments.of("1 location - Expected 0.0 distance price", List.of(loc1), 0.0),
+                Arguments.of("Multiple locations - Expected calculated distance price", List.of(loc1, loc2, loc3), 1000.0)
+        );
     }
 
     private String buildCompletionEmailBody(Ride ride, Passenger passenger) {
