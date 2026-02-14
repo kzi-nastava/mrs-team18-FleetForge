@@ -96,7 +96,9 @@ registerDriver(): void {
 
   this.registerDriverService.registerDriver(request).subscribe({
       next: (response) => {
-        this.registerDriverService.uploadProfilePicture(this.formData, response.driver.id).subscribe();
+        if(this.formData.has('file')){
+        this.registerDriverService.uploadProfilePicture(this.formData, response.driverId).subscribe();
+        }
         alert('Driver successfully registered!');
       },  
       error: (error) => {
