@@ -8,8 +8,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface RideLocationRepository extends JpaRepository<RideLocation, Long> {
-    List<RideLocation> findByRideOrderByRecordedAtAsc(Ride ride);
-
     List<RideLocation> findByRideAndRecordedAtAfterOrderByRecordedAtAsc(
             Ride ride,
             LocalDateTime recordedAfter
