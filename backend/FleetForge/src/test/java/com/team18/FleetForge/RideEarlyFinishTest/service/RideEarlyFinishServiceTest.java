@@ -4,6 +4,7 @@ import com.team18.FleetForge.dto.ride.lifecycle.FinishRideRequestDTO;
 import com.team18.FleetForge.dto.ride.lifecycle.FinishRideResponseDTO;
 import com.team18.FleetForge.exception.ride.RideNotActiveException;
 import com.team18.FleetForge.exception.ride.RideNotFoundException;
+import com.team18.FleetForge.model.enums.NotificationType;
 import com.team18.FleetForge.model.enums.RideStatus;
 import com.team18.FleetForge.model.enums.VehicleType;
 import com.team18.FleetForge.model.ride.GeoPoint;
@@ -20,6 +21,7 @@ import com.team18.FleetForge.service.NotificationService;
 import com.team18.FleetForge.service.PriceCalculationService;
 import com.team18.FleetForge.service.rides.RideFinishService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
@@ -79,37 +81,44 @@ class RideEarlyFinishServiceTest {
         ride.setTotalDistance(5.0);
     }
 
-
     @Test
+    @DisplayName("Should throw RideNotFoundException when ride does not exist")
     void shouldThrowRideNotFoundExceptionWhenRideDoesNotExist() {
-
+        // Arrange
         FinishRideRequestDTO request = new FinishRideRequestDTO();
         request.setRideId(999L);
-
         when(rideRepository.findById(999L)).thenReturn(Optional.empty());
 
-        assertThrows(RideNotFoundException.class,
-                () -> rideFinishService.finishRide(request));
+        // Act & Assert
+        assertThrows(RideNotFoundException.class, () -> rideFinishService.finishRide(request));
+
+        // Assert (Verifications)
+        verify(rideRepository).findById(999L);
+        verifyNoMoreInteractions(rideRepository);
+        verifyNoInteractions(driverRepository, emailService, notificationService);
     }
 
     @Test
+    @DisplayName("Should throw RideNotActiveException when ride is not IN_PROGRESS")
     void shouldThrowRideNotActiveExceptionWhenRideIsNotInProgress() {
-
+        // Arrange
         ride.setStatus(RideStatus.COMPLETED);
-
         FinishRideRequestDTO request = new FinishRideRequestDTO();
         request.setRideId(10L);
-
         when(rideRepository.findById(10L)).thenReturn(Optional.of(ride));
 
-        assertThrows(RideNotActiveException.class,
-                () -> rideFinishService.finishRide(request));
+        // Act & Assert
+        assertThrows(RideNotActiveException.class, () -> rideFinishService.finishRide(request));
+
+        // Assert (Verifications)
+        verify(rideRepository).findById(10L);
+        verifyNoInteractions(driverRepository, emailService, notificationService);
     }
 
-
     @Test
+    @DisplayName("Should NOT set driver available when next ride starts within 10 minutes")
     void shouldNotSetDriverAvailableWhenNextRideIsWithinTenMinutes() {
-
+        // Arrange
         FinishRideRequestDTO request = new FinishRideRequestDTO();
         request.setRideId(10L);
 
@@ -119,54 +128,65 @@ class RideEarlyFinishServiceTest {
         nextRide.setStartTime(LocalDateTime.now().plusMinutes(5));
         nextRide.setPassenger(passenger);
         nextRide.setWayPoints(new ArrayList<>());
-        nextRide.setPanicActivated(false);
 
         when(rideRepository.findById(10L)).thenReturn(Optional.of(ride));
         when(rideRepository.findAllByDriverAndStatus(driver, RideStatus.ACCEPTED))
                 .thenReturn(new ArrayList<>(List.of(nextRide)));
-
-        when(rideLocationRepository
-                .findByRideAndRecordedAtAfterOrderByRecordedAtAsc(eq(ride), any()))
+        when(rideLocationRepository.findByRideAndRecordedAtAfterOrderByRecordedAtAsc(eq(ride), any()))
                 .thenReturn(new ArrayList<>());
+        when(priceCalculationService.calculatePrice(anyDouble(), any())).thenReturn(500.0);
 
-        when(priceCalculationService.calculatePrice(anyDouble(), any()))
-                .thenReturn(500.0);
-
+        // Act
         FinishRideResponseDTO response = rideFinishService.finishRide(request);
 
-        assertFalse(driver.isAvailable());
+        // Assert
+        assertFalse(driver.isAvailable(), "Driver should remain unavailable due to an upcoming ride.");
         assertNotNull(response.getNextRide());
         assertEquals(20L, response.getNextRide().getRideId());
+
+        verify(rideRepository).save(ride);
+        verify(driverRepository).save(driver);
+
+        String subject = "Ride Completed - FleetForge";
+        String body = buildCompletionEmailBody(ride, passenger);
+        verify(emailService).sendEmail(passenger.getEmail(), subject, body);
+        verify(notificationService).sendNotificationToUser(passenger, NotificationType.RIDE_COMPLETED, "Ride finished", ride);
     }
 
-
     @Test
+    @DisplayName("Should set driver available when no next ride exists")
     void shouldSetDriverAvailableWhenNoNextRideExists() {
-
+        // Arrange
         FinishRideRequestDTO request = new FinishRideRequestDTO();
         request.setRideId(10L);
 
         when(rideRepository.findById(10L)).thenReturn(Optional.of(ride));
         when(rideRepository.findAllByDriverAndStatus(driver, RideStatus.ACCEPTED))
                 .thenReturn(new ArrayList<>());
-
-        when(rideLocationRepository
-                .findByRideAndRecordedAtAfterOrderByRecordedAtAsc(eq(ride), any()))
+        when(rideLocationRepository.findByRideAndRecordedAtAfterOrderByRecordedAtAsc(eq(ride), any()))
                 .thenReturn(new ArrayList<>());
+        when(priceCalculationService.calculatePrice(anyDouble(), any())).thenReturn(500.0);
 
-        when(priceCalculationService.calculatePrice(anyDouble(), any()))
-                .thenReturn(500.0);
-
+        // Act
         FinishRideResponseDTO response = rideFinishService.finishRide(request);
 
-        assertTrue(driver.isAvailable());
+        // Assert
+        assertTrue(driver.isAvailable(), "Driver should be set to available as there is no next ride.");
         assertNull(response.getNextRide());
+
+        verify(driverRepository).save(driver);
+        verify(rideRepository).save(ride);
+
+        String subject = "Ride Completed - FleetForge";
+        String body = buildCompletionEmailBody(ride, passenger);
+        verify(emailService).sendEmail(passenger.getEmail(), subject, body);
+        verify(notificationService).sendNotificationToUser(passenger, NotificationType.RIDE_COMPLETED, "Ride finished", ride);
     }
 
-
     @Test
+    @DisplayName("Should recalculate distance and cost when driver is far from end location")
     void shouldRecalculateDistanceAndCostWhenDriverIsFarFromEndLocation() {
-
+        // Arrange
         FinishRideRequestDTO request = new FinishRideRequestDTO();
         request.setRideId(10L);
 
@@ -174,32 +194,52 @@ class RideEarlyFinishServiceTest {
         when(rideRepository.findAllByDriverAndStatus(driver, RideStatus.ACCEPTED))
                 .thenReturn(new ArrayList<>());
 
-        RideLocation loc1 = new RideLocation();
-        loc1.setLatitude(45.0);
-        loc1.setLongitude(19.0);
+        // Setting up historical locations for distance recalculation
+        RideLocation loc1 = new RideLocation(); loc1.setLatitude(45.0); loc1.setLongitude(19.0);
+        RideLocation loc2 = new RideLocation(); loc2.setLatitude(45.5); loc2.setLongitude(19.5);
+        RideLocation loc3 = new RideLocation(); loc3.setLatitude(46.0); loc3.setLongitude(20.0);
 
-        RideLocation loc2 = new RideLocation();
-        loc2.setLatitude(45.5);
-        loc2.setLongitude(19.5);
-
-        RideLocation loc3 = new RideLocation();
-        loc3.setLatitude(46.0);
-        loc3.setLongitude(20.0);
-
-        when(rideLocationRepository
-                .findByRideAndRecordedAtAfterOrderByRecordedAtAsc(eq(ride), any()))
-                .thenReturn(new ArrayList<>(List.of(loc1, loc2, loc3)));
-
+        when(rideLocationRepository.findByRideAndRecordedAtAfterOrderByRecordedAtAsc(eq(ride), any()))
+                .thenReturn(List.of(loc1, loc2, loc3));
         when(priceCalculationService.calculatePrice(anyDouble(), eq(VehicleType.STANDARD)))
                 .thenReturn(1000.0);
 
+        // Act
         FinishRideResponseDTO response = rideFinishService.finishRide(request);
 
+        // Assert
         assertEquals(RideStatus.COMPLETED, response.getStatus());
-        assertEquals(1000.0, response.getTotalCost());
+        assertEquals(1000.0, response.getTotalCost(), "Cost should match the recalculated value.");
         assertTrue(driver.isAvailable());
 
-        verify(priceCalculationService)
-                .calculatePrice(ride.getTotalDistance(), VehicleType.STANDARD);
+        verify(priceCalculationService).calculatePrice(ride.getTotalDistance(), VehicleType.STANDARD);
+        verify(rideRepository).save(ride);
+        verify(driverRepository).save(driver);
+
+        String subject = "Ride Completed - FleetForge";
+        String body = buildCompletionEmailBody(ride, passenger);
+        verify(emailService).sendEmail(passenger.getEmail(), subject, body);
+        verify(notificationService).sendNotificationToUser(passenger, NotificationType.RIDE_COMPLETED, "Ride finished", ride);
+    }
+
+    private String buildCompletionEmailBody(Ride ride, Passenger passenger) {
+        return String.format(
+                "Dear %s %s,\n\n" +
+                        "Your ride has been completed successfully!\n\n" +
+                        "Ride Details:\n" +
+                        "- From: %s\n" +
+                        "- To: %s\n" +
+                        "- Start Time: %s\n" +
+                        "- End Time: %s\n" +
+                        "- Total Cost: %.2f RSD\n\n" +
+                        "Thank you for using FleetForge!\n\n" +
+                        "You can now rate your ride and driver through the application.\n\n" +
+                        "Best regards,\n" +
+                        "FleetForge Team",
+                passenger.getFirstName(), passenger.getLastName(),
+                ride.getStartAddress(), ride.getEndAddress(),
+                ride.getStartTime(), ride.getEndTime(),
+                ride.getTotalCost()
+        );
     }
 }
