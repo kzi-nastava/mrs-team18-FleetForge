@@ -55,6 +55,7 @@ export class PassengerHomeComponent implements OnDestroy {
   private pickupSearchSubject = new Subject<string>();
   private dropoffSearchSubject = new Subject<string>();
   private waypointSearchSubjects = new Map<number, Subject<string>>();
+  isRouteLoading: boolean = false;
   
   private subscriptions: Subscription[] = [];
   estimatedDistance: number = 0;
@@ -398,6 +399,8 @@ vehicles: VehicleLocationDTO[] = [];
   ngAfterViewInit(): void {
     const data = history.state.favoriteRoute;
     if (data) {
+      this.isRouteLoading = true;
+      this.cdr.detectChanges();
       this.rideForm.get('pickup')?.setValue(data.startAddress);
       this.rideForm.get('dropoff')?.setValue(data.endAddress);
 
@@ -457,20 +460,6 @@ vehicles: VehicleLocationDTO[] = [];
   scrollToBookRide(): void {
     document.getElementById('bookRide')?.scrollIntoView();
   }
-
-  // loadVehicles(): void {
-  //   this.vehicleService.getActiveVehicles().subscribe({
-  //     next: (vehicles) => {
-  //       this.vehicles = [...vehicles]; 
-  //       this.cdr.detectChanges(); 
-  //       console.log('Loaded vehicles:', this.vehicles);
-  //       console.log('vehicles property after assignment:', this.vehicles);
-  //     },
-  //     error: (error) => {
-  //       console.error('Error loading vehicles:', error);
-  //     }
-  //   });
-  // }
   addPassengerInput(): void {
   this.passengerArray.push(
       new FormControl('', { validators: [Validators.required, Validators.email], nonNullable: true })
@@ -521,6 +510,8 @@ this.waypointArray.controls.forEach(control => {
   const dropoffMarker = this.mapComponent['locationMarkers'].get(endingPoint.value);
   
   if (pickupMarker && dropoffMarker) {
+    this.isRouteLoading = true;
+    this.cdr.detectChanges();
     const pickupLatLng = pickupMarker.getLatLng();
     const dropoffLatLng = dropoffMarker.getLatLng();
     this.mapComponent.updateRoute(
@@ -529,6 +520,8 @@ this.waypointArray.controls.forEach(control => {
       waypoints
     );
   } else {
+    this.isRouteLoading = false;
+    this.cdr.detectChanges();
     this.mapComponent.clearRoute();
   }
 }
@@ -538,6 +531,8 @@ this.waypointArray.controls.forEach(control => {
     this.estimatedDistance = summary.distanceKm;
     this.estimatedDuration = summary.durationMin;
     this.estimatedCost = summary.cost;
+    this.isRouteLoading = false;
+    this.cdr.detectChanges();
     console.log('Route summary received in component:', summary);
   }
   private refactorIdsWaypoints(): void {
