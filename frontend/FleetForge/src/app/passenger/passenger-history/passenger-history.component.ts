@@ -411,10 +411,4 @@ export class PassengerHistoryComponent {
       .fill(false)
       .map((_, index) => index < safeRating);
   }
-
-  private buildRideDate(daysAgo: number): string {
-    const date = new Date();
-    date.setDate(date.getDate() - daysAgo);
-    return date.toISOString();
-  }
 }
