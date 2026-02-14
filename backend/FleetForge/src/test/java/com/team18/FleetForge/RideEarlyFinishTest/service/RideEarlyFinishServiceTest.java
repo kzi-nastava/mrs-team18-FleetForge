@@ -1,4 +1,4 @@
-package com.team18.FleetForge.RideEarlyFinishTest;
+package com.team18.FleetForge.RideEarlyFinishTest.service;
 
 import com.team18.FleetForge.dto.ride.lifecycle.FinishRideRequestDTO;
 import com.team18.FleetForge.dto.ride.lifecycle.FinishRideResponseDTO;

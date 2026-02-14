@@ -1,4 +1,4 @@
-package com.team18.FleetForge.RideEarlyFinishTest;
+package com.team18.FleetForge.RideEarlyFinishTest.controller;
 
 import static org.junit.jupiter.api.Assertions.*;
 
