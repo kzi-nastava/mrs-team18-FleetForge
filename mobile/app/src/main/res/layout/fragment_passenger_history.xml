@@ -118,7 +118,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center"
-        android:padding="12dp"
+        android:padding="8dp"
         android:background="@android:color/white"
         android:elevation="8dp">
 

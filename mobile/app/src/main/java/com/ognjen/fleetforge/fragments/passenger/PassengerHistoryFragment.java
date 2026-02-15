@@ -25,7 +25,6 @@ import com.ognjen.fleetforge.adapters.PassengerHistoryAdapter;
 import com.ognjen.fleetforge.dtos.common.PageResponse;
 import com.ognjen.fleetforge.dtos.passenger.FavoriteRouteGetResponseDTO;
 import com.ognjen.fleetforge.dtos.passenger.PassengerRideHistoryDto;
-import com.ognjen.fleetforge.model.PassengerHistory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -125,7 +124,17 @@ public class PassengerHistoryFragment extends Fragment {
             loadRides();
         });
 
-        adapter.setOnActionListener((ride, heartBtn) -> handleOnHeart(ride, heartBtn));
+        adapter.setOnActionListener(new PassengerHistoryAdapter.OnActionListener() {
+            @Override
+            public void onHeart(PassengerRideHistoryDto ride, ImageButton heartBtn) {
+                handleOnHeart(ride, heartBtn);
+            }
+
+            @Override
+            public void onDetailsClicked(PassengerRideHistoryDto ride) {
+                handleOnDetails(ride);
+            }
+        });
 
         viewModel.getFavorites().observe(getViewLifecycleOwner(),response -> {
             if(response!=null){
@@ -162,6 +171,17 @@ public class PassengerHistoryFragment extends Fragment {
 
     interface OnDateSelectedListener {
         void onDateSelected(String date);
+    }
+
+    private void handleOnDetails(PassengerRideHistoryDto ride) {
+        viewModel.getRideDetails(ride.getRideId()).observe(getViewLifecycleOwner(), details -> {
+            if (details != null) {
+                adapter.setDetailedData(details);
+                adapter.setExpandedRideId(ride.getRideId());
+            } else {
+                Toast.makeText(getContext(), "Failed to load ride details", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void refreshRides() {

@@ -14,6 +14,7 @@ import com.ognjen.fleetforge.dtos.passenger.FavoriteRouteGetResponseDTO;
 import com.ognjen.fleetforge.dtos.passenger.PassengerChangeInformationRequestDTO;
 import com.ognjen.fleetforge.dtos.passenger.PassengerChangeInformationResponseDTO;
 import com.ognjen.fleetforge.dtos.passenger.PassengerGetResponseDTO;
+import com.ognjen.fleetforge.dtos.passenger.PassengerRideDetailsDto;
 import com.ognjen.fleetforge.dtos.passenger.PassengerRideHistoryDto;
 import com.ognjen.fleetforge.model.FavoriteRoute;
 import com.ognjen.fleetforge.utils.FileUtil;
@@ -34,6 +35,24 @@ public class PassengerRepo {
 
     public PassengerRepo(){
         this.service= RetrofitClient.getInstance().getPassengerService();
+    }
+
+    public LiveData<PassengerRideDetailsDto> getRideDetails(Long rideId) {
+        MutableLiveData<PassengerRideDetailsDto> data = new MutableLiveData<>();
+        service.getRideDetails(rideId).enqueue(new Callback<PassengerRideDetailsDto>() {
+            @Override
+            public void onResponse(Call<PassengerRideDetailsDto> call, Response<PassengerRideDetailsDto> response) {
+                if (response.isSuccessful()) {
+                    data.setValue(response.body());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<PassengerRideDetailsDto> call, Throwable t) {
+                data.setValue(null);
+            }
+        });
+        return data;
     }
 
     public LiveData<PassengerGetResponseDTO> getLoggedPassenger(){

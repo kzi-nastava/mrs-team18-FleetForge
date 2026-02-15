@@ -6,6 +6,7 @@ import com.ognjen.fleetforge.dtos.passenger.PassengerChangeInformationRequestDTO
 import com.ognjen.fleetforge.dtos.passenger.PassengerChangeInformationResponseDTO;
 import com.ognjen.fleetforge.dtos.passenger.PassengerGetResponseDTO;
 import com.ognjen.fleetforge.dtos.common.PasswordChangeRequestDTO;
+import com.ognjen.fleetforge.dtos.passenger.PassengerRideDetailsDto;
 import com.ognjen.fleetforge.dtos.passenger.PassengerRideHistoryDto;
 
 import java.util.List;
@@ -52,4 +53,7 @@ public interface PassengerService {
             @Query("from") String from,
             @Query("to") String to
     );
+
+    @GET("/api/passenger/rides/{id}")
+    Call<PassengerRideDetailsDto> getRideDetails(@Path("id") Long id);
 }

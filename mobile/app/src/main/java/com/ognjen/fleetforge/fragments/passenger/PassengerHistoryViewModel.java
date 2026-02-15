@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.ognjen.fleetforge.dtos.common.PageResponse;
 import com.ognjen.fleetforge.dtos.passenger.FavoriteRouteGetResponseDTO;
+import com.ognjen.fleetforge.dtos.passenger.PassengerRideDetailsDto;
 import com.ognjen.fleetforge.dtos.passenger.PassengerRideHistoryDto;
 import com.ognjen.fleetforge.repository.PassengerRepo;
 
@@ -22,6 +23,10 @@ public class PassengerHistoryViewModel extends ViewModel {
 
     public LiveData<PageResponse<PassengerRideHistoryDto>> getRides(String from, String to, String sortBy, String direction) {
         return repo.getRides(currentPage, pageSize, from, to, sortBy, direction);
+    }
+
+    public LiveData<PassengerRideDetailsDto> getRideDetails(Long rideId) {
+        return repo.getRideDetails(rideId);
     }
 
     public void resetPage() {
