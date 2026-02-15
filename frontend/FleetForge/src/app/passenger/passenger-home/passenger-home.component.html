@@ -163,3 +163,20 @@
     </div>
   </div>
 </div>
+
+<div class="blocked-dialog-overlay" *ngIf="showBlockedDialog()" (click)="closeBlockedDialog()">
+  <div class="blocked-dialog-card" (click)="$event.stopPropagation()">
+    <h3 class="blocked-dialog-title">Ride ordering unavailable</h3>
+    <p class="blocked-dialog-text">
+      Your account is blocked and you currently cannot order a ride.
+    </p>
+    <p class="blocked-dialog-reason">
+      <strong>Reason:</strong> {{ blockReason() || 'No reason provided.' }}
+    </p>
+    <div class="blocked-dialog-actions">
+      <button type="button" class="btn blocked-dialog-btn" (click)="closeBlockedDialog()">
+        Close
+      </button>
+    </div>
+  </div>
+</div>
