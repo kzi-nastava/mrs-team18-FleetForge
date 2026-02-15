@@ -74,3 +74,20 @@
 
 <button class="resetPassBtn" routerLink="/profile-password-reset">Reset password</button>
 <div class="hoursActive">Hours active: {{formattedActivity}} </div>
+
+<div class="blocked-dialog-overlay" *ngIf="showBlockedDialog()" (click)="closeBlockedDialog()">
+  <div class="blocked-dialog-card" (click)="$event.stopPropagation()">
+    <h3 class="blocked-dialog-title">Profile changes unavailable</h3>
+    <p class="blocked-dialog-text">
+      Your account is blocked and you will not be able to ride for our company again.
+    </p>
+    <p class="blocked-dialog-reason">
+      <strong>Reason:</strong> {{ blockReason() || 'No reason provided.' }}
+    </p>
+    <div class="blocked-dialog-actions">
+      <button type="button" class="blocked-dialog-btn" (click)="closeBlockedDialog()">
+        Close
+      </button>
+    </div>
+  </div>
+</div>
