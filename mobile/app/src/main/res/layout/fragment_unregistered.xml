@@ -28,10 +28,10 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Start Location"
+                android:hint="@string/start_location"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
-                <com.google.android.material.textfield.TextInputEditText
+                <com.google.android.material.textfield.MaterialAutoCompleteTextView
                     android:id="@+id/et_start_location"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -42,10 +42,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:hint="End Destination"
+                android:hint="@string/end_destination"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
-                <com.google.android.material.textfield.TextInputEditText
+                <com.google.android.material.textfield.MaterialAutoCompleteTextView
                     android:id="@+id/et_end_location"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -53,11 +53,11 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <Button
-                android:id="@+id/btn_estimate"
+                android:id="@+id/btn_order"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:text="ESTIMATE"
+                android:text="@string/order"
                 android:textColor="@android:color/white"
                 android:backgroundTint="#FF9800" />
 
