@@ -10,6 +10,7 @@ export interface UserInformationDTO{
     phoneNumber:string;
     address:string;
     profilePicture:string;
+    blocked:boolean;
 }
 
 export interface DriverInformationDTO extends UserInformationDTO{
@@ -39,4 +40,21 @@ export interface UserInformationChangeDTO{
     email:string;
     phoneNumber:string;
     address:string;
+}
+
+
+export interface GetAllUsersDTO{
+    content:UserInformationDTO[];
+    first:boolean;
+    last:boolean;
+    totalPages:number;
+}
+
+export interface BlockUserRequestDTO{
+    reason:string;
+}
+
+export interface GetIsBlockedUserDTO{
+    blocked:boolean;
+    reason:string;
 }
