@@ -20,8 +20,12 @@ public class PassengerHistoryViewModel extends ViewModel {
         repo= new PassengerRepo();
     }
 
-    public LiveData<PageResponse<PassengerRideHistoryDto>> getRides(String from, String to) {
-        return repo.getRides(currentPage, pageSize, from, to);
+    public LiveData<PageResponse<PassengerRideHistoryDto>> getRides(String from, String to, String sortBy, String direction) {
+        return repo.getRides(currentPage, pageSize, from, to, sortBy, direction);
+    }
+
+    public void resetPage() {
+        this.currentPage = 0;
     }
 
     public void nextPage() { currentPage++; }

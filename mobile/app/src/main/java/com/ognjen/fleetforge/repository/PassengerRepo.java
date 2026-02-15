@@ -213,9 +213,9 @@ public class PassengerRepo {
             return data;
         }
 
-    public LiveData<PageResponse<PassengerRideHistoryDto>> getRides(int page, int size, String from, String to) {
+    public LiveData<PageResponse<PassengerRideHistoryDto>> getRides(int page, int size, String from, String to, String sortBy, String direction) {
         MutableLiveData<PageResponse<PassengerRideHistoryDto>> data = new MutableLiveData<>();
-        service.getPassengerRides(page, size, "startTime", "desc", from, to).enqueue(new Callback<PageResponse<PassengerRideHistoryDto>>() {
+        service.getPassengerRides(page, size, sortBy, direction, from, to).enqueue(new Callback<PageResponse<PassengerRideHistoryDto>>() {
             @Override
             public void onResponse(Call<PageResponse<PassengerRideHistoryDto>> call, Response<PageResponse<PassengerRideHistoryDto>> response) {
                 if (response.isSuccessful()) data.setValue(response.body());

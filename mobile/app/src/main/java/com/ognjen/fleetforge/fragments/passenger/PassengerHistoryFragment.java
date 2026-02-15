@@ -9,6 +9,8 @@ import androidx.lifecycle.ViewModelProvider;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -17,6 +19,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.textfield.TextInputEditText;
 import com.ognjen.fleetforge.R;
 import com.ognjen.fleetforge.adapters.PassengerHistoryAdapter;
 import com.ognjen.fleetforge.dtos.common.PageResponse;
@@ -30,11 +33,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link PassengerHistoryFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class PassengerHistoryFragment extends Fragment {
 
     private ListView historyList;
@@ -45,38 +43,19 @@ public class PassengerHistoryFragment extends Fragment {
 
     private Set<Long> favoriteRideIds = new HashSet<>();
     private Map<Long, Long> rideIdToFavoriteId = new HashMap<>();
-    private PassengerHistoryFragment.OnRouteNameEnteredListener listener;
-    public static class TempClass{
-        Long id;
-    }
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private String currentSortBy = "startTime";
+    private String currentDirection = "desc";
+    private String dateFrom = null;
+    private String dateTo = null;
+    private boolean isAscending = false;
 
     public PassengerHistoryFragment() {
-        // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment PassengerHistory.
-     */
-    // TODO: Rename and change types and number of parameters
     public static PassengerHistoryFragment newInstance(String param1, String param2) {
         PassengerHistoryFragment fragment = new PassengerHistoryFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -95,20 +74,55 @@ public class PassengerHistoryFragment extends Fragment {
         Button btnNext = view.findViewById(R.id.btn_next_page);
         Button btnPrev = view.findViewById(R.id.btn_prev_page);
 
+        AutoCompleteTextView spinnerSortBy = view.findViewById(R.id.spinner_sort_by);
+        ImageButton btnDirection = view.findViewById(R.id.btn_sort_direction);
+        TextInputEditText etFrom = view.findViewById(R.id.et_date_from);
+        TextInputEditText etTo = view.findViewById(R.id.et_date_to);
+
+
         adapter = new PassengerHistoryAdapter(getActivity(), rides);
         historyList.setAdapter(adapter);
 
-        // Initial load
-        loadRides(null, null);
+        loadRides();
+
+        String[] options = {"startTime", "endTime", "startAddress", "endAddress","status"};
+        ArrayAdapter<String> sortAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, options);
+        spinnerSortBy.setAdapter(sortAdapter);
+        spinnerSortBy.setText(options[0], false);
+
+
+        spinnerSortBy.setOnItemClickListener((parent, v, position, id) -> {
+            currentSortBy = options[position];
+            refreshRides();
+        });
+
+        btnDirection.setOnClickListener(v -> {
+            isAscending = !isAscending;
+            currentDirection = isAscending ? "asc" : "desc";
+            btnDirection.setImageResource(isAscending ? android.R.drawable.arrow_up_float : android.R.drawable.arrow_down_float);
+            refreshRides();
+        });
+
+        etFrom.setOnClickListener(v -> showDatePicker(date -> {
+            dateFrom = date;
+            etFrom.setText(date);
+            refreshRides();
+        }));
+
+        etTo.setOnClickListener(v -> showDatePicker(date -> {
+            dateTo = date;
+            etTo.setText(date);
+            refreshRides();
+        }));
 
         btnNext.setOnClickListener(v -> {
             viewModel.nextPage();
-            loadRides(null, null);
+            loadRides();
         });
 
         btnPrev.setOnClickListener(v -> {
             viewModel.prevPage();
-            loadRides(null, null);
+            loadRides();
         });
 
         adapter.setOnActionListener((ride, heartBtn) -> handleOnHeart(ride, heartBtn));
@@ -133,11 +147,27 @@ public class PassengerHistoryFragment extends Fragment {
         return view;
     }
 
-    private void loadRides(String from, String to) {
-        viewModel.getRides(from, to).observe(getViewLifecycleOwner(), response -> {
-            if (response != null && response.getContent() != null) {
+    private void showDatePicker(OnDateSelectedListener listener) {
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        new android.app.DatePickerDialog(getContext(), (view, year, month, dayOfMonth) -> {
+            String selectedDate = String.format("%d-%02d-%02d", year, month + 1, dayOfMonth);
+            listener.onDateSelected(selectedDate);
+        }, cal.get(java.util.Calendar.YEAR), cal.get(java.util.Calendar.MONTH), cal.get(java.util.Calendar.DAY_OF_MONTH)).show();
+    }
+
+    interface OnDateSelectedListener {
+        void onDateSelected(String date);
+    }
+
+    private void refreshRides() {
+        viewModel.resetPage();
+        loadRides();
+    }
+
+    private void loadRides() {
+        viewModel.getRides(dateFrom, dateTo, currentSortBy, currentDirection).observe(getViewLifecycleOwner(), response -> {    if (response != null && response.getContent() != null) {
                 rides.clear();
-                rides.addAll(response.getContent()); // No mapping needed!
+                rides.addAll(response.getContent());
                 adapter.notifyDataSetChanged();
                 updatePaginationUI(response);
             }
@@ -152,16 +182,13 @@ public class PassengerHistoryFragment extends Fragment {
         Button btnNext = view.findViewById(R.id.btn_next_page);
         Button btnPrev = view.findViewById(R.id.btn_prev_page);
 
-        // Update text: e.g., "Page 1 of 5"
         pageInfo.setText("Page " + (response.getNumber() + 1) + " of " + response.getTotalPages());
 
-        // Disable buttons if there is no more data
         btnPrev.setEnabled(!response.isFirst());
         btnNext.setEnabled(!response.isLast());
     }
 
     private void handleOnHeart(PassengerRideHistoryDto ride, ImageButton heartBtn) {
-        // Updated to use ride.getRideId() from DTO
         if (heartBtn.isSelected()) {
             viewModel.deleteFavorite(rideIdToFavoriteId.get(ride.getRideId())).observe(getViewLifecycleOwner(), success -> {
                 if (success) {
