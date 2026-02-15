@@ -40,6 +40,12 @@
     <string name="become_a_fleetforge_user">Become a FleetForge User</string>
     <string name="step_1_of_3">Step 1 of 3</string>
     <string name="phone_number">Phone Number</string>
+    <string name="order">ORDER</string>
+    <string name="end_destination">End Destination</string>
+    <string name="start_location">Start Location</string>
+    <string name="price_rsd_0_00">Price: RSD 0.00</string>
+    <string name="duration_0_min">Duration: 0 min</string>
+    <string name="distance_0_km">Distance: 0 km</string>
     <string-array name="vehicle_types">
         <item>Van</item>
         <item>Luxury</item>
