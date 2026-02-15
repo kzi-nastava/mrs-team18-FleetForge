@@ -271,21 +271,15 @@ public class AdminController {
     }
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/block/{id}")
-    public ResponseEntity<?> blockUser(@PathVariable Long id) throws Exception {
+    public ResponseEntity<?> blockUser(@PathVariable Long id, @RequestBody BlockUserRequestDTO request) throws Exception {
         User user= userService.getUserById(id);
         if(user.isBlocked()){
             throw new Exception("User is already blocked");
         }
         user.setBlocked(true);
+        user.setBlockReason(request.getReason());
+        userService.save(user);
         return new ResponseEntity<>(HttpStatus.OK);
-    }
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/blocked/{id}")
-    public ResponseEntity<GetIsBlockedUserDTO> isUserBlocked(@PathVariable Long id){
-        GetIsBlockedUserDTO response= new GetIsBlockedUserDTO();
-        User user= userService.getUserById(id);
-        response.setBlocked(user.isBlocked());
-        return new ResponseEntity<>(response,HttpStatus.OK);
     }
 }
 
