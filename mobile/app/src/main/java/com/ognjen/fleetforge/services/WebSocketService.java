@@ -39,7 +39,7 @@ public class WebSocketService  extends Service {
             manager.createNotificationChannel(serviceChannel);
         }
 
-        webSocketManager= new WebSocketManager();
+        webSocketManager = WebSocketManager.getInstance();
     }
 
     @Override

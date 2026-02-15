@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import com.ognjen.fleetforge.fragments.admin.AdminChatFragment;
 import com.ognjen.fleetforge.fragments.admin.AdminProfile;
 import com.ognjen.fleetforge.fragments.admin.DriverChangesFragment;
 import com.ognjen.fleetforge.activities.auth.LoginActivity;
@@ -16,6 +17,7 @@ import com.ognjen.fleetforge.fragments.driver.DriverHistoryFragment;
 import com.ognjen.fleetforge.fragments.PlaceholderFragment;
 import com.ognjen.fleetforge.R;
 import com.ognjen.fleetforge.fragments.passenger.FavoriteRoutes;
+import com.ognjen.fleetforge.fragments.passenger.PassengerChatFragment;
 import com.ognjen.fleetforge.fragments.passenger.PassengerHistoryFragment;
 import com.ognjen.fleetforge.fragments.passenger.RideOrder;
 import com.ognjen.fleetforge.fragments.unregistered.UnregisteredFragment;
@@ -104,8 +106,12 @@ public class MainActivity extends AppCompatActivity {
             return new CurrentRideDriver();
         } else if (itemId == R.id.nav_history_admin) {
             return PlaceholderFragment.newInstance("Ride History");
-        } else if (itemId == R.id.nav_chat) {
-            return PlaceholderFragment.newInstance("Live Chat");
+        } else if (itemId == R.id.nav_chat_admin) {
+            return new AdminChatFragment();
+        } else if (itemId == R.id.nav_chat_driver) {
+            return new PassengerChatFragment();
+        } else if (itemId == R.id.nav_chat_passenger) {
+            return new PassengerChatFragment();
         } else if (itemId == R.id.nav_current_ride) {
             return PlaceholderFragment.newInstance("Current Ride");
         } else if (itemId == R.id.nav_register_driver) {
