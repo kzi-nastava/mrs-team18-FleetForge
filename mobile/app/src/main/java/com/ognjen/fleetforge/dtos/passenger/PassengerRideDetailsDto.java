@@ -58,4 +58,5 @@ public class PassengerRideDetailsDto {
     public double getTotalDistance() { return totalDistance; }
     public double getTotalCost() { return totalCost; }
     public String getVehicleType() { return vehicleType; }
+
 }

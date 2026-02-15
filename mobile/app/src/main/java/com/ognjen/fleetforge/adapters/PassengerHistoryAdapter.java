@@ -12,9 +12,10 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.imageview.ShapeableImageView;
+import com.ognjen.fleetforge.BuildConfig;
 import com.ognjen.fleetforge.R;
 import com.ognjen.fleetforge.dtos.passenger.PassengerRideDetailsDto;
 import com.ognjen.fleetforge.dtos.passenger.PassengerRideHistoryDto;
@@ -33,6 +34,7 @@ import java.util.Locale;
 import java.util.Set;
 
 public class PassengerHistoryAdapter extends ArrayAdapter<PassengerRideHistoryDto> {
+    private static final String BaseUrl = "http://" + BuildConfig.IP_ADDR + ":8080";
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("MMM dd, yyyy", Locale.getDefault());
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("hh:mm a", Locale.getDefault());
@@ -126,6 +128,28 @@ public class PassengerHistoryAdapter extends ArrayAdapter<PassengerRideHistoryDt
         });
     }
 
+    private void setRatingStars(TextView textView, Double rating, String label) {
+        double safeRating = rating != null ? rating : 0.0;
+
+        int fullStars = (int) Math.round(safeRating);
+        int maxStars = 5;
+
+        StringBuilder stars = new StringBuilder(label + " ");
+
+        for (int i = 1; i <= maxStars; i++) {
+            if (i <= fullStars) {
+                stars.append("★");
+            } else {
+                stars.append("☆");
+            }
+        }
+
+        textView.setText(stars.toString());
+
+        textView.setTextColor(Color.parseColor("#FFB300")); //  yellow
+    }
+
+
     private void bindExpandedView(ViewHolder holder, PassengerRideHistoryDto ride) {
         boolean isExpanded = ride.getRideId().equals(expandedRideId);
         holder.expandedLayout.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
@@ -147,6 +171,13 @@ public class PassengerHistoryAdapter extends ArrayAdapter<PassengerRideHistoryDt
             holder.driverName.setText(
                     detailedData.getDriver().firstName + " " +
                             detailedData.getDriver().lastName);
+
+            // Profile picture
+            String imgUrl = BaseUrl + detailedData.getDriver().profileImage;
+
+            Glide.with(getContext())
+                    .load(imgUrl)
+                    .into(holder.driverImage);
 
             // Driver phone
             holder.driverPhone.setText(
@@ -174,9 +205,14 @@ public class PassengerHistoryAdapter extends ArrayAdapter<PassengerRideHistoryDt
             holder.vehicleType.setText(
                     "Vehicle: " + detailedData.getVehicleType());
 
-            // Example ratings (replace with real values if backend provides)
-            holder.driverRating.setText("Driver: ★★★★★");
-            holder.vehicleRating.setText("Vehicle: ★★★★★");
+            // Ratings
+            setRatingStars(holder.driverRating,
+                    ride.getDriverRating(),
+                    "Driver:");
+
+            setRatingStars(holder.vehicleRating,
+                    ride.getVehicleRating(),
+                    "Vehicle:");
 
             // Inconsistencies
             if (detailedData.isHasInconsistencies()) {
