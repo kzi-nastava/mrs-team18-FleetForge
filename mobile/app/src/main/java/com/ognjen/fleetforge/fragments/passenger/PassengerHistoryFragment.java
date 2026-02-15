@@ -87,14 +87,19 @@ public class PassengerHistoryFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view =inflater.inflate(R.layout.fragment_passenger_history, container, false);
+        View view = inflater.inflate(R.layout.fragment_passenger_history, container, false);
 
-        historyList=view.findViewById(R.id.history_list);
+        historyList = view.findViewById(R.id.history_list);
         rides.clear();
-        PassengerHistory ride1= new PassengerHistory();
-        ride1.setRideId(3L);
-        rides.add(ride1);
-        adapter= new PassengerHistoryAdapter(getActivity(),rides);
+
+
+        for (long i = 1; i <= 5; i++) {
+            PassengerHistory dummyRide = new PassengerHistory();
+            dummyRide.setRideId(i);
+            rides.add(dummyRide);
+        }
+
+        adapter = new PassengerHistoryAdapter(getActivity(), rides);
         historyList.setAdapter(adapter);
 
         adapter.setOnActionListener(new PassengerHistoryAdapter.OnActionListener() {

@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -62,19 +63,36 @@ public class PassengerHistoryAdapter extends ArrayAdapter<PassengerHistory> {
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.passenger_history_card, parent, false);
         }
-        ImageButton heart= convertView.findViewById(R.id.heart_button);
-        TextView title= convertView.findViewById(R.id.title);
-        if(ride!=null) {
-            title.setText("TITLE");
+
+        // Bind Views
+        ImageButton heart = convertView.findViewById(R.id.heart_button);
+        TextView startAddr = convertView.findViewById(R.id.tv_start_address);
+        TextView endAddr = convertView.findViewById(R.id.tv_end_address);
+        TextView statusTime = convertView.findViewById(R.id.tv_status_time);
+        View btnDetails = convertView.findViewById(R.id.btn_details);
+        View btnRate = convertView.findViewById(R.id.btn_rate);
+
+        if (ride != null) {
+            // Use dummy data or model data
+            startAddr.setText("Knez Mihailova 1, Belgrade");
+            endAddr.setText("Bulevar Oslobođenja 5, Novi Sad");
+            statusTime.setText("Completed • 14:00 - 15:15");
+
+            // Favorite Logic
             boolean isFavorite = favoriteRideIds.contains(ride.getRideId());
             heart.setSelected(isFavorite);
-            heart.setOnClickListener(v -> {
-                if(listener!=null){
-                    listener.onHeart(ride,heart);
-                }
-            });
-        }
 
+            heart.setOnClickListener(v -> {
+                if (listener != null) listener.onHeart(ride, heart);
+            });
+
+            // Dummy Click Listeners
+            btnDetails.setOnClickListener(v ->
+                    Toast.makeText(getContext(), "Details for ride #" + ride.getRideId(), Toast.LENGTH_SHORT).show());
+
+            btnRate.setOnClickListener(v ->
+                    Toast.makeText(getContext(), "Rating ride #" + ride.getRideId(), Toast.LENGTH_SHORT).show());
+        }
 
         return  convertView;
     }
