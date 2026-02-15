@@ -1,5 +1,6 @@
 package com.ognjen.fleetforge.fragments.unregistered;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -31,11 +32,12 @@ import org.osmdroid.views.overlay.Marker;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.ognjen.fleetforge.BuildConfig;
 import com.ognjen.fleetforge.R;
+import com.ognjen.fleetforge.activities.auth.LoginActivity;
 import com.ognjen.fleetforge.api.RetrofitClient;
 import com.ognjen.fleetforge.dtos.photon.PhotonResponse;
-import com.ognjen.fleetforge.fragments.passenger.RideOrderViewModel;
 import com.ognjen.fleetforge.model.VehicleLocation;
 import com.ognjen.fleetforge.utils.MapManager;
+import com.ognjen.fleetforge.viewmodels.UnregisteredHomeViewModel;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -55,8 +57,10 @@ public class UnregisteredFragment extends Fragment {
     private MaterialAutoCompleteTextView endLocation;
     private Button orderBtn;
     private CardView locationCard;
+    private CardView infoCard;
+    private TextView tvDistance, tvDuration, tvPrice;
 
-    private RideOrderViewModel viewModel;
+    private UnregisteredHomeViewModel viewModel;
 
     private Handler searchHandler = new Handler(Looper.getMainLooper());
     private Runnable searchRunnable;
@@ -65,7 +69,7 @@ public class UnregisteredFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        viewModel = new ViewModelProvider(this).get(RideOrderViewModel.class);
+        viewModel = new ViewModelProvider(this).get(UnregisteredHomeViewModel.class);
         viewModel.init(BuildConfig.MAPBOX_API_KEY);
 
         Configuration.getInstance().setUserAgentValue(requireContext().getPackageName());
@@ -91,6 +95,11 @@ public class UnregisteredFragment extends Fragment {
         orderBtn = view.findViewById(R.id.btn_order);
         locationCard = view.findViewById(R.id.location_card);
 
+        infoCard = view.findViewById(R.id.ride_info_card);
+        tvDistance = view.findViewById(R.id.tv_distance);
+        tvDuration = view.findViewById(R.id.tv_duration);
+        tvPrice = view.findViewById(R.id.tv_price);
+
         mapManager = new MapManager(mapView, requireContext());
         mapManager.centerOnDefault();
 
@@ -109,11 +118,15 @@ public class UnregisteredFragment extends Fragment {
         });
 
 
-        orderBtn.setOnClickListener(v ->
-                Toast.makeText(getContext(),
-                        "Login required to order ride",
-                        Toast.LENGTH_SHORT).show());
+        orderBtn.setOnClickListener(v -> {
+            Toast.makeText(getContext(), "Login required to order ride", Toast.LENGTH_SHORT).show();
 
+            Intent intent = new Intent(getActivity(), LoginActivity.class);
+
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+            startActivity(intent);
+        });
         loadVehicles();
     }
     private void updateCardPosition(boolean isKeyboardVisible) {
@@ -155,21 +168,27 @@ public class UnregisteredFragment extends Fragment {
 
         viewModel.getRouteData().observe(getViewLifecycleOwner(), calculatedRoute -> {
             if (calculatedRoute != null) {
-
                 List<GeoPoint> osmPoints = new ArrayList<>();
-
-                for (com.ognjen.fleetforge.model.GeoPoint point :
-                        calculatedRoute.getCoordinates()) {
-
-                    osmPoints.add(new GeoPoint(
-                            point.getLatitude(),
-                            point.getLongitude()
-                    ));
+                for (com.ognjen.fleetforge.model.GeoPoint point : calculatedRoute.getCoordinates()) {
+                    osmPoints.add(new GeoPoint(point.getLatitude(), point.getLongitude()));
                 }
-
                 mapManager.drawRoute(osmPoints, 0xFFFF9800);
+
+                double distanceKm = calculatedRoute.getDistanceKm();
+                int durationMin = (int) (calculatedRoute.getEstimatedMinutes());
+
+                tvDistance.setText(String.format("Distance: %.2f km", distanceKm));
+                tvDuration.setText(String.format("Duration: %d min", durationMin));
+                infoCard.setVisibility(View.VISIBLE);
+
+                viewModel.fetchPrice(distanceKm, "STANDARD");
             }
         });
+
+        viewModel.getEstimatedPrice().observe(getViewLifecycleOwner(), price -> {
+            tvPrice.setText(String.format("Price: RSD %.2f", price));
+        });
+
     }
 
     private void setupAutocomplete(MaterialAutoCompleteTextView field) {

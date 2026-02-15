@@ -13,7 +13,8 @@ public interface PhotonApiService {
                 @Query("lat") double lat,
                 @Query("lon") double lon,
                 @Query("lang") String lang,
-                @Query("limit") int limit
+                @Query("limit") int limit,
+                @Query("bbox") String bbox
         );
 
 }

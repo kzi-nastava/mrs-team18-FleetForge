@@ -63,7 +63,7 @@ public class RoutingRepo {
     public LiveData<PhotonResponse> getPhotonSuggestions(String query) {
         MutableLiveData<PhotonResponse> data = new MutableLiveData<>();
 
-        photonApiService.getSuggestions(query, 45.2671, 19.8335, "en", 10)
+        photonApiService.getSuggestions(query, 45.2671, 19.8335, "en", 10, "19.7639,45.2212,19.9316,45.3219")
                 .enqueue(new Callback<PhotonResponse>() {
                     @Override
                     public void onResponse(Call<PhotonResponse> call, Response<PhotonResponse> response) {
