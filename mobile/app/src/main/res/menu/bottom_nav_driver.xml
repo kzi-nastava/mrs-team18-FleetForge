@@ -18,7 +18,7 @@
 
 
     <item
-        android:id="@+id/nav_chat"
+        android:id="@+id/nav_chat_driver"
         android:title="Chat"
         android:icon="@android:drawable/ic_menu_send" />
 

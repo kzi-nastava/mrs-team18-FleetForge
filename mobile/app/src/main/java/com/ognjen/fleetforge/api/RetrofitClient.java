@@ -36,14 +36,12 @@ public class RetrofitClient {
                 .build();
 
         Gson gson = new GsonBuilder()
-                .registerTypeAdapter(LocalDateTime.class, (JsonSerializer<LocalDateTime>) (src, typeOfSrc, context) -> {
-
-                    return new JsonPrimitive(src.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS")));
-                })
-                .registerTypeAdapter(LocalDateTime.class, (JsonDeserializer<LocalDateTime>) (json, typeOfT, context) -> {
-
-                    return LocalDateTime.parse(json.getAsString(), DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS"));
-                })
+                .registerTypeAdapter(LocalDateTime.class, (JsonSerializer<LocalDateTime>) (src, typeOfSrc, context) ->
+                    new JsonPrimitive(src.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+                )
+                .registerTypeAdapter(LocalDateTime.class, (JsonDeserializer<LocalDateTime>) (json, typeOfT, context) ->
+                    LocalDateTime.parse(json.getAsString(), DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+                )
                 .create();
         retrofit = new Retrofit.Builder()
                 .baseUrl(BaseUrl)
@@ -92,7 +90,7 @@ public class RetrofitClient {
         return retrofitWithoutAuth.create(AuthService.class);
     }
 
-    public UserService getUserService(){
-        return retrofit.create(UserService.class);
+    public ChatService getChatService() {
+        return retrofit.create(ChatService.class);
     }
 }

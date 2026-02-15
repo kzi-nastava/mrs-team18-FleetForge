@@ -11,7 +11,6 @@ export class ChatWebSocketService implements OnDestroy {
   private client: Client;
   private isConnected$ = new BehaviorSubject<boolean>(false);
   private messagesSubject$ = new Subject<ChatMessageResponseDTO>();
-  private typingSubject$ = new Subject<string>();
   private adminMessagesSubject$ = new Subject<ChatMessageResponseDTO>();
 
   private subscriptions: StompSubscription[] = [];
@@ -155,23 +154,6 @@ export class ChatWebSocketService implements OnDestroy {
     return this.adminMessagesSubject$.asObservable();
   }
 
-  /**
-   * Subscribe to typing indicator queue.
-   * Used to show "User is typing..." indicator.
-   */
-  subscribeToTyping(): Observable<string> {
-    if (!this.client.active || !this.isConnected$.value) {
-      throw new Error('STOMP connection is not active. Call connect() first.');
-    }
-    
-    const sub = this.client.subscribe('/user/queue/typing', (message: IMessage) => {
-      this.typingSubject$.next(message.body);
-      message.ack();
-    });
-
-    this.subscriptions.push(sub);
-    return this.typingSubject$.asObservable();
-  }
 
   /**
    * Send a message via WebSocket (/app/chat/send).
@@ -194,19 +176,6 @@ export class ChatWebSocketService implements OnDestroy {
     });
   }
 
-  /**
-   * Send typing indicator to signal that user is typing.
-   */
-  sendTyping(chatId: number): void {
-    if (!this.client.active || !this.isConnected$.value) {
-      return;
-    }
-    
-    this.client.publish({
-      destination: '/app/chat/typing',
-      body: JSON.stringify(chatId)
-    });
-  }
 
   /**
    * Get connection state observable.
