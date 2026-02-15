@@ -25,16 +25,11 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.ognjen.fleetforge.fragments.driver.DriverProfile;
 import com.ognjen.fleetforge.fragments.passenger.PassengerProfile;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class MainActivity extends AppCompatActivity {
 
     private BottomNavigationView bottomNavigation;
     private AuthManager authManager;
     private UserRole currentRole;
-
-    private final Map<Integer, Fragment> fragmentCache = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,17 +81,6 @@ public class MainActivity extends AppCompatActivity {
         loadFragment(initialFragment);
     }
 
-    private Fragment getOrCreateFragment(int itemId) {
-        if (fragmentCache.containsKey(itemId)) {
-            return fragmentCache.get(itemId);
-        }
-        Fragment fragment = createFragmentForMenuItem(itemId);
-        if (fragment != null) {
-            fragmentCache.put(itemId, fragment);
-        }
-        return fragment;
-    }
-
     private Fragment createFragmentForMenuItem(int itemId) {
         if (itemId == R.id.nav_unregistered_home) {
             return new UnregisteredFragment();
@@ -144,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
             return false;
         }
 
-        Fragment fragment = getOrCreateFragment(id);
+        Fragment fragment = createFragmentForMenuItem(id);
         if (fragment != null) {
             loadFragment(fragment);
             return true;
@@ -169,9 +153,9 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         UserRole newRole = authManager.getCurrentRole();
         if (newRole != currentRole) {
-            fragmentCache.clear();
             recreate();
         }
     }
 
 }
+
