@@ -73,32 +73,4 @@ public class ChatWebSocketController {
                 responseDTO
         );
     }
-
-    /**
-     * Handle typing indicator (optional feature).
-     *
-     * Client sends to: /app/chat/typing
-     */
-    @MessageMapping("/chat/typing")
-    public void handleTyping(
-            @Payload Long chatId,
-            Authentication authentication
-    ) {
-        User sender = (User) authentication.getPrincipal();
-        Chat chat = chatService.getChatById(chatId);
-
-        // Send typing indicator to recipient
-        if (sender.getRole() == Role.ROLE_ADMIN) {
-            messagingTemplate.convertAndSendToUser(
-                    chat.getUser().getEmail(),
-                    "/queue/typing",
-                    sender.getFirstName() + " is typing..."
-            );
-        } else {
-            messagingTemplate.convertAndSend(
-                    "/topic/admin/typing",
-                    sender.getFirstName() + " is typing in chat " + chatId
-            );
-        }
-    }
 }
