@@ -14,9 +14,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
+import com.google.android.material.imageview.ShapeableImageView;
 import com.ognjen.fleetforge.R;
 import com.ognjen.fleetforge.dtos.passenger.PassengerRideDetailsDto;
 import com.ognjen.fleetforge.dtos.passenger.PassengerRideHistoryDto;
+import com.ognjen.fleetforge.utils.MapManager;
 
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
@@ -26,6 +28,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
@@ -75,7 +78,8 @@ public class PassengerHistoryAdapter extends ArrayAdapter<PassengerRideHistoryDt
 
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.passenger_history_card, parent, false);
-            holder = new ViewHolder(convertView);
+            // Pass context to ViewHolder for MapManager initialization
+            holder = new ViewHolder(convertView, getContext());
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
@@ -135,15 +139,100 @@ public class PassengerHistoryAdapter extends ArrayAdapter<PassengerRideHistoryDt
             notifyDataSetChanged();
         });
 
-        // Load detailed data into the expanded view if available
-        if (isExpanded && detailedData != null && detailedData.getId().equals(ride.getRideId())) {
-            holder.driverName.setText(String.format("%s %s", detailedData.getDriver().firstName, detailedData.getDriver().lastName));
-            holder.price.setText(String.format(Locale.getDefault(), "Cost: %.2f RSD", detailedData.getTotalCost()));
-            holder.distance.setText(String.format(Locale.getDefault(), "Distance: %.2f km", detailedData.getTotalDistance()));
+        // Load detailed data and setup map
+        if (isExpanded && detailedData != null &&
+                detailedData.getId().equals(ride.getRideId())) {
 
-            if (holder.mapView != null) {
-                setupMiniMap(holder.mapView, detailedData);
+            // Driver name
+            holder.driverName.setText(
+                    detailedData.getDriver().firstName + " " +
+                            detailedData.getDriver().lastName);
+
+            // Driver phone
+            holder.driverPhone.setText(
+                    detailedData.getDriver().phoneNumber);
+
+            // Distance
+            holder.distance.setText(String.format(
+                    Locale.getDefault(),
+                    "Distance: %.1f km",
+                    detailedData.getTotalDistance()));
+
+            // Duration
+            holder.duration.setText(String.format(
+                    Locale.getDefault(),
+                    "Duration: %d min",
+                    detailedData.getEstimatedDuration()));
+
+            // Cost
+            holder.price.setText(String.format(
+                    Locale.getDefault(),
+                    "%.0f RSD",
+                    detailedData.getTotalCost()));
+
+            // Vehicle type
+            holder.vehicleType.setText(
+                    "Vehicle: " + detailedData.getVehicleType());
+
+            // Example ratings (replace with real values if backend provides)
+            holder.driverRating.setText("Driver: ★★★★★");
+            holder.vehicleRating.setText("Vehicle: ★★★★★");
+
+            // Inconsistencies
+            if (detailedData.isHasInconsistencies()) {
+                holder.inconsistencies.setText("Inconsistencies: Driver took wrong turn");
+                holder.inconsistencies.setVisibility(View.VISIBLE);
+            } else {
+                holder.inconsistencies.setText("Inconsistencies: None");
+                holder.inconsistencies.setVisibility(View.GONE);
             }
+
+            // Date & time formatting
+            try {
+                if (detailedData.getStartTime() != null) {
+                    LocalDateTime start = LocalDateTime.parse(detailedData.getStartTime());
+                    DateTimeFormatter formatter =
+                            DateTimeFormatter.ofPattern("M/d/yy, h:mm a", Locale.getDefault());
+                    holder.detailDateTime.setText(start.format(formatter));
+                }
+            } catch (Exception e) {
+                holder.detailDateTime.setText("-");
+            }
+
+            if (holder.mapManager != null) {
+                setupMap(holder, detailedData);
+            }
+        }
+
+    }
+
+    private void setupMap(ViewHolder holder, PassengerRideDetailsDto details) {
+        MapManager mm = holder.mapManager;
+        mm.clearAll();
+
+        if (details.getStartLocation() != null && details.getEndLocation() != null) {
+            double startLat = details.getStartLocation().latitude;
+            double startLon = details.getStartLocation().longitude;
+            double endLat = details.getEndLocation().latitude;
+            double endLon = details.getEndLocation().longitude;
+
+            mm.addMarker(startLat, startLon, "Start: " + details.getStartAddress(), R.drawable.ic_map_point);
+            mm.addMarker(endLat, endLon, "End: " + details.getEndAddress(), R.drawable.ic_map_point);
+
+            List<GeoPoint> routePoints = new ArrayList<>();
+            routePoints.add(new GeoPoint(startLat, startLon));
+
+            routePoints.add(new GeoPoint(endLat, endLon));
+
+            int colorPrimary = getContext().getResources().getColor(R.color.colorPrimary);
+            mm.drawRoute(routePoints, colorPrimary);
+
+            double centerLat = (startLat + endLat) / 2;
+            double centerLon = (startLon + endLon) / 2;
+            holder.mapView.getController().setZoom(13.0);
+            holder.mapView.getController().setCenter(new GeoPoint(centerLat, centerLon));
+        } else {
+            mm.centerOnDefault();
         }
     }
 
@@ -171,27 +260,41 @@ public class PassengerHistoryAdapter extends ArrayAdapter<PassengerRideHistoryDt
 
     private static class ViewHolder {
         final TextView startAddr, endAddr, statusTime, tvRideDate;
+        final TextView driverPhone, duration, vehicleType,
+                driverRating, vehicleRating, inconsistencies, detailDateTime;
+        final ShapeableImageView driverImage;
         final TextView driverName, price, distance;
         final ImageButton heart;
         final Button btnDetails, btnHide;
         final View expandedLayout;
         final MapView mapView;
+        final MapManager mapManager; // Keep reference to the manager
 
-        ViewHolder(View view) {
+        ViewHolder(View view, Context context) {
             startAddr = view.findViewById(R.id.tv_start_address);
             endAddr = view.findViewById(R.id.tv_end_address);
             statusTime = view.findViewById(R.id.tv_status_time);
             tvRideDate = view.findViewById(R.id.tv_ride_date);
             heart = view.findViewById(R.id.heart_button);
-
             expandedLayout = view.findViewById(R.id.ll_expanded_view);
             btnDetails = view.findViewById(R.id.btn_details);
             btnHide = view.findViewById(R.id.btn_hide_details);
-
             driverName = view.findViewById(R.id.tv_driver_name);
             price = view.findViewById(R.id.tv_detail_price);
             distance = view.findViewById(R.id.tv_detail_distance);
+
+            driverImage = view.findViewById(R.id.iv_driver_img);
+            driverPhone = view.findViewById(R.id.tv_driver_phone);
+            duration = view.findViewById(R.id.tv_detail_duration);
+            vehicleType = view.findViewById(R.id.tv_detail_vehicle);
+            driverRating = view.findViewById(R.id.tv_driver_rating);
+            vehicleRating = view.findViewById(R.id.tv_vehicle_rating);
+            inconsistencies = view.findViewById(R.id.tv_inconsistencies);
+            detailDateTime = view.findViewById(R.id.tv_detail_datetime);
+
             mapView = view.findViewById(R.id.map_view);
+            // Initialize MapManager once per ViewHolder
+            mapManager = new MapManager(mapView, context);
         }
     }
 }

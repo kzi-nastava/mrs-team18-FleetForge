@@ -23,7 +23,7 @@ public class PassengerRideDetailsDto {
         return startLocation;
     }
 
-    public Location getEndLocationLocation() {
+    public Location getEndLocation() {
         return endLocation;
     }
 
@@ -42,6 +42,17 @@ public class PassengerRideDetailsDto {
     public Long getId() { return id; }
     public String getStartAddress() { return startAddress; }
     public String getEndAddress() { return endAddress; }
+    public int getEstimatedDuration() {
+        return estimatedDuration;
+    }
+
+    public boolean isHasInconsistencies() {
+        return hasInconsistencies;
+    }
+
+    public String getStartTime() {
+        return startTime;
+    }
     public List<Location> getWayPoints() { return wayPoints; }
     public DriverMiniDto getDriver() { return driver; }
     public double getTotalDistance() { return totalDistance; }
