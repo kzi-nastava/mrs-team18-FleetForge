@@ -9,10 +9,12 @@ import androidx.lifecycle.ViewModel;
 import com.ognjen.fleetforge.dtos.driver.DriverGetResponseDTO;
 import com.ognjen.fleetforge.dtos.driver.DriverProfileChangeRequestDTO;
 import com.ognjen.fleetforge.dtos.driver.DriverProfileChangeResponseDTO;
+import com.ognjen.fleetforge.dtos.user.GetIsBlockedUserDTO;
 import com.ognjen.fleetforge.dtos.vehicle.VehicleInformationChangeRequestDTO;
 import com.ognjen.fleetforge.dtos.vehicle.VehicleInformationChangeResponseDTO;
 import com.ognjen.fleetforge.enums.VehicleType;
 import com.ognjen.fleetforge.repository.DriverRepo;
+import com.ognjen.fleetforge.repository.UsersRepo;
 
 import java.io.IOException;
 
@@ -20,8 +22,18 @@ public class DriverProfileViewModel extends ViewModel {
 
     private DriverRepo repo;
     private LiveData<DriverGetResponseDTO> data;
+    private UsersRepo usersRepo;
+    private LiveData<GetIsBlockedUserDTO> blocked;
+
+    public LiveData<GetIsBlockedUserDTO> checkBlocked() {
+        if(blocked==null){
+            blocked=usersRepo.checkIfBlocked();
+        }
+        return blocked;
+    }
     public DriverProfileViewModel(){
         repo= new DriverRepo();
+        usersRepo= new UsersRepo();
     }
     public LiveData<DriverGetResponseDTO> getLoggedDriver(){
         if(data==null){
