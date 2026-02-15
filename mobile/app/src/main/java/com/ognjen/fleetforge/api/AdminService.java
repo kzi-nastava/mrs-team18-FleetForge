@@ -7,6 +7,7 @@ import com.ognjen.fleetforge.dtos.admin.AdminDriverVehicleInfoChangeDTO;
 import com.ognjen.fleetforge.dtos.admin.AdminGetResponseDTO;
 import com.ognjen.fleetforge.dtos.admin.AdminViewDriverChangesResponseDTO;
 import com.ognjen.fleetforge.dtos.admin.AdminViewVehicleChangesResponseDTO;
+import com.ognjen.fleetforge.dtos.admin.BlockUserRequestDTO;
 import com.ognjen.fleetforge.dtos.common.PasswordChangeRequestDTO;
 import com.ognjen.fleetforge.dtos.passenger.PassengerChangeInformationRequestDTO;
 import com.ognjen.fleetforge.dtos.passenger.PassengerChangeInformationResponseDTO;
@@ -47,4 +48,7 @@ public interface AdminService {
 
     @PUT("/api/admin")
     Call<AdminChangeInformationResponseDTO> changeCurrentAdmin(@Body AdminChangeInformationRequestDTO request);
+
+    @PUT("/api/admin/block/{id}")
+    Call<Void> blockUser(@Path("id")Long id, @Body BlockUserRequestDTO requestDTO);
 }

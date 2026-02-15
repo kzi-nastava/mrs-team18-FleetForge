@@ -91,4 +91,8 @@ public class RetrofitClient {
     public AuthService getAuthService() {
         return retrofitWithoutAuth.create(AuthService.class);
     }
+
+    public UserService getUserService(){
+        return retrofit.create(UserService.class);
+    }
 }
