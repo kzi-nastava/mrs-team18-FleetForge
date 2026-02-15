@@ -17,7 +17,7 @@
             android:id="@+id/tv_ride_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Oct 24, 2023"
+            android:text="Jan 24, 2026"
             android:textStyle="bold"
             android:textColor="@color/text_primary"
             android:layout_marginBottom="8dp" />

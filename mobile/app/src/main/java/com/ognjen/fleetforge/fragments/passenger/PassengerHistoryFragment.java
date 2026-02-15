@@ -104,14 +104,14 @@ public class PassengerHistoryFragment extends Fragment {
         });
 
         etFrom.setOnClickListener(v -> showDatePicker(date -> {
-            dateFrom = date;
             etFrom.setText(date);
+            dateFrom = formatToApiTimestamp(date);
             refreshRides();
         }));
 
         etTo.setOnClickListener(v -> showDatePicker(date -> {
-            dateTo = date;
             etTo.setText(date);
+            dateTo = formatToApiTimestamp(date);
             refreshRides();
         }));
 
@@ -145,6 +145,11 @@ public class PassengerHistoryFragment extends Fragment {
             }
         });
         return view;
+    }
+
+    private String formatToApiTimestamp(String date) {
+        if (date == null || date.isEmpty()) return null;
+        return date + "T00:00:00.000Z";
     }
 
     private void showDatePicker(OnDateSelectedListener listener) {
