@@ -11,11 +11,13 @@ import com.ognjen.fleetforge.dtos.photon.PhotonResponse;
 import com.ognjen.fleetforge.dtos.ride.RideCreateRequestDTO;
 import com.ognjen.fleetforge.dtos.ride.RideCreateResponseDTO;
 import com.ognjen.fleetforge.dtos.ride.WaypointRideCreateDTO;
+import com.ognjen.fleetforge.dtos.user.GetIsBlockedUserDTO;
 import com.ognjen.fleetforge.model.CalculatedRoute;
 import com.ognjen.fleetforge.model.GeoPoint;
 import com.ognjen.fleetforge.enums.VehicleType;
 import com.ognjen.fleetforge.repository.RideRepo;
 import com.ognjen.fleetforge.repository.RoutingRepo;
+import com.ognjen.fleetforge.repository.UsersRepo;
 
 
 import java.io.IOException;
@@ -29,6 +31,15 @@ public class RideOrderViewModel extends ViewModel {
     private final MutableLiveData<PhotonResponse> suggestions = new MutableLiveData<>();
     private RoutingService routingService;
     private RideRepo rideRepo;
+    private UsersRepo usersRepo;
+    private LiveData<GetIsBlockedUserDTO> blocked;
+
+    public LiveData<GetIsBlockedUserDTO> checkBlocked() {
+        if(blocked==null){
+            blocked=usersRepo.checkIfBlocked();
+        }
+        return blocked;
+    }
 
     private MutableLiveData<CalculatedRoute> routeData = new MutableLiveData<>();
     public LiveData<CalculatedRoute> getRouteData() { return routeData; }
@@ -40,6 +51,7 @@ public class RideOrderViewModel extends ViewModel {
         }
         routingService= new RoutingService(apiKey);
         rideRepo= new RideRepo();
+        usersRepo= new UsersRepo();
     }
 
 
@@ -83,5 +95,4 @@ public class RideOrderViewModel extends ViewModel {
 
             return rideRepo.createRide(requestDTO);
         }
-
 }

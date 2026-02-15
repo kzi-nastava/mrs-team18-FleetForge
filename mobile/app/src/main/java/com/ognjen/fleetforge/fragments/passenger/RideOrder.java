@@ -3,6 +3,7 @@
     import static androidx.appcompat.content.res.AppCompatResources.getDrawable;
     import static androidx.core.util.TypedValueCompat.dpToPx;
 
+    import android.app.AlertDialog;
     import android.graphics.Color;
     import android.os.Bundle;
 
@@ -231,6 +232,10 @@
             });
 
             orderBtn.setOnClickListener(v -> {
+                viewModel.checkBlocked().observe(getViewLifecycleOwner(), blockedResponse -> {
+                    if (blockedResponse != null && blockedResponse.isBlocked()) {
+                        showBlockedDialog(blockedResponse.getReason());
+                    } else {
                 if(canOrder()){
                     ArrayList<WaypointRideCreateDTO> coordinates= new ArrayList<>();
                     WaypointRideCreateDTO startWaypoint= new WaypointRideCreateDTO();
@@ -301,12 +306,24 @@
                     Toast.makeText(getContext(),"Form is not valid. Check if all text fields are filled and if all waypoints are selected from dropdown list.",
                             Toast.LENGTH_LONG).show();
                 }
+                    }
+                });
             });
 
             if(getArguments() != null) {
                 populateFromFavoriteRoute();
             }
             return view;
+        }
+
+        private void showBlockedDialog(String reason) {
+            new AlertDialog.Builder(getContext())
+                    .setTitle("Account Blocked")
+                    .setMessage("Your account is blocked and you cannot order a ride.\n\nReason: " +
+                            (reason != null && !reason.isEmpty() ? reason : "No reason provided."))
+                    .setPositiveButton("OK", null)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
         }
         private void setupAutocomplete(MaterialAutoCompleteTextView field) {
             field.addTextChangedListener(new TextWatcher() {
