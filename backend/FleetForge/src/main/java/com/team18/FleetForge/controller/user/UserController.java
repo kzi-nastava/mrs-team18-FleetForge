@@ -2,13 +2,17 @@ package com.team18.FleetForge.controller.user;
 
 
 import com.team18.FleetForge.dto.CurrentUserDTO;
+import com.team18.FleetForge.dto.admin.GetAllUsersDTO;
+import com.team18.FleetForge.dto.admin.GetIsBlockedUserDTO;
 import com.team18.FleetForge.model.users.User;
 import com.team18.FleetForge.service.ProfilePictureService;
 import com.team18.FleetForge.service.users.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -99,5 +103,28 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Failed to upload profile picture"));
         }
+    }
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping
+    public ResponseEntity<GetAllUsersDTO> getAllUsers(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "3") int size,
+                                                            @RequestParam(required = false) String email){
+        GetAllUsersDTO response= new GetAllUsersDTO();
+        Page<User> users= userService.getAllUsers(page,size, email);
+        response.setContent(users.getContent());
+        response.setLast(users.isLast());
+        response.setFirst(users.isFirst());
+        response.setTotalPages(users.getTotalPages());
+        return ResponseEntity.ok(response);
+    }
+    @PreAuthorize("hasRole('PASSENGER')||hasRole('DRIVER')")
+    @GetMapping("/blocked")
+    public ResponseEntity<GetIsBlockedUserDTO> isUserBlocked(){
+        Authentication auth= SecurityContextHolder.getContext().getAuthentication();
+        User loggedUser=(User) auth.getPrincipal();
+        GetIsBlockedUserDTO response= new GetIsBlockedUserDTO();
+        User user= userService.getUserById(loggedUser.getId());
+        response.setBlocked(user.isBlocked());
+        response.setReason(user.getBlockReason());
+        return new ResponseEntity<>(response,HttpStatus.OK);
     }
 }
