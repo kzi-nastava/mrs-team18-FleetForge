@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnDestroy, ViewChild, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, signal, ViewChild, ViewEncapsulation } from '@angular/core';
 import { VehicleLocationDTO, VehicleType } from '../../shared/models/vehicle.model';
 import { VehicleService } from '../../shared/services/vehicle.service';
 import { MapComponent } from '../../shared/map/map';
@@ -63,6 +63,9 @@ export class PassengerHomeComponent implements OnDestroy {
   estimatedCost: number = 0;
   passengersNumber: number = 0;
   waypointsNumber: number = 0;
+  isBlocked = signal(false);
+  blockReason = signal('');
+  showBlockedDialog = signal(false);
 vehicles: VehicleLocationDTO[] = [];
 
   minDateTime: string = '';
@@ -101,6 +104,15 @@ vehicles: VehicleLocationDTO[] = [];
     setInterval(() => this.updateMinDateTime(), 60000);
     this.setupPickupSearch();
     this.setupDropoffSearch();
+    this.passengerHomeService.getIsBlocked().subscribe({
+      next: (response) => {
+        this.isBlocked.set(response.blocked);
+        this.blockReason.set(response.reason);
+      },
+      error: (error) => {
+        console.error('Error fetching blocked status:', error);
+      }
+    });
   }
    ngOnDestroy(): void {
     this.subscriptions.forEach(sub => sub.unsubscribe());
@@ -577,6 +589,11 @@ get passengerArray(): FormArray<FormControl<string>> {
   return this.rideForm.get('passenger') as FormArray<FormControl<string>>;
 }
 onSubmit(): void {
+  if (this.isBlocked()) {
+    this.showBlockedDialog.set(true);
+    return;
+  }
+
   console.log(this.rideForm.value);
   if (this.rideForm.valid) {
     const wayPointsDto: WayPointDTO[] = [];
@@ -678,6 +695,10 @@ onSubmit(): void {
   } else {
     alert("Form is not valid!");
   }
+}
+
+closeBlockedDialog(): void {
+  this.showBlockedDialog.set(false);
 }
   
 removeWaypoint(index: number): void {

@@ -11,6 +11,7 @@ import com.ognjen.fleetforge.fragments.admin.AdminChatFragment;
 import com.ognjen.fleetforge.fragments.admin.AdminProfile;
 import com.ognjen.fleetforge.fragments.admin.DriverChangesFragment;
 import com.ognjen.fleetforge.activities.auth.LoginActivity;
+import com.ognjen.fleetforge.fragments.admin.UsersList;
 import com.ognjen.fleetforge.fragments.driver.CurrentRideDriver;
 import com.ognjen.fleetforge.fragments.admin.RegisterDriver;
 import com.ognjen.fleetforge.fragments.driver.DriverHistoryFragment;
@@ -45,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
 
         setupBottomNavigation();
         loadInitialFragment();
+
+        getWindow().setDecorFitsSystemWindows(false);
     }
 
     private void setupBottomNavigation() {
@@ -117,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
         } else if (itemId == R.id.nav_register_driver) {
             return new RegisterDriver();
         } else if (itemId == R.id.nav_block_users) {
-            return PlaceholderFragment.newInstance("Block Users");
+            return new UsersList();
         } else if (itemId == R.id.nav_profile_changes) {
             return new DriverChangesFragment();
         }else if(itemId==R.id.nav_favorites){

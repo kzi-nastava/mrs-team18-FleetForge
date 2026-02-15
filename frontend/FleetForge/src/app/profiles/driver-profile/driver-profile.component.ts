@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, ElementRef, Signal, ViewChild, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, signal, Signal, ViewChild, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -29,6 +29,17 @@ export class DriverProfileComponent {
   formData = new FormData();
   driverEmail: string = '';
   constructor(private driverService: DriverService,private cdr: ChangeDetectorRef) { }
+  isBlocked = signal(false);
+  blockReason = signal('');
+  showBlockedDialog = signal(false);
+
+openBlockedDialog(): void {
+  this.showBlockedDialog.set(true);
+}
+
+closeBlockedDialog(): void {
+  this.showBlockedDialog.set(false);
+}
 
 editDriver(): void {
   const file = this.formData.get('file') as File | null;
@@ -95,6 +106,20 @@ editVehicle(): void {
     petFriendly: new FormControl(false)
   });
 ngOnInit(): void {
+    this.driverService.getIsBlocked().subscribe({
+      next: (response) => {
+        this.isBlocked.set(response.blocked);
+        this.blockReason.set(response.reason || 'No reason provided.');
+        if (response.blocked) {
+          this.openBlockedDialog();
+        }
+      },
+      error: () => {
+        this.isBlocked.set(false);
+        this.blockReason.set('');
+      }
+    });
+
     this.driverService.getCurrentDriver().subscribe((driverData) => {
       this.driverEmail=driverData.email ?? '';
        this.editDriverInfo.setValue({

@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { DriverChangeRequestDTO, DriverChangeResponseDTO, DriverInformationDTO, UserInformationDTO } from '../../shared/dtos/users.dtos';
+import { DriverChangeRequestDTO, DriverChangeResponseDTO, DriverInformationDTO, GetIsBlockedUserDTO, UserInformationDTO } from '../../shared/dtos/users.dtos';
 import { Vehicle } from '../model/vehicle.model';
 import { VehicleChangeRequestDTO, VehicleChangeResponseDTO } from '../../shared/dtos/vehicle.dtos';
 import { DriverActivityResponseDTO } from '../../shared/dtos/driver.dtos';
@@ -38,4 +38,8 @@ export class DriverService {
   getDriverActivty():Observable<DriverActivityResponseDTO> {
     return this.http.get<DriverActivityResponseDTO>(`${this.apiUrl}/active-hours`);
   }
+
+  getIsBlocked():Observable<GetIsBlockedUserDTO>{
+      return this.http.get<GetIsBlockedUserDTO>(this.apiUsersUrl+"/blocked");
+    }
 }

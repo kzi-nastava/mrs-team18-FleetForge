@@ -95,7 +95,7 @@ export const SIDEBAR_MENU_CONFIG: Record<UserRole, SidebarMenuItem[]> = {
     {
       label: 'Block Users',
       icon: '🚫',
-      path: '/admin/block-users'
+      path: '/admin/users-list'
     },
     {
       label: 'Live Chat',

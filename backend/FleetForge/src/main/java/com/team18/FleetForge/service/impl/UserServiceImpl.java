@@ -11,6 +11,9 @@ import com.team18.FleetForge.model.users.User;
 import com.team18.FleetForge.repository.users.UserRepository;
 import com.team18.FleetForge.service.users.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -104,5 +107,12 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(driverEntity);
         return  driverEntity;
+    }
+    public Page<User> getAllUsers(int page, int size, String email){
+        Pageable pageable= PageRequest.of(page,size);
+        if (email != null && !email.isEmpty()) {
+            return userRepository.findByEmailContainingIgnoreCase(email, pageable);
+        }
+        return userRepository.findAll(pageable);
     }
 }
