@@ -1,10 +1,12 @@
 package com.ognjen.fleetforge.api;
 
+import com.ognjen.fleetforge.dtos.common.PageResponse;
 import com.ognjen.fleetforge.dtos.passenger.FavoriteRouteGetResponseDTO;
 import com.ognjen.fleetforge.dtos.passenger.PassengerChangeInformationRequestDTO;
 import com.ognjen.fleetforge.dtos.passenger.PassengerChangeInformationResponseDTO;
 import com.ognjen.fleetforge.dtos.passenger.PassengerGetResponseDTO;
 import com.ognjen.fleetforge.dtos.common.PasswordChangeRequestDTO;
+import com.ognjen.fleetforge.dtos.passenger.PassengerRideHistoryDto;
 
 import java.util.List;
 
@@ -18,6 +20,7 @@ import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface PassengerService {
 
@@ -39,4 +42,14 @@ public interface PassengerService {
 
     @POST("/api/passenger/favorites/{routeName}/{rideId}")
     Call<Void> addFavorite(@Path("routeName")String routeName, @Path("rideId")Long rideId);
+
+    @GET("/api/passenger/rides")
+    Call<PageResponse<PassengerRideHistoryDto>> getPassengerRides(
+            @Query("page") int page,
+            @Query("size") int size,
+            @Query("sortBy") String sortBy,
+            @Query("direction") String direction,
+            @Query("from") String from,
+            @Query("to") String to
+    );
 }

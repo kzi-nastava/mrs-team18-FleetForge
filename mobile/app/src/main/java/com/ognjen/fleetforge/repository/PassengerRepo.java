@@ -8,11 +8,13 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.ognjen.fleetforge.api.PassengerService;
 import com.ognjen.fleetforge.api.RetrofitClient;
+import com.ognjen.fleetforge.dtos.common.PageResponse;
 import com.ognjen.fleetforge.dtos.common.PasswordChangeRequestDTO;
 import com.ognjen.fleetforge.dtos.passenger.FavoriteRouteGetResponseDTO;
 import com.ognjen.fleetforge.dtos.passenger.PassengerChangeInformationRequestDTO;
 import com.ognjen.fleetforge.dtos.passenger.PassengerChangeInformationResponseDTO;
 import com.ognjen.fleetforge.dtos.passenger.PassengerGetResponseDTO;
+import com.ognjen.fleetforge.dtos.passenger.PassengerRideHistoryDto;
 import com.ognjen.fleetforge.model.FavoriteRoute;
 import com.ognjen.fleetforge.utils.FileUtil;
 
@@ -210,4 +212,20 @@ public class PassengerRepo {
             });
             return data;
         }
+
+    public LiveData<PageResponse<PassengerRideHistoryDto>> getRides(int page, int size, String from, String to) {
+        MutableLiveData<PageResponse<PassengerRideHistoryDto>> data = new MutableLiveData<>();
+        service.getPassengerRides(page, size, "startTime", "desc", from, to).enqueue(new Callback<PageResponse<PassengerRideHistoryDto>>() {
+            @Override
+            public void onResponse(Call<PageResponse<PassengerRideHistoryDto>> call, Response<PageResponse<PassengerRideHistoryDto>> response) {
+                if (response.isSuccessful()) data.setValue(response.body());
+            }
+
+            @Override
+            public void onFailure(Call<PageResponse<PassengerRideHistoryDto>> call, Throwable t) {
+                data.setValue(null);
+            }
+        });
+        return data;
+    }
 }

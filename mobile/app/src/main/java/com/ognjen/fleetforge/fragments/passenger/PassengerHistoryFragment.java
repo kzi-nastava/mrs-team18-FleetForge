@@ -9,16 +9,19 @@ import androidx.lifecycle.ViewModelProvider;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ognjen.fleetforge.R;
 import com.ognjen.fleetforge.adapters.PassengerHistoryAdapter;
+import com.ognjen.fleetforge.dtos.common.PageResponse;
 import com.ognjen.fleetforge.dtos.passenger.FavoriteRouteGetResponseDTO;
+import com.ognjen.fleetforge.dtos.passenger.PassengerRideHistoryDto;
 import com.ognjen.fleetforge.model.PassengerHistory;
 
 import java.util.ArrayList;
@@ -37,7 +40,7 @@ public class PassengerHistoryFragment extends Fragment {
     private ListView historyList;
 
     private PassengerHistoryAdapter adapter;
-    private ArrayList<PassengerHistory> rides= new ArrayList<>();
+    private ArrayList<PassengerRideHistoryDto> rides = new ArrayList<>();
     private PassengerHistoryViewModel viewModel;
 
     private Set<Long> favoriteRideIds = new HashSet<>();
@@ -85,29 +88,31 @@ public class PassengerHistoryFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_passenger_history, container, false);
 
         historyList = view.findViewById(R.id.history_list);
-        rides.clear();
-
-
-        for (long i = 1; i <= 5; i++) {
-            PassengerHistory dummyRide = new PassengerHistory();
-            dummyRide.setRideId(i);
-            rides.add(dummyRide);
-        }
+        Button btnNext = view.findViewById(R.id.btn_next_page);
+        Button btnPrev = view.findViewById(R.id.btn_prev_page);
 
         adapter = new PassengerHistoryAdapter(getActivity(), rides);
         historyList.setAdapter(adapter);
 
-        adapter.setOnActionListener(new PassengerHistoryAdapter.OnActionListener() {
-            @Override
-            public void onHeart(PassengerHistory ride, ImageButton heartBtn) {
-                handleOnHeart(ride,heartBtn);
-            }
+        // Initial load
+        loadRides(null, null);
+
+        btnNext.setOnClickListener(v -> {
+            viewModel.nextPage();
+            loadRides(null, null);
         });
+
+        btnPrev.setOnClickListener(v -> {
+            viewModel.prevPage();
+            loadRides(null, null);
+        });
+
+        adapter.setOnActionListener((ride, heartBtn) -> handleOnHeart(ride, heartBtn));
+
         viewModel.getFavorites().observe(getViewLifecycleOwner(),response -> {
             if(response!=null){
                 favoriteRideIds.clear();
@@ -128,35 +133,53 @@ public class PassengerHistoryFragment extends Fragment {
         return view;
     }
 
-    private void handleOnHeart(PassengerHistory ride, ImageButton heartBtn){
-        if(heartBtn.isSelected()){
+    private void loadRides(String from, String to) {
+        viewModel.getRides(from, to).observe(getViewLifecycleOwner(), response -> {
+            if (response != null && response.getContent() != null) {
+                rides.clear();
+                rides.addAll(response.getContent()); // No mapping needed!
+                adapter.notifyDataSetChanged();
+                updatePaginationUI(response);
+            }
+        });
+    }
 
+    private void updatePaginationUI(PageResponse<?> response) {
+        View view = getView();
+        if (view == null) return;
+
+        TextView pageInfo = view.findViewById(R.id.tv_pagination_info);
+        Button btnNext = view.findViewById(R.id.btn_next_page);
+        Button btnPrev = view.findViewById(R.id.btn_prev_page);
+
+        // Update text: e.g., "Page 1 of 5"
+        pageInfo.setText("Page " + (response.getNumber() + 1) + " of " + response.getTotalPages());
+
+        // Disable buttons if there is no more data
+        btnPrev.setEnabled(!response.isFirst());
+        btnNext.setEnabled(!response.isLast());
+    }
+
+    private void handleOnHeart(PassengerRideHistoryDto ride, ImageButton heartBtn) {
+        // Updated to use ride.getRideId() from DTO
+        if (heartBtn.isSelected()) {
             viewModel.deleteFavorite(rideIdToFavoriteId.get(ride.getRideId())).observe(getViewLifecycleOwner(), success -> {
-                if(success) {
+                if (success) {
                     heartBtn.setSelected(false);
-                    Toast.makeText(getContext(), "Removed from favorites", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(getContext(), "Error removing favorite", Toast.LENGTH_SHORT).show();
+                    favoriteRideIds.remove(ride.getRideId());
+                    Toast.makeText(getContext(), "Removed", Toast.LENGTH_SHORT).show();
                 }
             });
-        }else{
+        } else {
             showFavoriteRouteDialog(routeName -> {
-                if (routeName.trim().isEmpty()) {
-                    Toast.makeText(getContext(), "Name cannot be empty", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                viewModel.addFavorite(routeName, ride.getRideId()).observe(getViewLifecycleOwner(), newFavoriteId -> {
-                    if (newFavoriteId != null) {
+                viewModel.addFavorite(routeName, ride.getRideId()).observe(getViewLifecycleOwner(), success -> {
+                    if (success) {
                         heartBtn.setSelected(true);
-
-                        Toast.makeText(getContext(), "Added to favorites", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(getContext(), "Error adding to favorites", Toast.LENGTH_SHORT).show();
+                        favoriteRideIds.add(ride.getRideId());
+                        Toast.makeText(getContext(), "Added", Toast.LENGTH_SHORT).show();
                     }
                 });
             });
-
         }
     }
     interface OnRouteNameEnteredListener {
