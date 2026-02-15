@@ -3,6 +3,7 @@ package com.ognjen.fleetforge.fragments.driver;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -210,7 +211,21 @@ public class DriverProfile extends Fragment {
                 }
             });
         });
+        driverProfileViewModel.checkBlocked().observe(getViewLifecycleOwner(), blockedResponse -> {
+            if (blockedResponse != null && blockedResponse.isBlocked()) {
+                showBlockedDialog(blockedResponse.getReason());
+            }
+        });
         return view;
     }
-
+    private void showBlockedDialog(String reason) {
+        new AlertDialog.Builder(getContext())
+                .setTitle("Account Blocked")
+                .setMessage("Your account is blocked and you cannot be added to rides.\n\nReason: " +
+                        (reason != null && !reason.isEmpty() ? reason : "No reason provided."))
+                .setPositiveButton("OK", null)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setCancelable(false)
+                .show();
+    }
 }

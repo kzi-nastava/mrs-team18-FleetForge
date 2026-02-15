@@ -15,6 +15,7 @@ import com.ognjen.fleetforge.dtos.admin.AdminDriverVehicleInfoChangeDTO;
 import com.ognjen.fleetforge.dtos.admin.AdminGetResponseDTO;
 import com.ognjen.fleetforge.dtos.admin.AdminViewDriverChangesResponseDTO;
 import com.ognjen.fleetforge.dtos.admin.AdminViewVehicleChangesResponseDTO;
+import com.ognjen.fleetforge.dtos.admin.BlockUserRequestDTO;
 import com.ognjen.fleetforge.dtos.common.PasswordChangeRequestDTO;
 import com.ognjen.fleetforge.dtos.passenger.PassengerChangeInformationRequestDTO;
 import com.ognjen.fleetforge.dtos.passenger.PassengerChangeInformationResponseDTO;
@@ -220,5 +221,29 @@ public class AdminRepo {
         });
         return data;
 
+    }
+
+    public LiveData<Boolean> blockUser(Long id,BlockUserRequestDTO requestDTO){
+        MutableLiveData<Boolean> data= new MutableLiveData<>();
+        service.blockUser(id,requestDTO).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if(response.isSuccessful()){
+                    data.setValue(true);
+                }else{
+                    try {
+                        android.util.Log.e("API_ERROR", "Error body: " + response.errorBody().string());
+                    } catch (Exception e) { e.printStackTrace(); }
+                    data.setValue(false);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable throwable) {
+                android.util.Log.e("API_FAILURE", "Doslo je do greske: ", throwable);
+                data.setValue(false);
+            }
+        });
+        return data;
     }
 }
