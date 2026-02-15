@@ -42,10 +42,6 @@ closeBlockedDialog(): void {
 }
 
 editDriver(): void {
-  if (this.isBlocked()) {
-    return;
-  }
-
   const file = this.formData.get('file') as File | null;
   const fileExtension = file ? file.name.substring(file.name.lastIndexOf('.')) : '';
   console.log("img: " + this.driverEmail + fileExtension);
@@ -60,10 +56,6 @@ editDriver(): void {
   });
 }
 editVehicle(): void {
-  if (this.isBlocked()) {
-    return;
-  }
-
   this.driverService.createVehicleChangeRequest({
     newModel: this.editVehicleInfo.value.model ?? '',
     newType: (this.editVehicleInfo.value.type ?? '') as VehicleType,
@@ -79,10 +71,6 @@ editVehicle(): void {
 @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
   imageUrl: string = 'blank_profile.webp';
   openFilePicker(): void {
-    if (this.isBlocked()) {
-      return;
-    }
-
     this.fileInput.nativeElement.click();
   }
   onFileSelected(event: Event): void {
