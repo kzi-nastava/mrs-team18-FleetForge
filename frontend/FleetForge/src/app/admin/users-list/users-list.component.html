@@ -1,0 +1,107 @@
+<div class="admin-dashboard">
+	<div class="header-section">
+		<h2 class="dashboard-title">Users List</h2>
+	</div>
+
+	<div class="rides-section">
+		<h3 class="section-title">Search users</h3>
+
+		<div class="filter-section">
+			<div class="filter-field">
+				<label for="searchEmail">Email</label>
+				<input
+					id="searchEmail"
+					type="text"
+					placeholder="Search by email"
+					[(ngModel)]="searchEmail"
+				/>
+			</div>
+
+			<div>
+				<button type="button" (click)="searchUsers()" [disabled]="isLoading()">
+					{{ isLoading() ? 'Searching...' : 'Search' }}
+				</button>
+			</div>
+		</div>
+
+		<div class="table-container" *ngIf="users().length > 0">
+			<table class="rides-table">
+				<thead>
+					<tr>
+						<th>Email</th>
+						<th>First name</th>
+						<th>Last name</th>
+						<th>Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr *ngFor="let user of users()">
+						<td><div class="cell-content">{{ user.email }}</div></td>
+						<td><div class="cell-content">{{ user.firstName }}</div></td>
+						<td><div class="cell-content">{{ user.lastName }}</div></td>
+						<td>
+							<button
+								type="button"
+								class="action-btn block"
+								[disabled]="isBlocked(user.id)"
+								(click)="blockUser(user)"
+							>
+								{{ isBlocked(user.id) ? 'Blocked' : 'Block' }}
+							</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<div class="empty-state" *ngIf="!isLoading() && users().length === 0">
+			No users found.
+		</div>
+
+		<div class="pagination-controls">
+			<button type="button" (click)="prevPage()" [disabled]="currentPage() === 0">
+				Previous
+			</button>
+			<span class="page-indicator">{{ currentPage() + 1 }} / {{ totalPages() }}</span>
+			<button
+				type="button"
+				(click)="nextPage()"
+				[disabled]="currentPage() === totalPages() - 1"
+			>
+				Next
+			</button>
+		</div>
+	</div>
+
+	<div class="dialog-overlay" *ngIf="isBlockDialogOpen()" (click)="closeBlockDialog()">
+		<div class="dialog-card" (click)="$event.stopPropagation()">
+			<h3 class="dialog-title">Block User</h3>
+			<p class="dialog-subtitle">
+				Provide a reason for blocking
+				<strong>{{ selectedUserToBlock()?.email }}</strong>
+			</p>
+
+			<label for="blockReason" class="dialog-label">Reason</label>
+			<textarea
+				id="blockReason"
+				[(ngModel)]="blockReason"
+				rows="4"
+				placeholder="Type block reason..."
+			></textarea>
+
+			<div class="dialog-actions">
+				<button type="button" class="secondary-btn" (click)="closeBlockDialog()" [disabled]="isBlocking()">
+					Cancel
+				</button>
+				<button
+					type="button"
+					class="primary-btn"
+					(click)="confirmBlockUser()"
+					[disabled]="!blockReason.trim() || isBlocking()"
+				>
+					{{ isBlocking() ? 'Blocking...' : 'Confirm block' }}
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
