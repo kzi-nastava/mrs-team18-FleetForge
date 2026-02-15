@@ -11,11 +11,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -50,6 +54,7 @@ public class UnregisteredFragment extends Fragment {
     private MaterialAutoCompleteTextView startLocation;
     private MaterialAutoCompleteTextView endLocation;
     private Button orderBtn;
+    private CardView locationCard;
 
     private RideOrderViewModel viewModel;
 
@@ -84,6 +89,7 @@ public class UnregisteredFragment extends Fragment {
         startLocation = view.findViewById(R.id.et_start_location);
         endLocation = view.findViewById(R.id.et_end_location);
         orderBtn = view.findViewById(R.id.btn_order);
+        locationCard = view.findViewById(R.id.location_card);
 
         mapManager = new MapManager(mapView, requireContext());
         mapManager.centerOnDefault();
@@ -93,12 +99,50 @@ public class UnregisteredFragment extends Fragment {
         setupAutocomplete(endLocation);
         setupSelectionListeners();
 
+        ViewCompat.setOnApplyWindowInsetsListener(view, (v, insets) -> {
+            boolean isKeyboardVisible =
+                    insets.isVisible(WindowInsetsCompat.Type.ime());
+
+            updateCardPosition(isKeyboardVisible);
+
+            return insets;
+        });
+
+
         orderBtn.setOnClickListener(v ->
                 Toast.makeText(getContext(),
                         "Login required to order ride",
                         Toast.LENGTH_SHORT).show());
 
         loadVehicles();
+    }
+    private void updateCardPosition(boolean isKeyboardVisible) {
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) locationCard.getLayoutParams();
+
+        if (isKeyboardVisible) {
+            params.removeRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+            params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+
+            params.topMargin = (int) (32 * getResources().getDisplayMetrics().density);
+            params.bottomMargin = 0;
+        } else {
+            params.removeRule(RelativeLayout.ALIGN_PARENT_TOP);
+            params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+
+            params.bottomMargin = (int) (16 * getResources().getDisplayMetrics().density);
+            params.topMargin = 0;
+        }
+
+        locationCard.setLayoutParams(params);
+    }
+
+    private void hideKeyboard() {
+        View view = this.getView();
+        if (view != null) {
+            android.view.inputmethod.InputMethodManager imm = (android.view.inputmethod.InputMethodManager)
+                    requireContext().getSystemService(android.content.Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 
     private void observeViewModel() {
@@ -157,17 +201,19 @@ public class UnregisteredFragment extends Fragment {
     }
 
     private void setupSelectionListeners() {
-
         startLocation.setOnItemClickListener((parent, view, position, id) -> {
-            PhotonResponse.Feature selected =
-                    (PhotonResponse.Feature) parent.getItemAtPosition(position);
+            PhotonResponse.Feature selected = (PhotonResponse.Feature) parent.getItemAtPosition(position);
             handleLocationSelection(startLocation, selected);
+
+            endLocation.requestFocus();
         });
 
         endLocation.setOnItemClickListener((parent, view, position, id) -> {
-            PhotonResponse.Feature selected =
-                    (PhotonResponse.Feature) parent.getItemAtPosition(position);
+            PhotonResponse.Feature selected = (PhotonResponse.Feature) parent.getItemAtPosition(position);
             handleLocationSelection(endLocation, selected);
+
+            endLocation.clearFocus();
+            hideKeyboard();
         });
     }
 

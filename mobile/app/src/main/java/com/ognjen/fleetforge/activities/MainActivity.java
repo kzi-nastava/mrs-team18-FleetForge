@@ -48,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
 
         setupBottomNavigation();
         loadInitialFragment();
+
+        getWindow().setDecorFitsSystemWindows(false);
     }
 
     private void setupBottomNavigation() {
