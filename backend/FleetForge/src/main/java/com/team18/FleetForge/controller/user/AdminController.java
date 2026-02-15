@@ -8,6 +8,7 @@ import com.team18.FleetForge.dto.vehicle.VehicleChangeInformationResponseDTO;
 import com.team18.FleetForge.model.users.DriverProfileChangeRequest;
 import com.team18.FleetForge.model.users.Admin;
 import com.team18.FleetForge.model.users.Driver;
+import com.team18.FleetForge.model.users.User;
 import com.team18.FleetForge.model.vehicles.Vehicle;
 import com.team18.FleetForge.model.vehicles.VehicleInformationChangeRequest;
 import com.team18.FleetForge.model.enums.InformationChangeRequestStatus;
@@ -268,7 +269,24 @@ public class AdminController {
                 rideService.getAdminRideDetails(rideId)
         );
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/block/{id}")
+    public ResponseEntity<?> blockUser(@PathVariable Long id) throws Exception {
+        User user= userService.getUserById(id);
+        if(user.isBlocked()){
+            throw new Exception("User is already blocked");
+        }
+        user.setBlocked(true);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/blocked/{id}")
+    public ResponseEntity<GetIsBlockedUserDTO> isUserBlocked(@PathVariable Long id){
+        GetIsBlockedUserDTO response= new GetIsBlockedUserDTO();
+        User user= userService.getUserById(id);
+        response.setBlocked(user.isBlocked());
+        return new ResponseEntity<>(response,HttpStatus.OK);
+    }
 }
 
 
