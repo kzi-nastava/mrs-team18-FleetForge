@@ -5,6 +5,7 @@ import com.team18.FleetForge.model.users.Admin;
 import com.team18.FleetForge.model.users.Driver;
 import com.team18.FleetForge.model.users.Passenger;
 import com.team18.FleetForge.model.users.User;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -18,4 +19,5 @@ public interface UserService {
     Driver createDriver(DriverCreateRequestDTO driver);
 
     List<String> searchUserEmailsByPrefix(String prefix);
+    Page<User> getAllUsers(int page, int size, String email);
 }
