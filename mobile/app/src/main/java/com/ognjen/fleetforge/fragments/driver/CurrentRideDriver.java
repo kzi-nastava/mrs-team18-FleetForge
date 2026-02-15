@@ -18,6 +18,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.ognjen.fleetforge.BuildConfig;
 import com.ognjen.fleetforge.R;
 import com.ognjen.fleetforge.dtos.driver.DriverLocationUpdateRequestDTO;
@@ -106,7 +107,6 @@ public class CurrentRideDriver extends Fragment {
     }
 
     private void initializeViews(View view) {
-        Log.d(TAG, "Step 1: Initializing views");
 
         mapView = view.findViewById(R.id.map_view);
         loadingOverlay = view.findViewById(R.id.loading_overlay);
@@ -131,8 +131,6 @@ public class CurrentRideDriver extends Fragment {
     }
 
     private void initializeMap() {
-        Log.d(TAG, "Step 1: Initializing map");
-
         Configuration.getInstance().setUserAgentValue(requireContext().getPackageName());
 
         mapManager = new MapManager(mapView, requireContext());
@@ -140,14 +138,12 @@ public class CurrentRideDriver extends Fragment {
     }
 
     private void initializeServices() {
-        Log.d(TAG, "Step 1: Initializing services");
         driverApiService = RetrofitClient.getInstance().getDriverService();
         routingService = new RoutingService(MAPBOX_API_KEY);
         simulationHandler = new Handler(Looper.getMainLooper());
     }
 
     private void fetchActiveRide() {
-        Log.d(TAG, "Step 2: Fetching active ride");
 
         Call<RideTrackingDTO> call = driverApiService.getActiveRideTracking();
         call.enqueue(new Callback<RideTrackingDTO>() {
@@ -191,7 +187,6 @@ public class CurrentRideDriver extends Fragment {
         passengerName.setText(fullName);
         passengerPhone.setText(currentRide.getPassenger().getPhoneNumber());
 
-        Log.d(TAG, "Passenger: " + fullName);
     }
 
     private void displayRouteInfo() {
@@ -200,8 +195,6 @@ public class CurrentRideDriver extends Fragment {
         departureAddress.setText(currentRide.getRoute().getStartAddress());
         destinationAddress.setText(currentRide.getRoute().getEndAddress());
 
-        Log.d(TAG, "Route: " + currentRide.getRoute().getStartAddress() +
-                " → " + currentRide.getRoute().getEndAddress());
     }
 
     private void configureButtons() {
@@ -216,7 +209,6 @@ public class CurrentRideDriver extends Fragment {
             btnSecondaryAction.setBackgroundTintList(
                     getResources().getColorStateList(R.color.error, null));
 
-            Log.d(TAG, "Buttons configured for ACCEPTED status");
 
         } else if ("IN_PROGRESS".equals(status)) {
             btnPrimaryAction.setText("Finish Ride");
@@ -227,12 +219,10 @@ public class CurrentRideDriver extends Fragment {
             btnSecondaryAction.setBackgroundTintList(
                     getResources().getColorStateList(R.color.panic, null));
 
-            Log.d(TAG, "Buttons configured for IN_PROGRESS status");
         }
     }
 
     private void calculateAndDisplayRoute() {
-        Log.d(TAG, "Step 4: Starting route calculation");
 
         new Thread(() -> {
             try {
@@ -292,7 +282,6 @@ public class CurrentRideDriver extends Fragment {
     }
 
     private void displayRouteOnMap() {
-        Log.d(TAG, "Step 5: Displaying route on map");
 
         if (calculatedRoute == null) return;
         mapManager.clearAll();
@@ -314,7 +303,6 @@ public class CurrentRideDriver extends Fragment {
             mapView.getController().setZoom(14.0);
         }
 
-        Log.d(TAG, "Route displayed with " + osmPoints.size() + " points");
     }
 
     private void addRouteMarkers() {
@@ -366,7 +354,6 @@ public class CurrentRideDriver extends Fragment {
     }
 
     private void updateDistanceAndTime() {
-        Log.d(TAG, "Step 6: Updating distance and time");
 
         if (calculatedRoute == null) return;
 
@@ -393,14 +380,12 @@ public class CurrentRideDriver extends Fragment {
     }
 
     private void startSimulation() {
-        Log.d(TAG, "Step 8: Starting live simulation");
 
         simulationRunnable = new Runnable() {
             @Override
             public void run() {
                 if (routeSimulator == null || routeSimulator.isComplete()) {
                     Log.d(TAG, "Simulation complete - arrived at destination");
-                    onSimulationComplete();
                     return;
                 }
 
@@ -539,9 +524,6 @@ public class CurrentRideDriver extends Fragment {
             }
         }
     }
-    private void onSimulationComplete() {
-        Toast.makeText(requireContext(), "Arrived at destination!", Toast.LENGTH_SHORT).show();
-    }
 
     private void stopSimulation() {
         if (simulationHandler != null && simulationRunnable != null) {
@@ -568,11 +550,41 @@ public class CurrentRideDriver extends Fragment {
                     Toast.makeText(requireContext(), "Ride with id: "+response.getId()+" started. Status: "+response.getStatus(), Toast.LENGTH_SHORT).show();
                 }
             });
+        }else if(btnPrimaryAction.getText().equals("Finish Ride")){
+            viewModel.finishRide(currentRide.getRideId()).observe(getViewLifecycleOwner(),response->{
+                if(response!=null){
+                    stopSimulation();
+                    Toast.makeText(requireContext(), "Ride finished successfully!", Toast.LENGTH_LONG).show();
+
+                    currentRide = null;
+                    calculatedRoute = null;
+                    routeSimulator = null;
+
+                    if(mapManager != null) {
+                        mapManager.clearAll();
+                    }
+
+                    if(response.getNextRide() != null) {
+                        Toast.makeText(requireContext(), "Next ride assigned!", Toast.LENGTH_SHORT).show();
+                        fetchActiveRide();
+                    } else {
+                        navigateToDashboard();
+
+                    }
+                }
+            });
         }
     }
 
     private void onSecondaryActionClick() {
         Toast.makeText(requireContext(), "Secondary action clicked", Toast.LENGTH_SHORT).show();
+    }
+
+    private void navigateToDashboard() {
+        BottomNavigationView bottomNav = requireActivity().findViewById(R.id.bottom_navigation);
+        if (bottomNav != null) {
+            bottomNav.setSelectedItemId(R.id.nav_dashboard);
+        }
     }
 
     @Override
