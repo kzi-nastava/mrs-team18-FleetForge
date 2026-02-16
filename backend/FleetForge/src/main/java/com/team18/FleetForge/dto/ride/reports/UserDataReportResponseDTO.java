@@ -13,5 +13,5 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDataReportResponseDTO {
-    private Map<LocalDate, List<Ride>> dataByDay;
+    private Map<LocalDate, List<ReportsRideDTO>> dataByDay;
 }
