@@ -5,6 +5,8 @@ import com.ognjen.fleetforge.dtos.driver.DriverLocationUpdateResponseDTO;
 import com.ognjen.fleetforge.dtos.ride.FinishRideResponseDTO;
 import com.ognjen.fleetforge.dtos.ride.RideCreateRequestDTO;
 import com.ognjen.fleetforge.dtos.ride.RideCreateResponseDTO;
+import com.ognjen.fleetforge.dtos.ride.RideReviewRequestDTO;
+import com.ognjen.fleetforge.dtos.ride.RideReviewResponseDTO;
 import com.ognjen.fleetforge.dtos.ride.RideStartResponseDTO;
 import com.ognjen.fleetforge.dtos.ride.RideTrackingDTO;
 
@@ -31,5 +33,11 @@ public interface RideService {
     @POST("api/rides/driver-location-update")
     Call<DriverLocationUpdateResponseDTO> updateDriverLocation(
             @Body DriverLocationUpdateRequestDTO request
+    );
+
+    @POST("api/rides/{rideId}/review")
+    Call<RideReviewResponseDTO> createReview(
+            @Path("rideId") Long rideId,
+            @Body RideReviewRequestDTO request
     );
 }
