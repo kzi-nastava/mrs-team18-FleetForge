@@ -4,7 +4,9 @@ import com.team18.FleetForge.dto.ride.lifecycle.RideCancellationRequestDTO;
 import com.team18.FleetForge.dto.ride.lifecycle.RideCancellationResult;
 import com.team18.FleetForge.model.enums.RideStatus;
 import com.team18.FleetForge.model.ride.Ride;
+import com.team18.FleetForge.model.users.Driver;
 import com.team18.FleetForge.repository.rides.RideRepository;
+import com.team18.FleetForge.repository.users.DriverRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -18,6 +20,7 @@ import java.time.LocalDateTime;
 public class RideCancellationService {
 
     private final RideRepository rideRepository;
+    private final DriverRepository driverRepository;
 
     public RideCancellationResult cancelRide(
             Long rideId,
@@ -59,7 +62,7 @@ public class RideCancellationService {
             );
         }
 
-        applyCancellation(ride, request.getReason());
+        applyCancellation(ride, request.getReason(), false);
         return success(ride.getId());
     }
 
@@ -79,7 +82,7 @@ public class RideCancellationService {
             );
         }
 
-        applyCancellation(ride, null);
+        applyCancellation(ride, null, true);
         return success(ride.getId());
     }
 
@@ -89,13 +92,19 @@ public class RideCancellationService {
                 && ride.getStatus() != RideStatus.IN_PROGRESS;
     }
 
-    private void applyCancellation(Ride ride, String reason) {
+    private void applyCancellation(Ride ride, String reason, boolean isPassenger) {
         ride.setStatus(RideStatus.CANCELLED);
         ride.setCancelledAt(LocalDateTime.now());
         ride.setCancellationReason(reason);
         ride.setTotalDistance((double) 0);
         ride.setTotalCost((double) 0);
         rideRepository.save(ride);
+
+        if(!isPassenger){
+            Driver driver = ride.getDriver();
+            driver.setAvailable(true);
+            driverRepository.save(driver);
+        }
     }
 
     private boolean hasRole(Authentication auth, String role) {
