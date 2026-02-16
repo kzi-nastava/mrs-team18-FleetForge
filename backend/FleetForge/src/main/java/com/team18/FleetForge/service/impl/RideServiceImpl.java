@@ -43,6 +43,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -584,19 +585,19 @@ public class RideServiceImpl implements RideService {
     public Map<LocalDate, List<Ride>> findRidesForLoggedUserForGivenDateRange(LocalDate fromDate, LocalDate toDate) {
         Authentication auth= SecurityContextHolder.getContext().getAuthentication();
         User user= (User) auth.getPrincipal();
-        List<Ride> rides= rideRepository.findRidesForPassengerForGivenDateRange(fromDate,toDate,user.getId());
+        List<Ride> rides= rideRepository.findRidesForPassengerForGivenDateRange(fromDate.atStartOfDay(),toDate.atTime(LocalTime.MAX),user.getId());
         return groupByDay(rides,fromDate,toDate);
     }
 
     @Override
     public Map<LocalDate, List<Ride>> findRidesForUserForGivenDateRange(LocalDate fromDate, LocalDate toDate, Long userId) {
-        List<Ride> rides= rideRepository.findRidesForPassengerForGivenDateRange(fromDate,toDate,userId);
+        List<Ride> rides= rideRepository.findRidesForPassengerForGivenDateRange(fromDate.atStartOfDay(),toDate.atTime(LocalTime.MAX),userId);
         return groupByDay(rides,fromDate,toDate);
     }
 
     @Override
     public Map<LocalDate, List<Ride>> findRidesForGivenDateRange(LocalDate fromDate, LocalDate toDate) {
-        List<Ride> rides= rideRepository.findRidesForGivenDateRange(fromDate,toDate);
+        List<Ride> rides= rideRepository.findRidesForGivenDateRange(fromDate.atStartOfDay(),toDate.atTime(LocalTime.MAX));
         return groupByDay(rides,fromDate,toDate);
     }
 
