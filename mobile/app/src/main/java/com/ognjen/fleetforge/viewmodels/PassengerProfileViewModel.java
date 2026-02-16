@@ -1,4 +1,4 @@
-package com.ognjen.fleetforge.fragments.passenger;
+package com.ognjen.fleetforge.viewmodels;
 
 import android.content.Context;
 import android.net.Uri;

@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.ognjen.fleetforge.fragments.admin.AdminChatFragment;
+import com.ognjen.fleetforge.fragments.admin.AdminHistoryFragment;
 import com.ognjen.fleetforge.fragments.admin.AdminProfile;
 import com.ognjen.fleetforge.fragments.admin.DriverChangesFragment;
 import com.ognjen.fleetforge.activities.auth.LoginActivity;
@@ -108,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
         }else if (itemId== R.id.nav_current_driver){
             return new CurrentRideDriver();
         } else if (itemId == R.id.nav_history_admin) {
-            return PlaceholderFragment.newInstance("Ride History");
+            return new AdminHistoryFragment();
         } else if (itemId == R.id.nav_chat_admin) {
             return new AdminChatFragment();
         } else if (itemId == R.id.nav_chat_driver) {
