@@ -1,7 +1,6 @@
 # Fleet Forge - Ride-Hailing System
 
-**Fleet Forge** is a full-stack, Uber-like ride-hailing platform developed as an integrated project across four university courses: *Inženjerstvo klijentskog sloja*, *Inženjerstvo serverskog sloja*, *Mobilne aplikacije*, and *Testiranje softvera*. The system facilitates seamless interaction between passengers, drivers, and administrators, focusing on reducing interaction with providers to ensure a safer and more consistent transport process.
-
+**Fleet Forge** is a full-stack, Uber-like ride-hailing platform developed as an integrated project across four university courses: *Client-Side Engineering*, *Server-Side Engineering*, *Mobile Applications*, and *Software Testing*. The system facilitates seamless interaction between passengers, drivers, and administrators, focusing on reducing interaction with providers to ensure a safer and more consistent transport process.
 
 ---
 
