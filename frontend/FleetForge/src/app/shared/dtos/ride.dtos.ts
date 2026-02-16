@@ -57,3 +57,10 @@ export interface RideReviewResponseDTO {
     comment: string;
     reviewedAt: string;
 }
+
+
+export interface RideReportDataDTO{
+    id:number;
+    totalDistance:number;
+    totalCost:number;
+}
