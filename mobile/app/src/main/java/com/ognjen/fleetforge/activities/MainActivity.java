@@ -17,6 +17,7 @@ import com.ognjen.fleetforge.fragments.admin.RegisterDriver;
 import com.ognjen.fleetforge.fragments.driver.DriverHistoryFragment;
 import com.ognjen.fleetforge.fragments.PlaceholderFragment;
 import com.ognjen.fleetforge.R;
+import com.ognjen.fleetforge.fragments.passenger.CurrentRidePassenger;
 import com.ognjen.fleetforge.fragments.passenger.FavoriteRoutes;
 import com.ognjen.fleetforge.fragments.passenger.PassengerChatFragment;
 import com.ognjen.fleetforge.fragments.passenger.PassengerHistoryFragment;
@@ -116,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
         } else if (itemId == R.id.nav_chat_passenger) {
             return new PassengerChatFragment();
         } else if (itemId == R.id.nav_current_ride) {
-            return PlaceholderFragment.newInstance("Current Ride");
+            return new CurrentRidePassenger();
         } else if (itemId == R.id.nav_register_driver) {
             return new RegisterDriver();
         } else if (itemId == R.id.nav_block_users) {
