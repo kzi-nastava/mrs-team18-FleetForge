@@ -43,10 +43,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -581,6 +578,35 @@ public class RideServiceImpl implements RideService {
                         .toList()
                 )
                 .build();
+    }
+
+    @Override
+    public Map<LocalDate, List<Ride>> findRidesForLoggedUserForGivenDateRange(LocalDate fromDate, LocalDate toDate) {
+        Authentication auth= SecurityContextHolder.getContext().getAuthentication();
+        User user= (User) auth.getPrincipal();
+        List<Ride> rides= rideRepository.findRidesForPassengerForGivenDateRange(fromDate,toDate,user.getId());
+        return groupByDay(rides,fromDate,toDate);
+    }
+
+    @Override
+    public Map<LocalDate, List<Ride>> findRidesForUserForGivenDateRange(LocalDate fromDate, LocalDate toDate, Long userId) {
+        List<Ride> rides= rideRepository.findRidesForPassengerForGivenDateRange(fromDate,toDate,userId);
+        return groupByDay(rides,fromDate,toDate);
+    }
+
+    @Override
+    public Map<LocalDate, List<Ride>> findRidesForGivenDateRange(LocalDate fromDate, LocalDate toDate) {
+        List<Ride> rides= rideRepository.findRidesForGivenDateRange(fromDate,toDate);
+        return groupByDay(rides,fromDate,toDate);
+    }
+
+    private Map<LocalDate, List<Ride>> groupByDay(List<Ride> rides, LocalDate fromDate, LocalDate toDate) {
+        Map<LocalDate, List<Ride>> result = new LinkedHashMap<>();
+        fromDate.datesUntil(toDate.plusDays(1)).forEach(date -> result.put(date, new ArrayList<>()));
+
+        rides.forEach(r -> result.get(r.getStartTime().toLocalDate()).add(r));
+
+        return result;
     }
 
 }

@@ -5,10 +5,12 @@ import com.team18.FleetForge.dto.ride.view.*;
 import com.team18.FleetForge.dto.ride.lifecycle.RideCreateRequestDTO;
 import com.team18.FleetForge.model.ride.Ride;
 import org.springframework.data.domain.Page;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 public interface RideService {
 
@@ -56,4 +58,8 @@ public interface RideService {
     );
 
     AdminRideDetailsDTO getAdminRideDetails(Long rideId);
+
+    Map<LocalDate, List<Ride>> findRidesForLoggedUserForGivenDateRange(LocalDate fromDate, LocalDate toDate);
+    Map<LocalDate, List<Ride>> findRidesForUserForGivenDateRange(LocalDate fromDate, LocalDate toDate, Long userId);
+    Map<LocalDate, List<Ride>> findRidesForGivenDateRange(LocalDate fromDate, LocalDate toDate);
 }
