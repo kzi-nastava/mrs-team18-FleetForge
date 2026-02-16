@@ -20,8 +20,18 @@ public class AdminHistoryViewModel extends ViewModel {
         repo= new AdminRepo();
     }
 
-    public LiveData<PageResponse<AdminRideHistoryDto>> getRides(String from, String to, String sortBy, String direction) {
-        return repo.getRides(currentPage, pageSize, from, to, sortBy, direction);
+    public LiveData<PageResponse<AdminRideHistoryDto>> getRides(
+            String from,
+            String to,
+            String sortBy,
+            String direction,
+            String username
+    ) {
+        return repo.getRides(currentPage, pageSize, from, to, sortBy, direction, username);
+    }
+
+    public LiveData<List<String>> searchUsersByPrefix(String prefix) {
+        return repo.searchUsersByPrefix(prefix);
     }
 
     public LiveData<AdminRideDetailsDto> getRideDetails(Long rideId) {

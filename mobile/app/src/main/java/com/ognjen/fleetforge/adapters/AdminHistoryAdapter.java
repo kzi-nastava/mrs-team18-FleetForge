@@ -23,16 +23,12 @@ import com.ognjen.fleetforge.utils.MapManager;
 
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.Marker;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
-
 public class AdminHistoryAdapter extends ArrayAdapter<AdminRideHistoryDto> {
     private static final String BaseUrl = "http://" + BuildConfig.IP_ADDR + ":8080";
 
@@ -41,7 +37,6 @@ public class AdminHistoryAdapter extends ArrayAdapter<AdminRideHistoryDto> {
 
     private Long expandedRideId = -1L;
     private AdminRideDetailsDto detailedData;
-    private Set<Long> favoriteRideIds = new HashSet<>();
     private OnActionListener listener;
 
     public interface OnActionListener {
@@ -63,11 +58,6 @@ public class AdminHistoryAdapter extends ArrayAdapter<AdminRideHistoryDto> {
 
     public void setDetailedData(AdminRideDetailsDto details) {
         this.detailedData = details;
-        notifyDataSetChanged();
-    }
-
-    public void setFavoriteIds(Set<Long> favoriteRideIds) {
-        this.favoriteRideIds = favoriteRideIds;
         notifyDataSetChanged();
     }
 

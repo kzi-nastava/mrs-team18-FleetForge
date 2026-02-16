@@ -19,6 +19,7 @@ import com.ognjen.fleetforge.dtos.passenger.PassengerRideDetailsDto;
 import com.ognjen.fleetforge.dtos.passenger.PassengerRideHistoryDto;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import okhttp3.MultipartBody;
 import retrofit2.Call;
@@ -65,9 +66,16 @@ public interface AdminService {
             @Query("sortBy") String sortBy,
             @Query("direction") String direction,
             @Query("from") String from,
-            @Query("to") String to
+            @Query("to") String to,
+            @Query("email") String username
     );
 
     @GET("/api/admin/rides/{id}")
     Call<AdminRideDetailsDto> getRideDetails(@Path("id") Long id);
+
+    @GET("/api/admin/search-users")
+    Call<List<String>> searchUsersByPrefix(
+            @Query("prefix") String prefix
+    );
+
 }

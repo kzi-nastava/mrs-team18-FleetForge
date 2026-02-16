@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="#F5F5F5"
-    android:fitsSystemWindows="true"
     tools:context=".fragments.admin.AdminHistoryFragment">
 
     <LinearLayout
@@ -14,6 +13,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:background="@android:color/white"
+        android:layout_marginTop="16dp"
         android:padding="16dp"
         android:elevation="4dp">
 

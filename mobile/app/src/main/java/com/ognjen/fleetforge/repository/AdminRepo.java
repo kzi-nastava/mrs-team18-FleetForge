@@ -25,6 +25,7 @@ import com.ognjen.fleetforge.utils.FileUtil;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -246,21 +247,38 @@ public class AdminRepo {
         return data;
     }
 
-    public LiveData<PageResponse<AdminRideHistoryDto>> getRides(int page, int size, String from, String to, String sortBy, String direction) {
+    public LiveData<PageResponse<AdminRideHistoryDto>> getRides(
+            int page,
+            int size,
+            String from,
+            String to,
+            String sortBy,
+            String direction,
+            String username
+    ) {
         MutableLiveData<PageResponse<AdminRideHistoryDto>> data = new MutableLiveData<>();
-        service.getRides(page, size, sortBy, direction, from, to).enqueue(new Callback<PageResponse<AdminRideHistoryDto>>() {
-            @Override
-            public void onResponse(Call<PageResponse<AdminRideHistoryDto>> call, Response<PageResponse<AdminRideHistoryDto>> response) {
-                if (response.isSuccessful()) data.setValue(response.body());
-            }
 
-            @Override
-            public void onFailure(Call<PageResponse<AdminRideHistoryDto>> call, Throwable t) {
-                data.setValue(null);
-            }
-        });
+        service.getRides(page, size, sortBy, direction, from, to, username)
+                .enqueue(new Callback<PageResponse<AdminRideHistoryDto>>() {
+                    @Override
+                    public void onResponse(Call<PageResponse<AdminRideHistoryDto>> call,
+                                           Response<PageResponse<AdminRideHistoryDto>> response) {
+                        if (response.isSuccessful()) {
+                            data.setValue(response.body());
+                        } else {
+                            data.setValue(null);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<PageResponse<AdminRideHistoryDto>> call, Throwable t) {
+                        data.setValue(null);
+                    }
+                });
+
         return data;
     }
+
 
     public LiveData<AdminRideDetailsDto> getRideDetails(Long rideId) {
         MutableLiveData<AdminRideDetailsDto> data = new MutableLiveData<>();
@@ -279,5 +297,28 @@ public class AdminRepo {
         });
         return data;
     }
+
+    public LiveData<List<String>> searchUsersByPrefix(String prefix) {
+        MutableLiveData<List<String>> data = new MutableLiveData<>();
+
+        service.searchUsersByPrefix(prefix).enqueue(new Callback<List<String>>() {
+            @Override
+            public void onResponse(Call<List<String>> call, Response<List<String>> response) {
+                if (response.isSuccessful()) {
+                    data.setValue(response.body());
+                } else {
+                    data.setValue(null);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<String>> call, Throwable t) {
+                data.setValue(null);
+            }
+        });
+
+        return data;
+    }
+
 
 }
