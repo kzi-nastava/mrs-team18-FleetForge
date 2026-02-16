@@ -53,6 +53,10 @@ export const SIDEBAR_MENU_CONFIG: Record<UserRole, SidebarMenuItem[]> = {
       label: 'Settings',
       icon: '⚙', // settings/gear icon
       path: '/passenger/settings'
+    },{
+      label:'Reports',
+      icon:'📊',
+      path:'/passenger/reports'
     }
   ],
 
@@ -82,6 +86,10 @@ export const SIDEBAR_MENU_CONFIG: Record<UserRole, SidebarMenuItem[]> = {
       label: 'Settings',
       icon: '⚙',
       path: '/driver/settings'
+    },{
+      label:'Reports',
+      icon:'📊',
+      path:'/driver/reports'
     }
   ],
 
@@ -120,6 +128,10 @@ export const SIDEBAR_MENU_CONFIG: Record<UserRole, SidebarMenuItem[]> = {
       label:'Price Management',
       icon:'💰',
       path: '/admin/price-management'
+    },{
+      label:'Reports',
+      icon:'📊',
+      path:'/admin/reports'
     }
   ]
 };

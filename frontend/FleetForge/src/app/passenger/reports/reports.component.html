@@ -1,0 +1,69 @@
+<div class="reports-page">
+	<h2 class="reports-title">Reports</h2>
+
+	<section class="reports-card">
+		<h3 class="section-title">Filters</h3>
+
+		<div class="filter-row">
+			<div class="field-group">
+				<label for="fromDate">From date</label>
+				<input id="fromDate" type="date" [(ngModel)]="fromDate" />
+			</div>
+
+			<div class="field-group">
+				<label for="toDate">To date</label>
+				<input id="toDate" type="date" [(ngModel)]="toDate" />
+			</div>
+
+			<button type="button" class="search-btn" (click)="onSearch()">Search</button>
+		</div>
+	</section>
+
+	<section class="reports-card">
+		<h3 class="section-title">Graphs</h3>
+
+		<div class="graph-fields">
+			<div class="field-group">
+				<canvasjs-chart [options]="chartOptions1" (chartInstance)="chart1 = $event"></canvasjs-chart>
+			</div>
+			<div class="field-group">
+				<canvasjs-chart [options]="chartOptions2"(chartInstance)="chart2 = $event"></canvasjs-chart>
+			</div>
+			<div class="field-group">
+				<canvasjs-chart [options]="chartOptions3" (chartInstance)="chart3 = $event"></canvasjs-chart>
+			</div>
+		</div>
+	</section>
+
+	<section class="reports-card">
+		<h3 class="section-title">Summary</h3>
+
+		<div class="summary-fields">
+			<div class="field-group">
+				<label for="cumulativePriceSum">Cumulative sum of price</label>
+				<input id="cumulativePriceSum" type="text" [value]="totalPrice" readonly />
+			</div>
+
+			<div class="field-group">
+				<label for="averagePrice">Average</label>
+				<input id="averagePrice" type="text" [value]="averagePrice" readonly />
+			</div>
+            <div class="field-group">
+                <label for="totalRides">Total rides</label>
+                <input id="totalRides" type="text" [value]="totalRides" readonly />
+                </div>
+            <div class="field-group">
+                <label for="averageRides">Average rides per day</label>
+                <input id="averageRides" type="text" [value]="averageRides" readonly />
+                </div>
+            <div class="field-group">
+                <label for="totalDistance">Total distance</label>
+                <input id="totalDistance" type="text" [value]="totalDistance" readonly />
+                </div>
+            <div class="field-group">
+                <label for="averageDistance">Average distance per day</label>
+                <input id="averageDistance" type="text" [value]="averageDistance" readonly />
+                </div>
+		</div>
+	</section>
+</div>

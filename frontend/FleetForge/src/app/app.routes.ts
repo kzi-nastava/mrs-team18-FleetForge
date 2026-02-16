@@ -35,6 +35,9 @@ import { AdminHistoryComponent } from './admin/admin-history/admin-history.compo
 import { AdminActiveRidesComponent } from './admin/admin-active-rides/admin-active-rides.component';
 import { PriceManagementComponent } from './admin/price-management/price-management.component';
 import { UsersListComponent } from './admin/users-list/users-list.component';
+import { ReportsComponent } from './passenger/reports/reports.component';
+import { DriverReportsComponent } from './driver/driver-reports/driver-reports.component';
+import { AdminReportsComponent } from './admin/admin-reports/admin-reports.component';
 
 export const routes: Routes = [
   /** ROUTES WITH NAVBAR */
@@ -90,6 +93,10 @@ export const routes: Routes = [
         path: 'passenger/live-chat',
         component: PassengerLiveChatComponent,
         canActivate: [authGuard, roleGuard(['PASSENGER'])]
+      },{
+        path:'passenger/reports',
+        component: ReportsComponent,
+        canActivate: [authGuard, roleGuard(['PASSENGER'])]
       },
 
       // Admin routes - require authentication and ADMIN role
@@ -131,6 +138,10 @@ export const routes: Routes = [
           path: 'admin/users-list',
           component: UsersListComponent,
           canActivate: [authGuard, roleGuard(['ADMIN'])]
+      },{
+          path: 'admin/reports',
+          component:AdminReportsComponent,
+          canActivate: [authGuard, roleGuard(['ADMIN'])]
       },
 
       // Driver routes - require authentication and DRIVER role
@@ -158,6 +169,11 @@ export const routes: Routes = [
         path: 'driver/live-chat',
         component: DriverLiveChatComponent,
         canActivate: [authGuard, roleGuard(['DRIVER'])]
+      },
+      {
+          path: 'driver/reports',
+          component:DriverReportsComponent,
+          canActivate: [authGuard, roleGuard(['DRIVER'])]
       },
       {
         path: 'set-password',

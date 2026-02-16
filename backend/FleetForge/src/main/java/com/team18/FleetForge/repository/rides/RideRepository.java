@@ -213,12 +213,12 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
             "left join fetch  r.linkedPassengers where " +
             "r.endTime is not null and r.startTime >= :fromDate and r.endTime<= :toDate and " +
             "(r.passenger.id = :userId or r.driver.id = :userId) ")
-    List<Ride> findRidesForPassengerForGivenDateRange(@Param("fromDate") LocalDate fromDate, @Param("toDate") LocalDate toDate, @Param("userId") Long userId);
+    List<Ride> findRidesForPassengerForGivenDateRange(@Param("fromDate") LocalDateTime fromDate, @Param("toDate") LocalDateTime toDate, @Param("userId") Long userId);
 
     @Query("select r from Ride r " +
             "left join fetch r.driver " +
             "left join fetch r.passenger " +
             "left join fetch  r.linkedPassengers where " +
             "r.endTime is not null and r.startTime >= :fromDate and r.endTime<= :toDate ")
-    List<Ride> findRidesForGivenDateRange(@Param("fromDate") LocalDate fromDate, @Param("toDate") LocalDate toDate);
+    List<Ride> findRidesForGivenDateRange(@Param("fromDate") LocalDateTime fromDate, @Param("toDate") LocalDateTime toDate);
 }
