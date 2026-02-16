@@ -4,7 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6b9556a4-dfdc-4a23-8fd4-ac909965b26a" name="Changes" comment="" />
+    <list default="true" id="6b9556a4-dfdc-4a23-8fd4-ac909965b26a" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/tests/AdminHistoryTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/tests/AdminHistoryTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../mobile/app/src/main/java/com/ognjen/fleetforge/fragments/passenger/PassengerHistoryFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/../mobile/app/src/main/java/com/ognjen/fleetforge/fragments/passenger/PassengerHistoryFragment.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -42,7 +46,7 @@
     "RunOnceActivity.git.unshallow": "true",
     "TestNG.AdminHistoryTest.executor": "Run",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "develop",
+    "git-widget-placeholder": "#289 on feature/passenger-history-mobile-ui-flow",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/ognje/Desktop/FleetForge/main-git/e2e-tests",
@@ -106,8 +110,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.27397.103" />
-        <option value="bundled-js-predefined-d6986cc7102b-3aa1da707db6-JavaScript-IU-252.27397.103" />
+        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.28238.7" />
+        <option value="bundled-js-predefined-d6986cc7102b-a71380e98a7c-JavaScript-IU-252.28238.7" />
       </set>
     </attachedChunks>
   </component>
@@ -120,6 +124,7 @@
       <updated>1770993438620</updated>
       <workItem from="1770993439901" duration="760000" />
       <workItem from="1771108166199" duration="11000" />
+      <workItem from="1771198096321" duration="1091000" />
     </task>
     <servers />
   </component>
