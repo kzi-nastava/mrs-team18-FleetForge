@@ -383,21 +383,31 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
+        <Button
+            android:id="@+id/reportsBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="36dp"
+            android:text="Reports"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.261"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/contentWrap" />
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_logout"
             android:layout_width="wrap_content"
-            android:layout_height="56dp"
-            android:layout_marginTop="32dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="36dp"
             android:text="Logout"
             android:textColor="@color/white"
-            android:textSize="16sp"
             android:textStyle="bold"
             android:visibility="visible"
             app:backgroundTint="@color/error"
-            app:cornerRadius="12dp"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.748"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/contentWrap" />
+            app:layout_constraintTop_toBottomOf="@+id/contentWrap" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </ScrollView>

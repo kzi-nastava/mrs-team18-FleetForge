@@ -23,6 +23,8 @@ import com.ognjen.fleetforge.R;
 import com.ognjen.fleetforge.activities.MainActivity;
 import com.ognjen.fleetforge.fragments.common.PasswordChangeProfile;
 import com.ognjen.fleetforge.auth.AuthManager;
+import com.ognjen.fleetforge.fragments.reports.AdminReports;
+import com.ognjen.fleetforge.fragments.reports.UserReports;
 import com.ognjen.fleetforge.services.WebSocketService;
 
 import java.io.IOException;
@@ -157,6 +159,15 @@ public class AdminProfile extends Fragment {
                     throw new RuntimeException(e);
                 }
             }
+        });
+        Button reports= view.findViewById(R.id.reportsBtn);
+        reports.setOnClickListener(v -> {
+            Fragment reportsFrag = new AdminReports();
+            requireActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, reportsFrag)
+                    .addToBackStack(null)
+                    .commit();
         });
         return view;
     }
