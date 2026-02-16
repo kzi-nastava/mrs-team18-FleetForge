@@ -165,7 +165,7 @@ public class DataLoader implements CommandLineRunner {
 
         Ride ride1 = createRide(
                 driver1, passenger1,
-                new GeoPoint(45.2550, 19.8450), "Bulevar oslobođenja 46, Novi Sad",
+                new GeoPoint(45.2591, 19.8227), "Bulevar oslobođenja 46, Novi Sad",
                 new GeoPoint(45.2671, 19.8335), "Trg slobode 1, Novi Sad",
                 LocalDateTime.now(),
                 null,

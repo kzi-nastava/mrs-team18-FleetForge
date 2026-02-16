@@ -48,13 +48,6 @@ public interface DriverService {
     @Multipart
     @POST("/api/users/upload-profile-picture/{id}")
     Call<Boolean> uploadProfilePictureById(@Path("id") Long id,@Part MultipartBody.Part file);
-    @GET("api/rides/active-tracking")
-    Call<RideTrackingDTO> getActiveRideTracking();
-
-    @POST("api/rides/driver-location-update")
-    Call<DriverLocationUpdateResponseDTO> updateDriverLocation(
-            @Body DriverLocationUpdateRequestDTO request
-    );
 
     @GET("/api/drivers/ride-history")
     Call<List<CompletedRideDTO>> getDriverRideHistory();

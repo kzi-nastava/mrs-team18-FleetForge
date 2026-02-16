@@ -21,13 +21,14 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.ognjen.fleetforge.BuildConfig;
 import com.ognjen.fleetforge.R;
+import com.ognjen.fleetforge.api.RideService;
 import com.ognjen.fleetforge.dtos.driver.DriverLocationUpdateRequestDTO;
 import com.ognjen.fleetforge.dtos.driver.DriverLocationUpdateResponseDTO;
 import com.ognjen.fleetforge.dtos.ride.RideTrackingDTO;
 import com.ognjen.fleetforge.dtos.ride.WaypointDTO;
 import com.ognjen.fleetforge.model.CalculatedRoute;
 import com.ognjen.fleetforge.model.GeoPoint;
-import com.ognjen.fleetforge.api.DriverService;
+import com.ognjen.fleetforge.api.RideService;
 import com.ognjen.fleetforge.api.RoutingService;
 import com.ognjen.fleetforge.api.RetrofitClient;
 import com.ognjen.fleetforge.utils.MapManager;
@@ -68,7 +69,7 @@ public class CurrentRideDriver extends Fragment {
 
     private MapManager mapManager;
     private RoutingService routingService;
-    private DriverService driverApiService;
+    private RideService rideService;
 
     private RideTrackingDTO currentRide;
     private CalculatedRoute calculatedRoute;
@@ -138,14 +139,14 @@ public class CurrentRideDriver extends Fragment {
     }
 
     private void initializeServices() {
-        driverApiService = RetrofitClient.getInstance().getDriverService();
+        rideService = RetrofitClient.getInstance().getRideService();
         routingService = new RoutingService(MAPBOX_API_KEY);
         simulationHandler = new Handler(Looper.getMainLooper());
     }
 
     private void fetchActiveRide() {
 
-        Call<RideTrackingDTO> call = driverApiService.getActiveRideTracking();
+        Call<RideTrackingDTO> call = rideService.getActiveRideTracking();
         call.enqueue(new Callback<RideTrackingDTO>() {
             @Override
             public void onResponse(Call<RideTrackingDTO> call, Response<RideTrackingDTO> response) {
@@ -495,7 +496,7 @@ public class CurrentRideDriver extends Fragment {
     private void sendLocationUpdateToBackend(GeoPoint location) {
         DriverLocationUpdateRequestDTO request = new DriverLocationUpdateRequestDTO(location);
 
-        Call<DriverLocationUpdateResponseDTO> call = driverApiService.updateDriverLocation(request);
+        Call<DriverLocationUpdateResponseDTO> call = rideService.updateDriverLocation(request);
         call.enqueue(new Callback<DriverLocationUpdateResponseDTO>() {
             @Override
             public void onResponse(Call<DriverLocationUpdateResponseDTO> call,
