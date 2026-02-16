@@ -38,7 +38,6 @@ public class RideController {
     private final RideService rideService;
     private final RideCancellationService rideCancellationService;
     private final RidePanicService ridePanicService;
-    private final UserService userService;
 
 
     /**
@@ -169,36 +168,5 @@ public class RideController {
                 .build();
 
         return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-    @PreAuthorize("hasRole('DRIVER')||hasRole('PASSENGER')")
-    @GetMapping("/logged-user/report-data")
-    public ResponseEntity<UserDataReportResponseDTO> getDataForLoggedUser(@RequestParam(required = true) LocalDate fromDate, @RequestParam(required = true) LocalDate toDate){
-        UserDataReportResponseDTO response= new UserDataReportResponseDTO();
-        response.setDataByDay(rideService.findRidesForLoggedUserForGivenDateRange(fromDate,toDate));
-        return new ResponseEntity<>(response,HttpStatus.OK);
-    }
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/admin-by-user/report-data")
-    public ResponseEntity<UserDataReportResponseDTO> getDataForUser(@RequestParam(required = true) LocalDate fromDate, @RequestParam(required = true) LocalDate toDate,
-                                                                    @RequestParam(required = true) String email){
-        UserDataReportResponseDTO response= new UserDataReportResponseDTO();
-
-        Optional<User> user= userService.getUserByEmail(email);
-        Map<LocalDate, List<Ride>> rides= new HashMap<>();
-        if(!user.isEmpty()){
-          rides = rideService.findRidesForUserForGivenDateRange(fromDate,toDate,user.get().getId());
-        }
-        response.setDataByDay(rides);
-
-        return new ResponseEntity<>(response,HttpStatus.OK);
-    }
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/admin/report-data")
-    public ResponseEntity<UserDataReportResponseDTO> getDataForReport(@RequestParam(required = true) LocalDate fromDate, @RequestParam(required = true) LocalDate toDate){
-        UserDataReportResponseDTO response= new UserDataReportResponseDTO();
-        Map<LocalDate, List<Ride>> rides=rideService.findRidesForGivenDateRange(fromDate,toDate);
-        response.setDataByDay(rides);
-
-        return new ResponseEntity<>(response,HttpStatus.OK);
     }
 }
