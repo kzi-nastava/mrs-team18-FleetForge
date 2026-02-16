@@ -106,8 +106,8 @@ public class AdminHistoryTest extends TestBase {
         Assert.assertTrue(adminPage.isTableDisplayed(),
                 "Rides table should be displayed after valid search");
 
-        // Assert at 2 rows returned
-        Assert.assertEquals(adminPage.getRideRows().size(), 2, "Rides should be loaded");
+        // Assert at 3 rows returned
+        Assert.assertEquals(adminPage.getRideRows().size(), 3, "Rides should be loaded");
 
         // If rides exist, pagination should be visible
         Assert.assertTrue(adminPage.isPaginationDisplayed(),

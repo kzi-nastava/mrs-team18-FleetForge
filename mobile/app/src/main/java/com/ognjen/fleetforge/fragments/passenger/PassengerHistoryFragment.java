@@ -1,6 +1,11 @@
 package com.ognjen.fleetforge.fragments.passenger;
 
 import android.app.AlertDialog;
+import android.content.Context;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -32,7 +37,15 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class PassengerHistoryFragment extends Fragment {
+public class PassengerHistoryFragment extends Fragment implements SensorEventListener {
+    private SensorManager sensorManager;
+    private static final int SHAKE_THRESHOLD = 800;
+    private long lastUpdate;
+    private float last_x;
+    private float last_y;
+    private float last_z;
+    private static final int SHAKE_COOLDOWN = 1500;
+    private long lastShakeTime = 0;
 
     private ListView historyList;
 
@@ -67,6 +80,8 @@ public class PassengerHistoryFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        sensorManager = (SensorManager) requireActivity().getSystemService(Context.SENSOR_SERVICE);
+
         View view = inflater.inflate(R.layout.fragment_passenger_history, container, false);
 
         historyList = view.findViewById(R.id.history_list);
@@ -237,6 +252,82 @@ public class PassengerHistoryFragment extends Fragment {
     interface OnRouteNameEnteredListener {
         void onNameEntered(String routeName);
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (sensorManager != null) {
+            sensorManager.registerListener(
+                    this,
+                    sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+                    SensorManager.SENSOR_DELAY_NORMAL
+            );
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (sensorManager != null) {
+            sensorManager.unregisterListener(this);
+        }
+    }
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        //
+    }
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+
+        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+
+            long curTime = System.currentTimeMillis();
+
+            if ((curTime - lastUpdate) > 100) {
+                long diffTime = (curTime - lastUpdate);
+                lastUpdate = curTime;
+
+                float x = event.values[0];
+                float y = event.values[1];
+                float z = event.values[2];
+
+                float speed = Math.abs(x + y + z - last_x - last_y - last_z)
+                        / diffTime * 10000;
+
+                if (speed > SHAKE_THRESHOLD) {
+                    if (curTime - lastShakeTime > SHAKE_COOLDOWN) {
+                        lastShakeTime = curTime;
+
+                        currentSortBy = "startTime";
+
+                        AutoCompleteTextView spinnerSortBy = getView().findViewById(R.id.spinner_sort_by);
+                        spinnerSortBy.setText("startTime", false);
+
+                        ImageButton btnDirection = getView().findViewById(R.id.btn_sort_direction);
+                        isAscending = !isAscending;
+                        currentDirection = isAscending ? "asc" : "desc";
+                        btnDirection.setImageResource(isAscending ? android.R.drawable.arrow_up_float : android.R.drawable.arrow_down_float);
+
+                        refreshRides();
+                        viewModel.resetPage();
+
+                        loadRides();
+
+                        Toast.makeText(getContext(),
+                                "Sorted by Start Time",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                last_x = x;
+                last_y = y;
+                last_z = z;
+            }
+        }
+    }
+
+
     private void showFavoriteRouteDialog(OnRouteNameEnteredListener listener) {
         final EditText input = new EditText(getContext());
         input.setHint("e.g. Work, Home...");
