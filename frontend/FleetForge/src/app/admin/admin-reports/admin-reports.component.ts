@@ -219,6 +219,10 @@ chart3: any;
     },
     error: (error: any) => {
       console.error('Error fetching report data:', error);
+      this.cdr.detectChanges();
+      this.chart1?.render();
+      this.chart2?.render();
+      this.chart3?.render();
     }
   });
 }}
