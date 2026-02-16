@@ -120,7 +120,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     android:inputType="text"
-                    android:imeOptions="actionNext"
+                    android:imeOptions="actionSearch"
                     android:textSize="14sp"
                     android:paddingStart="14dp"
                     android:paddingEnd="14dp"/>
@@ -156,13 +156,14 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:enabled="false"
             android:text="Previous" />
 
         <TextView
             android:id="@+id/tv_pagination_info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Page 1 of 3"
+            android:text="Page 0 of 0"
             android:layout_marginHorizontal="16dp"
             android:textStyle="bold"
             android:textColor="#757575" />
@@ -172,6 +173,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:enabled="false"
             android:text="Next" />
     </LinearLayout>
 

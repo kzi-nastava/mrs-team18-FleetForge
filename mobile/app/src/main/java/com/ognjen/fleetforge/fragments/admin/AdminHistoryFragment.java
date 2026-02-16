@@ -143,6 +143,24 @@ public class AdminHistoryFragment extends Fragment{
             public void afterTextChanged(android.text.Editable s) {}
         });
 
+        etUsername.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH ||
+                    actionId == android.view.inputmethod.EditorInfo.IME_ACTION_DONE ||
+                    (event != null && event.getKeyCode() == android.view.KeyEvent.KEYCODE_ENTER)) {
+
+                usernameFilter = etUsername.getText().toString();
+
+                refreshRides();
+
+                android.view.inputmethod.InputMethodManager imm = (android.view.inputmethod.InputMethodManager)
+                        getContext().getSystemService(android.content.Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+
+                return true;
+            }
+            return false;
+        });
+
         etUsername.setOnItemClickListener((parent, view1, position, id) -> {
             usernameFilter = usernameAdapter.getItem(position);
             refreshRides();

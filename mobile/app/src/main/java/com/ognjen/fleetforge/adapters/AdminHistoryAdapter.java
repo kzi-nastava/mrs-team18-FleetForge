@@ -1,5 +1,6 @@
 package com.ognjen.fleetforge.adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.view.LayoutInflater;
@@ -44,7 +45,7 @@ public class AdminHistoryAdapter extends ArrayAdapter<AdminRideHistoryDto> {
     }
 
     public AdminHistoryAdapter(Context context, ArrayList<AdminRideHistoryDto> data) {
-        super(context, R.layout.passenger_history_card, data);
+        super(context, R.layout.admin_history_card, data);
     }
 
     public void setOnActionListener(OnActionListener listener) {
@@ -68,7 +69,7 @@ public class AdminHistoryAdapter extends ArrayAdapter<AdminRideHistoryDto> {
         AdminRideHistoryDto ride = getItem(position);
 
         if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.passenger_history_card, parent, false);
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.admin_history_card, parent, false);
             // Pass context to ViewHolder for MapManager initialization
             holder = new ViewHolder(convertView, getContext());
             convertView.setTag(holder);
@@ -134,6 +135,7 @@ public class AdminHistoryAdapter extends ArrayAdapter<AdminRideHistoryDto> {
     }
 
 
+    @SuppressLint("SetTextI18n")
     private void bindExpandedView(ViewHolder holder, AdminRideHistoryDto ride) {
         boolean isExpanded = ride.getRideId().equals(expandedRideId);
         holder.expandedLayout.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
@@ -190,20 +192,42 @@ public class AdminHistoryAdapter extends ArrayAdapter<AdminRideHistoryDto> {
                     "Vehicle: " + detailedData.getVehicleType());
 
             // Ratings
-            setRatingStars(holder.driverRating,
-                    detailedData.getRatings().getDriverRating(),
-                    "Driver:");
+            AdminRideDetailsDto.Ratings ratings = detailedData.getRatings();
 
-            setRatingStars(holder.vehicleRating,
-                    detailedData.getRatings().getVehicleRating(),
-                    "Vehicle:");
+            Double driverScore = (ratings != null) ? ratings.getDriverRating() : 0.0;
+            Double vehicleScore = (ratings != null) ? ratings.getVehicleRating() : 0.0;
 
-            // Inconsistencies
-            if (detailedData.getHasInconsistencies()) {
-                holder.inconsistencies.setText("Inconsistencies: Driver took wrong turn");
-                holder.inconsistencies.setVisibility(View.VISIBLE);
+            setRatingStars(holder.driverRating, driverScore, "Driver:");
+            setRatingStars(holder.vehicleRating, vehicleScore, "Vehicle:");
+
+            StringBuilder passengers = new StringBuilder("Passengers: ");
+            if (detailedData.getMainPassenger() != null) {
+                passengers.append(detailedData.getMainPassenger().getFirstName()).append(" ").append(detailedData.getMainPassenger().getLastName());
+            }
+            if (detailedData.getLinkedPassengers() != null && !detailedData.getLinkedPassengers().isEmpty()) {
+                for (AdminRideDetailsDto.PassengerInfo p : detailedData.getLinkedPassengers()) {
+                    passengers.append(", ").append(p.getFirstName()).append(" ").append(p.getLastName());
+                }
+            }
+            holder.tvPassengers.setText(passengers.toString());
+
+            if ("CANCELLED".equalsIgnoreCase(detailedData.getStatus())) {
+                holder.tvCancellation.setVisibility(View.VISIBLE);
+                holder.tvCancellation.setText(String.format("Cancelled by %s: %s",
+                        detailedData.getCancelledBy(),
+                        detailedData.getCancellationReason()));
             } else {
-                holder.inconsistencies.setText("Inconsistencies: None");
+                holder.tvCancellation.setVisibility(View.GONE);
+            }
+
+            if (detailedData.getHasInconsistencies() && detailedData.getInconsistencies() != null) {
+                holder.inconsistencies.setVisibility(View.VISIBLE);
+                StringBuilder incMsg = new StringBuilder("Inconsistencies Detected:\n");
+                for (var report : detailedData.getInconsistencies()) {
+                    incMsg.append("- ").append(report.getMessage()).append("\n");
+                }
+                holder.inconsistencies.setText(incMsg.toString().trim());
+            } else {
                 holder.inconsistencies.setVisibility(View.GONE);
             }
 
@@ -269,7 +293,7 @@ public class AdminHistoryAdapter extends ArrayAdapter<AdminRideHistoryDto> {
         final TextView driverPhone, duration, vehicleType,
                 driverRating, vehicleRating, inconsistencies, detailDateTime;
         final ShapeableImageView driverImage;
-        final TextView driverName, price, distance;
+        final TextView driverName, price, distance, tvPassengers, tvCancellation;
         final ImageButton heart;
         final Button btnDetails, btnHide;
         final View expandedLayout;
@@ -297,6 +321,8 @@ public class AdminHistoryAdapter extends ArrayAdapter<AdminRideHistoryDto> {
             vehicleRating = view.findViewById(R.id.tv_vehicle_rating);
             inconsistencies = view.findViewById(R.id.tv_inconsistencies);
             detailDateTime = view.findViewById(R.id.tv_detail_datetime);
+            tvPassengers = view.findViewById(R.id.tv_passengers);
+            tvCancellation = view.findViewById(R.id.tv_cancellation_info);
 
             mapView = view.findViewById(R.id.map_view);
             // Initialize MapManager once per ViewHolder
