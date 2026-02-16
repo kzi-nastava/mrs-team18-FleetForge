@@ -2,12 +2,14 @@ package com.ognjen.fleetforge.repository;
 
 import android.content.Context;
 import android.net.Uri;
+import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.ognjen.fleetforge.api.PassengerService;
 import com.ognjen.fleetforge.api.RetrofitClient;
+import com.ognjen.fleetforge.api.RideService;
 import com.ognjen.fleetforge.dtos.common.PageResponse;
 import com.ognjen.fleetforge.dtos.common.PasswordChangeRequestDTO;
 import com.ognjen.fleetforge.dtos.passenger.FavoriteRouteGetResponseDTO;
@@ -16,6 +18,8 @@ import com.ognjen.fleetforge.dtos.passenger.PassengerChangeInformationResponseDT
 import com.ognjen.fleetforge.dtos.passenger.PassengerGetResponseDTO;
 import com.ognjen.fleetforge.dtos.passenger.PassengerRideDetailsDto;
 import com.ognjen.fleetforge.dtos.passenger.PassengerRideHistoryDto;
+import com.ognjen.fleetforge.dtos.ride.RideReviewRequestDTO;
+import com.ognjen.fleetforge.dtos.ride.RideReviewResponseDTO;
 import com.ognjen.fleetforge.model.FavoriteRoute;
 import com.ognjen.fleetforge.utils.FileUtil;
 
@@ -32,6 +36,8 @@ import retrofit2.Response;
 
 public class PassengerRepo {
     private PassengerService service;
+
+    private RideService rideService;
 
     public PassengerRepo(){
         this.service= RetrofitClient.getInstance().getPassengerService();
@@ -243,6 +249,35 @@ public class PassengerRepo {
             @Override
             public void onFailure(Call<PageResponse<PassengerRideHistoryDto>> call, Throwable t) {
                 data.setValue(null);
+            }
+        });
+        return data;
+    }
+
+    public LiveData<Boolean> submitReview(Long rideId, int driverRating, int vehicleRating, String comment) {
+        MutableLiveData<Boolean> data = new MutableLiveData<>();
+        RideService rideService = RetrofitClient.getInstance().getRideService();
+        RideReviewRequestDTO request = new RideReviewRequestDTO(vehicleRating, driverRating, comment);
+
+        rideService.createReview(rideId, request).enqueue(new Callback<RideReviewResponseDTO>() {
+            @Override
+            public void onResponse(Call<RideReviewResponseDTO> call, Response<RideReviewResponseDTO> response) {
+                if (response.isSuccessful()) {
+                    data.setValue(true);
+                } else {
+                    try {
+                        Log.e("API_ERROR", "Error body: " + response.errorBody().string());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    data.setValue(false);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<RideReviewResponseDTO> call, Throwable throwable) {
+                Log.e("API_FAILURE", "Failed to submit review: ", throwable);
+                data.setValue(false);
             }
         });
         return data;

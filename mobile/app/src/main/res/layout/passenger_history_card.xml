@@ -19,13 +19,31 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <TextView
-                android:id="@+id/tv_ride_date"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textStyle="bold"
-                android:textColor="@color/text_primary"
-                android:layout_marginBottom="8dp" />
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:id="@+id/tv_ride_date"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary" />
+
+                <!-- Rating Display (shown when ride is already rated) -->
+                <TextView
+                    android:id="@+id/tv_rating_display"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="★★★★☆"
+                    android:textColor="#FFB300"
+                    android:textSize="16sp"
+                    android:visibility="gone"
+                    android:layout_gravity="center_vertical" />
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
