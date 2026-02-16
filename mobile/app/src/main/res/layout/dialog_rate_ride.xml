@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@android:color/white"
+    android:padding="24dp">
+
+    <!-- Header with title and close button -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Rate your ride"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#212121"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true" />
+
+        <ImageButton
+            android:id="@+id/btn_close"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentEnd="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            android:contentDescription="Close"
+            app:tint="#757575" />
+    </RelativeLayout>
+
+    <!-- Route info -->
+    <TextView
+        android:id="@+id/tv_route_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Modene 10, Novi Sad → Dnevnik, Novi Sad"
+        android:textSize="14sp"
+        android:textColor="#757575"
+        android:layout_marginBottom="24dp" />
+
+    <!-- Driver Rating Section -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Rate driver"
+        android:textSize="16sp"
+        android:textColor="#212121"
+        android:layout_marginBottom="8dp" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="24dp">
+
+        <ImageView
+            android:id="@+id/driver_star_1"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="4dp"
+            android:src="@drawable/ic_star_empty"
+            android:contentDescription="Star 1" />
+
+        <ImageView
+            android:id="@+id/driver_star_2"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="4dp"
+            android:src="@drawable/ic_star_empty"
+            android:contentDescription="Star 2" />
+
+        <ImageView
+            android:id="@+id/driver_star_3"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="4dp"
+            android:src="@drawable/ic_star_empty"
+            android:contentDescription="Star 3" />
+
+        <ImageView
+            android:id="@+id/driver_star_4"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="4dp"
+            android:src="@drawable/ic_star_empty"
+            android:contentDescription="Star 4" />
+
+        <ImageView
+            android:id="@+id/driver_star_5"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_star_empty"
+            android:contentDescription="Star 5" />
+    </LinearLayout>
+
+    <!-- Vehicle Rating Section -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Rate vehicle"
+        android:textSize="16sp"
+        android:textColor="#212121"
+        android:layout_marginBottom="8dp" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="24dp">
+
+        <ImageView
+            android:id="@+id/vehicle_star_1"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="4dp"
+            android:src="@drawable/ic_star_empty"
+            android:contentDescription="Star 1" />
+
+        <ImageView
+            android:id="@+id/vehicle_star_2"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="4dp"
+            android:src="@drawable/ic_star_empty"
+            android:contentDescription="Star 2" />
+
+        <ImageView
+            android:id="@+id/vehicle_star_3"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="4dp"
+            android:src="@drawable/ic_star_empty"
+            android:contentDescription="Star 3" />
+
+        <ImageView
+            android:id="@+id/vehicle_star_4"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="4dp"
+            android:src="@drawable/ic_star_empty"
+            android:contentDescription="Star 4" />
+
+        <ImageView
+            android:id="@+id/vehicle_star_5"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_star_empty"
+            android:contentDescription="Star 5" />
+    </LinearLayout>
+
+    <!-- Comment Section -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Comment"
+        android:textSize="16sp"
+        android:textColor="#212121"
+        android:layout_marginBottom="8dp" />
+
+    <EditText
+        android:id="@+id/et_comment"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:gravity="top|start"
+        android:hint="Share more about your ride"
+        android:textSize="14sp"
+        android:padding="12dp"
+        android:background="@drawable/rounded_edittext_background"
+        android:layout_marginBottom="24dp"
+        android:maxLength="500"
+        android:inputType="textMultiLine" />
+
+    <!-- Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end">
+
+        <Button
+            android:id="@+id/btn_not_now"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Not now"
+            android:textColor="#757575"
+            android:layout_marginEnd="8dp" />
+
+        <Button
+            android:id="@+id/btn_submit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Submit"
+            android:backgroundTint="#FFA726"
+            android:textColor="@android:color/white"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp" />
+    </LinearLayout>
+
+</LinearLayout>
