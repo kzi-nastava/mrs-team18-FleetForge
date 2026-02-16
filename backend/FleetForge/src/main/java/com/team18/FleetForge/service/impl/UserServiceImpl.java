@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -114,5 +115,10 @@ public class UserServiceImpl implements UserService {
             return userRepository.findByEmailContainingIgnoreCase(email, pageable);
         }
         return userRepository.findAll(pageable);
+    }
+
+    @Override
+    public Optional<User> getUserByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 }
