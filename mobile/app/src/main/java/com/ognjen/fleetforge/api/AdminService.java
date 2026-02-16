@@ -5,13 +5,18 @@ import com.ognjen.fleetforge.dtos.admin.AdminChangeInformationResponseDTO;
 import com.ognjen.fleetforge.dtos.admin.AdminDriverVehicleChangeStatusResponseDTO;
 import com.ognjen.fleetforge.dtos.admin.AdminDriverVehicleInfoChangeDTO;
 import com.ognjen.fleetforge.dtos.admin.AdminGetResponseDTO;
+import com.ognjen.fleetforge.dtos.admin.AdminRideDetailsDto;
+import com.ognjen.fleetforge.dtos.admin.AdminRideHistoryDto;
 import com.ognjen.fleetforge.dtos.admin.AdminViewDriverChangesResponseDTO;
 import com.ognjen.fleetforge.dtos.admin.AdminViewVehicleChangesResponseDTO;
 import com.ognjen.fleetforge.dtos.admin.BlockUserRequestDTO;
+import com.ognjen.fleetforge.dtos.common.PageResponse;
 import com.ognjen.fleetforge.dtos.common.PasswordChangeRequestDTO;
 import com.ognjen.fleetforge.dtos.passenger.PassengerChangeInformationRequestDTO;
 import com.ognjen.fleetforge.dtos.passenger.PassengerChangeInformationResponseDTO;
 import com.ognjen.fleetforge.dtos.passenger.PassengerGetResponseDTO;
+import com.ognjen.fleetforge.dtos.passenger.PassengerRideDetailsDto;
+import com.ognjen.fleetforge.dtos.passenger.PassengerRideHistoryDto;
 
 import java.util.ArrayList;
 
@@ -24,6 +29,7 @@ import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface AdminService {
     @GET("/api/admin/profile-change-requests")
@@ -51,4 +57,17 @@ public interface AdminService {
 
     @PUT("/api/admin/block/{id}")
     Call<Void> blockUser(@Path("id")Long id, @Body BlockUserRequestDTO requestDTO);
+
+    @GET("/api/admin/rides")
+    Call<PageResponse<AdminRideHistoryDto>> getRides(
+            @Query("page") int page,
+            @Query("size") int size,
+            @Query("sortBy") String sortBy,
+            @Query("direction") String direction,
+            @Query("from") String from,
+            @Query("to") String to
+    );
+
+    @GET("/api/admin/rides/{id}")
+    Call<AdminRideDetailsDto> getRideDetails(@Path("id") Long id);
 }

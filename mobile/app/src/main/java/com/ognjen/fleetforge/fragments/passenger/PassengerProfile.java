@@ -26,6 +26,7 @@ import com.ognjen.fleetforge.R;
 import com.ognjen.fleetforge.auth.AuthManager;
 import com.ognjen.fleetforge.activities.MainActivity;
 import com.ognjen.fleetforge.services.WebSocketService;
+import com.ognjen.fleetforge.viewmodels.PassengerProfileViewModel;
 
 import java.io.IOException;
 

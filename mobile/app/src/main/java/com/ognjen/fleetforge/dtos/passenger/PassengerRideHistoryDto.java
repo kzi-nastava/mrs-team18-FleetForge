@@ -1,6 +1,5 @@
 package com.ognjen.fleetforge.dtos.passenger;
 
-import java.util.Objects;
 
 public class PassengerRideHistoryDto {
     private Long rideId;

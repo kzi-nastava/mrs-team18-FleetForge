@@ -13,18 +13,17 @@ import com.ognjen.fleetforge.dtos.admin.AdminChangeInformationResponseDTO;
 import com.ognjen.fleetforge.dtos.admin.AdminDriverVehicleChangeStatusResponseDTO;
 import com.ognjen.fleetforge.dtos.admin.AdminDriverVehicleInfoChangeDTO;
 import com.ognjen.fleetforge.dtos.admin.AdminGetResponseDTO;
+import com.ognjen.fleetforge.dtos.admin.AdminRideDetailsDto;
+import com.ognjen.fleetforge.dtos.admin.AdminRideHistoryDto;
 import com.ognjen.fleetforge.dtos.admin.AdminViewDriverChangesResponseDTO;
 import com.ognjen.fleetforge.dtos.admin.AdminViewVehicleChangesResponseDTO;
 import com.ognjen.fleetforge.dtos.admin.BlockUserRequestDTO;
+import com.ognjen.fleetforge.dtos.common.PageResponse;
 import com.ognjen.fleetforge.dtos.common.PasswordChangeRequestDTO;
-import com.ognjen.fleetforge.dtos.passenger.PassengerChangeInformationRequestDTO;
-import com.ognjen.fleetforge.dtos.passenger.PassengerChangeInformationResponseDTO;
-import com.ognjen.fleetforge.dtos.passenger.PassengerGetResponseDTO;
 import com.ognjen.fleetforge.utils.FileUtil;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import okhttp3.MediaType;
@@ -246,4 +245,39 @@ public class AdminRepo {
         });
         return data;
     }
+
+    public LiveData<PageResponse<AdminRideHistoryDto>> getRides(int page, int size, String from, String to, String sortBy, String direction) {
+        MutableLiveData<PageResponse<AdminRideHistoryDto>> data = new MutableLiveData<>();
+        service.getRides(page, size, sortBy, direction, from, to).enqueue(new Callback<PageResponse<AdminRideHistoryDto>>() {
+            @Override
+            public void onResponse(Call<PageResponse<AdminRideHistoryDto>> call, Response<PageResponse<AdminRideHistoryDto>> response) {
+                if (response.isSuccessful()) data.setValue(response.body());
+            }
+
+            @Override
+            public void onFailure(Call<PageResponse<AdminRideHistoryDto>> call, Throwable t) {
+                data.setValue(null);
+            }
+        });
+        return data;
+    }
+
+    public LiveData<AdminRideDetailsDto> getRideDetails(Long rideId) {
+        MutableLiveData<AdminRideDetailsDto> data = new MutableLiveData<>();
+        service.getRideDetails(rideId).enqueue(new Callback<AdminRideDetailsDto>() {
+            @Override
+            public void onResponse(Call<AdminRideDetailsDto> call, Response<AdminRideDetailsDto> response) {
+                if (response.isSuccessful()) {
+                    data.setValue(response.body());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<AdminRideDetailsDto> call, Throwable t) {
+                data.setValue(null);
+            }
+        });
+        return data;
+    }
+
 }

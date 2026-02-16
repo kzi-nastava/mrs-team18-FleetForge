@@ -93,4 +93,6 @@ public class RetrofitClient {
     public ChatService getChatService() {
         return retrofit.create(ChatService.class);
     }
+
+    public UserService getUserService(){ return retrofit.create(UserService.class);}
 }
