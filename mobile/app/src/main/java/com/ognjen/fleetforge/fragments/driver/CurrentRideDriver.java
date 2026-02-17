@@ -105,6 +105,14 @@ public class CurrentRideDriver extends Fragment {
         initializeMap();
         initializeServices();
 
+        viewModel.getCancelRideObservable().observe(getViewLifecycleOwner(), success -> {
+            if (Boolean.TRUE.equals(success)) {
+                handleRideCancelled();
+            } else {
+                showError("Failed to cancel ride");
+            }
+        });
+
         viewModel.getFinishRideObservable().observe(getViewLifecycleOwner(), response -> {
             if (response != null) {
                 handleRideFinished(response);
@@ -648,16 +656,19 @@ public class CurrentRideDriver extends Fragment {
     }
 
     private void performCancelRide(String reason) {
-        viewModel.cancelRide(currentRide.getRideId(), reason).observe(getViewLifecycleOwner(), success -> {
-            if (Boolean.TRUE.equals(success)) {
-                Toast.makeText(requireContext(), "Ride cancelled successfully", Toast.LENGTH_SHORT).show();
-                stopSimulation();
-                currentRide = null;
-                navigateToDashboard();
-            } else {
-                Toast.makeText(requireContext(), "Failed to cancel ride", Toast.LENGTH_SHORT).show();
-            }
-        });
+        if (currentRide != null) {
+            viewModel.cancelRide(currentRide.getRideId(), reason);
+        }
+    }
+
+    private void handleRideCancelled() {
+        Toast.makeText(requireContext(), "Ride cancelled successfully", Toast.LENGTH_SHORT).show();
+        stopSimulation();
+        currentRide = null;
+        if (mapManager != null) {
+            mapManager.clearAll();
+        }
+        navigateToDashboard();
     }
 
     private void navigateToDashboard() {
