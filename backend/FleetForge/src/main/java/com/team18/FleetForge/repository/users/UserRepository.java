@@ -17,4 +17,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "AND u.email LIKE CONCAT(:prefix, '%')")
     List<User> findTop5ByEmailPrefix(@Param("prefix") String prefix);
     Page<User> findByEmailContainingIgnoreCase(String email, Pageable pageable);
+
+    @Query("SELECT u FROM User u WHERE TYPE(u) = com.team18.FleetForge.model.users.Admin")
+    List<User> findAllAdmins();
 }

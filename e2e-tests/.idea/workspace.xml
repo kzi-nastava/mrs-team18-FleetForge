@@ -5,9 +5,26 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6b9556a4-dfdc-4a23-8fd4-ac909965b26a" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/tests/AdminHistoryTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/tests/AdminHistoryTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../mobile/app/src/main/java/com/ognjen/fleetforge/fragments/passenger/PassengerHistoryFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/../mobile/app/src/main/java/com/ognjen/fleetforge/fragments/passenger/PassengerHistoryFragment.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../frontend/FleetForge/public/sounds/alarm.mp3" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../frontend/FleetForge/src/app/admin/admin-home/admin-home.component.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../frontend/FleetForge/src/app/admin/admin-home/admin-home.component.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../frontend/FleetForge/src/app/admin/admin-home/admin-home.component.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../frontend/FleetForge/src/app/shared/alarm/alarm.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/FleetForge/src/main/java/com/team18/FleetForge/dto/vehicle/VehicleLocationDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/FleetForge/src/main/java/com/team18/FleetForge/dto/vehicle/VehicleLocationDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/FleetForge/src/main/java/com/team18/FleetForge/repository/rides/RideRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/FleetForge/src/main/java/com/team18/FleetForge/repository/rides/RideRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/FleetForge/src/main/java/com/team18/FleetForge/repository/users/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/FleetForge/src/main/java/com/team18/FleetForge/repository/users/UserRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/FleetForge/src/main/java/com/team18/FleetForge/service/NotificationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/FleetForge/src/main/java/com/team18/FleetForge/service/NotificationService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/FleetForge/src/main/java/com/team18/FleetForge/service/impl/VehicleServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/FleetForge/src/main/java/com/team18/FleetForge/service/impl/VehicleServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/FleetForge/src/main/java/com/team18/FleetForge/service/rides/RidePanicService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/FleetForge/src/main/java/com/team18/FleetForge/service/rides/RidePanicService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/FleetForge/src/app/app.routes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/FleetForge/src/app/app.routes.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/FleetForge/src/app/auth/guard/home-redirect-guard.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/FleetForge/src/app/auth/guard/home-redirect-guard.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/FleetForge/src/app/navigation/navbar/navbar.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/FleetForge/src/app/navigation/navbar/navbar.component.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/FleetForge/src/app/navigation/navbar/notification-dropdown/notification-dropdown.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/FleetForge/src/app/navigation/navbar/notification-dropdown/notification-dropdown.component.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/FleetForge/src/app/navigation/sidebar/sidebar-config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/FleetForge/src/app/navigation/sidebar/sidebar-config.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/FleetForge/src/app/shared/enums/notification-type.enum.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/FleetForge/src/app/shared/enums/notification-type.enum.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/FleetForge/src/app/shared/map/map.css" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/FleetForge/src/app/shared/map/map.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/FleetForge/src/app/shared/map/map.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/FleetForge/src/app/shared/map/map.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/FleetForge/src/app/shared/models/vehicle.model.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/FleetForge/src/app/shared/models/vehicle.model.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,7 +63,7 @@
     "RunOnceActivity.git.unshallow": "true",
     "TestNG.AdminHistoryTest.executor": "Run",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "#289 on feature/passenger-history-mobile-ui-flow",
+    "git-widget-placeholder": "feature/admin-panic-notification",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/ognje/Desktop/FleetForge/main-git/e2e-tests",
@@ -125,6 +142,7 @@
       <workItem from="1770993439901" duration="760000" />
       <workItem from="1771108166199" duration="11000" />
       <workItem from="1771198096321" duration="1091000" />
+      <workItem from="1771365187269" duration="212000" />
     </task>
     <servers />
   </component>

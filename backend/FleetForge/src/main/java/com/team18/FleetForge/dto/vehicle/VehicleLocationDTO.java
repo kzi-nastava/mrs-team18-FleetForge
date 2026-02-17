@@ -16,4 +16,6 @@ public class VehicleLocationDTO {
     private GeoPoint currentLocation;
     private Boolean isAvailable;
     private Boolean isActive;
+    private Boolean panicActivated;
+    private Long rideId;
 }

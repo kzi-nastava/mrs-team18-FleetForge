@@ -97,6 +97,9 @@ public class Ride {
     @Column(name = "panic_activated")
     private Boolean panicActivated = false;
 
+    @Column(name = "is_panic_handled")
+    private Boolean isPanicHandled = false;
+
     @Column(name = "panic_activated_at")
     private LocalDateTime panicActivatedAt;
 

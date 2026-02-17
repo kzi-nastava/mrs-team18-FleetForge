@@ -1,17 +1,22 @@
 package com.team18.FleetForge.service.impl;
 
 import com.team18.FleetForge.dto.vehicle.VehicleLocationDTO;
+import com.team18.FleetForge.model.ride.Ride;
 import com.team18.FleetForge.model.vehicles.Vehicle;
 import com.team18.FleetForge.model.users.Driver;
+import com.team18.FleetForge.repository.rides.RideRepository;
 import com.team18.FleetForge.repository.users.DriverRepository;
 import com.team18.FleetForge.repository.vehicles.VehicleRepo;
 import com.team18.FleetForge.service.vehicles.VehicleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,6 +28,7 @@ public class VehicleServiceImpl implements VehicleService {
 
     private final DriverRepository driverRepository;
     private final VehicleRepo  vehicleRepo;
+    private final RideRepository rideRepository;
 
     @Override
     public List<VehicleLocationDTO> getActiveVehicleLocations() {
@@ -50,6 +56,19 @@ public class VehicleServiceImpl implements VehicleService {
 
     private VehicleLocationDTO mapDriverToVehicleLocationDTO(Driver driver) {
         Vehicle vehicle = driver.getVehicle();
+        boolean isAdmin = checkIsAdmin();
+
+        Boolean isPanicActive = null;
+        Long rideId = null;
+
+        if (isAdmin) {
+            Optional<Ride> activePanicRide = rideRepository.findActivePanicRideByDriver(driver.getId());
+
+            if (activePanicRide.isPresent()) {
+                isPanicActive = true;
+                rideId = activePanicRide.get().getId();
+            }
+        }
 
         return new VehicleLocationDTO(
                 vehicle.getId(),
@@ -57,7 +76,18 @@ public class VehicleServiceImpl implements VehicleService {
                 vehicle.getType(),
                 driver.getCurrentLocation(),
                 driver.isAvailable(),
-                driver.isActive()
+                driver.isActive(),
+                isPanicActive,
+                rideId
         );
+    }
+
+    private boolean checkIsAdmin() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return false;
+        }
+        return authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
     }
 }
