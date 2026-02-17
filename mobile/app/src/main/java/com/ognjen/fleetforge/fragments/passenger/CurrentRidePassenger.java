@@ -18,13 +18,22 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.ognjen.fleetforge.BuildConfig;
 import com.ognjen.fleetforge.R;
+import com.ognjen.fleetforge.dialogs.RateRideDialog;
+import com.ognjen.fleetforge.dialogs.ReportInconsistencyDialog;
+import com.ognjen.fleetforge.dtos.ride.InconsistencyReportRequestDTO;
+import com.ognjen.fleetforge.dtos.ride.InconsistencyReportResponseDTO;
 import com.ognjen.fleetforge.dtos.ride.RideTrackingDTO;
 import com.ognjen.fleetforge.dtos.ride.WaypointDTO;
+import com.ognjen.fleetforge.dtos.ride.RideReviewRequestDTO;
+import com.ognjen.fleetforge.dtos.ride.RideReviewResponseDTO;
 import com.ognjen.fleetforge.model.CalculatedRoute;
 import com.ognjen.fleetforge.model.GeoPoint;
 import com.ognjen.fleetforge.api.RoutingService;
+import com.ognjen.fleetforge.api.RideService;
+import com.ognjen.fleetforge.api.RetrofitClient;
 import com.ognjen.fleetforge.utils.MapManager;
 
 import org.osmdroid.config.Configuration;
@@ -35,6 +44,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class CurrentRidePassenger extends Fragment {
 
@@ -66,6 +79,7 @@ public class CurrentRidePassenger extends Fragment {
 
     private MapManager mapManager;
     private RoutingService routingService;
+    private RideService rideService;
     private CurrentRidePassengerViewModel viewModel;
 
     private RideTrackingDTO currentRide;
@@ -135,6 +149,7 @@ public class CurrentRidePassenger extends Fragment {
 
     private void initializeServices() {
         routingService = new RoutingService(MAPBOX_API_KEY);
+        rideService = RetrofitClient.getInstance().getRideService();
         pollingHandler = new Handler(Looper.getMainLooper());
     }
 
@@ -164,7 +179,7 @@ public class CurrentRidePassenger extends Fragment {
 
         if ("COMPLETED".equals(tracking.getStatus())) {
             stopPolling();
-            Toast.makeText(requireContext(), "Ride completed successfully!", Toast.LENGTH_LONG).show();
+            showRatingDialog(tracking);
             return;
         }
 
@@ -378,9 +393,92 @@ public class CurrentRidePassenger extends Fragment {
         }
     }
 
+    private void showRatingDialog(RideTrackingDTO ride) {
+        String routeInfo = ride.getRoute().getStartAddress() + " → " + ride.getRoute().getEndAddress();
+
+        RateRideDialog dialog = new RateRideDialog(requireContext(), routeInfo, new RateRideDialog.OnRatingSubmitListener() {
+            @Override
+            public void onSubmit(int driverRating, int vehicleRating, String comment) {
+                submitReview(ride.getRideId(), driverRating, vehicleRating, comment);
+                navigateToDashboard();
+            }
+
+            @Override
+            public void onNotNow() {
+                navigateToDashboard();
+            }
+        });
+
+        dialog.show();
+    }
+
+    private void submitReview(Long rideId, int driverRating, int vehicleRating, String comment) {
+        RideReviewRequestDTO request = new RideReviewRequestDTO(vehicleRating, driverRating, comment);
+
+        rideService.createReview(rideId, request).enqueue(new Callback<RideReviewResponseDTO>() {
+            @Override
+            public void onResponse(Call<RideReviewResponseDTO> call, Response<RideReviewResponseDTO> response) {
+                if (!isAdded() || getContext() == null) return;
+
+                if (response.isSuccessful()) {
+                    Toast.makeText(getContext(), "Review submitted successfully!", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getContext(), "Failed to submit review", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<RideReviewResponseDTO> call, Throwable t) {
+                if (!isAdded() || getContext() == null) return;
+
+                Toast.makeText(getContext(), "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void navigateToDashboard() {
+        currentRide = null;
+        if (mapManager != null) {
+            mapManager.clearAll();
+        }
+        driverCarMarker = null;
+
+        BottomNavigationView bottomNav = requireActivity().findViewById(R.id.bottom_navigation);
+        if (bottomNav != null) {
+            bottomNav.setSelectedItemId(R.id.nav_home);
+        }
+    }
+
     private void onReportInconsistencyClick() {
-        Toast.makeText(requireContext(), "Report Inconsistency - To be implemented", Toast.LENGTH_SHORT).show();
-        // TODO: Implement inconsistency reporting dialog
+
+        ReportInconsistencyDialog dialog = new ReportInconsistencyDialog(requireContext(), this::submitInconsistencyReport);
+
+        dialog.show();
+    }
+
+    private void submitInconsistencyReport(String comment) {
+        GeoPoint currentLocation = currentRide.getCurrentLocation();
+        InconsistencyReportRequestDTO request = new InconsistencyReportRequestDTO(comment, currentLocation);
+
+        rideService.reportInconsistency(request).enqueue(new Callback<InconsistencyReportResponseDTO>() {
+            @Override
+            public void onResponse(Call<InconsistencyReportResponseDTO> call, Response<InconsistencyReportResponseDTO> response) {
+                if (!isAdded() || getContext() == null) return;
+
+                if (response.isSuccessful() && response.body() != null) {
+                    Toast.makeText(getContext(), "Report submitted successfully!", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getContext(), "Failed to submit report", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<InconsistencyReportResponseDTO> call, Throwable t) {
+                if (!isAdded() || getContext() == null) return;
+
+                Toast.makeText(getContext(), "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void onSOSClick() {

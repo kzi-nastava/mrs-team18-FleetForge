@@ -27,6 +27,7 @@ import org.osmdroid.views.overlay.Marker;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -47,6 +48,7 @@ public class PassengerHistoryAdapter extends ArrayAdapter<PassengerRideHistoryDt
     public interface OnActionListener {
         void onHeart(PassengerRideHistoryDto ride, ImageButton heartBtn);
         void onDetailsClicked(PassengerRideHistoryDto ride);
+        void onRateClicked(PassengerRideHistoryDto ride);
     }
 
     public PassengerHistoryAdapter(Context context, ArrayList<PassengerRideHistoryDto> data) {
@@ -126,6 +128,64 @@ public class PassengerHistoryAdapter extends ArrayAdapter<PassengerRideHistoryDt
         holder.heart.setOnClickListener(v -> {
             if (listener != null) listener.onHeart(ride, holder.heart);
         });
+
+        handleRatingUI(holder, ride);
+    }
+
+    private void handleRatingUI(ViewHolder holder, PassengerRideHistoryDto ride) {
+        if (!"COMPLETED".equals(ride.getStatus())) {
+            holder.btnRate.setVisibility(View.GONE);
+            holder.tvRatingDisplay.setVisibility(View.GONE);
+            return;
+        }
+
+        boolean isRated = ride.getDriverRating() != null && ride.getDriverRating() > 0;
+
+        if (isRated) {
+            holder.btnRate.setVisibility(View.GONE);
+            holder.tvRatingDisplay.setVisibility(View.VISIBLE);
+
+            double rating = ride.getDriverRating() != null ? ride.getDriverRating() : 0.0;
+            int fullStars = (int) Math.round(rating);
+            StringBuilder stars = new StringBuilder();
+
+            for (int i = 1; i <= 5; i++) {
+                if (i <= fullStars) {
+                    stars.append("★");
+                } else {
+                    stars.append("☆");
+                }
+            }
+
+            holder.tvRatingDisplay.setText(stars.toString());
+            holder.tvRatingDisplay.setTextColor(Color.parseColor("#FFB300"));
+        } else {
+            boolean canRate = canRateRide(ride);
+
+            if (canRate) {
+                holder.btnRate.setVisibility(View.VISIBLE);
+                holder.tvRatingDisplay.setVisibility(View.GONE);
+                holder.btnRate.setOnClickListener(v -> {
+                    if (listener != null) listener.onRateClicked(ride);
+                });
+            } else {
+                holder.btnRate.setVisibility(View.GONE);
+                holder.tvRatingDisplay.setVisibility(View.GONE);
+            }
+        }
+    }
+
+    private boolean canRateRide(PassengerRideHistoryDto ride) {
+        if (ride.getEndTime() == null) return false;
+
+        try {
+            LocalDateTime endTime = LocalDateTime.parse(ride.getEndTime());
+            LocalDateTime now = LocalDateTime.now();
+            long daysPassed = ChronoUnit.DAYS.between(endTime, now);
+            return daysPassed <= 3;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private void setRatingStars(TextView textView, Double rating, String label) {
@@ -234,10 +294,6 @@ public class PassengerHistoryAdapter extends ArrayAdapter<PassengerRideHistoryDt
             } catch (Exception e) {
                 holder.detailDateTime.setText("-");
             }
-
-            if (holder.mapManager != null) {
-                setupMap(holder, detailedData);
-            }
         }
 
     }
@@ -301,7 +357,8 @@ public class PassengerHistoryAdapter extends ArrayAdapter<PassengerRideHistoryDt
         final ShapeableImageView driverImage;
         final TextView driverName, price, distance;
         final ImageButton heart;
-        final Button btnDetails, btnHide;
+        final Button btnDetails, btnHide, btnRate;
+        final TextView tvRatingDisplay;
         final View expandedLayout;
         final MapView mapView;
         final MapManager mapManager; // Keep reference to the manager
@@ -315,6 +372,8 @@ public class PassengerHistoryAdapter extends ArrayAdapter<PassengerRideHistoryDt
             expandedLayout = view.findViewById(R.id.ll_expanded_view);
             btnDetails = view.findViewById(R.id.btn_details);
             btnHide = view.findViewById(R.id.btn_hide_details);
+            btnRate = view.findViewById(R.id.btn_rate);
+            tvRatingDisplay = view.findViewById(R.id.tv_rating_display);
             driverName = view.findViewById(R.id.tv_driver_name);
             price = view.findViewById(R.id.tv_detail_price);
             distance = view.findViewById(R.id.tv_detail_distance);
