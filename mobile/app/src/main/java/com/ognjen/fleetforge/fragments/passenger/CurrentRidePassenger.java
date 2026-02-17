@@ -22,6 +22,9 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.ognjen.fleetforge.BuildConfig;
 import com.ognjen.fleetforge.R;
 import com.ognjen.fleetforge.dialogs.RateRideDialog;
+import com.ognjen.fleetforge.dialogs.ReportInconsistencyDialog;
+import com.ognjen.fleetforge.dtos.ride.InconsistencyReportRequestDTO;
+import com.ognjen.fleetforge.dtos.ride.InconsistencyReportResponseDTO;
 import com.ognjen.fleetforge.dtos.ride.RideTrackingDTO;
 import com.ognjen.fleetforge.dtos.ride.WaypointDTO;
 import com.ognjen.fleetforge.dtos.ride.RideReviewRequestDTO;
@@ -447,8 +450,35 @@ public class CurrentRidePassenger extends Fragment {
     }
 
     private void onReportInconsistencyClick() {
-        Toast.makeText(requireContext(), "Report Inconsistency - To be implemented", Toast.LENGTH_SHORT).show();
-        // TODO: Implement inconsistency reporting dialog
+
+        ReportInconsistencyDialog dialog = new ReportInconsistencyDialog(requireContext(), this::submitInconsistencyReport);
+
+        dialog.show();
+    }
+
+    private void submitInconsistencyReport(String comment) {
+        GeoPoint currentLocation = currentRide.getCurrentLocation();
+        InconsistencyReportRequestDTO request = new InconsistencyReportRequestDTO(comment, currentLocation);
+
+        rideService.reportInconsistency(request).enqueue(new Callback<InconsistencyReportResponseDTO>() {
+            @Override
+            public void onResponse(Call<InconsistencyReportResponseDTO> call, Response<InconsistencyReportResponseDTO> response) {
+                if (!isAdded() || getContext() == null) return;
+
+                if (response.isSuccessful() && response.body() != null) {
+                    Toast.makeText(getContext(), "Report submitted successfully!", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getContext(), "Failed to submit report", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<InconsistencyReportResponseDTO> call, Throwable t) {
+                if (!isAdded() || getContext() == null) return;
+
+                Toast.makeText(getContext(), "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void onSOSClick() {

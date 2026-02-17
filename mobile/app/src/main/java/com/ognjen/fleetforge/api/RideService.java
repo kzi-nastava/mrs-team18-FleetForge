@@ -3,6 +3,8 @@ package com.ognjen.fleetforge.api;
 import com.ognjen.fleetforge.dtos.driver.DriverLocationUpdateRequestDTO;
 import com.ognjen.fleetforge.dtos.driver.DriverLocationUpdateResponseDTO;
 import com.ognjen.fleetforge.dtos.ride.FinishRideResponseDTO;
+import com.ognjen.fleetforge.dtos.ride.InconsistencyReportRequestDTO;
+import com.ognjen.fleetforge.dtos.ride.InconsistencyReportResponseDTO;
 import com.ognjen.fleetforge.dtos.ride.RideCreateRequestDTO;
 import com.ognjen.fleetforge.dtos.ride.RideCreateResponseDTO;
 import com.ognjen.fleetforge.dtos.ride.RideReviewRequestDTO;
@@ -39,5 +41,10 @@ public interface RideService {
     Call<RideReviewResponseDTO> createReview(
             @Path("rideId") Long rideId,
             @Body RideReviewRequestDTO request
+    );
+
+    @POST("api/rides/report-inconsistency")
+    Call<InconsistencyReportResponseDTO> reportInconsistency(
+            @Body InconsistencyReportRequestDTO request
     );
 }
