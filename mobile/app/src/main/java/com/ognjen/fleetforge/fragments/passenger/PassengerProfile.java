@@ -25,6 +25,7 @@ import com.ognjen.fleetforge.fragments.common.PasswordChangeProfile;
 import com.ognjen.fleetforge.R;
 import com.ognjen.fleetforge.auth.AuthManager;
 import com.ognjen.fleetforge.activities.MainActivity;
+import com.ognjen.fleetforge.fragments.reports.UserReports;
 import com.ognjen.fleetforge.services.WebSocketService;
 import com.ognjen.fleetforge.viewmodels.PassengerProfileViewModel;
 
@@ -109,6 +110,16 @@ public class PassengerProfile extends Fragment {
 
         profilePic.setOnClickListener(v->{
             imagePicker.launch("image/*");
+        });
+
+        Button reports= view.findViewById(R.id.reportsBtn);
+        reports.setOnClickListener(v -> {
+            Fragment passengerReports = new UserReports();
+            requireActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, passengerReports)
+                    .addToBackStack(null)
+                    .commit();
         });
 
         return view;

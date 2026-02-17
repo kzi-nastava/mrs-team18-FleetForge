@@ -33,6 +33,7 @@ import com.ognjen.fleetforge.fragments.common.PasswordChangeProfile;
 import com.ognjen.fleetforge.R;
 import com.ognjen.fleetforge.auth.AuthManager;
 import com.ognjen.fleetforge.activities.MainActivity;
+import com.ognjen.fleetforge.fragments.reports.UserReports;
 import com.ognjen.fleetforge.services.WebSocketService;
 
 import java.io.IOException;
@@ -215,6 +216,15 @@ public class DriverProfile extends Fragment {
             if (blockedResponse != null && blockedResponse.isBlocked()) {
                 showBlockedDialog(blockedResponse.getReason());
             }
+        });
+        Button reports= view.findViewById(R.id.reportsBtn);
+        reports.setOnClickListener(v -> {
+            Fragment reportsFragment = new UserReports();
+            requireActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, reportsFragment)
+                    .addToBackStack(null)
+                    .commit();
         });
         return view;
     }

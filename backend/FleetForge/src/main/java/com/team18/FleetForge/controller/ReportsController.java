@@ -41,11 +41,7 @@ public class ReportsController {
         UserDataReportResponseDTO response= new UserDataReportResponseDTO();
 
         Optional<User> user= userService.getUserByEmail(email);
-        Map<LocalDate, List<Ride>> rides= new HashMap<>();
-        if(!user.isEmpty()){
-            rides = rideService.findRidesForUserForGivenDateRange(fromDate,toDate,user.get().getId());
-        }
-        response.setDataByDay(toDTO(rideService.findRidesForUserForGivenDateRange(fromDate, toDate, user.get().getId())));
+        user.ifPresent(value -> response.setDataByDay(toDTO(rideService.findRidesForUserForGivenDateRange(fromDate, toDate, value.getId()))));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

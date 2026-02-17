@@ -29,6 +29,7 @@ import android.widget.Toast;
 import com.google.android.material.textfield.TextInputEditText;
 import com.ognjen.fleetforge.R;
 import com.ognjen.fleetforge.adapters.PassengerHistoryAdapter;
+import com.ognjen.fleetforge.dialogs.RateRideDialog;
 import com.ognjen.fleetforge.dtos.common.PageResponse;
 import com.ognjen.fleetforge.dtos.passenger.FavoriteRouteGetResponseDTO;
 import com.ognjen.fleetforge.dtos.passenger.PassengerRideHistoryDto;
@@ -151,6 +152,11 @@ public class PassengerHistoryFragment extends Fragment implements SensorEventLis
             public void onDetailsClicked(PassengerRideHistoryDto ride) {
                 handleOnDetails(ride);
             }
+
+            @Override
+            public void onRateClicked(PassengerRideHistoryDto ride) {
+                handleOnRate(ride);
+            }
         });
 
         viewModel.getFavorites().observe(getViewLifecycleOwner(),response -> {
@@ -260,6 +266,32 @@ public class PassengerHistoryFragment extends Fragment implements SensorEventLis
             });
         }
     }
+
+    private void handleOnRate(PassengerRideHistoryDto ride) {
+        String routeInfo = ride.getStartAddress() + " → " + ride.getEndAddress();
+
+        RateRideDialog dialog = new RateRideDialog(requireContext(), routeInfo, new RateRideDialog.OnRatingSubmitListener() {
+            @Override
+            public void onSubmit(int driverRating, int vehicleRating, String comment) {
+                viewModel.submitReview(ride.getRideId(), driverRating, vehicleRating, comment)
+                    .observe(getViewLifecycleOwner(), success -> {
+                        if (success) {
+                            Toast.makeText(getContext(), "Review submitted successfully!", Toast.LENGTH_SHORT).show();
+                            refreshRides();
+                        } else {
+                            Toast.makeText(getContext(), "Failed to submit review", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+            }
+
+            @Override
+            public void onNotNow() {
+            }
+        });
+
+        dialog.show();
+    }
+
     interface OnRouteNameEnteredListener {
         void onNameEntered(String routeName);
     }

@@ -97,5 +97,5 @@ public class RetrofitClient {
     public UserService getUserService(){
         return retrofit.create(UserService.class);
     }
-
+    public ReportsService getReportsService(){return retrofit.create(ReportsService.class);}
 }

@@ -58,4 +58,8 @@ public class PassengerHistoryViewModel extends ViewModel {
     public LiveData<Boolean> addFavorite(String routeName, Long rideId) {
         return repo.addFavorite(routeName, rideId);
     }
+
+    public LiveData<Boolean> submitReview(Long rideId, int driverRating, int vehicleRating, String comment) {
+        return repo.submitReview(rideId, driverRating, vehicleRating, comment);
+    }
 }
