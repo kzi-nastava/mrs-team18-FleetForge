@@ -6,8 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="6b9556a4-dfdc-4a23-8fd4-ac909965b26a" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/tests/AdminHistoryTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/tests/AdminHistoryTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../mobile/app/src/main/java/com/ognjen/fleetforge/fragments/passenger/PassengerHistoryFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/../mobile/app/src/main/java/com/ognjen/fleetforge/fragments/passenger/PassengerHistoryFragment.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,8 +43,12 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "TestNG.AdminHistoryTest.executor": "Run",
+    "TestNG.FavoriteRoutesOrderTest.addToFavoriteRoutes.executor": "Run",
+    "TestNG.FavoriteRoutesOrderTest.addToFavoritesAndOrder.executor": "Run",
+    "TestNG.FavoriteRoutesOrderTest.removeFromFavoritesHistoryPage.executor": "Run",
+    "TestNG.FavoriteRoutesOrderTest.removeFromFavorites_FavoritesPage.executor": "Run",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "#289 on feature/passenger-history-mobile-ui-flow",
+    "git-widget-placeholder": "develop",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/ognje/Desktop/FleetForge/main-git/e2e-tests",
@@ -55,12 +57,15 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
     "settings.editor.selected.configurable": "preferences.PinNote",
     "to.speed.mode.migration.done": "true",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
-  <component name="RunManager" selected="TestNG.AdminHistoryTest">
+  <component name="RunManager" selected="TestNG.FavoriteRoutesOrderTest.addToFavoritesAndOrder">
     <configuration name="Main" type="Application" factoryName="Application" nameIsGenerated="true">
       <option name="ALTERNATIVE_JRE_PATH" value="22" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
@@ -97,12 +102,92 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="FavoriteRoutesOrderTest.addToFavoriteRoutes" type="TestNG" temporary="true" nameIsGenerated="true">
+      <module name="selenium2" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="tests.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="tests" />
+      <option name="MAIN_CLASS_NAME" value="tests.FavoriteRoutesOrderTest" />
+      <option name="METHOD_NAME" value="addToFavoriteRoutes" />
+      <option name="TEST_OBJECT" value="METHOD" />
+      <properties />
+      <listeners />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="FavoriteRoutesOrderTest.addToFavoritesAndOrder" type="TestNG" temporary="true" nameIsGenerated="true">
+      <module name="selenium2" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="tests.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="tests" />
+      <option name="MAIN_CLASS_NAME" value="tests.FavoriteRoutesOrderTest" />
+      <option name="METHOD_NAME" value="addToFavoritesAndOrder" />
+      <option name="TEST_OBJECT" value="METHOD" />
+      <properties />
+      <listeners />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="FavoriteRoutesOrderTest.removeFromFavoritesHistoryPage" type="TestNG" temporary="true" nameIsGenerated="true">
+      <module name="selenium2" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="tests.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="tests" />
+      <option name="MAIN_CLASS_NAME" value="tests.FavoriteRoutesOrderTest" />
+      <option name="METHOD_NAME" value="removeFromFavoritesHistoryPage" />
+      <option name="TEST_OBJECT" value="METHOD" />
+      <properties />
+      <listeners />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="FavoriteRoutesOrderTest.removeFromFavorites_FavoritesPage" type="TestNG" temporary="true" nameIsGenerated="true">
+      <module name="selenium2" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="tests.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="tests" />
+      <option name="MAIN_CLASS_NAME" value="tests.FavoriteRoutesOrderTest" />
+      <option name="METHOD_NAME" value="removeFromFavorites_FavoritesPage" />
+      <option name="TEST_OBJECT" value="METHOD" />
+      <properties />
+      <listeners />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <list>
       <item itemvalue="Application.Main" />
+      <item itemvalue="TestNG.FavoriteRoutesOrderTest.addToFavoriteRoutes" />
+      <item itemvalue="TestNG.FavoriteRoutesOrderTest.addToFavoritesAndOrder" />
+      <item itemvalue="TestNG.FavoriteRoutesOrderTest.removeFromFavoritesHistoryPage" />
+      <item itemvalue="TestNG.FavoriteRoutesOrderTest.removeFromFavorites_FavoritesPage" />
       <item itemvalue="TestNG.AdminHistoryTest" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="TestNG.FavoriteRoutesOrderTest.addToFavoritesAndOrder" />
+        <item itemvalue="TestNG.FavoriteRoutesOrderTest.removeFromFavorites_FavoritesPage" />
+        <item itemvalue="TestNG.FavoriteRoutesOrderTest.removeFromFavoritesHistoryPage" />
+        <item itemvalue="TestNG.FavoriteRoutesOrderTest.addToFavoriteRoutes" />
         <item itemvalue="TestNG.AdminHistoryTest" />
       </list>
     </recent_temporary>
@@ -110,8 +195,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.28238.7" />
-        <option value="bundled-js-predefined-d6986cc7102b-a71380e98a7c-JavaScript-IU-252.28238.7" />
+        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.27397.103" />
+        <option value="bundled-js-predefined-d6986cc7102b-3aa1da707db6-JavaScript-IU-252.27397.103" />
       </set>
     </attachedChunks>
   </component>
@@ -125,6 +210,7 @@
       <workItem from="1770993439901" duration="760000" />
       <workItem from="1771108166199" duration="11000" />
       <workItem from="1771198096321" duration="1091000" />
+      <workItem from="1771364882430" duration="301000" />
     </task>
     <servers />
   </component>
