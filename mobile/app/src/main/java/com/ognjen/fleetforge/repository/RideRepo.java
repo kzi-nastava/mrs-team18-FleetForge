@@ -1,14 +1,19 @@
 package com.ognjen.fleetforge.repository;
 
+import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.ognjen.fleetforge.api.RetrofitClient;
 import com.ognjen.fleetforge.api.RideService;
 import com.ognjen.fleetforge.dtos.ride.FinishRideResponseDTO;
+import com.ognjen.fleetforge.dtos.common.PageResponse;
+import com.ognjen.fleetforge.dtos.ride.CancellationRequest;
 import com.ognjen.fleetforge.dtos.ride.RideCreateRequestDTO;
 import com.ognjen.fleetforge.dtos.ride.RideCreateResponseDTO;
 import com.ognjen.fleetforge.dtos.ride.RideStartResponseDTO;
+import com.ognjen.fleetforge.dtos.ride.ScheduledRideDto;
+
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -69,6 +74,50 @@ public class RideRepo {
         });
         return data;
     }
+
+
+    public LiveData<PageResponse<ScheduledRideDto>> getScheduledRides(int page, int size) {
+        MutableLiveData<PageResponse<ScheduledRideDto>> data = new MutableLiveData<>();
+
+        service.getScheduledRides(page, size).enqueue(new Callback<PageResponse<ScheduledRideDto>>() {
+            @Override
+            public void onResponse(Call<PageResponse<ScheduledRideDto>> call, Response<PageResponse<ScheduledRideDto>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    data.setValue(response.body());
+                } else {
+                    data.setValue(null);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<PageResponse<ScheduledRideDto>> call, Throwable t) {
+                data.setValue(null);
+            }
+        });
+
+        return data;
+    }
+
+    public LiveData<Boolean> cancelRide(Long rideId, @Nullable String reason) {
+        MutableLiveData<Boolean> result = new MutableLiveData<>();
+
+        CancellationRequest body = (reason != null) ? new CancellationRequest(reason) : new CancellationRequest(null);
+
+        service.cancelRide(rideId, body).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                result.setValue(response.isSuccessful());
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                result.setValue(false);
+            }
+        });
+        return result;
+    }
+
+
 
     public LiveData<FinishRideResponseDTO> finishRide(Long id) {
         MutableLiveData<FinishRideResponseDTO> data = new MutableLiveData<>();

@@ -604,7 +604,60 @@ public class CurrentRideDriver extends Fragment {
 
 
     private void onSecondaryActionClick() {
-        Toast.makeText(requireContext(), "Secondary action clicked", Toast.LENGTH_SHORT).show();
+        String currentText = btnSecondaryAction.getText().toString();
+
+        if ("Cancel".equalsIgnoreCase(currentText)) {
+            showCancelConfirmationDialog();
+        } else if ("SOS".equalsIgnoreCase(currentText)) {
+            Toast.makeText(requireContext(), "Emergency SOS triggered!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void showCancelConfirmationDialog() {
+        if (currentRide == null) return;
+
+        final android.widget.EditText inputReason = new android.widget.EditText(requireContext());
+        inputReason.setHint("Enter reason (e.g., Vehicle breakdown, Traffic)");
+
+        android.widget.FrameLayout container = new android.widget.FrameLayout(requireContext());
+        android.widget.FrameLayout.LayoutParams params = new  android.widget.FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        int marginInDp = 16;
+        int marginInPx = (int) (marginInDp * getResources().getDisplayMetrics().density);
+
+        params.leftMargin = marginInPx;
+        params.rightMargin = marginInPx;
+        inputReason.setLayoutParams(params);
+        container.addView(inputReason);
+
+        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle("Cancel Ride")
+                .setMessage("Please provide a reason for cancellation:")
+                .setView(container) // Add the EditText container to the dialog
+                .setPositiveButton("Confirm Cancellation", (dialog, which) -> {
+                    String reason = inputReason.getText().toString().trim();
+
+                    if (reason.isEmpty()) {
+                        Toast.makeText(requireContext(), "Reason is required!", Toast.LENGTH_SHORT).show();
+                    } else {
+                        performCancelRide(reason);
+                    }
+                })
+                .setNegativeButton("Back", null)
+                .show();
+    }
+
+    private void performCancelRide(String reason) {
+        viewModel.cancelRide(currentRide.getRideId(), reason).observe(getViewLifecycleOwner(), success -> {
+            if (Boolean.TRUE.equals(success)) {
+                Toast.makeText(requireContext(), "Ride cancelled successfully", Toast.LENGTH_SHORT).show();
+                stopSimulation();
+                currentRide = null;
+                navigateToDashboard();
+            } else {
+                Toast.makeText(requireContext(), "Failed to cancel ride", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void navigateToDashboard() {
