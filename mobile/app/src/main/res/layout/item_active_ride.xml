@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Collapsed View -->
+        <LinearLayout
+            android:id="@+id/ll_collapsed_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Panic Indicator Banner -->
+            <TextView
+                android:id="@+id/panic_indicator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:gravity="center"
+                android:background="@android:color/holo_red_light"
+                android:visibility="gone"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Driver Name & Start Time -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:id="@+id/driver_name"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Driver Name"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:textColor="@color/text_primary" />
+
+                <TextView
+                    android:id="@+id/passenger_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="👥 2"
+                    android:textSize="14sp"
+                    android:textColor="@color/text_secondary"
+                    android:layout_gravity="center_vertical" />
+            </LinearLayout>
+
+            <!-- Start Address -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="4dp">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@android:drawable/ic_menu_mylocation"
+                    app:tint="@color/colorPrimary" />
+
+                <TextView
+                    android:id="@+id/start_address"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="From: Address"
+                    android:textSize="14sp"
+                    android:textColor="@color/text_secondary"
+                    android:ellipsize="end"
+                    android:maxLines="1" />
+            </LinearLayout>
+
+            <!-- End Address -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@android:drawable/ic_menu_mapmode"
+                    app:tint="@color/colorAccent" />
+
+                <TextView
+                    android:id="@+id/end_address"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="To: Address"
+                    android:textSize="14sp"
+                    android:textColor="@color/text_secondary"
+                    android:ellipsize="end"
+                    android:maxLines="1" />
+            </LinearLayout>
+
+            <!-- Start Time -->
+            <TextView
+                android:id="@+id/start_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Started: Time"
+                android:textSize="12sp"
+                android:textColor="@color/text_secondary"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Details Button -->
+            <Button
+                android:id="@+id/btn_details"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="View Details"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+        </LinearLayout>
+
+        <!-- Expanded View -->
+        <LinearLayout
+            android:id="@+id/ll_expanded_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:padding="16dp"
+            android:background="@android:color/white">
+
+            <!-- Map View -->
+            <org.osmdroid.views.MapView
+                android:id="@+id/map_view"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Active Ride Details Content -->
+            <include layout="@layout/layout_active_ride_details" />
+
+            <!-- Hide Details Button -->
+            <Button
+                android:id="@+id/btn_hide_details"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Hide Details"
+                style="@style/Widget.MaterialComponents.Button.TextButton"/>
+        </LinearLayout>
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>
+
