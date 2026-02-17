@@ -16,6 +16,7 @@ import com.ognjen.fleetforge.dtos.passenger.PassengerChangeInformationResponseDT
 import com.ognjen.fleetforge.dtos.passenger.PassengerGetResponseDTO;
 import com.ognjen.fleetforge.dtos.passenger.PassengerRideDetailsDto;
 import com.ognjen.fleetforge.dtos.passenger.PassengerRideHistoryDto;
+import com.ognjen.fleetforge.dtos.ride.ScheduledRideDto;
 import com.ognjen.fleetforge.model.FavoriteRoute;
 import com.ognjen.fleetforge.utils.FileUtil;
 
@@ -54,8 +55,7 @@ public class PassengerRepo {
         });
         return data;
     }
-
-    public LiveData<PassengerGetResponseDTO> getLoggedPassenger(){
+        public LiveData<PassengerGetResponseDTO> getLoggedPassenger(){
             MutableLiveData<PassengerGetResponseDTO> data=new MutableLiveData<>();
             service.getLoggedPassenger().enqueue(new Callback<PassengerGetResponseDTO>() {
                 @Override

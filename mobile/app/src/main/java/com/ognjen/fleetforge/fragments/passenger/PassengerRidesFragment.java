@@ -63,7 +63,7 @@ public class PassengerRidesFragment extends Fragment {
             if (position == 0) {
                 return new PassengerHistoryFragment();
             } else {
-                return PlaceholderFragment.newInstance("Scheduled rides");
+                return new ScheduledRidesFragment();
             }
         }
 

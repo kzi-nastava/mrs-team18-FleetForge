@@ -6,9 +6,11 @@ import androidx.lifecycle.MutableLiveData;
 import com.google.gson.Gson;
 import com.ognjen.fleetforge.api.RetrofitClient;
 import com.ognjen.fleetforge.api.RideService;
+import com.ognjen.fleetforge.dtos.common.PageResponse;
 import com.ognjen.fleetforge.dtos.ride.RideCreateRequestDTO;
 import com.ognjen.fleetforge.dtos.ride.RideCreateResponseDTO;
 import com.ognjen.fleetforge.dtos.ride.RideStartResponseDTO;
+import com.ognjen.fleetforge.dtos.ride.ScheduledRideDto;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -69,4 +71,28 @@ public class RideRepo {
         });
         return data;
     }
+
+
+    public LiveData<PageResponse<ScheduledRideDto>> getScheduledRides(int page, int size) {
+        MutableLiveData<PageResponse<ScheduledRideDto>> data = new MutableLiveData<>();
+
+        service.getScheduledRides(page, size).enqueue(new Callback<PageResponse<ScheduledRideDto>>() {
+            @Override
+            public void onResponse(Call<PageResponse<ScheduledRideDto>> call, Response<PageResponse<ScheduledRideDto>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    data.setValue(response.body());
+                } else {
+                    data.setValue(null);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<PageResponse<ScheduledRideDto>> call, Throwable t) {
+                data.setValue(null);
+            }
+        });
+
+        return data;
+    }
+
 }
