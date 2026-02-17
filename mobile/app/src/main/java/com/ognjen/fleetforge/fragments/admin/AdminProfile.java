@@ -169,6 +169,17 @@ public class AdminProfile extends Fragment {
                     .addToBackStack(null)
                     .commit();
         });
+
+        Button priceManagement = view.findViewById(R.id.priceManagementBtn);
+        priceManagement.setOnClickListener(v -> {
+            Fragment priceManagementFrag = new PriceManagement();
+            requireActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, priceManagementFrag)
+                    .addToBackStack(null)
+                    .commit();
+        });
+
         return view;
     }
 }
