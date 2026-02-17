@@ -11,7 +11,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.ognjen.fleetforge.BuildConfig;
 import com.ognjen.fleetforge.R;
+import com.ognjen.fleetforge.api.RoutingService;
 import com.ognjen.fleetforge.dtos.driver.CompletedRideDTO;
 import com.ognjen.fleetforge.utils.MapManager;
 
@@ -27,9 +29,13 @@ public class RideHistoryAdapter extends RecyclerView.Adapter<RideHistoryAdapter.
     private List<CompletedRideDTO> rideList;
     private Context context;
     private int expandedPosition = -1;
+    private final RoutingService routingService;
+    private static final String MAPBOX_API_KEY = BuildConfig.MAPBOX_API_KEY;
+
 
     public RideHistoryAdapter(List<CompletedRideDTO> rideList) {
         this.rideList = rideList != null ? rideList : new ArrayList<>();
+        this.routingService = new RoutingService(MAPBOX_API_KEY);
     }
 
     @NonNull
@@ -163,56 +169,66 @@ public class RideHistoryAdapter extends RecyclerView.Adapter<RideHistoryAdapter.
         }
 
         private void setupMap(CompletedRideDTO ride) {
-            mapManager.clearAll();
+            MapManager mm = this.mapManager;
+            mm.clearAll();
 
-            if (ride.getPickupCoords() != null && ride.getDropoffCoords() != null) {
-                GeoPoint startPoint = new GeoPoint(
-                        ride.getPickupLatitude(),
-                        ride.getPickupLongitude()
-                );
-                mapManager.addMarker(
-                        startPoint.getLatitude(),
-                        startPoint.getLongitude(),
-                        "Start: " + ride.getPickupAddress(),
-                        R.drawable.ic_map_point
-                );
+            if (ride.getPickupLatitude() == 0 || ride.getPickupLongitude() == 0) {
+                mm.centerOnDefault();
+                return;
+            }
 
-                GeoPoint endPoint = new GeoPoint(
-                        ride.getDropoffLatitude(),
-                        ride.getDropoffLongitude()
-                );
-                mapManager.addMarker(
-                        endPoint.getLatitude(),
-                        endPoint.getLongitude(),
-                        "End: " + ride.getDropoffAddress(),
-                        R.drawable.ic_map_point
-                );
+            double startLat = ride.getPickupLatitude();
+            double startLon = ride.getPickupLongitude();
+            double endLat   = ride.getDropoffLatitude();
+            double endLon   = ride.getDropoffLongitude();
 
-                List<GeoPoint> routePoints = new ArrayList<>();
-                routePoints.add(startPoint);
+            mm.addMarker(startLat, startLon, "Start: " + ride.getPickupAddress(), R.drawable.ic_map_point);
+            mm.addMarker(endLat, endLon, "End: " + ride.getDropoffAddress(), R.drawable.ic_map_point);
 
-                // Add waypoints if they exist
-                if (ride.getWaypoints() != null && !ride.getWaypoints().isEmpty()) {
-                    for (List<Double> waypoint : ride.getWaypoints()) {
-                        if (waypoint.size() >= 2) {
-                            routePoints.add(new GeoPoint(waypoint.get(0), waypoint.get(1)));
-                        }
+            double centerLat = (startLat + endLat) / 2;
+            double centerLon = (startLon + endLon) / 2;
+            mapView.getController().setZoom(13.0);
+            mapView.getController().setCenter(new org.osmdroid.util.GeoPoint(centerLat, centerLon));
+
+            List<com.ognjen.fleetforge.model.GeoPoint> routePoints = new ArrayList<>();
+            routePoints.add(new com.ognjen.fleetforge.model.GeoPoint(startLat, startLon));
+
+            if (ride.getWaypoints() != null) {
+                for (List<Double> wp : ride.getWaypoints()) {
+                    if (wp.size() >= 2) {
+                        routePoints.add(new com.ognjen.fleetforge.model.GeoPoint(wp.get(0), wp.get(1)));
                     }
                 }
-
-                routePoints.add(endPoint);
-
-                int colorPrimary = context.getResources().getColor(R.color.colorPrimary);
-                mapManager.drawRoute(routePoints, colorPrimary);
-
-                double centerLat = (startPoint.getLatitude() + endPoint.getLatitude()) / 2;
-                double centerLon = (startPoint.getLongitude() + endPoint.getLongitude()) / 2;
-
-                mapView.getController().setZoom(13.0);
-                mapView.getController().setCenter(new GeoPoint(centerLat, centerLon));
-            } else {
-                mapManager.centerOnDefault();
             }
+
+            routePoints.add(new com.ognjen.fleetforge.model.GeoPoint(endLat, endLon));
+
+            new Thread(() -> {
+                try {
+                    var calculatedRoute = routingService.calculateRoute(routePoints);
+
+                    new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+                        List<org.osmdroid.util.GeoPoint> osmPoints = new ArrayList<>();
+                        for (com.ognjen.fleetforge.model.GeoPoint pt : calculatedRoute.getCoordinates()) {
+                            osmPoints.add(new org.osmdroid.util.GeoPoint(pt.getLatitude(), pt.getLongitude()));
+                        }
+
+                        int colorPrimary = context.getResources().getColor(R.color.colorPrimary);
+                        mm.drawRoute(osmPoints, colorPrimary);
+                        mapView.invalidate();
+                    });
+
+                } catch (Exception e) {
+                    new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+                        List<org.osmdroid.util.GeoPoint> fallback = new ArrayList<>();
+                        fallback.add(new org.osmdroid.util.GeoPoint(startLat, startLon));
+                        fallback.add(new org.osmdroid.util.GeoPoint(endLat, endLon));
+                        int colorPrimary = context.getResources().getColor(R.color.colorPrimary);
+                        mm.drawRoute(fallback, colorPrimary);
+                        mapView.invalidate();
+                    });
+                }
+            }).start();
         }
 
         private void setupPassengers(CompletedRideDTO ride) {

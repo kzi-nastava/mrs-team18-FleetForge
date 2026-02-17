@@ -17,13 +17,13 @@ import com.bumptech.glide.Glide;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.ognjen.fleetforge.BuildConfig;
 import com.ognjen.fleetforge.R;
+import com.ognjen.fleetforge.api.RoutingService;
 import com.ognjen.fleetforge.dtos.passenger.PassengerRideDetailsDto;
 import com.ognjen.fleetforge.dtos.passenger.PassengerRideHistoryDto;
+import com.ognjen.fleetforge.model.CalculatedRoute;
 import com.ognjen.fleetforge.utils.MapManager;
 
-import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.Marker;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -37,6 +37,8 @@ import java.util.Set;
 public class PassengerHistoryAdapter extends ArrayAdapter<PassengerRideHistoryDto> {
     private static final String BaseUrl = "http://" + BuildConfig.IP_ADDR + ":8080";
 
+    private final RoutingService routingService;
+    private static final String MAPBOX_API_KEY = BuildConfig.MAPBOX_API_KEY;
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("MMM dd, yyyy", Locale.getDefault());
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("hh:mm a", Locale.getDefault());
 
@@ -53,6 +55,7 @@ public class PassengerHistoryAdapter extends ArrayAdapter<PassengerRideHistoryDt
 
     public PassengerHistoryAdapter(Context context, ArrayList<PassengerRideHistoryDto> data) {
         super(context, R.layout.passenger_history_card, data);
+        this.routingService = new RoutingService(MAPBOX_API_KEY);
     }
 
     public void setOnActionListener(OnActionListener listener) {
@@ -82,7 +85,6 @@ public class PassengerHistoryAdapter extends ArrayAdapter<PassengerRideHistoryDt
 
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.passenger_history_card, parent, false);
-            // Pass context to ViewHolder for MapManager initialization
             holder = new ViewHolder(convertView, getContext());
             convertView.setTag(holder);
         } else {
@@ -294,6 +296,10 @@ public class PassengerHistoryAdapter extends ArrayAdapter<PassengerRideHistoryDt
             } catch (Exception e) {
                 holder.detailDateTime.setText("-");
             }
+
+            if (holder.mapManager != null) {
+                setupMap(holder, detailedData);
+            }
         }
 
     }
@@ -302,30 +308,55 @@ public class PassengerHistoryAdapter extends ArrayAdapter<PassengerRideHistoryDt
         MapManager mm = holder.mapManager;
         mm.clearAll();
 
-        if (details.getStartLocation() != null && details.getEndLocation() != null) {
-            double startLat = details.getStartLocation().latitude;
-            double startLon = details.getStartLocation().longitude;
-            double endLat = details.getEndLocation().latitude;
-            double endLon = details.getEndLocation().longitude;
-
-            mm.addMarker(startLat, startLon, "Start: " + details.getStartAddress(), R.drawable.ic_map_point);
-            mm.addMarker(endLat, endLon, "End: " + details.getEndAddress(), R.drawable.ic_map_point);
-
-            List<GeoPoint> routePoints = new ArrayList<>();
-            routePoints.add(new GeoPoint(startLat, startLon));
-
-            routePoints.add(new GeoPoint(endLat, endLon));
-
-            int colorPrimary = getContext().getResources().getColor(R.color.colorPrimary);
-            mm.drawRoute(routePoints, colorPrimary);
-
-            double centerLat = (startLat + endLat) / 2;
-            double centerLon = (startLon + endLon) / 2;
-            holder.mapView.getController().setZoom(13.0);
-            holder.mapView.getController().setCenter(new GeoPoint(centerLat, centerLon));
-        } else {
+        if (details.getStartLocation() == null || details.getEndLocation() == null) {
             mm.centerOnDefault();
+            return;
         }
+
+        double startLat = details.getStartLocation().latitude;
+        double startLon = details.getStartLocation().longitude;
+        double endLat   = details.getEndLocation().latitude;
+        double endLon   = details.getEndLocation().longitude;
+
+        mm.addMarker(startLat, startLon, "Start: " + details.getStartAddress(), R.drawable.ic_map_point);
+        mm.addMarker(endLat,   endLon,   "End: "   + details.getEndAddress(),   R.drawable.ic_map_point);
+
+        double centerLat = (startLat + endLat) / 2;
+        double centerLon = (startLon + endLon) / 2;
+        holder.mapView.getController().setZoom(13.0);
+        holder.mapView.getController().setCenter(
+                new org.osmdroid.util.GeoPoint(centerLat, centerLon));
+
+        List<com.ognjen.fleetforge.model.GeoPoint> routePoints = new ArrayList<>();
+        routePoints.add(new com.ognjen.fleetforge.model.GeoPoint(startLat, startLon));
+        routePoints.add(new com.ognjen.fleetforge.model.GeoPoint(endLat,   endLon));
+
+        new Thread(() -> {
+            try {
+                CalculatedRoute calculatedRoute = routingService.calculateRoute(routePoints);
+
+                new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+                    List<org.osmdroid.util.GeoPoint> osmPoints = new ArrayList<>();
+                    for (com.ognjen.fleetforge.model.GeoPoint pt : calculatedRoute.getCoordinates()) {
+                        osmPoints.add(new org.osmdroid.util.GeoPoint(
+                                pt.getLatitude(), pt.getLongitude()));
+                    }
+
+                    int colorPrimary = getContext().getResources().getColor(R.color.colorPrimary);
+                    mm.drawRoute(osmPoints, colorPrimary);
+                    holder.mapView.invalidate();
+                });
+
+            } catch (Exception e) {
+                new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+                    List<org.osmdroid.util.GeoPoint> fallback = new ArrayList<>();
+                    fallback.add(new org.osmdroid.util.GeoPoint(startLat, startLon));
+                    fallback.add(new org.osmdroid.util.GeoPoint(endLat,   endLon));
+                    int colorPrimary = getContext().getResources().getColor(R.color.colorPrimary);
+                    mm.drawRoute(fallback, colorPrimary);
+                });
+            }
+        }).start();
     }
 
     private int getStatusColor(String status) {
@@ -334,20 +365,6 @@ public class PassengerHistoryAdapter extends ArrayAdapter<PassengerRideHistoryDt
             case "CANCELLED": return Color.parseColor("#F44336");
             default: return Color.GRAY;
         }
-    }
-
-    private void setupMiniMap(MapView map, PassengerRideDetailsDto details) {
-        map.setMultiTouchControls(true);
-        map.getController().setZoom(15.0);
-        GeoPoint startPoint = new GeoPoint(details.getStartLocation().latitude, details.getStartLocation().longitude);
-        map.getController().setCenter(startPoint);
-
-        map.getOverlays().clear(); // Clear old markers
-        Marker startMarker = new Marker(map);
-        startMarker.setPosition(startPoint);
-        startMarker.setTitle("Start");
-        map.getOverlays().add(startMarker);
-        map.invalidate(); // Refresh map
     }
 
     private static class ViewHolder {
