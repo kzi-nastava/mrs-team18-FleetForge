@@ -3,12 +3,15 @@ package com.ognjen.fleetforge.fragments.passenger;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.ognjen.fleetforge.api.RetrofitClient;
 import com.ognjen.fleetforge.api.RideService;
+import com.ognjen.fleetforge.dtos.ride.RidePanicResponseDTO;
 import com.ognjen.fleetforge.dtos.ride.RideTrackingDTO;
+import com.ognjen.fleetforge.repository.RideRepo;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -18,12 +21,16 @@ public class CurrentRidePassengerViewModel extends ViewModel {
 
     private static final String TAG = "CurrentRidePassengerVM";
     private final RideService rideService;
+    private final RideRepo repo;
     private final MutableLiveData<RideTrackingDTO> rideTrackingData = new MutableLiveData<>();
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
     private final MutableLiveData<Boolean> noActiveRide = new MutableLiveData<>();
+    private final MediatorLiveData<RidePanicResponseDTO> panicLiveData = new MediatorLiveData<>();
+
 
     public CurrentRidePassengerViewModel() {
         this.rideService = RetrofitClient.getInstance().getRideService();
+        this.repo= new RideRepo();
     }
 
     public LiveData<RideTrackingDTO> getRideTrackingData() {
@@ -37,6 +44,8 @@ public class CurrentRidePassengerViewModel extends ViewModel {
     public LiveData<Boolean> getNoActiveRide() {
         return noActiveRide;
     }
+
+    public LiveData<RidePanicResponseDTO> getPanicObservable() { return panicLiveData; }
 
     public void fetchActiveRideTracking() {
         Call<RideTrackingDTO> call = rideService.getActiveRideTracking();
@@ -62,4 +71,13 @@ public class CurrentRidePassengerViewModel extends ViewModel {
             }
         });
     }
+
+    public void triggerPanic(Long rideId) {
+        LiveData<RidePanicResponseDTO> source = repo.triggerPanic(rideId);
+        panicLiveData.addSource(source, response -> {
+            panicLiveData.setValue(response);
+            panicLiveData.removeSource(source);
+        });
+    }
+
 }

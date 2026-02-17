@@ -11,6 +11,7 @@ import com.ognjen.fleetforge.dtos.common.PageResponse;
 import com.ognjen.fleetforge.dtos.ride.CancellationRequest;
 import com.ognjen.fleetforge.dtos.ride.RideCreateRequestDTO;
 import com.ognjen.fleetforge.dtos.ride.RideCreateResponseDTO;
+import com.ognjen.fleetforge.dtos.ride.RidePanicResponseDTO;
 import com.ognjen.fleetforge.dtos.ride.RideStartResponseDTO;
 import com.ognjen.fleetforge.dtos.ride.ScheduledRideDto;
 
@@ -143,4 +144,28 @@ public class RideRepo {
         });
         return data;
     }
+
+    public LiveData<RidePanicResponseDTO> triggerPanic(Long rideId) {
+        MutableLiveData<RidePanicResponseDTO> data = new MutableLiveData<>();
+
+        service.triggerPanic(rideId).enqueue(new Callback<RidePanicResponseDTO>() {
+            @Override
+            public void onResponse(Call<RidePanicResponseDTO> call,
+                                   Response<RidePanicResponseDTO> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    data.setValue(response.body());
+                } else {
+                    data.setValue(null);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<RidePanicResponseDTO> call, Throwable t) {
+                data.setValue(null);
+            }
+        });
+
+        return data;
+    }
+
 }

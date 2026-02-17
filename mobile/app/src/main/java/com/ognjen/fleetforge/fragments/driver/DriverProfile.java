@@ -23,6 +23,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
@@ -63,6 +64,8 @@ public class DriverProfile extends Fragment {
     private TextInputEditText passengers;
     private MaterialCheckBox babySeat;
     private MaterialCheckBox petFriendly;
+    private MaterialButton btnGoOnlineOffline;
+    private boolean isOnline = false;
 
     private Button changeDriver;
     private Button changeVehicle;
@@ -122,14 +125,17 @@ public class DriverProfile extends Fragment {
         dropDown.setAdapter(adapter);
 
         Button logout=view.findViewById(R.id.btn_logout);
-        logout.setOnClickListener(v -> {authManager.logout();
 
-            Intent serviceIntent = new Intent(requireContext(), WebSocketService.class);
-            requireActivity().stopService(serviceIntent);
-            Intent intent = new Intent(getActivity(), MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            requireActivity().finish();});
+        logout.setOnClickListener(v -> {
+            if (isOnline) {
+                driverProfileViewModel.goOffline().observe(getViewLifecycleOwner(), success -> {
+                    AuthManager.getInstance().saveSessionId(-1);
+                    proceedLogout();
+                });
+            } else {
+                proceedLogout();
+            }
+        });
 
         Button resetPass=view.findViewById(R.id.resetPassBtn);
         resetPass.setOnClickListener(v -> {
@@ -226,6 +232,37 @@ public class DriverProfile extends Fragment {
                     .addToBackStack(null)
                     .commit();
         });
+
+        btnGoOnlineOffline = view.findViewById(R.id.btn_go_online_offline);
+
+        isOnline = authManager.getSessionId() != -1;
+        updateOnlineButtonText();
+
+        btnGoOnlineOffline.setOnClickListener(v -> {
+            if (!isOnline) {
+                driverProfileViewModel.goOnline().observe(getViewLifecycleOwner(), sessionId -> {
+                    if (sessionId != null) {
+                        isOnline = true;
+                        updateOnlineButtonText();
+                        Toast.makeText(getContext(), "You are now online", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getContext(), "Failed to go online", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            } else {
+                driverProfileViewModel.goOffline().observe(getViewLifecycleOwner(), success -> {
+                    if (success != null && success) {
+                        AuthManager.getInstance().saveSessionId(-1); // clear session
+                        isOnline = false;
+                        updateOnlineButtonText();
+                        Toast.makeText(getContext(), "You are now offline", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getContext(), "Failed to go offline", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
+
         return view;
     }
     private void showBlockedDialog(String reason) {
@@ -237,5 +274,19 @@ public class DriverProfile extends Fragment {
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setCancelable(false)
                 .show();
+    }
+
+    private void updateOnlineButtonText() {
+        btnGoOnlineOffline.setText(isOnline ? "Go Offline" : "Go Online");
+    }
+
+    private void proceedLogout() {
+        authManager.logout();
+        Intent serviceIntent = new Intent(requireContext(), WebSocketService.class);
+        requireActivity().stopService(serviceIntent);
+        Intent intent = new Intent(getActivity(), MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        requireActivity().finish();
     }
 }

@@ -3,11 +3,14 @@ package com.ognjen.fleetforge.fragments.driver;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 
 import com.ognjen.fleetforge.dtos.ride.CancellationRequest;
 import com.ognjen.fleetforge.dtos.ride.FinishRideResponseDTO;
+import com.ognjen.fleetforge.dtos.ride.RidePanicResponseDTO;
 import com.ognjen.fleetforge.dtos.ride.RideStartResponseDTO;
 import com.ognjen.fleetforge.repository.RideRepo;
 import com.ognjen.fleetforge.utils.SingleLiveEvent;
@@ -22,8 +25,9 @@ public class CurrentRideDriverViewModel extends ViewModel {
     private final RideRepo repo;
 
     private final MutableLiveData<RideStartResponseDTO> startRideLiveData = new MutableLiveData<>();
-    private final SingleLiveEvent<FinishRideResponseDTO> finishRideLiveData = new SingleLiveEvent<>();
-    private final SingleLiveEvent<Boolean> cancelRideResult = new SingleLiveEvent<>();
+    private final MediatorLiveData<FinishRideResponseDTO> finishRideLiveData = new MediatorLiveData<>();
+    private final MediatorLiveData<Boolean> cancelRideResult = new MediatorLiveData<>();
+    private final MediatorLiveData<RidePanicResponseDTO> panicLiveData = new MediatorLiveData<>();
 
     public CurrentRideDriverViewModel(){
         this.repo= new RideRepo();
@@ -32,20 +36,32 @@ public class CurrentRideDriverViewModel extends ViewModel {
     public LiveData<FinishRideResponseDTO> getFinishRideObservable() {
         return finishRideLiveData;
     }
-
     public LiveData<Boolean> getCancelRideObservable() { return cancelRideResult; }
+    public LiveData<RidePanicResponseDTO> getPanicObservable() { return panicLiveData; }
 
     public LiveData<RideStartResponseDTO> startRide(Long id) { return repo.startRide(id); }
 
     public void cancelRide(Long rideId, String reason) {
-        repo.cancelRide(rideId, reason).observeForever(success -> {
+        LiveData<Boolean> source = repo.cancelRide(rideId, reason);
+        cancelRideResult.addSource(source, success -> {
             cancelRideResult.setValue(success);
+            cancelRideResult.removeSource(source);
         });
     }
 
     public void finishRide(Long rideId) {
-        repo.finishRide(rideId).observeForever(result -> {
+        LiveData<FinishRideResponseDTO> source = repo.finishRide(rideId);
+        finishRideLiveData.addSource(source, result -> {
             finishRideLiveData.setValue(result);
+            finishRideLiveData.removeSource(source);
+        });
+    }
+
+    public void triggerPanic(Long rideId) {
+        LiveData<RidePanicResponseDTO> source = repo.triggerPanic(rideId);
+        panicLiveData.addSource(source, response -> {
+            panicLiveData.setValue(response);
+            panicLiveData.removeSource(source);
         });
     }
 

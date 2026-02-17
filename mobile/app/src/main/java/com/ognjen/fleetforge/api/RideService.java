@@ -13,6 +13,7 @@ import com.ognjen.fleetforge.dtos.ride.InconsistencyReportRequestDTO;
 import com.ognjen.fleetforge.dtos.ride.InconsistencyReportResponseDTO;
 import com.ognjen.fleetforge.dtos.ride.RideCreateRequestDTO;
 import com.ognjen.fleetforge.dtos.ride.RideCreateResponseDTO;
+import com.ognjen.fleetforge.dtos.ride.RidePanicResponseDTO;
 import com.ognjen.fleetforge.dtos.ride.RideReviewRequestDTO;
 import com.ognjen.fleetforge.dtos.ride.RideReviewResponseDTO;
 import com.ognjen.fleetforge.dtos.ride.RideStartResponseDTO;
@@ -95,4 +96,10 @@ public interface RideService {
 
     @GET("/api/rides/active/{rideId}")
     Call<ActiveRideDetailsDTO> getActiveRideDetails(@Path("rideId") Long rideId);
+
+    @POST("/api/rides/{rideId}/panic")
+    Call<RidePanicResponseDTO> triggerPanic(
+            @Path("rideId") Long rideId
+    );
+
 }

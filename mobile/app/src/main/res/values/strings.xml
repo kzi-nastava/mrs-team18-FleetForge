@@ -48,6 +48,7 @@
     <string name="distance_0_km">Distance: 0 km</string>
     <string name="username">Username</string>
     <string name="resolve_panic">RESOLVE PANIC</string>
+    <string name="go_online">Go Online</string>
     <string-array name="vehicle_types">
         <item>Van</item>
         <item>Luxury</item>
