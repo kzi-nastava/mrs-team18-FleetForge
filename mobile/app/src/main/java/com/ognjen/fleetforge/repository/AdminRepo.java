@@ -8,6 +8,9 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.ognjen.fleetforge.api.AdminService;
 import com.ognjen.fleetforge.api.RetrofitClient;
+import com.ognjen.fleetforge.api.RideService;
+import com.ognjen.fleetforge.dtos.admin.ActiveRideDTO;
+import com.ognjen.fleetforge.dtos.admin.ActiveRideDetailsDTO;
 import com.ognjen.fleetforge.dtos.admin.AdminChangeInformationRequestDTO;
 import com.ognjen.fleetforge.dtos.admin.AdminChangeInformationResponseDTO;
 import com.ognjen.fleetforge.dtos.admin.AdminDriverVehicleChangeStatusResponseDTO;
@@ -36,9 +39,11 @@ import retrofit2.Response;
 
 public class AdminRepo {
     private AdminService service;
+    private RideService rideService;
 
     public AdminRepo(){
         service= RetrofitClient.getInstance().getAdminService();
+        rideService = RetrofitClient.getInstance().getRideService();
     }
 
     public LiveData<ArrayList<AdminViewDriverChangesResponseDTO>> getAllDriversChanges(){
@@ -313,6 +318,50 @@ public class AdminRepo {
 
             @Override
             public void onFailure(Call<List<String>> call, Throwable t) {
+                data.setValue(null);
+            }
+        });
+
+        return data;
+    }
+
+    public LiveData<List<ActiveRideDTO>> getAllActiveRides() {
+        MutableLiveData<List<ActiveRideDTO>> data = new MutableLiveData<>();
+
+        rideService.getAllActiveRides().enqueue(new Callback<List<ActiveRideDTO>>() {
+            @Override
+            public void onResponse(Call<List<ActiveRideDTO>> call, Response<List<ActiveRideDTO>> response) {
+                if (response.isSuccessful()) {
+                    data.setValue(response.body());
+                } else {
+                    data.setValue(null);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<ActiveRideDTO>> call, Throwable t) {
+                data.setValue(null);
+            }
+        });
+
+        return data;
+    }
+
+    public LiveData<ActiveRideDetailsDTO> getActiveRideDetails(Long rideId) {
+        MutableLiveData<ActiveRideDetailsDTO> data = new MutableLiveData<>();
+
+        rideService.getActiveRideDetails(rideId).enqueue(new Callback<ActiveRideDetailsDTO>() {
+            @Override
+            public void onResponse(Call<ActiveRideDetailsDTO> call, Response<ActiveRideDetailsDTO> response) {
+                if (response.isSuccessful()) {
+                    data.setValue(response.body());
+                } else {
+                    data.setValue(null);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ActiveRideDetailsDTO> call, Throwable t) {
                 data.setValue(null);
             }
         });
