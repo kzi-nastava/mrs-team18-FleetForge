@@ -1,5 +1,7 @@
 package com.ognjen.fleetforge.api;
 
+import com.ognjen.fleetforge.dtos.admin.ActiveRideDTO;
+import com.ognjen.fleetforge.dtos.admin.ActiveRideDetailsDTO;
 import com.ognjen.fleetforge.dtos.common.PageResponse;
 import com.ognjen.fleetforge.dtos.driver.DriverLocationUpdateRequestDTO;
 import com.ognjen.fleetforge.dtos.driver.DriverLocationUpdateResponseDTO;
@@ -14,6 +16,8 @@ import com.ognjen.fleetforge.dtos.ride.RideReviewResponseDTO;
 import com.ognjen.fleetforge.dtos.ride.RideStartResponseDTO;
 import com.ognjen.fleetforge.dtos.ride.RideTrackingDTO;
 import com.ognjen.fleetforge.dtos.ride.ScheduledRideDto;
+
+import java.util.List;
 
 
 import retrofit2.Call;
@@ -64,4 +68,10 @@ public interface RideService {
     Call<InconsistencyReportResponseDTO> reportInconsistency(
             @Body InconsistencyReportRequestDTO request
     );
+
+    @GET("/api/rides/active")
+    Call<List<ActiveRideDTO>> getAllActiveRides();
+
+    @GET("/api/rides/active/{rideId}")
+    Call<ActiveRideDetailsDTO> getActiveRideDetails(@Path("rideId") Long rideId);
 }
