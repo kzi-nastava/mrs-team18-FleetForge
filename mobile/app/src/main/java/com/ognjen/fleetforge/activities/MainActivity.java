@@ -3,8 +3,13 @@ package com.ognjen.fleetforge.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
 import com.ognjen.fleetforge.fragments.admin.AdminChatFragment;
@@ -51,6 +56,13 @@ public class MainActivity extends AppCompatActivity {
         loadInitialFragment();
 
         getWindow().setDecorFitsSystemWindows(false);
+        View mainView = findViewById(R.id.bottom_navigation).getRootView();
+
+        ViewCompat.setOnApplyWindowInsetsListener(mainView, (v, windowInsets) -> {
+            Insets systemBars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return windowInsets;
+        });
     }
 
     private void setupBottomNavigation() {

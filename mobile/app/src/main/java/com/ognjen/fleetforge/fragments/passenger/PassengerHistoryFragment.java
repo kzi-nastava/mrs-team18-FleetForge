@@ -8,6 +8,8 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -171,6 +173,21 @@ public class PassengerHistoryFragment extends Fragment implements SensorEventLis
         return view;
     }
 
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        viewModel.getRides().observe(getViewLifecycleOwner(), response -> {
+            if (response != null && response.getContent() != null) {
+                rides.clear();
+                rides.addAll(response.getContent());
+                adapter.notifyDataSetChanged();
+                updatePaginationUI(response);
+            }
+        });
+    }
+
+
     private String formatToApiTimestamp(String date) {
         if (date == null || date.isEmpty()) return null;
         return date + "T00:00:00.000Z";
@@ -205,13 +222,7 @@ public class PassengerHistoryFragment extends Fragment implements SensorEventLis
     }
 
     private void loadRides() {
-        viewModel.getRides(dateFrom, dateTo, currentSortBy, currentDirection).observe(getViewLifecycleOwner(), response -> {    if (response != null && response.getContent() != null) {
-                rides.clear();
-                rides.addAll(response.getContent());
-                adapter.notifyDataSetChanged();
-                updatePaginationUI(response);
-            }
-        });
+        viewModel.fetchRides(dateFrom, dateTo, currentSortBy, currentDirection);
     }
 
     private void updatePaginationUI(PageResponse<?> response) {
@@ -310,9 +321,6 @@ public class PassengerHistoryFragment extends Fragment implements SensorEventLis
                         btnDirection.setImageResource(isAscending ? android.R.drawable.arrow_up_float : android.R.drawable.arrow_down_float);
 
                         refreshRides();
-                        viewModel.resetPage();
-
-                        loadRides();
 
                         Toast.makeText(getContext(),
                                 "Sorted by Start Time",
