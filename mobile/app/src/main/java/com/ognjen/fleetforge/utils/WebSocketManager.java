@@ -113,11 +113,14 @@ public class WebSocketManager {
 
     public void subscribeToNotifications() {
         String topicPath = "/user/queue/notifications";
+        Log.d(TAG, "📡 Subscribing to: " + topicPath);
 
         Disposable topic = stomp.topic(topicPath)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(topicMessage -> {
+                    Log.d(TAG, "✅ NOTIFICATION RECEIVED via WebSocket");
+                    Log.d(TAG, "📦 Payload: " + topicMessage.getPayload());
                     handleNotificationMessage(topicMessage.getPayload());
                 }, throwable -> {
                     Log.e(TAG, "❌ Error subscribing to notifications", throwable);
@@ -182,9 +185,8 @@ public class WebSocketManager {
     private void handleNotificationMessage(String payload) {
         try {
             NotificationDTO notification = gson.fromJson(payload, NotificationDTO.class);
-            notificationData.postValue(notification);
         } catch (Exception e) {
-            Log.e(TAG, "Error parsing notification message", e);
+            Log.e(TAG, "❌ Error parsing notification", e);
         }
     }
 
