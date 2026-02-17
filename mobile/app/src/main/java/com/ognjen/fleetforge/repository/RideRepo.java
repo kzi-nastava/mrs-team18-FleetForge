@@ -12,6 +12,9 @@ import com.ognjen.fleetforge.dtos.ride.RideCreateResponseDTO;
 import com.ognjen.fleetforge.dtos.ride.RideStartResponseDTO;
 import com.ognjen.fleetforge.dtos.ride.ScheduledRideDto;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -94,5 +97,27 @@ public class RideRepo {
 
         return data;
     }
+
+    public LiveData<Boolean> cancelRide(Long rideId) {
+        MutableLiveData<Boolean> result = new MutableLiveData<>();
+
+        Map<String, String> body = new HashMap<>();
+        body.put("reason", "Passenger cancelled");
+
+        service.cancelRide(rideId, body).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                result.postValue(response.isSuccessful());
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                result.postValue(false);
+            }
+        });
+
+        return result;
+    }
+
 
 }

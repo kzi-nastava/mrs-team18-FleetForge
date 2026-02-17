@@ -42,7 +42,14 @@ public class ScheduledRidesFragment extends Fragment {
         scheduledList.setAdapter(adapter);
 
         adapter.setOnCancelListener(ride -> {
-            Toast.makeText(getContext(), "Cancel requested for Ride ID: " + ride.getId(), Toast.LENGTH_SHORT).show();
+            new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                    .setTitle("Cancel Ride")
+                    .setMessage("Are you sure you want to cancel this scheduled ride?")
+                    .setPositiveButton("Yes", (dialog, which) -> {
+                        viewModel.cancelRide(ride.getId());
+                    })
+                    .setNegativeButton("No", null)
+                    .show();
         });
 
         loadRides();
@@ -55,6 +62,22 @@ public class ScheduledRidesFragment extends Fragment {
         btnPrev.setOnClickListener(v -> {
             viewModel.prevPage();
             loadRides();
+        });
+
+        viewModel.getCancelResult().observe(getViewLifecycleOwner(), success -> {
+            if (success != null) {
+                if (success) {
+                    Toast.makeText(getContext(),
+                            "Ride cancelled successfully",
+                            Toast.LENGTH_SHORT).show();
+
+                    loadRides();
+                } else {
+                    Toast.makeText(getContext(),
+                            "Failed to cancel ride",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
         });
 
         return view;

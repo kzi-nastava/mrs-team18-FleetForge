@@ -10,6 +10,8 @@ import com.ognjen.fleetforge.dtos.ride.RideStartResponseDTO;
 import com.ognjen.fleetforge.dtos.ride.RideTrackingDTO;
 import com.ognjen.fleetforge.dtos.ride.ScheduledRideDto;
 
+import java.util.Map;
+
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -40,5 +42,11 @@ public interface RideService {
     Call<PageResponse<ScheduledRideDto>> getScheduledRides(
             @Query("page") int page,
             @Query("size") int size
+    );
+
+    @POST("/api/rides/{rideId}/cancellations")
+    Call<Void> cancelRide(
+            @Path("rideId") Long rideId,
+            @Body Map<String, String> body
     );
 }

@@ -578,7 +578,41 @@ public class CurrentRideDriver extends Fragment {
     }
 
     private void onSecondaryActionClick() {
-        Toast.makeText(requireContext(), "Secondary action clicked", Toast.LENGTH_SHORT).show();
+        String currentText = btnSecondaryAction.getText().toString();
+
+        if ("Cancel".equalsIgnoreCase(currentText)) {
+            showCancelConfirmationDialog();
+        } else if ("SOS".equalsIgnoreCase(currentText)) {
+            Toast.makeText(requireContext(), "Emergency SOS triggered!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void showCancelConfirmationDialog() {
+        if (currentRide == null) return;
+
+        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle("Cancel Ride")
+                .setMessage("Are you sure you want to cancel this ride?")
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    performCancelRide();
+                })
+                .setNegativeButton("No", null)
+                .show();
+    }
+
+    private void performCancelRide() {
+        viewModel.cancelRide(currentRide.getRideId()).observe(getViewLifecycleOwner(), success -> {
+            if (Boolean.TRUE.equals(success)) {
+                Toast.makeText(requireContext(), "Ride cancelled", Toast.LENGTH_SHORT).show();
+                stopSimulation();
+
+                currentRide = null;
+                if(mapManager != null) mapManager.clearAll();
+                navigateToDashboard();
+            } else {
+                Toast.makeText(requireContext(), "Failed to cancel ride", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void navigateToDashboard() {
