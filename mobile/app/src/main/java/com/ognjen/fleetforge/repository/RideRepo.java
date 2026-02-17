@@ -1,19 +1,18 @@
 package com.ognjen.fleetforge.repository;
 
+import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.google.gson.Gson;
 import com.ognjen.fleetforge.api.RetrofitClient;
 import com.ognjen.fleetforge.api.RideService;
 import com.ognjen.fleetforge.dtos.common.PageResponse;
+import com.ognjen.fleetforge.dtos.ride.CancellationRequest;
 import com.ognjen.fleetforge.dtos.ride.RideCreateRequestDTO;
 import com.ognjen.fleetforge.dtos.ride.RideCreateResponseDTO;
 import com.ognjen.fleetforge.dtos.ride.RideStartResponseDTO;
 import com.ognjen.fleetforge.dtos.ride.ScheduledRideDto;
 
-import java.util.HashMap;
-import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -98,24 +97,22 @@ public class RideRepo {
         return data;
     }
 
-    public LiveData<Boolean> cancelRide(Long rideId) {
+    public LiveData<Boolean> cancelRide(Long rideId, @Nullable String reason) {
         MutableLiveData<Boolean> result = new MutableLiveData<>();
 
-        Map<String, String> body = new HashMap<>();
-        body.put("reason", "Passenger cancelled");
+        CancellationRequest body = (reason != null) ? new CancellationRequest(reason) : new CancellationRequest(null);
 
         service.cancelRide(rideId, body).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
-                result.postValue(response.isSuccessful());
+                result.setValue(response.isSuccessful());
             }
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
-                result.postValue(false);
+                result.setValue(false);
             }
         });
-
         return result;
     }
 

@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.ognjen.fleetforge.api.RetrofitClient;
 import com.ognjen.fleetforge.api.RideService;
+import com.ognjen.fleetforge.dtos.ride.CancellationRequest;
 import com.ognjen.fleetforge.dtos.ride.FinishRideResponseDTO;
 import com.ognjen.fleetforge.dtos.ride.RideStartResponseDTO;
 import com.ognjen.fleetforge.repository.RideRepo;
@@ -35,13 +36,21 @@ public class CurrentRideDriverViewModel extends ViewModel {
         return repo.startRide(id);
     }
 
-    public LiveData<Boolean> cancelRide(Long rideId) {
-        // Reusing the repo pattern you showed in your example
-        repo.cancelRide(rideId).observeForever(success -> {
-            cancelRideResult.postValue(success);
+    public LiveData<Boolean> cancelRide(Long rideId, String reason) {
+        MutableLiveData<Boolean> result = new MutableLiveData<>();
+        rideService.cancelRide(rideId, new CancellationRequest(reason)).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                result.setValue(response.isSuccessful());
+            }
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                result.setValue(false);
+            }
         });
-        return cancelRideResult;
+        return result;
     }
+
     public LiveData<FinishRideResponseDTO> finishRide(Long rideId) {
         Call<FinishRideResponseDTO> call = rideService.finishRide(rideId);
         call.enqueue(new Callback<FinishRideResponseDTO>() {

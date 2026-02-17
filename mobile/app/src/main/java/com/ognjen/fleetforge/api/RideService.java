@@ -3,6 +3,7 @@ package com.ognjen.fleetforge.api;
 import com.ognjen.fleetforge.dtos.common.PageResponse;
 import com.ognjen.fleetforge.dtos.driver.DriverLocationUpdateRequestDTO;
 import com.ognjen.fleetforge.dtos.driver.DriverLocationUpdateResponseDTO;
+import com.ognjen.fleetforge.dtos.ride.CancellationRequest;
 import com.ognjen.fleetforge.dtos.ride.FinishRideResponseDTO;
 import com.ognjen.fleetforge.dtos.ride.RideCreateRequestDTO;
 import com.ognjen.fleetforge.dtos.ride.RideCreateResponseDTO;
@@ -10,7 +11,6 @@ import com.ognjen.fleetforge.dtos.ride.RideStartResponseDTO;
 import com.ognjen.fleetforge.dtos.ride.RideTrackingDTO;
 import com.ognjen.fleetforge.dtos.ride.ScheduledRideDto;
 
-import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -47,6 +47,6 @@ public interface RideService {
     @POST("/api/rides/{rideId}/cancellations")
     Call<Void> cancelRide(
             @Path("rideId") Long rideId,
-            @Body Map<String, String> body
+            @Body CancellationRequest body
     );
 }

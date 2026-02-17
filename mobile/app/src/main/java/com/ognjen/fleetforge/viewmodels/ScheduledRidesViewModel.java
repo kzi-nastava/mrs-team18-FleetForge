@@ -25,7 +25,7 @@ public class ScheduledRidesViewModel extends ViewModel {
     }
 
     public void cancelRide(Long rideId) {
-        repo.cancelRide(rideId).observeForever(success -> {
+        repo.cancelRide(rideId, null).observeForever(success -> {
             cancelResult.setValue(success);
         });
     }
