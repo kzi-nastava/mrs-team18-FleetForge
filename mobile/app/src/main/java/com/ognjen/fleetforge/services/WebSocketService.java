@@ -3,6 +3,7 @@ package com.ognjen.fleetforge.services;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Build;
@@ -12,13 +13,15 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.lifecycle.MutableLiveData;
 
+import com.ognjen.fleetforge.R;
+import com.ognjen.fleetforge.activities.MainActivity;
 import com.ognjen.fleetforge.dtos.NotificationDTO;
 import com.ognjen.fleetforge.utils.WebSocketManager;
 
 public class WebSocketService  extends Service {
+    private static final String TAG = "WebSocketService";
     private static final int FOREGROUND_ID = 1;
     private static final String CHANNEL_ID = "WS_Notifications";
-    public static final String ACTION_NEW_NOTIFICATION = "com.team18.NEW_NOTIFICATION";
 
     private WebSocketManager webSocketManager;
     public static MutableLiveData<String> messageData = new MutableLiveData<>();
@@ -34,7 +37,7 @@ public class WebSocketService  extends Service {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel serviceChannel = new NotificationChannel(
                     CHANNEL_ID, "WebSocket Service Channel",
-                    NotificationManager.IMPORTANCE_LOW);
+                    NotificationManager.IMPORTANCE_HIGH);
             NotificationManager manager = getSystemService(NotificationManager.class);
             manager.createNotificationChannel(serviceChannel);
         }
@@ -69,20 +72,38 @@ public class WebSocketService  extends Service {
             });
         }
 
-        return START_STICKY; //pokrenuce se ponovo ako se ubije
+        return START_STICKY;
     }
+
     private void showNotification(NotificationDTO notification) {
+
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtra("NOTIFICATION_ID", notification.getId());
+        intent.putExtra("NOTIFICATION_TYPE", notification.getType().name());
+        intent.putExtra("RIDE_ID", notification.getRideId());
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(
+                this,
+                Math.toIntExact(notification.getId()),
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+        );
 
         Notification notif = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("FleetForge")
                 .setContentText(notification.getMessage())
-                .setSmallIcon(android.R.drawable.ic_dialog_info)
+                .setSmallIcon(R.drawable.ic_notification)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setAutoCancel(true)
+                .setContentIntent(pendingIntent)
                 .build();
 
-        notificationManager.notify(Math.toIntExact(notification.getId())+1000, notif);
+        int notificationId = Math.toIntExact(notification.getId()) + 1000;
+        notificationManager.notify(notificationId, notif);
+
     }
 }
