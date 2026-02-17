@@ -185,6 +185,7 @@ public class WebSocketManager {
     private void handleNotificationMessage(String payload) {
         try {
             NotificationDTO notification = gson.fromJson(payload, NotificationDTO.class);
+            notificationData.postValue(notification);
         } catch (Exception e) {
             Log.e(TAG, "❌ Error parsing notification", e);
         }
