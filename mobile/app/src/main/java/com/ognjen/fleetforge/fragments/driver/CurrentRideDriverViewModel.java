@@ -11,6 +11,7 @@ import com.ognjen.fleetforge.api.RideService;
 import com.ognjen.fleetforge.dtos.ride.FinishRideResponseDTO;
 import com.ognjen.fleetforge.dtos.ride.RideStartResponseDTO;
 import com.ognjen.fleetforge.repository.RideRepo;
+import com.ognjen.fleetforge.utils.SingleLiveEvent;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -23,11 +24,15 @@ public class CurrentRideDriverViewModel extends ViewModel {
 
     private  final RideService rideService;
     private final MutableLiveData<RideStartResponseDTO> startRideLiveData = new MutableLiveData<>();
-    private final MutableLiveData<FinishRideResponseDTO> finishRideLiveData = new MutableLiveData<>();
+    private final SingleLiveEvent<FinishRideResponseDTO> finishRideLiveData = new SingleLiveEvent<>();
 
     public CurrentRideDriverViewModel(){
         this.repo= new RideRepo();
         this.rideService = RetrofitClient.getInstance().getRideService();
+    }
+
+    public LiveData<FinishRideResponseDTO> getFinishRideObservable() {
+        return finishRideLiveData;
     }
 
     public LiveData<RideStartResponseDTO> startRide(Long id){

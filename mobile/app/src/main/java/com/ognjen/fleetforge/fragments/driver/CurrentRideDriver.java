@@ -557,7 +557,7 @@ public class CurrentRideDriver extends Fragment {
                     Toast.makeText(requireContext(), "Ride started!", Toast.LENGTH_SHORT).show();
                 }
             });
-        }else if(btnPrimaryAction.getText().equals("Finish Ride")){
+        } else if(btnPrimaryAction.getText().equals("Finish Ride")){
             viewModel.finishRide(currentRide.getRideId()).observe(getViewLifecycleOwner(),response->{
                 if(response!=null){
                     stopSimulation();
