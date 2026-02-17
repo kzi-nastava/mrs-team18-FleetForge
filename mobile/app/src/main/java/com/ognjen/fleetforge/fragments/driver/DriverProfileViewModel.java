@@ -4,8 +4,10 @@ import android.content.Context;
 import android.net.Uri;
 
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.ognjen.fleetforge.auth.AuthManager;
 import com.ognjen.fleetforge.dtos.driver.DriverGetResponseDTO;
 import com.ognjen.fleetforge.dtos.driver.DriverProfileChangeRequestDTO;
 import com.ognjen.fleetforge.dtos.driver.DriverProfileChangeResponseDTO;
@@ -67,5 +69,23 @@ public class DriverProfileViewModel extends ViewModel {
     }
     public LiveData<Boolean> uploadProfilePicture(Context context, Uri imageUri) throws IOException {
         return repo.uploadProfilePic(context,imageUri);
+    }
+
+    public LiveData<Integer> goOnline() {
+        MutableLiveData<Integer> result = new MutableLiveData<>();
+        repo.goOnline().observeForever(response -> {
+            AuthManager.getInstance().saveSessionId(response.getSessionId());
+            result.setValue(response.getSessionId());
+        });
+        return result;
+    }
+
+    public LiveData<Boolean> goOffline() {
+        MutableLiveData<Boolean> result = new MutableLiveData<>();
+        int sessionId = AuthManager.getInstance().getSessionId();
+        repo.goOffline(sessionId).observeForever(success -> {
+            result.setValue(success);
+        });
+        return result;
     }
 }

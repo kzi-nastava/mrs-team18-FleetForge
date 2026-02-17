@@ -7,11 +7,10 @@ import com.ognjen.fleetforge.dtos.driver.DriverGetResponseDTO;
 import com.ognjen.fleetforge.dtos.driver.DriverProfileChangeRequestDTO;
 import com.ognjen.fleetforge.dtos.driver.DriverProfileChangeResponseDTO;
 import com.ognjen.fleetforge.dtos.common.PasswordChangeRequestDTO;
+import com.ognjen.fleetforge.dtos.driver.DriverSessionRequestDTO;
+import com.ognjen.fleetforge.dtos.driver.DriverSessionResponseDTO;
 import com.ognjen.fleetforge.dtos.vehicle.VehicleInformationChangeRequestDTO;
 import com.ognjen.fleetforge.dtos.vehicle.VehicleInformationChangeResponseDTO;
-import com.ognjen.fleetforge.dtos.driver.DriverLocationUpdateRequestDTO;
-import com.ognjen.fleetforge.dtos.driver.DriverLocationUpdateResponseDTO;
-import com.ognjen.fleetforge.dtos.ride.RideTrackingDTO;
 
 import java.util.List;
 
@@ -51,4 +50,10 @@ public interface DriverService {
 
     @GET("/api/drivers/ride-history")
     Call<List<CompletedRideDTO>> getDriverRideHistory();
+
+    @POST("/api/drivers/online")
+    Call<DriverSessionResponseDTO> goOnline();
+
+    @PUT("/api/drivers/offline")
+    Call<Void> goOffline(@Body DriverSessionRequestDTO request);
 }
