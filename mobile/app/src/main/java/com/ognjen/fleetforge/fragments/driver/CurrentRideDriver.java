@@ -121,6 +121,21 @@ public class CurrentRideDriver extends Fragment {
             }
         });
 
+        viewModel.getPanicObservable().observe(getViewLifecycleOwner(), response -> {
+            if (response != null) {
+                if (response.isSuccess()) {
+                    Toast.makeText(requireContext(),
+                            response.getMessage(),
+                            Toast.LENGTH_LONG).show();
+                } else {
+                    showError(response.getMessage());
+                }
+            } else {
+                showError("Failed to trigger panic.");
+            }
+        });
+
+
         fetchActiveRide();
     }
 
@@ -617,7 +632,9 @@ public class CurrentRideDriver extends Fragment {
         if ("Cancel".equalsIgnoreCase(currentText)) {
             showCancelConfirmationDialog();
         } else if ("SOS".equalsIgnoreCase(currentText)) {
-            Toast.makeText(requireContext(), "Emergency SOS triggered!", Toast.LENGTH_SHORT).show();
+            if (currentRide != null) {
+                viewModel.triggerPanic(currentRide.getRideId());
+            }
         }
     }
 

@@ -111,6 +111,21 @@ public class CurrentRidePassenger extends Fragment {
         initializeServices();
         observeViewModel();
 
+        viewModel.getPanicObservable().observe(getViewLifecycleOwner(), response -> {
+            if (response != null) {
+                if (response.isSuccess()) {
+                    Toast.makeText(requireContext(),
+                            response.getMessage(),
+                            Toast.LENGTH_LONG).show();
+                } else {
+                    showError(response.getMessage());
+                }
+            } else {
+                showError("Failed to trigger panic.");
+            }
+        });
+
+
         fetchActiveRide();
     }
 
@@ -233,6 +248,7 @@ public class CurrentRidePassenger extends Fragment {
         if ("IN_PROGRESS".equals(status)) {
             rideActionButtons.setVisibility(View.VISIBLE);
             buttonsDivider.setVisibility(View.VISIBLE);
+            btnSOS.setVisibility(View.VISIBLE);
         } else {
             rideActionButtons.setVisibility(View.GONE);
             buttonsDivider.setVisibility(View.GONE);
@@ -482,8 +498,13 @@ public class CurrentRidePassenger extends Fragment {
     }
 
     private void onSOSClick() {
-        Toast.makeText(requireContext(), "SOS - To be implemented", Toast.LENGTH_SHORT).show();
-        // TODO: Implement SOS functionality
+        if (currentRide != null) {
+            viewModel.triggerPanic(currentRide.getRideId());
+        } else {
+            Toast.makeText(requireContext(),
+                    "No active ride.",
+                    Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void showNoRideMessage() {
