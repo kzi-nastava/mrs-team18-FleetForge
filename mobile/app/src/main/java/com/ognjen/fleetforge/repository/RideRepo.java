@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.ognjen.fleetforge.api.RetrofitClient;
 import com.ognjen.fleetforge.api.RideService;
+import com.ognjen.fleetforge.dtos.ride.FinishRideResponseDTO;
 import com.ognjen.fleetforge.dtos.common.PageResponse;
 import com.ognjen.fleetforge.dtos.ride.CancellationRequest;
 import com.ognjen.fleetforge.dtos.ride.RideCreateRequestDTO;
@@ -117,4 +118,29 @@ public class RideRepo {
     }
 
 
+
+    public LiveData<FinishRideResponseDTO> finishRide(Long id) {
+        MutableLiveData<FinishRideResponseDTO> data = new MutableLiveData<>();
+
+        service.finishRide(id).enqueue(new Callback<FinishRideResponseDTO>() {
+            @Override
+            public void onResponse(Call<FinishRideResponseDTO> call, Response<FinishRideResponseDTO> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    data.setValue(response.body());
+                } else {
+                    try {
+                        android.util.Log.e("API_ERROR", "Error body: " + response.errorBody().string());
+                    } catch (Exception e) { e.printStackTrace(); }
+                    data.setValue(null);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<FinishRideResponseDTO> call, Throwable throwable) {
+                android.util.Log.e("API_FAILURE", "Error finishing ride: ", throwable);
+                data.setValue(null);
+            }
+        });
+        return data;
+    }
 }

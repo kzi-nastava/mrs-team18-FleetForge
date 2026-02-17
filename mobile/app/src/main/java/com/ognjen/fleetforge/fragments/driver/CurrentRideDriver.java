@@ -24,6 +24,7 @@ import com.ognjen.fleetforge.R;
 import com.ognjen.fleetforge.api.RideService;
 import com.ognjen.fleetforge.dtos.driver.DriverLocationUpdateRequestDTO;
 import com.ognjen.fleetforge.dtos.driver.DriverLocationUpdateResponseDTO;
+import com.ognjen.fleetforge.dtos.ride.FinishRideResponseDTO;
 import com.ognjen.fleetforge.dtos.ride.RideTrackingDTO;
 import com.ognjen.fleetforge.dtos.ride.WaypointDTO;
 import com.ognjen.fleetforge.model.CalculatedRoute;
@@ -104,7 +105,43 @@ public class CurrentRideDriver extends Fragment {
         initializeMap();
         initializeServices();
 
+        viewModel.getCancelRideObservable().observe(getViewLifecycleOwner(), success -> {
+            if (Boolean.TRUE.equals(success)) {
+                handleRideCancelled();
+            } else {
+                showError("Failed to cancel ride");
+            }
+        });
+
+        viewModel.getFinishRideObservable().observe(getViewLifecycleOwner(), response -> {
+            if (response != null) {
+                handleRideFinished(response);
+            } else {
+                showError("Failed to finish ride");
+            }
+        });
+
         fetchActiveRide();
+    }
+
+    private void handleRideFinished(FinishRideResponseDTO response) {
+        stopSimulation();
+        showFinishRideDialog(response);
+
+        currentRide = null;
+        calculatedRoute = null;
+        routeSimulator = null;
+
+        if (mapManager != null) {
+            mapManager.clearAll();
+        }
+
+        if (response.getNextRide() != null) {
+            Toast.makeText(requireContext(), "Next ride assigned!", Toast.LENGTH_SHORT).show();
+            fetchActiveRide();
+        } else {
+            navigateToDashboard();
+        }
     }
 
     private void initializeViews(View view) {
@@ -544,38 +581,35 @@ public class CurrentRideDriver extends Fragment {
 
 
     private void onPrimaryActionClick() {
+        if (currentRide == null) {
+            Toast.makeText(requireContext(), "Ride data is still loading or unavailable.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         if(btnPrimaryAction.getText().equals("Start Ride")){
-            viewModel.startRide(currentRide.getRideId()).observe(getViewLifecycleOwner(),response->{
-                if(response!=null){
+            viewModel.startRide(currentRide.getRideId()).observe(getViewLifecycleOwner(), response -> {
+                if(response != null){
                     fetchActiveRide();
-                    Toast.makeText(requireContext(), "Ride with id: "+response.getId()+" started. Status: "+response.getStatus(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), "Ride started!", Toast.LENGTH_SHORT).show();
                 }
             });
-        }else if(btnPrimaryAction.getText().equals("Finish Ride")){
-            viewModel.finishRide(currentRide.getRideId()).observe(getViewLifecycleOwner(),response->{
-                if(response!=null){
-                    stopSimulation();
-                    Toast.makeText(requireContext(), "Ride finished successfully!", Toast.LENGTH_LONG).show();
-
-                    currentRide = null;
-                    calculatedRoute = null;
-                    routeSimulator = null;
-
-                    if(mapManager != null) {
-                        mapManager.clearAll();
-                    }
-
-                    if(response.getNextRide() != null) {
-                        Toast.makeText(requireContext(), "Next ride assigned!", Toast.LENGTH_SHORT).show();
-                        fetchActiveRide();
-                    } else {
-                        navigateToDashboard();
-
-                    }
-                }
-            });
+        } else if(btnPrimaryAction.getText().equals("Finish Ride")){
+            viewModel.finishRide(currentRide.getRideId());
         }
     }
+
+    private void showFinishRideDialog(FinishRideResponseDTO response) {
+        String message = "Total price: " +
+                String.format(Locale.getDefault(), "%.2f RSD", response.getTotalCost());
+
+        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle("Ride Completed")
+                .setMessage(message)
+                .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
+                .setCancelable(false)
+                .show();
+    }
+
 
     private void onSecondaryActionClick() {
         String currentText = btnSecondaryAction.getText().toString();
@@ -622,16 +656,19 @@ public class CurrentRideDriver extends Fragment {
     }
 
     private void performCancelRide(String reason) {
-        viewModel.cancelRide(currentRide.getRideId(), reason).observe(getViewLifecycleOwner(), success -> {
-            if (Boolean.TRUE.equals(success)) {
-                Toast.makeText(requireContext(), "Ride cancelled successfully", Toast.LENGTH_SHORT).show();
-                stopSimulation();
-                currentRide = null;
-                navigateToDashboard();
-            } else {
-                Toast.makeText(requireContext(), "Failed to cancel ride", Toast.LENGTH_SHORT).show();
-            }
-        });
+        if (currentRide != null) {
+            viewModel.cancelRide(currentRide.getRideId(), reason);
+        }
+    }
+
+    private void handleRideCancelled() {
+        Toast.makeText(requireContext(), "Ride cancelled successfully", Toast.LENGTH_SHORT).show();
+        stopSimulation();
+        currentRide = null;
+        if (mapManager != null) {
+            mapManager.clearAll();
+        }
+        navigateToDashboard();
     }
 
     private void navigateToDashboard() {
