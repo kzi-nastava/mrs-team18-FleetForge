@@ -105,7 +105,35 @@ public class CurrentRideDriver extends Fragment {
         initializeMap();
         initializeServices();
 
+        viewModel.getFinishRideObservable().observe(getViewLifecycleOwner(), response -> {
+            if (response != null) {
+                handleRideFinished(response);
+            } else {
+                showError("Failed to finish ride");
+            }
+        });
+
         fetchActiveRide();
+    }
+
+    private void handleRideFinished(FinishRideResponseDTO response) {
+        stopSimulation();
+        showFinishRideDialog(response);
+
+        currentRide = null;
+        calculatedRoute = null;
+        routeSimulator = null;
+
+        if (mapManager != null) {
+            mapManager.clearAll();
+        }
+
+        if (response.getNextRide() != null) {
+            Toast.makeText(requireContext(), "Next ride assigned!", Toast.LENGTH_SHORT).show();
+            fetchActiveRide();
+        } else {
+            navigateToDashboard();
+        }
     }
 
     private void initializeViews(View view) {
@@ -558,29 +586,7 @@ public class CurrentRideDriver extends Fragment {
                 }
             });
         } else if(btnPrimaryAction.getText().equals("Finish Ride")){
-            viewModel.finishRide(currentRide.getRideId()).observe(getViewLifecycleOwner(),response->{
-                if(response!=null){
-                    stopSimulation();
-
-                    showFinishRideDialog(response);
-
-                    currentRide = null;
-                    calculatedRoute = null;
-                    routeSimulator = null;
-
-                    if(mapManager != null) {
-                        mapManager.clearAll();
-                    }
-
-                    if(response.getNextRide() != null) {
-                        Toast.makeText(requireContext(), "Next ride assigned!", Toast.LENGTH_SHORT).show();
-                        fetchActiveRide();
-                    } else {
-                        navigateToDashboard();
-
-                    }
-                }
-            });
+            viewModel.finishRide(currentRide.getRideId());
         }
     }
 
