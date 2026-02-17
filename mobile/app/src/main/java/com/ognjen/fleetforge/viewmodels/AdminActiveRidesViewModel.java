@@ -23,5 +23,9 @@ public class AdminActiveRidesViewModel extends ViewModel {
     public LiveData<ActiveRideDetailsDTO> getActiveRideDetails(Long rideId) {
         return repo.getActiveRideDetails(rideId);
     }
+
+    public LiveData<Boolean> handlePanic(Long rideId) {
+        return repo.handlePanic(rideId);
+    }
 }
 

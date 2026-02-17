@@ -15,6 +15,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
 import com.ognjen.fleetforge.enums.NotificationType;
+import com.ognjen.fleetforge.fragments.admin.AdminActiveRidesFragment;
 import com.ognjen.fleetforge.fragments.admin.AdminChatFragment;
 import com.ognjen.fleetforge.fragments.admin.AdminHistoryFragment;
 import com.ognjen.fleetforge.fragments.admin.AdminProfile;
@@ -111,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
         Fragment targetFragment = null;
 
         switch (type) {
+
             case RIDE_CREATED:
             case NO_AVAILABLE_DRIVER:
                 if (currentRole == UserRole.PASSENGER) {
@@ -130,6 +132,25 @@ public class MainActivity extends AppCompatActivity {
                 }
                 break;
 
+            case PANIC_ACTIVATED:
+                if (currentRole == UserRole.ADMIN) {
+
+                    Long rideId = getIntent().getLongExtra("RIDE_ID", -1);
+
+                    AdminActiveRidesFragment fragment = new AdminActiveRidesFragment();
+
+                    if (rideId != -1) {
+                        Bundle bundle = new Bundle();
+                        bundle.putLong("RIDE_ID", rideId);
+                        fragment.setArguments(bundle);
+                    }
+
+                    targetFragment = fragment;
+
+                    bottomNavigation.setSelectedItemId(R.id.nav_dashboard);
+                }
+                break;
+
             default:
                 Log.d(TAG, "No navigation action for notification type: " + type);
                 return;
@@ -139,6 +160,7 @@ public class MainActivity extends AppCompatActivity {
             loadFragment(targetFragment);
         }
     }
+
 
     private void setupBottomNavigation() {
         switch (currentRole) {

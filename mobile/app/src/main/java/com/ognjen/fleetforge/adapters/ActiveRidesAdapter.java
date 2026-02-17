@@ -47,6 +47,7 @@ public class ActiveRidesAdapter extends ArrayAdapter<ActiveRideDTO> {
 
     public interface OnDetailsClickListener {
         void onDetailsClick(ActiveRideDTO ride);
+        void onPanicHandleClick(ActiveRideDTO ride);
     }
 
     public ActiveRidesAdapter(@NonNull Context context, @NonNull List<ActiveRideDTO> rides) {
@@ -115,6 +116,21 @@ public class ActiveRidesAdapter extends ArrayAdapter<ActiveRideDTO> {
         holder.btnHide.setOnClickListener(v -> {
             expandedRideId = null;
             notifyDataSetChanged();
+        });
+
+        if (ride.getPanicActivated() != null && ride.getPanicActivated()) {
+            holder.panicIndicator.setVisibility(View.VISIBLE);
+            holder.panicIndicator.setText("⚠️ PANIC ACTIVATED");
+            holder.btnPanicHandle.setVisibility(View.VISIBLE);
+        } else {
+            holder.panicIndicator.setVisibility(View.GONE);
+            holder.btnPanicHandle.setVisibility(View.GONE);
+        }
+
+        holder.btnPanicHandle.setOnClickListener(v -> {
+            if (onDetailsClickListener != null) {
+                onDetailsClickListener.onPanicHandleClick(ride);
+            }
         });
 
         return convertView;
@@ -266,6 +282,7 @@ public class ActiveRidesAdapter extends ArrayAdapter<ActiveRideDTO> {
         TextView passengerCount;
         TextView panicIndicator;
         Button btnDetails;
+        Button btnPanicHandle;
 
         LinearLayout expandedLayout;
         MapView mapView;
@@ -287,6 +304,7 @@ public class ActiveRidesAdapter extends ArrayAdapter<ActiveRideDTO> {
             passengerCount = view.findViewById(R.id.passenger_count);
             panicIndicator = view.findViewById(R.id.panic_indicator);
             btnDetails = view.findViewById(R.id.btn_details);
+            btnPanicHandle = view.findViewById(R.id.btn_panic_handle);
 
             expandedLayout = view.findViewById(R.id.ll_expanded_view);
             mapView = view.findViewById(R.id.map_view);

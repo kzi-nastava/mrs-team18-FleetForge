@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -76,11 +77,39 @@ public class AdminActiveRidesFragment extends Fragment {
         adapter = new ActiveRidesAdapter(getActivity(), filteredRides);
         activeRidesList.setAdapter(adapter);
 
-        adapter.setOnDetailsClickListener(ride -> {
-            currentExpandedRideId = ride.getRideId();
-            adapter.setExpandedRideId(ride.getRideId());
-            startPolling();
-            fetchRideDetails(ride.getRideId());
+        adapter.setOnDetailsClickListener(new ActiveRidesAdapter.OnDetailsClickListener() {
+            @Override
+            public void onDetailsClick(ActiveRideDTO ride) {
+                currentExpandedRideId = ride.getRideId();
+                adapter.setExpandedRideId(ride.getRideId());
+                startPolling();
+                fetchRideDetails(ride.getRideId());
+            }
+
+            @Override
+            public void onPanicHandleClick(ActiveRideDTO ride) {
+                viewModel.handlePanic(ride.getRideId()).observe(getViewLifecycleOwner(), success -> {
+                    if (success != null && success) {
+                        loadActiveRides();
+                        Toast.makeText(getContext(), "Panic handled successfully", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getContext(), "Error handling panic", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
+    }
+
+    private void handlePanic(Long rideId) {
+        viewModel.handlePanic(rideId).observe(getViewLifecycleOwner(), success -> {
+            if (success != null && success) {
+                android.widget.Toast.makeText(requireContext(),
+                        "Panic situation resolved", android.widget.Toast.LENGTH_SHORT).show();
+                loadActiveRides();
+            } else {
+                android.widget.Toast.makeText(requireContext(),
+                        "Failed to resolve panic", android.widget.Toast.LENGTH_SHORT).show();
+            }
         });
     }
 

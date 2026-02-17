@@ -82,9 +82,14 @@ public class WebSocketService  extends Service {
 
         Intent intent = new Intent(this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
         intent.putExtra("NOTIFICATION_ID", notification.getId());
         intent.putExtra("NOTIFICATION_TYPE", notification.getType().name());
         intent.putExtra("RIDE_ID", notification.getRideId());
+
+        if (notification.getType().name().equals("PANIC_ACTIVATED")) {
+            intent.putExtra("OPEN_FRAGMENT", "ADMIN_ACTIVE_RIDES");
+        }
 
         PendingIntent pendingIntent = PendingIntent.getActivity(
                 this,
@@ -104,6 +109,5 @@ public class WebSocketService  extends Service {
 
         int notificationId = Math.toIntExact(notification.getId()) + 1000;
         notificationManager.notify(notificationId, notif);
-
     }
 }
