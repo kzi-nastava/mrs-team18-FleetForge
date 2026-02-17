@@ -14,6 +14,8 @@ import com.ognjen.fleetforge.dtos.driver.DriverCreateResponseDTO;
 import com.ognjen.fleetforge.dtos.driver.DriverGetResponseDTO;
 import com.ognjen.fleetforge.dtos.driver.DriverProfileChangeRequestDTO;
 import com.ognjen.fleetforge.dtos.driver.DriverProfileChangeResponseDTO;
+import com.ognjen.fleetforge.dtos.driver.DriverSessionRequestDTO;
+import com.ognjen.fleetforge.dtos.driver.DriverSessionResponseDTO;
 import com.ognjen.fleetforge.dtos.vehicle.VehicleInformationChangeRequestDTO;
 import com.ognjen.fleetforge.dtos.vehicle.VehicleInformationChangeResponseDTO;
 import com.ognjen.fleetforge.utils.FileUtil;
@@ -227,4 +229,42 @@ public class DriverRepo {
         }
         return result;
     }
+
+    public LiveData<DriverSessionResponseDTO> goOnline() {
+        MutableLiveData<DriverSessionResponseDTO> liveData = new MutableLiveData<>();
+        service.goOnline().enqueue(new Callback<DriverSessionResponseDTO>() {
+            @Override
+            public void onResponse(Call<DriverSessionResponseDTO> call, Response<DriverSessionResponseDTO> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    liveData.setValue(response.body());
+                } else {
+                    liveData.setValue(null);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<DriverSessionResponseDTO> call, Throwable t) {
+                liveData.setValue(null);
+            }
+        });
+        return liveData;
+    }
+
+    public LiveData<Boolean> goOffline(int sessionId) {
+        MutableLiveData<Boolean> liveData = new MutableLiveData<>();
+        DriverSessionRequestDTO request = new DriverSessionRequestDTO(sessionId);
+        service.goOffline(request).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                liveData.setValue(response.isSuccessful());
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                liveData.setValue(false);
+            }
+        });
+        return liveData;
+    }
+
 }

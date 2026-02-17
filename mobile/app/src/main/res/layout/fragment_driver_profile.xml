@@ -385,29 +385,43 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
         <Button
             android:id="@+id/reportsBtn"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="36dp"
             android:text="Reports"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.261"
+            android:layout_marginEnd="4dp"
+            app:layout_constraintHorizontal_weight="1"
+            app:layout_constraintHorizontal_chainStyle="spread"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btn_logout"
             app:layout_constraintTop_toBottomOf="@+id/contentWrap" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_logout"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="36dp"
             android:text="Logout"
             android:textColor="@color/white"
             android:textStyle="bold"
-            android:visibility="visible"
+            android:layout_marginHorizontal="4dp"
+            app:layout_constraintHorizontal_weight="1"
             app:backgroundTint="@color/error"
+            app:layout_constraintTop_toTopOf="@id/reportsBtn"
+            app:layout_constraintStart_toEndOf="@id/reportsBtn"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.748"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/contentWrap" />
+            app:layout_constraintEnd_toStartOf="@id/btn_go_online_offline" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_go_online_offline"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/go_online"
+            android:layout_marginStart="4dp"
+            app:layout_constraintHorizontal_weight="1"
+            app:layout_constraintTop_toTopOf="@id/reportsBtn"
+            app:layout_constraintStart_toEndOf="@id/btn_logout"
+            app:layout_constraintEnd_toEndOf="parent" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </ScrollView>

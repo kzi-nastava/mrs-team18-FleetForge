@@ -11,6 +11,8 @@ public class AuthManager {
     private static final String KEY_USER_NAME = "userName";
     private static final String KEY_USER_EMAIL = "userEmail";
     private static final String KEY_AUTH_TOKEN = "authToken";
+    private static final String KEY_SESSION_ID = "sessionId";
+
 
     private static AuthManager instance;
     private final SharedPreferences sharedPreferences;
@@ -57,6 +59,16 @@ public class AuthManager {
 
     public String getToken() {
         return sharedPreferences.getString(KEY_AUTH_TOKEN, null);
+    }
+
+    public void saveSessionId(int sessionId) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt(KEY_SESSION_ID, sessionId);
+        editor.apply();
+    }
+
+    public int getSessionId() {
+        return sharedPreferences.getInt(KEY_SESSION_ID, -1);
     }
 
     public void logout() {

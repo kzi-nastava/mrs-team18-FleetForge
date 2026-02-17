@@ -183,6 +183,7 @@ public class DriverControler {
         Driver driver = (Driver) authentication.getPrincipal();
         driver.setAvailable(false);
         driver.setActive(false);
+        userService.save(driver);
         Long sessionId = request.getSessionId();
         DriverSession foundSession = driverSessionService.findBySessionById(sessionId);
         foundSession.setEndedAt(LocalDateTime.now());

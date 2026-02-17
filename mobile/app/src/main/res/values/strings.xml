@@ -47,6 +47,7 @@
     <string name="duration_0_min">Duration: 0 min</string>
     <string name="distance_0_km">Distance: 0 km</string>
     <string name="username">Username</string>
+    <string name="go_online">Go Online</string>
     <string-array name="vehicle_types">
         <item>Van</item>
         <item>Luxury</item>
