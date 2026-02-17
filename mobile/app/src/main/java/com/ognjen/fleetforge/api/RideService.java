@@ -1,7 +1,9 @@
 package com.ognjen.fleetforge.api;
 
+import com.ognjen.fleetforge.dtos.common.PageResponse;
 import com.ognjen.fleetforge.dtos.driver.DriverLocationUpdateRequestDTO;
 import com.ognjen.fleetforge.dtos.driver.DriverLocationUpdateResponseDTO;
+import com.ognjen.fleetforge.dtos.ride.CancellationRequest;
 import com.ognjen.fleetforge.dtos.ride.FinishRideResponseDTO;
 import com.ognjen.fleetforge.dtos.ride.InconsistencyReportRequestDTO;
 import com.ognjen.fleetforge.dtos.ride.InconsistencyReportResponseDTO;
@@ -11,6 +13,8 @@ import com.ognjen.fleetforge.dtos.ride.RideReviewRequestDTO;
 import com.ognjen.fleetforge.dtos.ride.RideReviewResponseDTO;
 import com.ognjen.fleetforge.dtos.ride.RideStartResponseDTO;
 import com.ognjen.fleetforge.dtos.ride.RideTrackingDTO;
+import com.ognjen.fleetforge.dtos.ride.ScheduledRideDto;
+
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -18,6 +22,7 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface RideService {
 
@@ -35,6 +40,18 @@ public interface RideService {
     @POST("api/rides/driver-location-update")
     Call<DriverLocationUpdateResponseDTO> updateDriverLocation(
             @Body DriverLocationUpdateRequestDTO request
+    );
+
+    @GET("/api/rides/scheduled")
+    Call<PageResponse<ScheduledRideDto>> getScheduledRides(
+            @Query("page") int page,
+            @Query("size") int size
+    );
+
+    @POST("/api/rides/{rideId}/cancellations")
+    Call<Void> cancelRide(
+            @Path("rideId") Long rideId,
+            @Body CancellationRequest body
     );
 
     @POST("api/rides/{rideId}/review")

@@ -20,6 +20,7 @@ import com.ognjen.fleetforge.dtos.passenger.PassengerRideDetailsDto;
 import com.ognjen.fleetforge.dtos.passenger.PassengerRideHistoryDto;
 import com.ognjen.fleetforge.dtos.ride.RideReviewRequestDTO;
 import com.ognjen.fleetforge.dtos.ride.RideReviewResponseDTO;
+import com.ognjen.fleetforge.dtos.ride.ScheduledRideDto;
 import com.ognjen.fleetforge.model.FavoriteRoute;
 import com.ognjen.fleetforge.utils.FileUtil;
 

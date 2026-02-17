@@ -1,6 +1,7 @@
 package com.ognjen.fleetforge.fragments.passenger;
 
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.ognjen.fleetforge.dtos.common.PageResponse;
@@ -16,13 +17,20 @@ public class PassengerHistoryViewModel extends ViewModel {
     private int currentPage = 0;
     private final int pageSize = 10;
     private LiveData<List<FavoriteRouteGetResponseDTO>> favRoutes;
+    private MutableLiveData<PageResponse<PassengerRideHistoryDto>> ridesLiveData
+            = new MutableLiveData<>();
 
     public PassengerHistoryViewModel(){
         repo= new PassengerRepo();
     }
 
-    public LiveData<PageResponse<PassengerRideHistoryDto>> getRides(String from, String to, String sortBy, String direction) {
-        return repo.getRides(currentPage, pageSize, from, to, sortBy, direction);
+    public LiveData<PageResponse<PassengerRideHistoryDto>> getRides() {
+        return ridesLiveData;
+    }
+
+    public void fetchRides(String from, String to, String sortBy, String direction) {
+        repo.getRides(currentPage, pageSize, from, to, sortBy, direction)
+                .observeForever(ridesLiveData::setValue);
     }
 
     public LiveData<PassengerRideDetailsDto> getRideDetails(Long rideId) {

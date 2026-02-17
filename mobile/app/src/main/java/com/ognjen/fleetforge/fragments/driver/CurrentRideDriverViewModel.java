@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.ognjen.fleetforge.api.RetrofitClient;
 import com.ognjen.fleetforge.api.RideService;
+import com.ognjen.fleetforge.dtos.ride.CancellationRequest;
 import com.ognjen.fleetforge.dtos.ride.FinishRideResponseDTO;
 import com.ognjen.fleetforge.dtos.ride.RideStartResponseDTO;
 import com.ognjen.fleetforge.repository.RideRepo;
@@ -24,6 +25,7 @@ public class CurrentRideDriverViewModel extends ViewModel {
     private  final RideService rideService;
     private final MutableLiveData<RideStartResponseDTO> startRideLiveData = new MutableLiveData<>();
     private final MutableLiveData<FinishRideResponseDTO> finishRideLiveData = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> cancelRideResult = new MutableLiveData<>();
 
     public CurrentRideDriverViewModel(){
         this.repo= new RideRepo();
@@ -32,6 +34,21 @@ public class CurrentRideDriverViewModel extends ViewModel {
 
     public LiveData<RideStartResponseDTO> startRide(Long id){
         return repo.startRide(id);
+    }
+
+    public LiveData<Boolean> cancelRide(Long rideId, String reason) {
+        MutableLiveData<Boolean> result = new MutableLiveData<>();
+        rideService.cancelRide(rideId, new CancellationRequest(reason)).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                result.setValue(response.isSuccessful());
+            }
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                result.setValue(false);
+            }
+        });
+        return result;
     }
 
     public LiveData<FinishRideResponseDTO> finishRide(Long rideId) {

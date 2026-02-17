@@ -3,8 +3,13 @@ package com.ognjen.fleetforge.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
 import com.ognjen.fleetforge.fragments.admin.AdminChatFragment;
@@ -22,6 +27,7 @@ import com.ognjen.fleetforge.fragments.passenger.CurrentRidePassenger;
 import com.ognjen.fleetforge.fragments.passenger.FavoriteRoutes;
 import com.ognjen.fleetforge.fragments.passenger.PassengerChatFragment;
 import com.ognjen.fleetforge.fragments.passenger.PassengerHistoryFragment;
+import com.ognjen.fleetforge.fragments.passenger.PassengerRidesFragment;
 import com.ognjen.fleetforge.fragments.passenger.RideOrder;
 import com.ognjen.fleetforge.fragments.unregistered.UnregisteredFragment;
 import com.ognjen.fleetforge.model.UserRole;
@@ -50,6 +56,13 @@ public class MainActivity extends AppCompatActivity {
         loadInitialFragment();
 
         getWindow().setDecorFitsSystemWindows(false);
+        View mainView = findViewById(R.id.bottom_navigation).getRootView();
+
+        ViewCompat.setOnApplyWindowInsetsListener(mainView, (v, windowInsets) -> {
+            Insets systemBars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return windowInsets;
+        });
     }
 
     private void setupBottomNavigation() {
@@ -104,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
         } else if (itemId == R.id.nav_dashboard) {
             return PlaceholderFragment.newInstance("Dashboard");
         } else if (itemId == R.id.nav_history_user) {
-            return new PassengerHistoryFragment();
+            return new PassengerRidesFragment();
         } else if (itemId == R.id.nav_history_driver) {
             return new DriverHistoryFragment();
         }else if (itemId== R.id.nav_current_driver){
