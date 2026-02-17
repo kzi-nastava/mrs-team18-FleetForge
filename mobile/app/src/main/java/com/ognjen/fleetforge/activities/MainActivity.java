@@ -22,6 +22,7 @@ import com.ognjen.fleetforge.fragments.passenger.CurrentRidePassenger;
 import com.ognjen.fleetforge.fragments.passenger.FavoriteRoutes;
 import com.ognjen.fleetforge.fragments.passenger.PassengerChatFragment;
 import com.ognjen.fleetforge.fragments.passenger.PassengerHistoryFragment;
+import com.ognjen.fleetforge.fragments.passenger.PassengerRidesFragment;
 import com.ognjen.fleetforge.fragments.passenger.RideOrder;
 import com.ognjen.fleetforge.fragments.unregistered.UnregisteredFragment;
 import com.ognjen.fleetforge.model.UserRole;
@@ -104,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
         } else if (itemId == R.id.nav_dashboard) {
             return PlaceholderFragment.newInstance("Dashboard");
         } else if (itemId == R.id.nav_history_user) {
-            return new PassengerHistoryFragment();
+            return new PassengerRidesFragment();
         } else if (itemId == R.id.nav_history_driver) {
             return new DriverHistoryFragment();
         }else if (itemId== R.id.nav_current_driver){
