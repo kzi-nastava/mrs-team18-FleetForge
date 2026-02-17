@@ -24,6 +24,7 @@ import com.ognjen.fleetforge.R;
 import com.ognjen.fleetforge.api.RideService;
 import com.ognjen.fleetforge.dtos.driver.DriverLocationUpdateRequestDTO;
 import com.ognjen.fleetforge.dtos.driver.DriverLocationUpdateResponseDTO;
+import com.ognjen.fleetforge.dtos.ride.FinishRideResponseDTO;
 import com.ognjen.fleetforge.dtos.ride.RideTrackingDTO;
 import com.ognjen.fleetforge.dtos.ride.WaypointDTO;
 import com.ognjen.fleetforge.model.CalculatedRoute;
@@ -544,18 +545,24 @@ public class CurrentRideDriver extends Fragment {
 
 
     private void onPrimaryActionClick() {
+        if (currentRide == null) {
+            Toast.makeText(requireContext(), "Ride data is still loading or unavailable.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         if(btnPrimaryAction.getText().equals("Start Ride")){
-            viewModel.startRide(currentRide.getRideId()).observe(getViewLifecycleOwner(),response->{
-                if(response!=null){
+            viewModel.startRide(currentRide.getRideId()).observe(getViewLifecycleOwner(), response -> {
+                if(response != null){
                     fetchActiveRide();
-                    Toast.makeText(requireContext(), "Ride with id: "+response.getId()+" started. Status: "+response.getStatus(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), "Ride started!", Toast.LENGTH_SHORT).show();
                 }
             });
         }else if(btnPrimaryAction.getText().equals("Finish Ride")){
             viewModel.finishRide(currentRide.getRideId()).observe(getViewLifecycleOwner(),response->{
                 if(response!=null){
                     stopSimulation();
-                    Toast.makeText(requireContext(), "Ride finished successfully!", Toast.LENGTH_LONG).show();
+
+                    showFinishRideDialog(response);
 
                     currentRide = null;
                     calculatedRoute = null;
@@ -576,6 +583,19 @@ public class CurrentRideDriver extends Fragment {
             });
         }
     }
+
+    private void showFinishRideDialog(FinishRideResponseDTO response) {
+        String message = "Total price: " +
+                String.format(Locale.getDefault(), "%.2f RSD", response.getTotalCost());
+
+        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle("Ride Completed")
+                .setMessage(message)
+                .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
+                .setCancelable(false)
+                .show();
+    }
+
 
     private void onSecondaryActionClick() {
         Toast.makeText(requireContext(), "Secondary action clicked", Toast.LENGTH_SHORT).show();
