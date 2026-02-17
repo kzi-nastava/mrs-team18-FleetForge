@@ -16,4 +16,6 @@ export interface VehicleLocationDTO {
   currentLocation: GeoPoint;
   isAvailable: boolean;
   isActive: boolean;
+  panicActivated: boolean;
+  rideId: number | null;
 }

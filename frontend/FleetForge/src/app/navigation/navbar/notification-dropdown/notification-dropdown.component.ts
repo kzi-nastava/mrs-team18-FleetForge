@@ -58,15 +58,19 @@ export class NotificationDropdownComponent implements OnInit, OnDestroy {
       this.notificationService.markAsRead(notification.id);
     }
 
-    
     if (notification.type === NotificationType.RIDE_CREATED) {
-        this.router.navigate(['/passenger/current-ride']);
+      this.router.navigate(['/passenger/current-ride']);
 
     } else if (notification.type === NotificationType.RIDE_COMPLETED) {
-        this.router.navigate(['/passenger/ride-history']);
+      this.router.navigate(['/passenger/ride-history']);
+
+    } else if (notification.type === NotificationType.PANIC_ACTIVATED) {
+      this.router.navigate(['/admin/admin-home']);
     }
+
     this.closeDropdown();
   }
+
 
   markAllAsRead(): void {
     this.notificationService.markAllAsRead();

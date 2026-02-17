@@ -1,5 +1,4 @@
-
-import { Component, OnInit, OnDestroy, Inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, Inject, ChangeDetectorRef } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { AsyncPipe, LowerCasePipe, DOCUMENT } from '@angular/common';
 import { Subscription } from 'rxjs';
@@ -8,6 +7,8 @@ import { SidebarService } from '../sidebar/sidebar.service';
 import { Navbar, CurrentUserDTO } from './service/navbar';
 import { NotificationService } from '../../shared/services/notification.service';
 import { NotificationDropdownComponent } from './notification-dropdown/notification-dropdown.component';
+import { NotificationType } from '../../shared/enums/notification-type.enum';
+import { AlarmService } from '../../shared/alarm/alarm.service';
 
 export interface NavItem {
   label: string;
@@ -37,15 +38,23 @@ export class NavbarComponent implements OnInit, OnDestroy {
   status: boolean = false;
   private authSubscription?: Subscription;
 
+  private alarmSound = new Audio('sounds/alarm.mp3');
+  private isAlarmPlaying = false;
+  private notificationSub?: Subscription;
+
+
   constructor(
-    private sidebarService: SidebarService, 
-    private router: Router, 
+    private sidebarService: SidebarService,
+    private router: Router,
     private navbarService: Navbar,
     private notificationService: NotificationService,
-    @Inject(DOCUMENT) private document: Document
+    private alarmService: AlarmService,
+    @Inject(DOCUMENT) private document: Document,
+    private cdr: ChangeDetectorRef
   ) {
     this.isAuthenticated$ = this.sidebarService.isAuthenticated$;
     this.userRole$ = this.sidebarService.userRole$;
+    this.alarmSound.loop = true;
   }
 
   ngOnInit(): void {
@@ -54,18 +63,33 @@ export class NavbarComponent implements OnInit, OnDestroy {
         this.initializeNotifications();
         this.navbarService.getCurrentUser().subscribe(user => {
           this.currentUser = user;
+          this.cdr.detectChanges();
         });
       } else {
         this.notificationService.disconnect();
       }
     });
+
+    this.notificationSub = this.notificationService.getNotifications()
+      .subscribe(notifications => {
+        const  hasUnreadPanic = notifications.some(n =>
+          n.type === NotificationType.PANIC_ACTIVATED && !n.isRead
+        );
+
+        if (hasUnreadPanic) {
+          this.alarmService.start();
+        } else {
+          this.alarmService.stop();
+        }
+      });
   }
 
+
   ngOnDestroy(): void {
-    if (this.authSubscription) {
-      this.authSubscription.unsubscribe();
-    }
+    this.authSubscription?.unsubscribe();
+    this.notificationSub?.unsubscribe();
   }
+
 
   private async initializeNotifications(): Promise<void> {
     try {
@@ -89,16 +113,18 @@ export class NavbarComponent implements OnInit, OnDestroy {
       this.navbarService.goOffline({sessionId: Number(storage?.getItem('sessionId'))}).subscribe();
     }
     this.status = false;
-    
+
     // Disconnect notifications before logging out
     this.notificationService.disconnect();
-    
+
     this.sidebarService.setAuthenticated(false);
     this.sidebarService.setUserRole(null);
     this.showProfileMenu = false;
     storage?.removeItem('token');
     storage?.removeItem('role');
     this.router.navigate(['/']);
+
+    this.cdr.detectChanges();
   }
 
   viewProfile(): void {
@@ -120,10 +146,12 @@ export class NavbarComponent implements OnInit, OnDestroy {
       this.navbarService.goOnline().subscribe((response)=>{
         storage?.setItem('sessionId', response.sessionId.toString());
         this.status = true;
+        this.cdr.detectChanges();
       });
     } else {
       this.navbarService.goOffline({sessionId: Number(storage?.getItem('sessionId'))}).subscribe(()=>{
         this.status = false;
+        this.cdr.detectChanges();
       });
     }
   }

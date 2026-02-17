@@ -99,6 +99,10 @@ export const SIDEBAR_MENU_CONFIG: Record<UserRole, SidebarMenuItem[]> = {
       label: 'Ride History',
       icon: '⏱',
       path: '/admin/admin-history'
+    },{
+      label: 'Home',
+      icon: '🏠',
+      path: '/admin/admin-home'
     },
     {
       label: 'Block Users',

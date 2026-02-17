@@ -22,5 +22,10 @@ export const homeRedirectGuard: CanActivateFn = () => {
     return false;
   }
 
+  if (role === 'ADMIN') {
+    router.navigate(['/admin/admin-home']);
+    return false;
+  }
+
   return true;
 };
