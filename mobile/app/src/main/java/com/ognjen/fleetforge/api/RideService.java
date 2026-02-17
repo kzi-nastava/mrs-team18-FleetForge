@@ -3,6 +3,8 @@ package com.ognjen.fleetforge.api;
 import com.ognjen.fleetforge.dtos.common.PageResponse;
 import com.ognjen.fleetforge.dtos.driver.DriverLocationUpdateRequestDTO;
 import com.ognjen.fleetforge.dtos.driver.DriverLocationUpdateResponseDTO;
+import com.ognjen.fleetforge.dtos.price.PriceConfigurationDTO;
+import com.ognjen.fleetforge.dtos.price.UpdatePriceConfigurationDTO;
 import com.ognjen.fleetforge.dtos.ride.CancellationRequest;
 import com.ognjen.fleetforge.dtos.ride.FinishRideResponseDTO;
 import com.ognjen.fleetforge.dtos.ride.InconsistencyReportRequestDTO;
@@ -14,6 +16,9 @@ import com.ognjen.fleetforge.dtos.ride.RideReviewResponseDTO;
 import com.ognjen.fleetforge.dtos.ride.RideStartResponseDTO;
 import com.ognjen.fleetforge.dtos.ride.RideTrackingDTO;
 import com.ognjen.fleetforge.dtos.ride.ScheduledRideDto;
+import com.ognjen.fleetforge.enums.VehicleType;
+
+import java.util.List;
 
 
 import retrofit2.Call;
@@ -63,5 +68,18 @@ public interface RideService {
     @POST("api/rides/report-inconsistency")
     Call<InconsistencyReportResponseDTO> reportInconsistency(
             @Body InconsistencyReportRequestDTO request
+    );
+    @GET("/api/price-configurations")
+    Call<List<PriceConfigurationDTO>> getAllPriceConfigurations();
+
+    @GET("/api/price-configurations/{vehicleType}")
+    Call<PriceConfigurationDTO> getPriceConfigurationByVehicleType(
+            @Path("vehicleType") VehicleType vehicleType
+    );
+
+    @PUT("/api/price-configurations/{vehicleType}")
+    Call<PriceConfigurationDTO> updatePriceConfiguration(
+            @Path("vehicleType") VehicleType vehicleType,
+            @Body UpdatePriceConfigurationDTO dto
     );
 }
