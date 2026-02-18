@@ -17,7 +17,7 @@ public class OpenApiConfig {
 
         return new OpenAPI()
                 .info(new Info()
-                        .title("Tricolori API")
+                        .title("FleetForge API")
                         .description("Backend documentation for Taxi application")
                         .version("v1.0"))
                 .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
