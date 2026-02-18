@@ -149,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
 
                     targetFragment = fragment;
 
-                    bottomNavigation.setSelectedItemId(R.id.nav_dashboard);
+                    bottomNavigation.setSelectedItemId(R.id.nav_history_admin);
                 }
                 break;
 
@@ -191,10 +191,25 @@ public class MainActivity extends AppCompatActivity {
     private void loadInitialFragment() {
         Fragment initialFragment;
 
-        if (currentRole == UserRole.UNREGISTERED) {
-            initialFragment = new UnregisteredFragment();
-        } else {
-            initialFragment = PlaceholderFragment.newInstance("Dashboard");
+        switch (currentRole) {
+            case UNREGISTERED:
+                initialFragment = new UnregisteredFragment();
+                break;
+            case PASSENGER:
+                initialFragment = new RideOrder();
+                bottomNavigation.setSelectedItemId(R.id.nav_home);
+                break;
+            case DRIVER:
+                initialFragment = new DriverHistoryFragment();
+                bottomNavigation.setSelectedItemId(R.id.nav_history_driver);
+                break;
+            case ADMIN:
+                initialFragment = new AdminRidesFragment();
+                bottomNavigation.setSelectedItemId(R.id.nav_history_admin);
+                break;
+            default:
+                initialFragment = new UnregisteredFragment();
+                break;
         }
 
         loadFragment(initialFragment);
@@ -213,8 +228,6 @@ public class MainActivity extends AppCompatActivity {
             }
         } else if (itemId == R.id.nav_home) {
             return new RideOrder();
-        } else if (itemId == R.id.nav_dashboard) {
-            return PlaceholderFragment.newInstance("Dashboard");
         } else if (itemId == R.id.nav_history_user) {
             return new PassengerRidesFragment();
         } else if (itemId == R.id.nav_history_driver) {

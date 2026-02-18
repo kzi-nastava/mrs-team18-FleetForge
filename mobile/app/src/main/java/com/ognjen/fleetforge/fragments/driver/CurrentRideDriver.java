@@ -691,7 +691,7 @@ public class CurrentRideDriver extends Fragment {
     private void navigateToDashboard() {
         BottomNavigationView bottomNav = requireActivity().findViewById(R.id.bottom_navigation);
         if (bottomNav != null) {
-            bottomNav.setSelectedItemId(R.id.nav_dashboard);
+            bottomNav.setSelectedItemId(R.id.nav_profile);
         }
     }
 

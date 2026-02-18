@@ -11,11 +11,6 @@
         android:title="History"
         android:icon="@drawable/ic_history" />
 
-    <item
-        android:id="@+id/nav_dashboard"
-        android:title="Dashboard"
-        android:icon="@android:drawable/ic_menu_view" />
-
 
     <item
         android:id="@+id/nav_chat_driver"
