@@ -71,6 +71,14 @@ public class SecurityConfig {
                         .requestMatchers("/topic/**").permitAll()
                         .requestMatchers("/queue/**").permitAll()
 
+                        // Open Api
+                        .requestMatchers(
+                                "/v3/api-docs/**",
+                                "/v3/api-docs.yaml",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
+
                         .anyRequest().authenticated()
                 )
                 .headers(headers -> headers
