@@ -21,6 +21,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.ognjen.fleetforge.R;
 import com.ognjen.fleetforge.adapters.ActiveRidesAdapter;
 import com.ognjen.fleetforge.dtos.admin.ActiveRideDTO;
+import com.ognjen.fleetforge.utils.PanicAlarmManager;
 import com.ognjen.fleetforge.viewmodels.AdminActiveRidesViewModel;
 
 import org.osmdroid.config.Configuration;
@@ -150,6 +151,22 @@ public class AdminActiveRidesFragment extends Fragment {
             if (activeRides != null && !activeRides.isEmpty()) {
                 rides.clear();
                 rides.addAll(activeRides);
+
+                boolean hasActivePanic = false;
+
+                for (ActiveRideDTO ride : rides) {
+                    if (ride.getPanicActivated()) {
+                        hasActivePanic = true;
+                        break;
+                    }
+                }
+
+                if (hasActivePanic) {
+                    PanicAlarmManager.getInstance().startAlarm(requireContext());
+                } else {
+                    PanicAlarmManager.getInstance().stopAlarm();
+                }
+
                 filterRides(searchDriver.getText() != null ? searchDriver.getText().toString() : "");
             } else {
                 rides.clear();

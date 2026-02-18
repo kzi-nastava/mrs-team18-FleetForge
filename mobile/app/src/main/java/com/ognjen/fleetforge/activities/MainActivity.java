@@ -39,6 +39,7 @@ import com.ognjen.fleetforge.auth.AuthManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.ognjen.fleetforge.fragments.driver.DriverProfile;
 import com.ognjen.fleetforge.fragments.passenger.PassengerProfile;
+import com.ognjen.fleetforge.utils.PanicAlarmManager;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -134,6 +135,7 @@ public class MainActivity extends AppCompatActivity {
 
             case PANIC_ACTIVATED:
                 if (currentRole == UserRole.ADMIN) {
+                    PanicAlarmManager.getInstance().startAlarm(this);
 
                     Long rideId = getIntent().getLongExtra("RIDE_ID", -1);
 
