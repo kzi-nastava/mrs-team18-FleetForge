@@ -15,6 +15,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
 import com.ognjen.fleetforge.enums.NotificationType;
+import com.ognjen.fleetforge.fragments.admin.AdminActiveRidesFragment;
 import com.ognjen.fleetforge.fragments.admin.AdminChatFragment;
 import com.ognjen.fleetforge.fragments.admin.AdminHistoryFragment;
 import com.ognjen.fleetforge.fragments.admin.AdminProfile;
@@ -38,6 +39,7 @@ import com.ognjen.fleetforge.auth.AuthManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.ognjen.fleetforge.fragments.driver.DriverProfile;
 import com.ognjen.fleetforge.fragments.passenger.PassengerProfile;
+import com.ognjen.fleetforge.utils.PanicAlarmManager;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -111,6 +113,7 @@ public class MainActivity extends AppCompatActivity {
         Fragment targetFragment = null;
 
         switch (type) {
+
             case RIDE_CREATED:
             case NO_AVAILABLE_DRIVER:
                 if (currentRole == UserRole.PASSENGER) {
@@ -130,6 +133,26 @@ public class MainActivity extends AppCompatActivity {
                 }
                 break;
 
+            case PANIC_ACTIVATED:
+                if (currentRole == UserRole.ADMIN) {
+                    PanicAlarmManager.getInstance().startAlarm(this);
+
+                    Long rideId = getIntent().getLongExtra("RIDE_ID", -1);
+
+                    AdminActiveRidesFragment fragment = new AdminActiveRidesFragment();
+
+                    if (rideId != -1) {
+                        Bundle bundle = new Bundle();
+                        bundle.putLong("RIDE_ID", rideId);
+                        fragment.setArguments(bundle);
+                    }
+
+                    targetFragment = fragment;
+
+                    bottomNavigation.setSelectedItemId(R.id.nav_history_admin);
+                }
+                break;
+
             default:
                 Log.d(TAG, "No navigation action for notification type: " + type);
                 return;
@@ -139,6 +162,7 @@ public class MainActivity extends AppCompatActivity {
             loadFragment(targetFragment);
         }
     }
+
 
     private void setupBottomNavigation() {
         switch (currentRole) {
@@ -167,10 +191,25 @@ public class MainActivity extends AppCompatActivity {
     private void loadInitialFragment() {
         Fragment initialFragment;
 
-        if (currentRole == UserRole.UNREGISTERED) {
-            initialFragment = new UnregisteredFragment();
-        } else {
-            initialFragment = PlaceholderFragment.newInstance("Dashboard");
+        switch (currentRole) {
+            case UNREGISTERED:
+                initialFragment = new UnregisteredFragment();
+                break;
+            case PASSENGER:
+                initialFragment = new RideOrder();
+                bottomNavigation.setSelectedItemId(R.id.nav_home);
+                break;
+            case DRIVER:
+                initialFragment = new DriverHistoryFragment();
+                bottomNavigation.setSelectedItemId(R.id.nav_history_driver);
+                break;
+            case ADMIN:
+                initialFragment = new AdminRidesFragment();
+                bottomNavigation.setSelectedItemId(R.id.nav_history_admin);
+                break;
+            default:
+                initialFragment = new UnregisteredFragment();
+                break;
         }
 
         loadFragment(initialFragment);
@@ -189,8 +228,6 @@ public class MainActivity extends AppCompatActivity {
             }
         } else if (itemId == R.id.nav_home) {
             return new RideOrder();
-        } else if (itemId == R.id.nav_dashboard) {
-            return PlaceholderFragment.newInstance("Dashboard");
         } else if (itemId == R.id.nav_history_user) {
             return new PassengerRidesFragment();
         } else if (itemId == R.id.nav_history_driver) {

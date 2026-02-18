@@ -88,6 +88,20 @@ public class RideController {
                 .status(response.isSuccess() ? HttpStatus.OK : HttpStatus.BAD_REQUEST)
                 .body(response);
     }
+
+    /**
+     * PUT /api/rides/{rideId}/panic-handle
+     * Only Admin can deactivate/handle the panic situation.
+     */
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{rideId}/panic-handle")
+    public ResponseEntity<RidePanicResponseDTO> handlePanic(@PathVariable Long rideId) {
+        RidePanicResponseDTO response = ridePanicService.handlePanic(rideId);
+        return ResponseEntity
+                .status(response.isSuccess() ? HttpStatus.OK : HttpStatus.BAD_REQUEST)
+                .body(response);
+    }
+
     @PreAuthorize("hasRole('PASSENGER')")
     @PostMapping("/create")
     public ResponseEntity<RideCreateResponseDTO> createRide(@Valid @RequestBody RideCreateRequestDTO request) {

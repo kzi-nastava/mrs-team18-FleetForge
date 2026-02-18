@@ -41,6 +41,9 @@ public interface RideService {
     @PUT("/api/rides/{id}/start")
     Call<RideStartResponseDTO> startRide(@Path("id") Long id);
 
+    @PUT("/api/rides/{rideId}/panic-handle")
+    Call<Void> handlePanic(@Path("rideId") Long rideId);
+
     @PUT("/api/rides/{rideId}/finish")
     Call<FinishRideResponseDTO> finishRide(@Path("rideId") Long rideId);
 

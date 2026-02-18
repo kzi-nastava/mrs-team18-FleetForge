@@ -1,41 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="AutoImportSettings">
-    <option name="autoReloadType" value="SELECTIVE" />
-  </component>
-  <component name="ChangeListManager">
-    <list default="true" id="6b9556a4-dfdc-4a23-8fd4-ac909965b26a" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
-    <option name="SHOW_DIALOG" value="false" />
-    <option name="HIGHLIGHT_CONFLICTS" value="true" />
-    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
-    <option name="LAST_RESOLUTION" value="IGNORE" />
-  </component>
-  <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
-  </component>
-  <component name="GitHubPullRequestSearchHistory">{
-  &quot;lastFilter&quot;: {
-    &quot;state&quot;: &quot;OPEN&quot;,
-    &quot;assignee&quot;: &quot;ognjenvujovic04&quot;
-  }
-}</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/kzi-nastava/mrs-team18-FleetForge.git&quot;,
-    &quot;accountId&quot;: &quot;9d3eaec2-7239-4a9e-9263-eb5330dba5d6&quot;
-  }
-}</component>
-  <component name="ProjectColorInfo">{
-  &quot;associatedIndex&quot;: 0
-}</component>
-  <component name="ProjectId" id="39cRapB2QiR3Q99zsHuj5SI5BAV" />
-  <component name="ProjectViewState">
-    <option name="hideEmptyMiddlePackages" value="true" />
-    <option name="showLibraryContents" value="true" />
-  </component>
-  <component name="PropertiesComponent"><![CDATA[{
+    <component name="AutoImportSettings">
+        <option name="autoReloadType" value="SELECTIVE" />
+    </component>
+    <component name="ChangeListManager">
+        <list default="true" id="6b9556a4-dfdc-4a23-8fd4-ac909965b26a" name="Changes" comment="">
+            <change afterPath="$PROJECT_DIR$/../frontend/FleetForge/public/sounds/alarm.mp3" afterDir="false" />
+            <change afterPath="$PROJECT_DIR$/../frontend/FleetForge/src/app/admin/admin-home/admin-home.component.css" afterDir="false" />
+            <change afterPath="$PROJECT_DIR$/../frontend/FleetForge/src/app/admin/admin-home/admin-home.component.html" afterDir="false" />
+            <change afterPath="$PROJECT_DIR$/../frontend/FleetForge/src/app/admin/admin-home/admin-home.component.ts" afterDir="false" />
+            <change afterPath="$PROJECT_DIR$/../frontend/FleetForge/src/app/shared/alarm/alarm.service.ts" afterDir="false" />
+            <change beforePath="$PROJECT_DIR$/../backend/FleetForge/src/main/java/com/team18/FleetForge/dto/vehicle/VehicleLocationDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/FleetForge/src/main/java/com/team18/FleetForge/dto/vehicle/VehicleLocationDTO.java" afterDir="false" />
+            <change beforePath="$PROJECT_DIR$/../backend/FleetForge/src/main/java/com/team18/FleetForge/repository/rides/RideRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/FleetForge/src/main/java/com/team18/FleetForge/repository/rides/RideRepository.java" afterDir="false" />
+            <change beforePath="$PROJECT_DIR$/../backend/FleetForge/src/main/java/com/team18/FleetForge/repository/users/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/FleetForge/src/main/java/com/team18/FleetForge/repository/users/UserRepository.java" afterDir="false" />
+            <change beforePath="$PROJECT_DIR$/../backend/FleetForge/src/main/java/com/team18/FleetForge/service/NotificationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/FleetForge/src/main/java/com/team18/FleetForge/service/NotificationService.java" afterDir="false" />
+            <change beforePath="$PROJECT_DIR$/../backend/FleetForge/src/main/java/com/team18/FleetForge/service/impl/VehicleServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/FleetForge/src/main/java/com/team18/FleetForge/service/impl/VehicleServiceImpl.java" afterDir="false" />
+            <change beforePath="$PROJECT_DIR$/../backend/FleetForge/src/main/java/com/team18/FleetForge/service/rides/RidePanicService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/FleetForge/src/main/java/com/team18/FleetForge/service/rides/RidePanicService.java" afterDir="false" />
+            <change beforePath="$PROJECT_DIR$/../frontend/FleetForge/src/app/app.routes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/FleetForge/src/app/app.routes.ts" afterDir="false" />
+            <change beforePath="$PROJECT_DIR$/../frontend/FleetForge/src/app/auth/guard/home-redirect-guard.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/FleetForge/src/app/auth/guard/home-redirect-guard.ts" afterDir="false" />
+            <change beforePath="$PROJECT_DIR$/../frontend/FleetForge/src/app/navigation/navbar/navbar.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/FleetForge/src/app/navigation/navbar/navbar.component.ts" afterDir="false" />
+            <change beforePath="$PROJECT_DIR$/../frontend/FleetForge/src/app/navigation/navbar/notification-dropdown/notification-dropdown.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/FleetForge/src/app/navigation/navbar/notification-dropdown/notification-dropdown.component.ts" afterDir="false" />
+            <change beforePath="$PROJECT_DIR$/../frontend/FleetForge/src/app/navigation/sidebar/sidebar-config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/FleetForge/src/app/navigation/sidebar/sidebar-config.ts" afterDir="false" />
+            <change beforePath="$PROJECT_DIR$/../frontend/FleetForge/src/app/shared/enums/notification-type.enum.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/FleetForge/src/app/shared/enums/notification-type.enum.ts" afterDir="false" />
+            <change beforePath="$PROJECT_DIR$/../frontend/FleetForge/src/app/shared/map/map.css" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/FleetForge/src/app/shared/map/map.css" afterDir="false" />
+            <change beforePath="$PROJECT_DIR$/../frontend/FleetForge/src/app/shared/map/map.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/FleetForge/src/app/shared/map/map.ts" afterDir="false" />
+            <change beforePath="$PROJECT_DIR$/../frontend/FleetForge/src/app/shared/models/vehicle.model.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/FleetForge/src/app/shared/models/vehicle.model.ts" afterDir="false" />
+        </list>
+        <option name="SHOW_DIALOG" value="false" />
+        <option name="HIGHLIGHT_CONFLICTS" value="true" />
+        <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+        <option name="LAST_RESOLUTION" value="IGNORE" />
+    </component>
+    <component name="Git.Settings">
+        <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+    </component>
+    <component name="GitHubPullRequestSearchHistory">{
+        &quot;lastFilter&quot;: {
+        &quot;state&quot;: &quot;OPEN&quot;,
+        &quot;assignee&quot;: &quot;ognjenvujovic04&quot;
+        }
+        }</component>
+    <component name="GithubPullRequestsUISettings">{
+        &quot;selectedUrlAndAccountId&quot;: {
+        &quot;url&quot;: &quot;https://github.com/kzi-nastava/mrs-team18-FleetForge.git&quot;,
+        &quot;accountId&quot;: &quot;9d3eaec2-7239-4a9e-9263-eb5330dba5d6&quot;
+        }
+        }</component>
+    <component name="ProjectColorInfo">{
+        &quot;associatedIndex&quot;: 0
+        }</component>
+    <component name="ProjectId" id="39cRapB2QiR3Q99zsHuj5SI5BAV" />
+    <component name="ProjectViewState">
+        <option name="hideEmptyMiddlePackages" value="true" />
+        <option name="showLibraryContents" value="true" />
+    </component>
+    <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Application.Main.executor": "Run",
     "Application.Unnamed.executor": "Run",
@@ -43,12 +62,8 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "TestNG.AdminHistoryTest.executor": "Run",
-    "TestNG.FavoriteRoutesOrderTest.addToFavoriteRoutes.executor": "Run",
-    "TestNG.FavoriteRoutesOrderTest.addToFavoritesAndOrder.executor": "Run",
-    "TestNG.FavoriteRoutesOrderTest.removeFromFavoritesHistoryPage.executor": "Run",
-    "TestNG.FavoriteRoutesOrderTest.removeFromFavorites_FavoritesPage.executor": "Run",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "develop",
+    "git-widget-placeholder": "feature/admin-panic-notification",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/ognje/Desktop/FleetForge/main-git/e2e-tests",
@@ -57,164 +72,81 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.0",
-    "project.structure.side.proportion": "0.0",
     "settings.editor.selected.configurable": "preferences.PinNote",
     "to.speed.mode.migration.done": "true",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
-  <component name="RunManager" selected="TestNG.FavoriteRoutesOrderTest.addToFavoritesAndOrder">
-    <configuration name="Main" type="Application" factoryName="Application" nameIsGenerated="true">
-      <option name="ALTERNATIVE_JRE_PATH" value="22" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
-      <option name="MAIN_CLASS_NAME" value="org.example.Main" />
-      <module name="selenium2" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="AdminHistoryTest" type="TestNG" temporary="true" nameIsGenerated="true">
-      <module name="selenium2" />
-      <shortenClasspath name="NONE" />
-      <useClassPathOnly />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="tests.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="SUITE_NAME" value="" />
-      <option name="PACKAGE_NAME" value="tests" />
-      <option name="MAIN_CLASS_NAME" value="tests.AdminHistoryTest" />
-      <option name="GROUP_NAME" value="" />
-      <option name="TEST_OBJECT" value="CLASS" />
-      <option name="PARAMETERS" value="" />
-      <option name="OUTPUT_DIRECTORY" value="" />
-      <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="moduleWithDependencies" />
-      </option>
-      <option name="PROPERTIES_FILE" value="" />
-      <properties />
-      <listeners />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="FavoriteRoutesOrderTest.addToFavoriteRoutes" type="TestNG" temporary="true" nameIsGenerated="true">
-      <module name="selenium2" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="tests.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="tests" />
-      <option name="MAIN_CLASS_NAME" value="tests.FavoriteRoutesOrderTest" />
-      <option name="METHOD_NAME" value="addToFavoriteRoutes" />
-      <option name="TEST_OBJECT" value="METHOD" />
-      <properties />
-      <listeners />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="FavoriteRoutesOrderTest.addToFavoritesAndOrder" type="TestNG" temporary="true" nameIsGenerated="true">
-      <module name="selenium2" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="tests.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="tests" />
-      <option name="MAIN_CLASS_NAME" value="tests.FavoriteRoutesOrderTest" />
-      <option name="METHOD_NAME" value="addToFavoritesAndOrder" />
-      <option name="TEST_OBJECT" value="METHOD" />
-      <properties />
-      <listeners />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="FavoriteRoutesOrderTest.removeFromFavoritesHistoryPage" type="TestNG" temporary="true" nameIsGenerated="true">
-      <module name="selenium2" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="tests.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="tests" />
-      <option name="MAIN_CLASS_NAME" value="tests.FavoriteRoutesOrderTest" />
-      <option name="METHOD_NAME" value="removeFromFavoritesHistoryPage" />
-      <option name="TEST_OBJECT" value="METHOD" />
-      <properties />
-      <listeners />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="FavoriteRoutesOrderTest.removeFromFavorites_FavoritesPage" type="TestNG" temporary="true" nameIsGenerated="true">
-      <module name="selenium2" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="tests.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="tests" />
-      <option name="MAIN_CLASS_NAME" value="tests.FavoriteRoutesOrderTest" />
-      <option name="METHOD_NAME" value="removeFromFavorites_FavoritesPage" />
-      <option name="TEST_OBJECT" value="METHOD" />
-      <properties />
-      <listeners />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <list>
-      <item itemvalue="Application.Main" />
-      <item itemvalue="TestNG.FavoriteRoutesOrderTest.addToFavoriteRoutes" />
-      <item itemvalue="TestNG.FavoriteRoutesOrderTest.addToFavoritesAndOrder" />
-      <item itemvalue="TestNG.FavoriteRoutesOrderTest.removeFromFavoritesHistoryPage" />
-      <item itemvalue="TestNG.FavoriteRoutesOrderTest.removeFromFavorites_FavoritesPage" />
-      <item itemvalue="TestNG.AdminHistoryTest" />
-    </list>
-    <recent_temporary>
-      <list>
-        <item itemvalue="TestNG.FavoriteRoutesOrderTest.addToFavoritesAndOrder" />
-        <item itemvalue="TestNG.FavoriteRoutesOrderTest.removeFromFavorites_FavoritesPage" />
-        <item itemvalue="TestNG.FavoriteRoutesOrderTest.removeFromFavoritesHistoryPage" />
-        <item itemvalue="TestNG.FavoriteRoutesOrderTest.addToFavoriteRoutes" />
-        <item itemvalue="TestNG.AdminHistoryTest" />
-      </list>
-    </recent_temporary>
-  </component>
-  <component name="SharedIndexes">
-    <attachedChunks>
-      <set>
-        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.27397.103" />
-        <option value="bundled-js-predefined-d6986cc7102b-3aa1da707db6-JavaScript-IU-252.27397.103" />
-      </set>
-    </attachedChunks>
-  </component>
-  <component name="TaskManager">
-    <task active="true" id="Default" summary="Default task">
-      <changelist id="6b9556a4-dfdc-4a23-8fd4-ac909965b26a" name="Changes" comment="" />
-      <created>1770993438620</created>
-      <option name="number" value="Default" />
-      <option name="presentableId" value="Default" />
-      <updated>1770993438620</updated>
-      <workItem from="1770993439901" duration="760000" />
-      <workItem from="1771108166199" duration="11000" />
-      <workItem from="1771198096321" duration="1091000" />
-      <workItem from="1771364882430" duration="301000" />
-    </task>
-    <servers />
-  </component>
-  <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="3" />
-  </component>
+    <component name="RunManager" selected="TestNG.AdminHistoryTest">
+        <configuration name="Main" type="Application" factoryName="Application" nameIsGenerated="true">
+            <option name="ALTERNATIVE_JRE_PATH" value="22" />
+            <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+            <option name="MAIN_CLASS_NAME" value="org.example.Main" />
+            <module name="selenium2" />
+            <method v="2">
+                <option name="Make" enabled="true" />
+            </method>
+        </configuration>
+        <configuration name="AdminHistoryTest" type="TestNG" temporary="true" nameIsGenerated="true">
+            <module name="selenium2" />
+            <shortenClasspath name="NONE" />
+            <useClassPathOnly />
+            <extension name="coverage">
+                <pattern>
+                    <option name="PATTERN" value="tests.*" />
+                    <option name="ENABLED" value="true" />
+                </pattern>
+            </extension>
+            <option name="SUITE_NAME" value="" />
+            <option name="PACKAGE_NAME" value="tests" />
+            <option name="MAIN_CLASS_NAME" value="tests.AdminHistoryTest" />
+            <option name="GROUP_NAME" value="" />
+            <option name="TEST_OBJECT" value="CLASS" />
+            <option name="PARAMETERS" value="" />
+            <option name="OUTPUT_DIRECTORY" value="" />
+            <option name="TEST_SEARCH_SCOPE">
+                <value defaultName="moduleWithDependencies" />
+            </option>
+            <option name="PROPERTIES_FILE" value="" />
+            <properties />
+            <listeners />
+            <method v="2">
+                <option name="Make" enabled="true" />
+            </method>
+        </configuration>
+        <list>
+            <item itemvalue="Application.Main" />
+            <item itemvalue="TestNG.AdminHistoryTest" />
+        </list>
+        <recent_temporary>
+            <list>
+                <item itemvalue="TestNG.AdminHistoryTest" />
+            </list>
+        </recent_temporary>
+    </component>
+    <component name="SharedIndexes">
+        <attachedChunks>
+            <set>
+                <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.28238.7" />
+                <option value="bundled-js-predefined-d6986cc7102b-a71380e98a7c-JavaScript-IU-252.28238.7" />
+            </set>
+        </attachedChunks>
+    </component>
+    <component name="TaskManager">
+        <task active="true" id="Default" summary="Default task">
+            <changelist id="6b9556a4-dfdc-4a23-8fd4-ac909965b26a" name="Changes" comment="" />
+            <created>1770993438620</created>
+            <option name="number" value="Default" />
+            <option name="presentableId" value="Default" />
+            <updated>1770993438620</updated>
+            <workItem from="1770993439901" duration="760000" />
+            <workItem from="1771108166199" duration="11000" />
+            <workItem from="1771198096321" duration="1091000" />
+            <workItem from="1771365187269" duration="212000" />
+        </task>
+        <servers />
+    </component>
+    <component name="TypeScriptGeneratedFilesManager">
+        <option name="version" value="3" />
+    </component>
 </project>

@@ -104,39 +104,6 @@ public class DriverControler {
         return new ResponseEntity<>(response,HttpStatus.CREATED);
     }
 
-    /**
-     * PUT /api/drivers/{id}/availability
-     * Request Param:
-     *  - available (boolean)
-     * Response:
-     *  - 204 NO_CONTENT if changed
-     *  - 409 CONFLICT if change is deferred
-     */
-    @PreAuthorize("hasRole('DRIVER')")
-    @PutMapping("/{id}/availability")
-    public ResponseEntity<Void> changeAvailability(
-            @PathVariable Long id,
-            @RequestBody ChangeAvailabilityRequestDTO request
-    ) {
-        return ResponseEntity.noContent().build();
-    }
-
-
-    /**
-     * POST /api/drivers/{id}/logout-requests
-     * Response:
-     *  - 204 NO_CONTENT if logout is allowed
-     *  - 409 CONFLICT if logout conditions are not met
-     */
-    @PreAuthorize("hasRole('DRIVER')")
-    @PostMapping("/{id}/logout-requests")
-    public ResponseEntity<Void> requestLogout(
-            @PathVariable Long id
-    ) {
-        // Servers check if request is allowed, for now always send status 200
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-
     @Transactional
     @PreAuthorize("hasRole('DRIVER')")
     @PostMapping("/update-request")

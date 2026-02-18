@@ -20,6 +20,7 @@
             android:orientation="vertical"
             android:padding="16dp">
 
+
             <!-- Panic Indicator Banner -->
             <TextView
                 android:id="@+id/panic_indicator"
@@ -158,6 +159,16 @@
                 android:layout_gravity="center"
                 android:text="Hide Details"
                 style="@style/Widget.MaterialComponents.Button.TextButton"/>
+
+            <Button
+                android:id="@+id/btn_panic_handle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/resolve_panic"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="@android:color/holo_red_dark"
+                android:layout_marginBottom="8dp"
+                android:visibility="gone" />
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

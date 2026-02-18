@@ -45,6 +45,10 @@ export class RideService {
     );
   }
 
+  handlePanic(rideId: number) {
+    return this.http.put(`${this.apiUrl}/${rideId}/panic-handle`, {});
+  }
+
   triggerPanic(rideId: number) {
     return this.http.post<PanicResponse>(
       `${this.apiUrl}/${rideId}/panic`,

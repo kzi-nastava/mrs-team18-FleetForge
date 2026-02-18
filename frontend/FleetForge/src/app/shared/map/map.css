@@ -25,3 +25,32 @@
   align-items: center;
   justify-content: center;
 }
+
+@keyframes sos-pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7);
+  }
+  70% {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 15px rgba(255, 0, 0, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 0, 0, 0);
+  }
+}
+
+:host ::ng-deep .sos-marker-container {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  background-color: red !important;
+  border: 3px solid red !important;
+  border-radius: 50%;
+  color: white !important;
+  font-weight: bold;
+  font-size: 14px;
+  animation: sos-pulse 1.5s infinite;
+  z-index: 1000;
+}

@@ -7,6 +7,7 @@ import { RideTrackingDTO } from '../dtos/ride-tracking.dtos';
 import { environment } from '../../../environments/environment';
 import { RoutingService } from './service/routing.service';
 import { Observable } from 'rxjs';
+import { RideService } from '../services/ride.service';
 
 
 @Component({
@@ -25,10 +26,10 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   private locationMarkers: Map<string, L.Marker> = new Map();
   private currentLocationMarker: L.Marker | null = null;
   private trackingInterval: any;
-  
+
   @Output() mapClick = new EventEmitter<{address:string, lat:number, lng:number}>();
   @Output() routeCalculated = new EventEmitter<{distanceKm: number, estimatedMinutes: number}>();
-  @Output() routeCoordinatesAvailable = new EventEmitter<Array<{latitude: number, longitude: number}>>();  
+  @Output() routeCoordinatesAvailable = new EventEmitter<Array<{latitude: number, longitude: number}>>();
   @Output() routeSummary = new EventEmitter<{ distanceKm: number; durationMin: number; cost: number }>();
   @Input() set staticRoute(value: { pickup: [number, number]; dropoff: [number, number]; waypoints?: [number, number][] } | null) {
     this._staticRoute = value;
@@ -40,7 +41,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       this.displayVehicles();
     }
   }
-  
+
   @Input() set currentRide(value: RideTrackingDTO | null) {
     this._currentRide = value;
     if (this.map && value) {
@@ -48,7 +49,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     } else {
     }
   }
-  
+
   get vehicles(): VehicleLocationDTO[] {
     return this._vehicles;
   }
@@ -59,13 +60,14 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       this.routeControl = null;
     }
   }
-  
+
   public map!: L.Map;
   private vehicleMarkers: L.Marker[] = [];
 
   constructor(
     private nominatimService: NominatimService,
-    private routingService: RoutingService
+    private routingService: RoutingService,
+    private rideService: RideService
   ) {}
 
   private initMap(): void {
@@ -73,7 +75,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       center: [45.2396, 19.8227],
       zoom: 13,
     });
-    
+
     this.map.attributionControl.setPrefix(`Leaflet`);
 
     const tiles = L.tileLayer(
@@ -92,7 +94,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     });
 
     this.registerOnClick();
-  
+
     if (this._currentRide) {
       this.displayCurrentRide();
     }
@@ -104,8 +106,8 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
   private updateMarkerSizes(): void {
     const zoom = this.map.getZoom();
-    const iconSize = 30 + (zoom - 10) * 3; 
-    
+    const iconSize = 30 + (zoom - 10) * 3;
+
     this.vehicleMarkers.forEach(marker => {
       const icon = marker.getIcon() as L.DivIcon;
       icon.options.iconSize = [iconSize, iconSize];
@@ -118,15 +120,15 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     const DefaultIcon = L.icon({
       iconUrl: 'https://unpkg.com/leaflet@1.6.0/dist/images/marker-icon.png',
       shadowUrl: 'https://unpkg.com/leaflet@1.6.0/dist/images/marker-shadow.png',
-      iconSize: [25, 41],      
-      iconAnchor: [12, 41],    
-      popupAnchor: [1, -34],   
-      shadowSize: [41, 41]     
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+      shadowSize: [41, 41]
     });
 
     L.Marker.prototype.options.icon = DefaultIcon;
     this.initMap();
-    
+
     if (this.vehicles.length > 0) {
       this.displayVehicles();
     }
@@ -179,7 +181,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
     const route = this._currentRide.route;
     const vehicleType = this._currentRide.vehicleType as any;
-    
+
     const remainingWaypoints = route.waypoints
     .filter(wp => !wp.isCompleted)
     .sort((a, b) => a.order - b.order)
@@ -193,8 +195,8 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
     this.routeControl = L.Routing.control({
       waypoints: waypoints,
-      router: L.Routing.mapbox(environment.MAPBOX_API_KEY, { 
-        profile: 'mapbox/driving' 
+      router: L.Routing.mapbox(environment.MAPBOX_API_KEY, {
+        profile: 'mapbox/driving'
       }),
       routeWhileDragging: false,
       addWaypoints: false,
@@ -217,7 +219,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         latitude: coord.lat,
         longitude: coord.lng
       }));
-      
+
       this.routeCalculated.emit({ distanceKm, estimatedMinutes });
       this.routeCoordinatesAvailable.emit(coordinates);
 
@@ -227,20 +229,20 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
 
     this.addRouteMarkers(route.startLocation, route.startAddress, 'start');
-    
+
     route.waypoints.forEach((wp, index) => {
       this.addRouteMarkers(wp.location, wp.address, 'waypoint', index + 1);
     });
-    
+
     this.addRouteMarkers(route.endLocation, route.endAddress, 'end');
     this.updateCurrentLocationMarker(this._currentRide.currentLocation);
 
-    const bounds = L.latLngBounds(waypoints);    
+    const bounds = L.latLngBounds(waypoints);
   }
 
   private addRouteMarkers(location: {latitude: number, longitude: number}, address: string, type: 'start' | 'waypoint' | 'end', order?: number): void {
     let iconHtml = '';
-    
+
     if (type === 'start') {
       iconHtml = '<img src="/map-pointer.svg" style="width: 28px; height: 28px; filter: invert(65%) sepia(74%) saturate(1200%) hue-rotate(65deg);" />';
     } else if (type === 'end') {
@@ -259,7 +261,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     const marker = L.marker([location.latitude, location.longitude], { icon })
       .addTo(this.map)
       .bindPopup(address);
-    
+
     this.markers.push(marker);
   }
 
@@ -299,12 +301,12 @@ export class MapComponent implements AfterViewInit, OnDestroy {
           const lon = parseFloat(data[0].lon);
           const newMarker = L.marker([lat, lon]);
           this.locationMarkers.set(address, newMarker);
-        
+
           (newMarker as any).customAddress = address;
           newMarker.addTo(this.map);
           this.markers.push(newMarker);
           newMarker.bindPopup(address).openPopup();
-          
+
           observer.next();
           observer.complete();
         } else {
@@ -313,15 +315,15 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       });
     });
   }
-  
+
   removeMarker(address: string): void {
     this.markers = this.markers.filter(marker => {
       if ((marker as any).customAddress === address) {
-        this.map.removeLayer(marker); 
+        this.map.removeLayer(marker);
         this.locationMarkers.delete(address);
-        return false; 
+        return false;
       }
-      return true; 
+      return true;
     });
   }
 
@@ -398,7 +400,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     } else {
       iconHtml = '<img src="/waypoint-circle.svg" style="width: 28px; height: 28px;" />';
     }
-    
+
     const locationIcon = L.divIcon({
       html: iconHtml,
       className: 'location-marker-icon',
@@ -435,7 +437,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
     const waypointLatLngs = waypoints.map(wp => L.latLng(wp[0], wp[1]));
     const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--color-primary')?.trim() || '#FF9900';
-    
+
     this.routeControl = this.routingService.addRoute(
       this.map,
       L.latLng(pickup[0], pickup[1]),
@@ -501,33 +503,54 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   private createVehicleMarker(vehicle: VehicleLocationDTO): L.Marker {
     const { latitude, longitude } = vehicle.currentLocation;
     const isAvailable = vehicle.isAvailable;
-    
-    const iconUrl = isAvailable ? '/green-car-icon.svg' : '/red-car-icon.svg';
+    const isPanic = vehicle.panicActivated === true;
 
-    const html = `
-      <img src="${iconUrl}" alt="vehicle" style="width: 40px; height: 40px;">
-    `;
+    let html = '';
+    let iconSize: [number, number] = [40, 40];
+
+    if (isPanic) {
+      html = `<div class="sos-marker-container" style="width: 45px; height: 45px;">SOS</div>`;
+      iconSize = [45, 45];
+    } else {
+      const iconUrl = isAvailable ? '/green-car-icon.svg' : '/red-car-icon.svg';
+      html = `<img src="${iconUrl}" alt="vehicle" style="width: 40px; height: 40px;">`;
+    }
 
     const carIcon = L.divIcon({
       html: html,
-      className: 'car-marker-icon',
-      iconSize: [40, 40],
-      iconAnchor: [20, 20],
+      className: isPanic ? 'sos-icon-wrapper' : 'car-marker-icon',
+      iconSize: iconSize,
+      iconAnchor: [iconSize[0] / 2, iconSize[1] / 2],
       popupAnchor: [0, -20],
     });
 
-    const availabilityText = isAvailable ? 'Available' : 'Occupied';
-    const popupContent = `
-      <div style="font-family: var(--font-primary);">
-        <strong>${vehicle.model}</strong><br/>
-        Type: ${vehicle.vehicleType}<br/>
-        Status: <span style="font-weight: bold;">${availabilityText}</span>
-      </div>
-    `;
+    const marker = L.marker([latitude, longitude], {
+      icon: carIcon,
+      zIndexOffset: isPanic ? 1000 : 0
+    }).addTo(this.map);
 
-    const marker = L.marker([latitude, longitude], { icon: carIcon })
-      .addTo(this.map)
-      .bindPopup(popupContent);
+    if (isPanic && vehicle.rideId) {
+      marker.on('click', (e) => {
+        L.DomEvent.stopPropagation(e);
+
+        if(confirm(`Vehicle ${vehicle.model} is in PANIC. Do you want to resolve this event?`)) {
+          this.rideService.handlePanic(vehicle.rideId!).subscribe({
+            next: () => alert('Panic event handled successfully.'),
+            error: (err) => console.error('Failed to handle panic', err)
+          });
+        }
+      });
+    } else {
+      const availabilityText = isAvailable ? 'Available' : 'Occupied';
+      const popupContent = `
+        <div style="font-family: var(--font-primary);">
+          <strong>${vehicle.model}</strong><br/>
+          Type: ${vehicle.vehicleType}<br/>
+          Status: <b>${availabilityText}</b>
+        </div>
+      `;
+      marker.bindPopup(popupContent);
+    }
 
     return marker;
   }

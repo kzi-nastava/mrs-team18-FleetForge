@@ -38,6 +38,7 @@ import { UsersListComponent } from './admin/users-list/users-list.component';
 import { ReportsComponent } from './passenger/reports/reports.component';
 import { DriverReportsComponent } from './driver/driver-reports/driver-reports.component';
 import { AdminReportsComponent } from './admin/admin-reports/admin-reports.component';
+import { AdminHomeComponent } from './admin/admin-home/admin-home.component';
 
 export const routes: Routes = [
   /** ROUTES WITH NAVBAR */
@@ -123,6 +124,11 @@ export const routes: Routes = [
       {
         path: 'admin/admin-history',
         component: AdminHistoryComponent,
+        canActivate: [authGuard, roleGuard(['ADMIN'])]
+      },
+      {
+        path: 'admin/admin-home',
+        component: AdminHomeComponent,
         canActivate: [authGuard, roleGuard(['ADMIN'])]
       },
       {

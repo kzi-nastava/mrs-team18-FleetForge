@@ -68,6 +68,24 @@ public class AdminRepo {
         return data;
     }
 
+    public LiveData<Boolean> handlePanic(Long rideId) {
+        MutableLiveData<Boolean> successData = new MutableLiveData<>();
+
+        rideService.handlePanic(rideId).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                successData.setValue(response.isSuccessful());
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                successData.setValue(false);
+            }
+        });
+
+        return successData;
+    }
+
     public LiveData<ArrayList<AdminViewVehicleChangesResponseDTO>> getAllVehiclesChanges(){
         MutableLiveData<ArrayList<AdminViewVehicleChangesResponseDTO>> data= new MutableLiveData<>();
 

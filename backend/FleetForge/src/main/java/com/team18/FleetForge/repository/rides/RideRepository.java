@@ -221,4 +221,11 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
             "left join fetch  r.linkedPassengers where " +
             "r.endTime is not null and r.startTime >= :fromDate and r.endTime<= :toDate ")
     List<Ride> findRidesForGivenDateRange(@Param("fromDate") LocalDateTime fromDate, @Param("toDate") LocalDateTime toDate);
+
+    @Query("SELECT r FROM Ride r " +
+            "WHERE r.driver.id = :driverId " +
+            "AND r.status = com.team18.FleetForge.model.enums.RideStatus.IN_PROGRESS " +
+            "AND r.panicActivated = true " +
+            "AND r.isPanicHandled = false")
+    Optional<Ride> findActivePanicRideByDriver(@Param("driverId") Long driverId);
 }

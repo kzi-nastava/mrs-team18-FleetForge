@@ -2,6 +2,7 @@ package com.team18.FleetForge.service;
 
 import com.team18.FleetForge.dto.NotificationDTO;
 import com.team18.FleetForge.model.Notification;
+import com.team18.FleetForge.model.enums.Role;
 import com.team18.FleetForge.model.users.Passenger;
 import com.team18.FleetForge.model.ride.Ride;
 import com.team18.FleetForge.model.users.User;
@@ -101,5 +102,32 @@ public class NotificationService {
                 .createdAt(notification.getCreatedAt())
                 .rideId(notification.getRide() != null ? notification.getRide().getId() : null)
                 .build();
+    }
+
+    @Transactional
+    public void sendNotificationToAdmins(NotificationType type, String message, Ride ride) {
+        List<User> admins = userRepository.findAllAdmins();
+
+        for (User admin : admins) {
+            Notification notification = Notification.builder()
+                    .user(admin)
+                    .type(type)
+                    .message(message)
+                    .isRead(false)
+                    .createdAt(LocalDateTime.now())
+                    .ride(ride)
+                    .build();
+
+            notification = notificationRepository.save(notification);
+            NotificationDTO dto = buildNotificationDTO(notification);
+
+            messagingTemplate.convertAndSendToUser(
+                    admin.getEmail(),
+                    "/queue/notifications",
+                    dto
+            );
+        }
+
+        messagingTemplate.convertAndSend("/topic/admin/panic", "Panic alert for ride: " + ride.getId());
     }
 }
