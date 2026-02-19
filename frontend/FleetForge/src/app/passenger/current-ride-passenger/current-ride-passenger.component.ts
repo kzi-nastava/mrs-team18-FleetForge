@@ -119,10 +119,13 @@ export class CurrentRidePassengerComponent implements OnInit, OnDestroy {
       )
       .subscribe((data) => {
         if (!data) {
+          this.rideData = null;
+          this.cardInfo = null;
           this.rideService.setActiveRide(null);
+          this.cdr.detectChanges();
           return;
         }
-        this.rideData = data as RideTrackingDTO;
+        this.rideData = data;
         this.rideService.setActiveRide(this.rideData);
         this.setCardInfoFromRide();
 

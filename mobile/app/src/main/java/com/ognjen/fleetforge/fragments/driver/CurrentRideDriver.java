@@ -188,15 +188,17 @@ public class CurrentRideDriver extends Fragment {
             @Override
             public void onResponse(Call<RideTrackingDTO> call, Response<RideTrackingDTO> response) {
 
-                if (response.isSuccessful() && response.body() != null) {
-                    currentRide = response.body();
-                    Log.d(TAG, "Active ride found: " + currentRide.getRideId());
+                if (response.isSuccessful()) {
+                    if (response.body() != null) {
+                        currentRide = response.body();
+                        Log.d(TAG, "Active ride found: " + currentRide.getRideId());
 
-                    displayRideData();
-                    calculateAndDisplayRoute();
-
-                } else if (response.code() == 404) {
-                    showNoRideMessage();
+                        displayRideData();
+                        calculateAndDisplayRoute();
+                    } else {
+                        showNoRideMessage();
+                        Log.d(TAG, "No active ride found");
+                    }
                 } else {
                     showError("Failed to load ride data");
                 }

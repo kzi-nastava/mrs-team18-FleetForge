@@ -1,3 +1,33 @@
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 4rem 1.5rem;
+  margin: 2rem auto;
+  max-width: 560px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-background-white);
+}
+
+.empty-state svg {
+  color: var(--color-text-gray);
+  opacity: 0.6;
+  margin-bottom: 1rem;
+}
+
+.empty-state h2 {
+  color: var(--color-secondary);
+  margin: 0.75rem 0 0.5rem;
+}
+
+.empty-state p {
+  color: var(--color-text-gray);
+  margin: 0;
+}
+
 /* Passenger-specific modal styles */
 .modal-overlay {
   position: fixed;

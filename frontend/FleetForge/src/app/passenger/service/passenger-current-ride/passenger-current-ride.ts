@@ -14,9 +14,9 @@ export class PassengerCurrentRide {
   /**
    * Get active ride tracking for the currently logged-in passenger
    * GET /api/rides/active-tracking
-   * Returns 404 if no active ride exists
+   * Returns null if no active ride exists
    */
-  getActiveTracking(): Observable<RideTrackingDTO> {
-    return this.http.get<RideTrackingDTO>(`${this.apiUrl}/active-tracking`);
+  getActiveTracking(): Observable<RideTrackingDTO | null> {
+    return this.http.get<RideTrackingDTO | null>(`${this.apiUrl}/active-tracking`);
   }
 }
