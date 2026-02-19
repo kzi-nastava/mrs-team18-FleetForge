@@ -43,18 +43,20 @@ public class RideTrackingService {
 
     public RideTrackingDTO getActiveRideForUser(Long userId, Role role) {
 
-        LocalDateTime fiveMinutesAgo = LocalDateTime.now().minusMinutes(5);
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime fiveMinutesAgo = now.minusMinutes(5);
         List<Ride> activeRides;
         if (role.equals(Role.ROLE_DRIVER)) {
             activeRides = rideRepository.findActiveRidesByDriverId(userId);
         } else if (role.equals(Role.ROLE_PASSENGER)) {
-            activeRides = rideRepository.findActiveRidesByPassengerId(userId, fiveMinutesAgo);
+            activeRides = rideRepository.findActiveRidesByPassengerId(userId, fiveMinutesAgo, now);
         } else {
             throw new IllegalArgumentException("Invalid role: " + role);
         }
 
         if (activeRides.isEmpty()) {
-            throw new RuntimeException("No active ride found for user ID: " + userId);
+            log.info("No active ride found for user ID: {}", userId);
+            return null;
         }
 
         activeRides.sort((r1, r2) -> r1.getStartTime().compareTo(r2.getStartTime()));

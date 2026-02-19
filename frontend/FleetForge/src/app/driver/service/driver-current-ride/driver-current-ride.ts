@@ -21,8 +21,8 @@ export class DriverCurrentRide {
     );
   }
 
-  getActiveTracking(): Observable<RideTrackingDTO> {
-    return this.http.get<RideTrackingDTO>(`${this.apiUrl}/active-tracking`);
+  getActiveTracking(): Observable<RideTrackingDTO | null> {
+    return this.http.get<RideTrackingDTO | null>(`${this.apiUrl}/active-tracking`);
   }
 
   startRide(rideId: string): Observable<RideStartResponseDTO> {

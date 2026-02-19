@@ -35,9 +35,12 @@ public class ChatService {
                 });
     }
 
+    @Transactional(readOnly = true)
     public Chat getChatById(Long chatId) {
-        return chatRepository.findById(chatId)
+        Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(() -> new IllegalArgumentException("Chat not found with ID: " + chatId));
+        chat.getUser().getEmail();
+        return chat;
     }
 
     @Transactional(readOnly = true)

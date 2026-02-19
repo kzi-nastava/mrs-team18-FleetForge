@@ -52,12 +52,14 @@ public class CurrentRidePassengerViewModel extends ViewModel {
         call.enqueue(new Callback<RideTrackingDTO>() {
             @Override
             public void onResponse(Call<RideTrackingDTO> call, Response<RideTrackingDTO> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    rideTrackingData.postValue(response.body());
-                    Log.d(TAG, "Active ride tracking fetched: " + response.body().getRideId());
-                } else if (response.code() == 404) {
-                    noActiveRide.postValue(true);
-                    Log.d(TAG, "No active ride found");
+                if (response.isSuccessful()) {
+                    if (response.body() != null) {
+                        rideTrackingData.postValue(response.body());
+                        Log.d(TAG, "Active ride tracking fetched: " + response.body().getRideId());
+                    } else {
+                        noActiveRide.postValue(true);
+                        Log.d(TAG, "No active ride found");
+                    }
                 } else {
                     errorMessage.postValue("Failed to load ride data: " + response.code());
                     Log.e(TAG, "Error fetching ride: " + response.code());

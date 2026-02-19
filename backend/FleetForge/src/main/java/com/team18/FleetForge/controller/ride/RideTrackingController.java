@@ -26,8 +26,8 @@ public class RideTrackingController {
 
     /**
      * GET /api/rides/active-tracking
-     * Get active ride tracking for the currently logged-in passenger
-     * Returns 404 if no active ride exists
+     * Get active ride tracking for the currently logged-in passenger or driver
+     * Returns 200 with null body if no active ride exists
      */
     @GetMapping(
             value = "/active-tracking",
@@ -39,11 +39,7 @@ public class RideTrackingController {
 
         RideTrackingDTO tracking = rideTrackingService.getActiveRideForUser(user.getId(), user.getRole());
 
-        if (tracking == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        return new ResponseEntity<>(tracking, HttpStatus.OK);
+        return ResponseEntity.ok(tracking);
     }
 
     /**
