@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,7 +55,7 @@ public class CurrentRideDriver extends Fragment {
 
     private MapView mapView;
     private FrameLayout loadingOverlay;
-    private TextView noRideMessage;
+    private LinearLayout noRideMessage;
 
     private ImageView passengerProfileImage;
     private TextView passengerName;
@@ -201,19 +202,18 @@ public class CurrentRideDriver extends Fragment {
         Call<RideTrackingDTO> call = rideService.getActiveRideTracking();
         call.enqueue(new Callback<RideTrackingDTO>() {
             @Override
-            public void onResponse(Call<RideTrackingDTO> call, Response<RideTrackingDTO> response) {
+            public void onResponse(Call<RideTrackingDTO> call,
+                                   Response<RideTrackingDTO> response) {
 
-                if (response.isSuccessful()) {
-                    if (response.body() != null) {
-                        currentRide = response.body();
-                        Log.d(TAG, "Active ride found: " + currentRide.getRideId());
+                if (response.code() == 204) {
+                    showNoRideMessage();
+                    return;
+                }
 
-                        displayRideData();
-                        calculateAndDisplayRoute();
-                    } else {
-                        showNoRideMessage();
-                        Log.d(TAG, "No active ride found");
-                    }
+                if (response.isSuccessful() && response.body() != null) {
+                    currentRide = response.body();
+                    displayRideData();
+                    calculateAndDisplayRoute();
                 } else {
                     showError("Failed to load ride data");
                 }
@@ -225,6 +225,7 @@ public class CurrentRideDriver extends Fragment {
             }
         });
     }
+
 
     private void displayRideData() {
         if (currentRide == null) return;

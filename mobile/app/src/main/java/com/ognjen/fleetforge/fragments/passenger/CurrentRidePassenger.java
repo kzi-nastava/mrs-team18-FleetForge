@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,9 +58,8 @@ public class CurrentRidePassenger extends Fragment {
 
     private MapView mapView;
     private FrameLayout loadingOverlay;
-    private TextView noRideMessage;
+    private LinearLayout noRideMessage;
 
-    // TODO place real driver image
     private ImageView driverProfileImage;
     private TextView driverName;
     private TextView driverPhone;
@@ -68,8 +68,6 @@ public class CurrentRidePassenger extends Fragment {
     private TextView destinationAddress;
     private TextView distanceText;
     private TextView timeText;
-
-    // TODO  implement buttons logic
     private Button btnReportInconsistency;
     private Button btnSOS;
     private View rideActionButtons;
@@ -151,7 +149,6 @@ public class CurrentRidePassenger extends Fragment {
         rideActionButtons = view.findViewById(R.id.buttons_container);
         buttonsDivider = view.findViewById(R.id.buttons_divider);
 
-        // TODO implement button listeners
         btnReportInconsistency.setOnClickListener(v -> onReportInconsistencyClick());
         btnSOS.setOnClickListener(v -> onSOSClick());
     }
