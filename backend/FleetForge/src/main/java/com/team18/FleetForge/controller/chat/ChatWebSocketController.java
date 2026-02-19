@@ -59,18 +59,15 @@ public class ChatWebSocketController {
                 .readAt(savedMessage.getReadAt())
                 .build();
 
-        User recipient;
         if (sender.getRole() == Role.ROLE_ADMIN) {
-            recipient = chat.getUser();
+            User recipient = chat.getUser();
+            messagingTemplate.convertAndSendToUser(
+                    recipient.getEmail(),
+                    "/queue/messages",
+                    responseDTO
+            );
         } else {
             messagingTemplate.convertAndSend("/topic/admin/messages", responseDTO);
-            return;
         }
-
-        messagingTemplate.convertAndSendToUser(
-                recipient.getEmail(),
-                "/queue/messages",
-                responseDTO
-        );
     }
 }
