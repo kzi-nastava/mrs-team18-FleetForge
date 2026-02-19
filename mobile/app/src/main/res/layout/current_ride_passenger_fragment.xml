@@ -120,15 +120,37 @@
 
     </androidx.cardview.widget.CardView>
 
-    <!-- No Active Ride Message -->
-    <TextView
+    <!-- No Active Ride Overlay -->
+    <LinearLayout
         android:id="@+id/no_ride_message"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="No active ride"
-        android:textSize="18sp"
-        android:textColor="#666666"
-        android:visibility="gone" />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:background="#F5F5F5"
+        android:visibility="gone"
+        android:padding="32dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No Active Ride"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="#333333"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="You currently have no assigned rides.\nNew rides will appear here automatically."
+            android:textSize="16sp"
+            android:textColor="#666666"
+            android:gravity="center"
+            android:textAlignment="center"
+            android:layout_marginBottom="24dp"/>
+
+    </LinearLayout>
+
 
 </FrameLayout>

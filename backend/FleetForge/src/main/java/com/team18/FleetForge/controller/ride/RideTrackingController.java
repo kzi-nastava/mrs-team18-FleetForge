@@ -39,6 +39,10 @@ public class RideTrackingController {
 
         RideTrackingDTO tracking = rideTrackingService.getActiveRideForUser(user.getId(), user.getRole());
 
+        if (tracking == null) {
+            return ResponseEntity.noContent().build();
+        }
+
         return ResponseEntity.ok(tracking);
     }
 
